@@ -9,6 +9,10 @@ using std::vector;
 std::random_device rand_dev;
 std::mt19937 generator(rand_dev());
 
+// Pre-declare class types
+class Node;
+class Cluster;
+
 class Node {
 private: 
   vector<Node *> connections;
@@ -17,6 +21,7 @@ public:
   int            id;
   bool           is_type_a;
   int            degree;
+  Cluster *      cluster;
   Node(int);   
   void           set_edge(Node *);
   vector<int>    get_ids_of_connections();
@@ -46,7 +51,7 @@ vector<int> Node::get_ids_of_connections(){
 
 // Grab and return pointer to a random connection
 Node * Node::random_neighbor(){
-  std::uniform_int_distribution<int> distr(0, connections.size());
+  std::uniform_int_distribution<int> distr(0, connections.size()-1);
   return connections[distr(generator)];
 }
 
@@ -66,6 +71,15 @@ int make_and_return_node(int node_int){
   
   return node_b.random_neighbor()->id;
 }
+
+class Cluster: public Node {
+public:
+  vector<Node *> members;
+  void add_member(Node *);
+  void remove_member(Node *);
+  int num_edges_to_node(Node *);
+  int num_edges_to_cluster(Cluster *);
+};
 
 
 // You can include R code blocks in C++ files processed with sourceCpp
