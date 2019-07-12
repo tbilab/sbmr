@@ -1,32 +1,27 @@
+// [[Rcpp::plugins(cpp11)]]
 #include <Rcpp.h>
 #include <random>
 using namespace Rcpp;
 using std::string;
 using std::vector;
 
-// [[Rcpp::plugins(cpp11)]]
-
-// This is a simple example of exporting a C++ function to R. You can
-// source this function into an R session using the Rcpp::sourceCpp 
-// function (or via the Source button on the editor toolbar). Learn
-// more about Rcpp at:
-//
-//   http://www.rcpp.org/
-//   http://adv-r.had.co.nz/Rcpp.html
-//   http://gallery.rcpp.org/
-//
+// Setup random number generation
+std::random_device rand_dev;
+std::mt19937 generator(rand_dev());
 
 class Node {
 private: 
+  vector<Node *> connections;
 
 public:
-  Node(int);
-  int id;
-  bool is_type_a;
-  vector<Node *> connections;
-  void set_edge(Node *);
-  vector<int> get_ids_of_connections();
-  Node * random_neighbor();
+  int            id;
+  bool           is_type_a;
+  int            degree;
+  Node(int);   
+  void           set_edge(Node *);
+  vector<int>    get_ids_of_connections();
+  Node *         random_neighbor();
+  static void join_nodes(Node *, Node *);
 };
 
 Node::Node(int node_id){
@@ -36,6 +31,7 @@ Node::Node(int node_id){
 // Add an edge to the node's edges array
 void Node::set_edge(Node *ptr_to_neighbor){
   connections.push_back(ptr_to_neighbor);
+  degree++;
 }
 
 vector<int> Node::get_ids_of_connections(){
@@ -48,13 +44,16 @@ vector<int> Node::get_ids_of_connections(){
   return connected_ids;
 }
 
+// Grab and return pointer to a random connection
 Node * Node::random_neighbor(){
-  
-  std::random_device rand_dev;
-  std::mt19937 generator(rand_dev());
-  std::uniform_int_distribution<int>  distr(0, connections.size());
-  
+  std::uniform_int_distribution<int> distr(0, connections.size());
   return connections[distr(generator)];
+}
+
+// Join two nodes together with an edge
+void Node::join_nodes(Node * node_1_ptr, Node * node_2_ptr){
+  node_1_ptr->set_edge(node_2_ptr);
+  node_2_ptr->set_edge(node_1_ptr);
 }
 
 // [[Rcpp::export]]
@@ -63,10 +62,9 @@ int make_and_return_node(int node_int){
        node_b(5),
        node_c(2);
   
-  node_a.set_edge(&node_b);
-  node_a.set_edge(&node_c);
+  Node::join_nodes(&node_a, &node_b);
   
-  return node_a.random_neighbor()->id;
+  return node_b.random_neighbor()->id;
 }
 
 
