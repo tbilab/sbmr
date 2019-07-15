@@ -6,63 +6,85 @@
 using namespace Rcpp;
 using std::string;
 using std::vector;
+using std::map;
 
 // Setup random number generation
 std::random_device rand_dev;
 std::mt19937 generator(rand_dev());
 
 
-// Constructor that takes the nodes unique id integer
-Node::Node(int node_id){
+
+// =======================================================
+// Constructor that takes the nodes unique id integer and type
+// =======================================================
+Node::Node(int node_id, bool type_a){
   id = node_id;
+  is_type_a = type_a;
+  degree = 0;
 }
 
 
-// Add an edge to the node's edges array
-void Node::set_edge(Node *ptr_to_neighbor){
-  connections.push_back(ptr_to_neighbor);
-  // Increment the nodes degree because it has a new edge
-  degree++;
-}
 
-// Dump all the currently connected node ids to a vector and return
-vector<int> Node::get_ids_of_connections(){
-  vector<int> connected_ids(connections.size());
+// =======================================================
+// Add connection to edge map
+// =======================================================
+void Node::add_edge(Node* node_ptr) {
+  map<int, Edge>::iterator edge_it;
   
-  for(int i = 0; i < connections.size(); i++){
-    connected_ids[i] = connections[i]->id;
+  // Try and find the node in edges.
+  edge_it = edges.find(node_ptr->id);
+  
+  // Is there already a connection to this node?
+  bool already_connected = edge_it != edges.end();
+  
+  if(already_connected){
+    // If there is already a connection just iterate the count up
+    edge_it->second.count++;
+  } else {
+    // Otherwise add a whole new edge to edges map.
+    Edge new_edge;
+    new_edge.node = node_ptr;
+    new_edge.count = 1;
+    edges[node_ptr->id] = new_edge;
   }
   
-  return connected_ids;
-}
+  // Increment the degree of the node up
+  degree++;
+}          
 
-// Grab and return pointer to a random connection
-Node * Node::random_neighbor(){
-  std::uniform_int_distribution<int> distr(0, connections.size()-1);
-  return connections[distr(generator)];
-}
 
-// Join two nodes together with an edge
-void Node::join_nodes(Node * node_1_ptr, Node * node_2_ptr){
-  node_1_ptr->set_edge(node_2_ptr);
-  node_2_ptr->set_edge(node_1_ptr);
-}
+// =======================================================
+// Methods to implement
+// =======================================================
+void          remove_edge(Node*);       // Remove a connection from edge map
+int           num_edges_to_node(Node*); // How many total edges to another node?
+Node*         get_random_neighbor();    // Find a random neighbor node
+void          add_member(Node*);        // Add a node to the members map
+void          swap_clusters(Node*);     // Swap current cluster with a new one
+vector<Edge>  num_edges_to_clusters();  // Get how many edges to all represented neighbor clusters
+
 
 
 
 // [[Rcpp::export]]
-int make_node_and_print(){
-  Node my_node(4);
-  return my_node.id;
+List make_node_and_print(bool add_edge){
+  Node node_a(1, true),
+       node_b(2, false);
+  
+  if(add_edge){
+    node_a.add_edge(&node_b);
+  }
+  
+  return List::create(
+    _["id"] = node_a.id,
+    _["degree"] = node_a.degree
+  );
 }
 
 
 
-// You can include R code blocks in C++ files processed with sourceCpp
-// (useful for testing and development). The R code will be automatically 
-// run after the compilation.
-//
-
 /*** R
-make_node_and_print()
+make_node_and_print(FALSE)
+make_node_and_print(TRUE)
+
 */
