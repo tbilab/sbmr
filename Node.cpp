@@ -143,9 +143,42 @@ void Node::swap_clusters(Node* new_cluster_ptr){
 
 
 // =======================================================
-// Methods to implement
+// Get how many edges to all represented neighbor clusters
 // =======================================================
-vector<Edge>  num_edges_to_clusters();  // Get how many edges to all represented neighbor clusters
+vector<Edge> Node::num_edges_to_clusters(){
+  map<int, Edge>::iterator   edges_it;          // Iterator for going through all edges
+  map<Node*, int>            clust_counts_map;  // Keep track of cluster counts for seen clusters
+  map<Node*, int>::iterator  counts_map_it;     // Iterator for looping trhough cluster counts
+  Node*                      edge_cluster;      // Pointer to current edge's cluster
+  int                        i = 0;             // Keeps track of iteration progress
+  vector<Edge>               clust_counts_vec;  // Returned vector of cluster edges
+  
+  // Go through all edges and count cluster occurances
+  for(edges_it = edges.begin(); edges_it != edges.end(); ++edges_it){
+    // Grab current cluster pointer from iterator
+    edge_cluster = edges_it->second.node->cluster;
+    
+    // Increment the counts
+    clust_counts_map[edge_cluster]++;
+  }
+  
+  // Preallocate return vector size
+  clust_counts_vec.reserve(clust_counts_map.size());
+  
+  // Loop through map to construct vector to return
+  for(counts_map_it = clust_counts_map.begin(); counts_map_it != clust_counts_map.end(); ++counts_map_it){
+    
+    // First fill in the cluster node pointer value
+    clust_counts_vec[i].node = counts_map_it->first;
+    
+    // Then fill in the counts to that cluster
+    clust_counts_vec[i].count = counts_map_it->second;
+  }
+  
+  return clust_counts_vec;
+}
+
+
 
 // [[Rcpp::export]]
 List make_node_and_print(
