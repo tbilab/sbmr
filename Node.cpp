@@ -22,27 +22,6 @@ Node::Node(int node_id, bool type_a){
   degree = 0;
 }
 
-// =======================================================
-// Search edges to find connection to a supplied node
-// =======================================================
-Edge_Search Node::find_edge(Node* node_ptr){
-  map<int, Edge>::iterator edge_to_find;
-  Edge_Search              results;
-  
-  // Try and find the node in edges.
-  edge_to_find = edges.find(node_ptr->id);
-  
-  // Is there already a connection to this node?
-  results.exists = edge_to_find != edges.end();
-  
-  if(results.exists){
-    results.edge = edge_to_find->second;
-  }
-  
-  return results;
-}
-
-
 
 // =======================================================
 // Add connection to edge map
@@ -70,6 +49,7 @@ void Node::add_edge(Node* node_ptr) {
   // Increment the degree of the node up
   degree++;
 }          
+
 
 // =======================================================
 // Remove a connection from edge map
@@ -102,6 +82,7 @@ void Node::remove_edge(Node* node_ptr, bool remove_all){
   }
 }      
 
+
 // =======================================================
 // How many total edges to another node?
 // =======================================================
@@ -121,6 +102,7 @@ int Node::num_edges_to_node(Node* node_ptr){
   }
 } 
 
+
 // =======================================================
 // Find a random neighbor node
 // =======================================================
@@ -134,13 +116,23 @@ Node* Node::get_random_neighbor(){
   return edge_grabber->second.node;
 }    
 
+
+// =======================================================
+// Add a node to the members map
+// =======================================================
+void Node::add_member(Node* node_ptr){
+  members[node_ptr->id] = node_ptr;
+} 
+
+
+
+
+
 // =======================================================
 // Methods to implement
 // =======================================================
-void          add_member(Node*);        // Add a node to the members map
 void          swap_clusters(Node*);     // Swap current cluster with a new one
 vector<Edge>  num_edges_to_clusters();  // Get how many edges to all represented neighbor clusters
-
 
 // [[Rcpp::export]]
 List make_node_and_print(
@@ -149,15 +141,21 @@ List make_node_and_print(
 ){
   Node node_a(1, true),
        node_b(2, false),
-       node_c(3, true);
+       node_c(3, true),
+       clust_a(4, true);
   
   if(add_edge){
     node_a.add_edge(&node_b);
     node_a.add_edge(&node_b);
     node_a.add_edge(&node_c);
   }
+  // Add members to cluster node
+  clust_a.add_member(&node_a);
+  clust_a.add_member(&node_b);
+  
   
   if(remove_all_edges){
+    clust_a.add_member(&node_c);
     node_a.remove_edge(&node_b, true);
   } else{
     node_a.remove_edge(&node_b, false);
@@ -166,7 +164,9 @@ List make_node_and_print(
   return List::create(
     _["id"] = node_a.id,
     _["degree"] = node_a.degree,
-    _["edges_to_b"] = node_a.num_edges_to_node(&node_b)
+    _["edges_to_b"] = node_a.num_edges_to_node(&node_b),
+    _["random_neighbor_id"] = node_a.get_random_neighbor()->id,
+    _["clust_a_n_neighbors"] = clust_a.members.size()
   );
 }
 
