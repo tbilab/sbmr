@@ -1,24 +1,33 @@
 //=================================
 // include guard
+//=================================
 #ifndef __NODE_INCLUDED__
 #define __NODE_INCLUDED__
-
-class Node;
-  
-struct Edge
-{
-  Node* node;
-  int count;
-};
-
 using std::string;
 using std::vector;
 using std::map;
 
+
+//=================================
+// What this file declares
+//=================================
+class  Node;
+struct Edge;
+
+
+//=================================
+// Edge structure for holding pointer to connected 
+// node and how many edges between
+//=================================
+struct Edge {
+  Node* node;
+  int   count;
+};
+
+//=================================
+// Main node class declaration
+//=================================
 class Node {
-  private: 
-    std::vector<Node*> connections;
-  
   public:
     Node(int, bool);   
     // ==========================================
@@ -29,10 +38,11 @@ class Node {
     map<int, Node*>  members;     // What nodes are contained within this node?
     map<int, Edge>   edges;       // What nodes is this node connected to and how many times?
     int              degree;      // How many total connection are there to this node
+    
     // ==========================================
     // Methods
     void          add_edge(Node*);          // Add connection to edge map
-    void          remove_edge(Node*);       // Remove a connection from edge map
+    void          remove_edge(Node*, bool); // Remove a connection from edge map
     int           num_edges_to_node(Node*); // How many total edges to another node?
     Node*         get_random_neighbor();    // Find a random neighbor node
     void          add_member(Node*);        // Add a node to the members map
