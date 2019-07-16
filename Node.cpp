@@ -121,17 +121,30 @@ Node* Node::get_random_neighbor(){
 // Add a node to the members map
 // =======================================================
 void Node::add_member(Node* node_ptr){
+  // Add node to member map
   members[node_ptr->id] = node_ptr;
+  
+  // Set cluster membership for node 
+  node_ptr->cluster = this;
 } 
 
 
+// =======================================================
+// Swap current cluster with a new one
+// =======================================================
+void Node::swap_clusters(Node* new_cluster_ptr){
+  // Remove self from old clusters members
+  cluster->members.erase(id);
+  
+  // Add self to new cluster's members
+  new_cluster_ptr->add_member(this);
+}
 
 
 
 // =======================================================
 // Methods to implement
 // =======================================================
-void          swap_clusters(Node*);     // Swap current cluster with a new one
 vector<Edge>  num_edges_to_clusters();  // Get how many edges to all represented neighbor clusters
 
 // [[Rcpp::export]]
@@ -142,7 +155,8 @@ List make_node_and_print(
   Node node_a(1, true),
        node_b(2, false),
        node_c(3, true),
-       clust_a(4, true);
+       clust_a(4, true),
+       clust_b(5, true);
   
   if(add_edge){
     node_a.add_edge(&node_b);
@@ -155,7 +169,7 @@ List make_node_and_print(
   
   
   if(remove_all_edges){
-    clust_a.add_member(&node_c);
+    node_a.swap_clusters(&clust_b);
     node_a.remove_edge(&node_b, true);
   } else{
     node_a.remove_edge(&node_b, false);
@@ -166,7 +180,8 @@ List make_node_and_print(
     _["degree"] = node_a.degree,
     _["edges_to_b"] = node_a.num_edges_to_node(&node_b),
     _["random_neighbor_id"] = node_a.get_random_neighbor()->id,
-    _["clust_a_n_neighbors"] = clust_a.members.size()
+    _["node_a_cluster"] = node_a.cluster->id,
+    _["clust_a_n_members"] = clust_a.members.size()
   );
 }
 
