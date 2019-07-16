@@ -13,7 +13,7 @@ using std::map;
 //=================================
 class  Node;
 struct Edge;
-
+struct Edge_Search;
 
 //=================================
 // Edge structure for holding pointer to connected 
@@ -24,10 +24,18 @@ struct Edge {
   int   count;
 };
 
+struct Edge_Search {
+  Edge edge;
+  bool exists; 
+};
+
 //=================================
 // Main node class declaration
 //=================================
 class Node {
+  private:
+    Edge_Search      find_edge(Node*); 
+  
   public:
     Node(int, bool);   
     // ==========================================
