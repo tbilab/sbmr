@@ -44,13 +44,17 @@ class Node {
     
     // ==========================================
     // Methods
-    void          add_edge(Node*);          // Add connection to edge map
-    void          remove_edge(Node*, bool); // Remove a connection from edge map
-    int           num_edges_to_node(Node*); // How many total edges to another node?
-    Node*         get_random_neighbor();    // Find a random neighbor node
-    void          add_member(Node*);        // Add a node to the members map
-    void          swap_clusters(Node*);     // Swap current cluster with a new one
-    vector<Edge>  num_edges_to_clusters();  // Get how many edges to all represented neighbor clusters
+    void          remove_edge(Node*, bool);     // Remove a connection from edge map
+    int           num_edges_to_node(Node*);     // How many total edges to another node?
+    Node*         get_random_neighbor();        // Find a random neighbor node
+    void          add_member(Node*);            // Add a node to the members map
+    void          swap_clusters(Node*);         // Swap current cluster with a new one
+    vector<int>   neighbor_clusters();          // Ids of every neighbor's cluster
+    static void   connect_nodes(Node*, Node*);  // Static method to connect two nodes to each other with edge
+    
+  private:
+    void          add_edge(Node*);              // Add connection to edge map
+    
 };
 
 #endif

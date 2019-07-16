@@ -141,86 +141,77 @@ void Node::swap_clusters(Node* new_cluster_ptr){
 }
 
 
-
 // =======================================================
 // Get how many edges to all represented neighbor clusters
 // =======================================================
-vector<Edge> Node::num_edges_to_clusters(){
-  map<int, Edge>::iterator   edges_it;          // Iterator for going through all edges
-  map<Node*, int>            clust_counts_map;  // Keep track of cluster counts for seen clusters
-  map<Node*, int>::iterator  counts_map_it;     // Iterator for looping trhough cluster counts
-  Node*                      edge_cluster;      // Pointer to current edge's cluster
-  int                        i = 0;             // Keeps track of iteration progress
-  vector<Edge>               clust_counts_vec;  // Returned vector of cluster edges
+vector<int> Node::neighbor_clusters(){
+  map<int, Edge>::iterator  edges_it;             // Iterator for going through all edges
+  vector<int>               neighbor_clusters;    // Returned vector of neighbor cluster ids
   
-  // Go through all edges and count cluster occurances
-  for(edges_it = edges.begin(); edges_it != edges.end(); ++edges_it){
-    // Grab current cluster pointer from iterator
-    edge_cluster = edges_it->second.node->cluster;
-    
-    // Increment the counts
-    clust_counts_map[edge_cluster]++;
+  neighbor_clusters.reserve(edges.size());
+  for(edges_it = edges.begin(); edges_it != edges.end(); edges_it++){
+    neighbor_clusters.push_back(edges_it->second.node->cluster->id);
   }
-  
-  // Preallocate return vector size
-  clust_counts_vec.reserve(clust_counts_map.size());
-  
-  // Loop through map to construct vector to return
-  for(counts_map_it = clust_counts_map.begin(); counts_map_it != clust_counts_map.end(); ++counts_map_it){
-    
-    // First fill in the cluster node pointer value
-    clust_counts_vec[i].node = counts_map_it->first;
-    
-    // Then fill in the counts to that cluster
-    clust_counts_vec[i].count = counts_map_it->second;
-  }
-  
-  return clust_counts_vec;
+ 
+  return neighbor_clusters;
 }
 
+
+// =======================================================
+// Static method to connect two nodes to each other with edge
+// =======================================================
+void Node::connect_nodes(Node* node_a_ptr, Node* node_b_ptr){
+  // Add edge to node a
+  node_a_ptr->add_edge(node_b_ptr);
+  node_b_ptr->add_edge(node_a_ptr);
+}
 
 
 // [[Rcpp::export]]
 List make_node_and_print(
-    bool add_edge, 
-    bool remove_all_edges
+    bool swap_clusters
 ){
   Node node_a(1, true),
        node_b(2, false),
        node_c(3, true),
-       clust_a(4, true),
-       clust_b(5, true);
+       node_d(4, true),
+       clust_a(10, true),
+       clust_b(11, true);
+
+  Node::connect_nodes(&node_a, &node_b);
+  Node::connect_nodes(&node_a, &node_c);
+  Node::connect_nodes(&node_a, &node_d);
+  Node::connect_nodes(&node_b, &node_c);
   
-  if(add_edge){
-    node_a.add_edge(&node_b);
-    node_a.add_edge(&node_b);
-    node_a.add_edge(&node_c);
-  }
   // Add members to cluster node
   clust_a.add_member(&node_a);
   clust_a.add_member(&node_b);
+  clust_b.add_member(&node_c);
+  clust_b.add_member(&node_d);
   
-  
-  if(remove_all_edges){
+  if(swap_clusters){
     node_a.swap_clusters(&clust_b);
-    node_a.remove_edge(&node_b, true);
-  } else{
-    node_a.remove_edge(&node_b, false);
   }
   
+  
   return List::create(
-    _["id"] = node_a.id,
-    _["degree"] = node_a.degree,
-    _["edges_to_b"] = node_a.num_edges_to_node(&node_b),
+    _["id"]                 = node_a.id,
+    _["cluster"]            = node_a.cluster->id,
+    _["degree"]             = node_a.degree,
+    _["num_edges"]          = node_a.edges.size(),
+    _["edges_to_b"]         = node_a.num_edges_to_node(&node_b),
     _["random_neighbor_id"] = node_a.get_random_neighbor()->id,
-    _["node_a_cluster"] = node_a.cluster->id,
-    _["clust_a_n_members"] = clust_a.members.size()
+    _["clust_a_n_members"]  = clust_a.members.size(),
+    _["clust_b_n_members"]  = clust_b.members.size(),
+    _["node_b_cluster"]     = node_c.cluster->id,
+    _["neighbor_clusters"]  = node_a.neighbor_clusters()
   );
+  
 }
 
 
 
 /*** R
-make_node_and_print(TRUE, FALSE)
-make_node_and_print(TRUE, TRUE)
+make_node_and_print(TRUE)
+make_node_and_print(FALSE)
 */
