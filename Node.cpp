@@ -16,7 +16,7 @@ std::mt19937 generator(rand_dev());
 // =======================================================
 // Constructor that takes the nodes unique id integer and type
 // =======================================================
-Node::Node(int node_id, bool type_a){
+Node::Node(string node_id, bool type_a){
   id = node_id;
   is_type_a = type_a;
   degree = 0;
@@ -27,7 +27,7 @@ Node::Node(int node_id, bool type_a){
 // Add connection to edge map
 // =======================================================
 void Node::add_edge(Node* node_ptr) {
-  map<int, Edge>::iterator edge_to_add;
+  map<string, Edge>::iterator edge_to_add;
   
   // Try and find the node in edges.
   edge_to_add = edges.find(node_ptr->id);
@@ -57,7 +57,7 @@ void Node::add_edge(Node* node_ptr) {
 void Node::remove_edge(Node* node_ptr, bool remove_all){
   int num_edges;
   bool single_edge;
-  map<int, Edge>::iterator edge_to_delete;
+  map<string, Edge>::iterator edge_to_delete;
   
   // Try and find the node in edges.
   edge_to_delete = edges.find(node_ptr->id);
@@ -87,7 +87,7 @@ void Node::remove_edge(Node* node_ptr, bool remove_all){
 // How many total edges to another node?
 // =======================================================
 int Node::num_edges_to_node(Node* node_ptr){
-  map<int, Edge>::iterator edge_to_find;
+  map<string, Edge>::iterator edge_to_find;
 
   // Try and find the node in edges.
   edge_to_find = edges.find(node_ptr->id);
@@ -110,7 +110,7 @@ Node* Node::get_random_neighbor(){
   std::uniform_int_distribution<int> distr(0, edges.size()-1); 
   int random_map_index = distr(generator);
   
-  map<int, Edge>::iterator edge_grabber = edges.begin();
+  map<string, Edge>::iterator edge_grabber = edges.begin();
   std::advance(edge_grabber, random_map_index);
   
   return edge_grabber->second.node;
@@ -144,9 +144,9 @@ void Node::swap_clusters(Node* new_cluster_ptr){
 // =======================================================
 // Get how many edges to all represented neighbor clusters
 // =======================================================
-vector<int> Node::neighbor_clusters(){
-  map<int, Edge>::iterator  edges_it;             // Iterator for going through all edges
-  vector<int>               neighbor_clusters;    // Returned vector of neighbor cluster ids
+vector<string> Node::neighbor_clusters(){
+  map<string, Edge>::iterator  edges_it;             // Iterator for going through all edges
+  vector<string>               neighbor_clusters;    // Returned vector of neighbor cluster ids
   
   neighbor_clusters.reserve(edges.size());
   for(edges_it = edges.begin(); edges_it != edges.end(); edges_it++){
@@ -171,12 +171,12 @@ void Node::connect_nodes(Node* node_a_ptr, Node* node_b_ptr){
 List make_node_and_print(
     bool swap_clusters
 ){
-  Node node_a(1, true),
-       node_b(2, false),
-       node_c(3, true),
-       node_d(4, true),
-       clust_a(10, true),
-       clust_b(11, true);
+  Node node_a("n1", true),
+       node_b("n2", false),
+       node_c("n3", true),
+       node_d("n4", true),
+       clust_a("c1", true),
+       clust_b("c2", true);
 
   Node::connect_nodes(&node_a, &node_b);
   Node::connect_nodes(&node_a, &node_c);
