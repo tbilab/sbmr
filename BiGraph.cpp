@@ -39,20 +39,22 @@ void BiGraph::add_node(string name, bool type_a){
 // Remove node from graph
 //=================================
 void BiGraph::remove_node(string name, bool type_a){
+  NodeMap*            map_for_type_ptr;    // Pointer to the correct map for type
+  NodeMap::iterator   node_to_delete;      // Iterator to loop through node map
+  bool                node_exists;         // Does the node exist in our graph?
+  EdgeMap             node_edges;          // Edges for deleted node
+  EdgeMap::iterator   node_edges_it;       // Iterator for those edges
+  Node *              node_to_delete_ptr;  // Reference to node to be deleted
+  Node *              neighbor_node_ptr;   // Reference for neighbor of node
   
-  // Pointer to the correct map for type
-  NodeMap*            map_for_type_ptr = type_a ? &a_nodes : &b_nodes;
-  NodeMap::iterator   node_to_delete;                                 // Itterator to loop through node map
-  EdgeMap             node_edges; 
-  EdgeMap::iterator   node_edges_it;
-  Node *              node_to_delete_ptr;
-  Node *              neighbor_node_ptr; 
-  
+  // Grab correct node map
+  map_for_type_ptr = type_a ? &a_nodes : &b_nodes;
+    
   // Try and find the node.
   node_to_delete = map_for_type_ptr->find(name);
   
   // Does this node exist in our graph?
-  bool node_exists = node_to_delete != map_for_type_ptr->end();
+  node_exists = node_to_delete != map_for_type_ptr->end();
   
   // If node exists, remove it.
   if(node_exists){
@@ -86,6 +88,7 @@ Node* BiGraph::get_node_by_id(string name, bool type_a){
   NodeMap*            map_for_type_ptr;   // Pointer to the correct map for type
   NodeMap::iterator   node_to_find;       // Iterator for finding node
   Node *              node_to_return_ptr; // Pointer for node requested
+  
   // Grab correct node map
   map_for_type_ptr = type_a ? &a_nodes : &b_nodes;
   
@@ -128,8 +131,6 @@ void BiGraph::add_edge(string a_name, string b_name){
 //=================================
 // Methods to declare
 //=================================
-
-
 // Node*                                 BiGraph::draw_random_node(string, bool);
 // void                                  BiGraph::cleanup_empty_clusters();       // Removes nodes with no members
 // vector< tuple<string, string> >       BiGraph::take_cluster_snapshot();
