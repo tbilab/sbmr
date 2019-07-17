@@ -129,7 +129,7 @@ void BiGraph::add_edge(string a_name, string b_name){
 
 
 //=================================
-// Methods to declare
+// Methods still needed to be filled out
 //=================================
 // Node*                                 BiGraph::draw_random_node(string, bool);
 // void                                  BiGraph::cleanup_empty_clusters();       // Removes nodes with no members
@@ -142,9 +142,8 @@ void BiGraph::add_edge(string a_name, string b_name){
 List load_data(vector<string> edges_a, vector<string> edges_b){
   BiGraph my_bigraph;
   int n_edges = edges_a.size();
-  int i;
-  
-  for(i = 0; i < n_edges; i++){
+
+  for(int i = 0; i < n_edges; i++){
     my_bigraph.add_edge(edges_a[i], edges_b[i]);
   }
 
