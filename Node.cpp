@@ -12,22 +12,29 @@ using std::map;
 std::random_device rand_dev;
 std::mt19937 generator(rand_dev());
 
+// Define an edge map for ease of reading
+typedef map<string, Edge> EdgeMap;
+
 
 // =======================================================
 // Constructor that takes the nodes unique id integer and type
 // =======================================================
-Node::Node(string node_id, bool type_a){
-  id = node_id;
-  is_type_a = type_a;
-  degree = 0;
-}
+// Node::Node():
+//   id('Init'),
+//   is_type_a(true),
+//   degree(0){}
+
+Node::Node(string node_id, bool type_a):
+  id(node_id),
+  is_type_a(type_a),
+  degree(0){}
 
 
 // =======================================================
 // Add connection to edge map
 // =======================================================
 void Node::add_edge(Node* node_ptr) {
-  map<string, Edge>::iterator edge_to_add;
+  EdgeMap::iterator edge_to_add;
   
   // Try and find the node in edges.
   edge_to_add = edges.find(node_ptr->id);
@@ -57,7 +64,7 @@ void Node::add_edge(Node* node_ptr) {
 void Node::remove_edge(Node* node_ptr, bool remove_all){
   int num_edges;
   bool single_edge;
-  map<string, Edge>::iterator edge_to_delete;
+  EdgeMap::iterator edge_to_delete;
   
   // Try and find the node in edges.
   edge_to_delete = edges.find(node_ptr->id);
@@ -87,7 +94,7 @@ void Node::remove_edge(Node* node_ptr, bool remove_all){
 // How many total edges to another node?
 // =======================================================
 int Node::num_edges_to_node(Node* node_ptr){
-  map<string, Edge>::iterator edge_to_find;
+  EdgeMap::iterator edge_to_find;
 
   // Try and find the node in edges.
   edge_to_find = edges.find(node_ptr->id);
@@ -110,7 +117,7 @@ Node* Node::get_random_neighbor(){
   std::uniform_int_distribution<int> distr(0, edges.size()-1); 
   int random_map_index = distr(generator);
   
-  map<string, Edge>::iterator edge_grabber = edges.begin();
+  EdgeMap::iterator edge_grabber = edges.begin();
   std::advance(edge_grabber, random_map_index);
   
   return edge_grabber->second.node;
@@ -145,7 +152,7 @@ void Node::swap_clusters(Node* new_cluster_ptr){
 // Get how many edges to all represented neighbor clusters
 // =======================================================
 vector<string> Node::neighbor_clusters(){
-  map<string, Edge>::iterator  edges_it;             // Iterator for going through all edges
+  EdgeMap::iterator  edges_it;             // Iterator for going through all edges
   vector<string>               neighbor_clusters;    // Returned vector of neighbor cluster ids
   
   neighbor_clusters.reserve(edges.size());

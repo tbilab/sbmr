@@ -14,8 +14,6 @@ using std::map;
 //=================================
 class  Node;
 struct Edge;
-struct Edge_Search;
-
 
 //=================================
 // Edge structure for holding pointer to connected 
@@ -32,6 +30,7 @@ struct Edge {
 //=================================
 class Node {
   public:
+    // Node();
     Node(string, bool);   
     // ==========================================
     // Attributes
@@ -53,7 +52,7 @@ class Node {
     static void     connect_nodes(Node*, Node*);  // Static method to connect two nodes to each other with edge
     
   private:
-    void          add_edge(Node*);              // Add connection to edge map
+    void            add_edge(Node*);              // Add connection to edge map
     
 };
 
