@@ -139,22 +139,18 @@ void BiGraph::add_edge(string a_name, string b_name){
 
 
 // [[Rcpp::export]]
-List load_data(vector<string> edges_a, vector<string> edges_b, bool delete_a_node){
+List load_data(vector<string> edges_a, vector<string> edges_b){
   BiGraph my_bigraph;
+  int n_edges = edges_a.size();
+  int i;
   
-  my_bigraph.add_edge("a_1", "b_1");
-  my_bigraph.add_edge("a_1", "b_2");
-  my_bigraph.add_edge("a_2", "b_1");
-  my_bigraph.add_edge("a_2", "b_3");
-
-  if(delete_a_node){
-    my_bigraph.remove_node("b_1", false);
+  for(i = 0; i < n_edges; i++){
+    my_bigraph.add_edge(edges_a[i], edges_b[i]);
   }
-  
+
   return List::create(
     _["n_a_nodes"] = my_bigraph.a_nodes.size(),
-    _["n_b_nodes"] = my_bigraph.b_nodes.size(),
-    _["a_1_n_edges"] = my_bigraph.get_node_by_id("a_1", true)->edges.size()
+    _["n_b_nodes"] = my_bigraph.b_nodes.size()
   );
 }
 
@@ -162,6 +158,5 @@ List load_data(vector<string> edges_a, vector<string> edges_b, bool delete_a_nod
 
 /*** R
 data <- readr::read_csv('southern_women.csv', col_types = readr::cols(event = 'c', individual = 'c')) 
-load_data(data$event, data$individual, FALSE)
-load_data(data$event, data$individual, TRUE)
+load_data(data$event, data$individual)
 */
