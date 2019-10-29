@@ -29,6 +29,7 @@ class Node {
     bool                is_cluster;  // Is Node a cluster node
     vector<Node*>       members;     // Nodes that are contained within node (if node is cluster)
     string              type;        // What type of node is this?
+    map<Node*, int>     counts_to_clusters; // Pointer keyed map to number of connections to clusters
     
     // ==========================================
     // Methods   
@@ -41,7 +42,8 @@ class Node {
     //Node*           get_random_neighbor();        // Find a random neighbor node
     //void            swap_clusters(Node*);         // Swap current cluster with a new one
     //vector<string>  neighbor_clusters();          // Ids of every neighbor's cluster
-    
+  private:
+   map<Node*, int> build_counts_to_clusters();     // Get map of counts to connected clusters
 };
 
 #endif

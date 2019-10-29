@@ -33,6 +33,53 @@ void Node::set_cluster(Node* cluster_node_ptr) {
   cluster = cluster_node_ptr;
 }
 
+// =======================================================
+// Build a map of cluster -> # connections for current node
+// =======================================================
+
+map<Node*, int> Node::build_counts_to_clusters() {
+  
+  vector<Node*> nodes_to_scan;
+  vector<Node*>::iterator connection_it;
+  map<Node*, int> cluster_connections; 
+  Node* connected_cluster;
+  
+  // If Node is a cluster, gather nodes to scan from its members
+  if(is_cluster) {
+    vector<Node*>::iterator member_it; // Iterator for member nodes
+    vector<Node*> member_connections; // Pointer to member's connections vector
+    
+    // First loop over each member of this cluster
+    for(member_it = members.begin(); member_it != members.end(); ++member_it){
+      // Grab pointer to member connections vector. First we de-reference the
+      // pointer to each member, which is itself a pointer to a node. We then
+      // enter the node itself to get its connections with ->
+      member_connections = (*member_it)->connections; 
+      
+      // Loop over the member connections vector
+      for(connection_it = member_connections.begin(); connection_it != member_connections.end(); ++connection_it) {
+        // Convert the current connected node to a real pointer from iterator
+        // and send to the nodes-to-scan vector
+        nodes_to_scan.push_back(*connection_it);
+      }
+    } // end member loop
+  } else {
+    // If the current node is just a normal node we don't need to run into its
+    // members before looping over connections
+    for(connection_it = connections.begin(); connection_it != connections.end(); ++connection_it) {
+      nodes_to_scan.push_back(*connection_it);
+    }
+  } // end else statement
+  
+  // Finally, loop over all the connections and record the cluster membership
+  for(connection_it = nodes_to_scan.begin(); connection_it != nodes_to_scan.end(); ++connection_it) {
+    connected_cluster = (*connection_it)->cluster;
+    cluster_connections[connected_cluster] += 1;
+  }
+  
+  return cluster_connections;
+}
+
 
 // =======================================================
 // Static method to connect two nodes to each other with edge
@@ -58,7 +105,6 @@ List make_node_and_print( ) {
     _["id"]                 = node1.id,
     _["num_edges"]          = node1.connections.size()
   );
-  
 }
 
 
