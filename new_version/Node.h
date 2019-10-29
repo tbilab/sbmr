@@ -36,14 +36,9 @@ class Node {
     void            set_cluster(Node*);           // Set current node cluster
     void            add_connection(Node*);        // Add connection to another node
     void            add_member(Node*);            // Add a node to the members map
+    void            build_counts_to_clusters();   // Get map of counts to connected clusters
+    string          print_counts_to_clusters();   // Print cluster counts for debugging
     static void     connect_nodes(Node*, Node*);  // Static method to connect two nodes to each other with edge
-    //int             num_edges_to_node(Node*);     // Get total edges to another node
-    //void            remove_edge(Node*, bool);     // Remove a connection from edge map
-    //Node*           get_random_neighbor();        // Find a random neighbor node
-    //void            swap_clusters(Node*);         // Swap current cluster with a new one
-    //vector<string>  neighbor_clusters();          // Ids of every neighbor's cluster
-  private:
-   map<Node*, int> build_counts_to_clusters();     // Get map of counts to connected clusters
 };
 
 #endif

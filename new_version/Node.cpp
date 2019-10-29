@@ -36,12 +36,12 @@ void Node::set_cluster(Node* cluster_node_ptr) {
 // =======================================================
 // Build a map of cluster -> # connections for current node
 // =======================================================
-
-map<Node*, int> Node::build_counts_to_clusters() {
+void Node::build_counts_to_clusters() {
   
+  // Start by flushing counts to clusters map incase it was previously set
+  counts_to_clusters.clear();
   vector<Node*> nodes_to_scan;
   vector<Node*>::iterator connection_it;
-  map<Node*, int> cluster_connections; 
   Node* connected_cluster;
   
   // If Node is a cluster, gather nodes to scan from its members
@@ -74,12 +74,29 @@ map<Node*, int> Node::build_counts_to_clusters() {
   // Finally, loop over all the connections and record the cluster membership
   for(connection_it = nodes_to_scan.begin(); connection_it != nodes_to_scan.end(); ++connection_it) {
     connected_cluster = (*connection_it)->cluster;
-    cluster_connections[connected_cluster] += 1;
+    counts_to_clusters[connected_cluster] += 1;
   }
   
-  return cluster_connections;
 }
 
+
+// =======================================================
+// Print cluster connections, for debugging
+// =======================================================
+string Node::print_counts_to_clusters(){
+  string all_connections;
+  map<Node*, int>::iterator connection_it;
+  string cluster_id;
+  int connection_count;
+  
+  for(connection_it = counts_to_clusters.begin(); connection_it != counts_to_clusters.end(); ++connection_it) {
+    cluster_id = (connection_it->first)->id;
+    connection_count = connection_it->second;
+    all_connections.append(cluster_id + ":" + std::to_string(connection_count) + ",");
+  }
+  
+  return all_connections;
+}   
 
 // =======================================================
 // Static method to connect two nodes to each other with edge
@@ -94,16 +111,28 @@ void Node::connect_nodes(Node* node1_ptr, Node* node2_ptr) {
 
 // [[Rcpp::export]]
 List make_node_and_print( ) {
-  Node node1("n1", false),
-       node2("n2", false),
-       node3("n3", false);
-
-  Node::connect_nodes(&node1, &node2);
-  Node::connect_nodes(&node1, &node3);
+  Node n1("n1", false),
+       n2("n2", false),
+       n3("n3", false),
+       c1("c1", true),
+       c2("c2", true);
+  
+  n1.set_cluster(&c1);
+  n2.set_cluster(&c1);
+  n3.set_cluster(&c2);
+  
+  Node::connect_nodes(&n1, &n2);
+  Node::connect_nodes(&n1, &n3);
+  
+  n1.build_counts_to_clusters();
   
   return List::create(
-    _["id"]                 = node1.id,
-    _["num_edges"]          = node1.connections.size()
+    _["id"]                  = n1.id,
+    _["n1_cluster"]          = n1.cluster->id,
+    _["n2_cluster"]          = n2.cluster->id,
+    _["num_edges"]           = n1.connections.size(),
+    _["n_connected_clusters"]= n1.counts_to_clusters.size(),
+    _["cluster_connections"] = n1.print_counts_to_clusters()
   );
 }
 
