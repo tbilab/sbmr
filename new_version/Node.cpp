@@ -1,6 +1,7 @@
 // [[Rcpp::plugins(cpp11)]]
 #include <Rcpp.h>
 #include <random>
+#include <queue> 
 #include "Node.h" 
 
 using namespace Rcpp;
@@ -12,8 +13,9 @@ using std::map;
 // =======================================================
 // Constructor that takes the nodes unique id integer and type
 // =======================================================
-Node::Node(string node_id, bool node_is_cluster):
+Node::Node(string node_id, bool node_is_cluster, int level):
   id(node_id),
+  level(level),
   is_cluster(node_is_cluster){}
 
 
@@ -25,12 +27,42 @@ void Node::add_connection(Node* node_ptr) {
   connections.push_back(node_ptr);
 }          
 
-
 // =======================================================
 // Swap current cluster with a new one
 // =======================================================
 void Node::set_cluster(Node* cluster_node_ptr) {
   cluster = cluster_node_ptr;
+}
+
+
+vector<Node*> Node::get_all_connections(int desired_level) {
+  
+  vector<Node*> connected_nodes;
+  std::queue<Node*> members_to_process;
+  std::queue<Node*> connections_to_process; 
+  
+  vector<Node*>::iterator member_iterator;
+  
+  int i = 0;
+  
+  // Start by placing all members of this node into the process queue.
+  for(member_iterator = members.begin(); member_iterator != members.end(); ++ member_iterator){
+    members_to_process.push(*member_iterator);
+  }
+  
+  // Work through the process queue, adding more nodes when nodes have members
+  // If the node looked at is at level 0, aka data, add it to the connections to
+  // process queue
+  
+  
+  // Start processing through the connections from all level-0 children, 
+  // Continuing to add to the queue until we have reached the desired connection
+  // level, then add nodes to the connected_nodes return vector
+  
+  // Return the vector of these connected nodes at the desired level. 
+  
+  
+  return connected_nodes;
 }
 
 // =======================================================
@@ -111,11 +143,11 @@ void Node::connect_nodes(Node* node1_ptr, Node* node2_ptr) {
 
 // [[Rcpp::export]]
 List make_node_and_print( ) {
-  Node n1("n1", false),
-       n2("n2", false),
-       n3("n3", false),
-       c1("c1", true),
-       c2("c2", true);
+  Node n1("n1", false, 1),
+       n2("n2", false, 1),
+       n3("n3", false, 1),
+       c1("c1", true, 2),
+       c2("c2", true, 2);
   
   n1.set_cluster(&c1);
   n2.set_cluster(&c1);
@@ -128,10 +160,8 @@ List make_node_and_print( ) {
   
   return List::create(
     _["id"]                  = n1.id,
-    _["n1_cluster"]          = n1.cluster->id,
-    _["n2_cluster"]          = n2.cluster->id,
+    _["cluster"]             = n1.cluster->id,
     _["num_edges"]           = n1.connections.size(),
-    _["n_connected_clusters"]= n1.counts_to_clusters.size(),
     _["cluster_connections"] = n1.print_counts_to_clusters()
   );
 }
