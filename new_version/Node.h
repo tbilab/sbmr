@@ -21,7 +21,8 @@ using std::map;
 class Node {
   public:
     // Node();
-    Node(string, int);  // Constructor function takes ID and if node is cluster
+    Node(string, int);       // Constructor function takes ID, node hiearchy level, and assumes default 0 for type
+    Node(string, int, int);  // Constructor function takes ID, node hiearchy level, and specification of type as integer
     // ==========================================
     // Attributes
     string               id;          // Unique integer id for node
@@ -30,7 +31,7 @@ class Node {
     Node*                parent;      // What node contains this node (aka its cluster)
     bool                 has_parent;  // Does this node have a parent or is it the currently highest level?
     unordered_set<Node*> children;    // Nodes that are contained within node (if node is cluster)
-    string               type;        // What type of node is this?
+    int                  type;        // What type of node is this?
 
     // ==========================================
     // Methods   

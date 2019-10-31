@@ -12,13 +12,22 @@ using std::unordered_set;
 
 
 // =======================================================
-// Constructor that takes the nodes unique id integer and type
+// Constructor that takes the nodes id and level. Assumes default 0 type. 
 // =======================================================
 Node::Node(string node_id, int level):
   id(node_id),
   level(level),
+  type(0),
   has_parent(false){}
 
+// =======================================================
+// Constructor that takes the node's id, level, and type. 
+// =======================================================
+Node::Node(string node_id, int level, int type):
+  id(node_id),
+  level(level),
+  type(type),
+  has_parent(false){}
 
 // =======================================================
 // Add connection to another node
@@ -177,26 +186,13 @@ string print_node_ids(container nodes) {
     node_ids.append((*node_it)->id + ", ");
   }
   
+  // Remove last comma for cleanliness
+  node_ids.erase(node_ids.end() - 2, node_ids.end());
+  
   return node_ids;
 }
 
-// =======================================================
-// Print cluster connections, for debugging
-// =======================================================
-//string Node::print_counts_to_clusters(){
-//  string all_connections;
-//  map<Node*, int>::iterator connection_it;
-//  string cluster_id;
-//  int connection_count;
-//  
-//  for(connection_it = counts_to_clusters.begin(); connection_it != counts_to_clusters.end(); ++connection_it) {
-//    cluster_id = (connection_it->first)->id;
-//    connection_count = connection_it->second;
-//    all_connections.append(cluster_id + ":" + std::to_string(connection_count) + ",");
-//  }
-//  
-//  return all_connections;
-//}   
+
 
 // =======================================================
 // Static method to connect two nodes to each other with edge
@@ -211,16 +207,16 @@ void Node::connect_nodes(Node* node1_ptr, Node* node2_ptr) {
 
 // [[Rcpp::export]]
 List make_node_and_print( ) {
-  Node n1("n1", 0),
-       n2("n2", 0),
-       n3("n3", 0),
-       m1("m1", 0),
-       m2("m2", 0),
-       m3("m3", 0),
-       c1("c1", 1),
-       c2("c2", 1),
-       d1("d1", 1),
-       d2("d2", 1);
+  Node n1("n1", 0, 1),
+       n2("n2", 0, 1),
+       n3("n3", 0, 1),
+       m1("m1", 0, 2),
+       m2("m2", 0, 2),
+       m3("m3", 0, 2),
+       c1("c1", 1, 1),
+       c2("c2", 1, 1),
+       d1("d1", 1, 2),
+       d2("d2", 1, 2);
 
   n1.set_parent(&c1);
   n2.set_parent(&c1);
@@ -243,8 +239,7 @@ List make_node_and_print( ) {
     _["edges"]               = print_node_ids(n1.connections),
     _["n1 parent"]           = n1.get_parent_at_level(1)->id,
     _["n1 l1 cons"]          = print_node_ids(n1.get_connections_to_level(1)),
-    _["c1 l1 cons"]          = print_node_ids(c1.get_connections_to_level(1)),
-    // _["n1 parent*2"]         = n1.get_parent_at_level(2)->id,
+    _["c1 l0 cons"]          = print_node_ids(c1.get_connections_to_level(0)),
     _["c1 children"]         = print_node_ids(c1.children),
     _["parent_num_kids"]     = c1.get_children_at_level(0).size()
   );
