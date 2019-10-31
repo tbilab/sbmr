@@ -10,6 +10,7 @@ using std::unordered_set;
 
 // For a bit of clarity
 typedef vector<Node*> NodeList;
+typedef unordered_set<Node*> ChildSet;
 
 // =======================================================
 // Constructor that takes the nodes id and level. Assumes default 0 type. 
@@ -76,11 +77,11 @@ void Node::remove_child(Node* child_node) {
 // Get all member nodes of current node at a given level
 // =======================================================
 NodeList Node::get_children_at_level(int desired_level) {
-  NodeList                   children_nodes;
-  unordered_set<Node*>::iterator  child_it;
-  Node*                           current_node;
-  bool                            at_desired_level;
-  std::queue<Node*>               children_queue;
+  NodeList            children_nodes;
+  ChildSet::iterator  child_it;
+  Node*               current_node;
+  bool                at_desired_level;
+  std::queue<Node*>   children_queue;
 
   // Start by placing the current node into children queue
   children_queue.push(this);
@@ -116,9 +117,10 @@ NodeList Node::get_children_at_level(int desired_level) {
 // Get parent of current node at a given level
 // =======================================================
 Node* Node::get_parent_at_level(int level_of_parent) {
+  int    level_delta;    // How many levels up do we need to go?
+  Node*  current_node;   // What node are we currently looking at?
   
-  // How many levels up do we need to go?
-  int level_delta = level_of_parent - level;
+  level_delta = level_of_parent - level;
   
   // First we need to make sure that the requested level is not less than that
   // of the current node.
@@ -127,7 +129,7 @@ Node* Node::get_parent_at_level(int level_of_parent) {
   }
   
   // Start with this node as current node
-  Node* current_node = this;
+  current_node = this;
   
   // Traverse up parents until we've reached just below where we want to go
   for(int i = 0; i < level_delta; i++){
@@ -176,17 +178,22 @@ NodeList Node::get_connections_to_level(int desired_level) {
 // Get number of edges between and fraction of total for starting node
 // =======================================================
 connection_info Node::connections_to_node(Node* target_node) {
-  connection_info connections;
-  NodeList::iterator connections_it;
+  connection_info    connections;               // connection info struct we're returning
+  NodeList::iterator connections_it;            // For iterating through all connected nodes 
+  int                n_connections_to_target;   // How many connection for node are to our target node
+  NodeList           all_connections_to_level;  // List of every connection from node to leel of target node
   
-  int n_connections_to_target = 0;
-  int level_of_target = target_node->level;
-  NodeList all_connections_to_level = this->get_connections_to_level(level_of_target);
+  
+  // Grab all the nodes connected to node at the level of the target node
+  all_connections_to_level = this->get_connections_to_level(target_node->level);
   
   // Make sure that there are actually connections for us to look through
   if (all_connections_to_level.size() == 0) {
     throw "Current node has no connections";
   }
+  
+  // Start with no connection to target...
+  n_connections_to_target = 0;
   
   // Go through all the connections
   for (
@@ -194,7 +201,6 @@ connection_info Node::connections_to_node(Node* target_node) {
       connections_it != all_connections_to_level.end();
       ++connections_it
   ) { 
-    
     // If connection at level matches the target node, increment target
     // connection counter
     if (*connections_it == target_node) {
@@ -215,34 +221,37 @@ connection_info Node::connections_to_node(Node* target_node) {
 // Probability node transitions to a given group
 // =======================================================
 double Node::prob_of_joining_group(Node* target_group, NodeList groups_to_check, int total_possible_groups) {
-  double epsilon = 0.01; // This will eventually be passed to function
-  NodeList::iterator group_it; 
-  Node* current_group;
-  double cummulative_prob = 0.0;
-  connection_info node_to_current_connections;
-  connection_info current_to_target_connections;
-  double frac_connections_in_group;
-  double n_between_current_target;
-  double n_total_current;
+  NodeList::iterator   group_it;                      // For parsing through all groups to check
+  Node*                group_being_checked;           // What group are we currently comparing to target      
+  connection_info      node_to_checked_connections;   // Connection stats for this node to group we're investigating
+  connection_info      checked_to_target_connections; // Connection stats for group we're investigating to potential move group
+  double               frac_connections_in_group;     // Proportion of connections of node belonging to investigated group
+  double               n_between_checked_target;      // How many connections are there between the investigated group and potential move group
+  double               n_total_current;               // How many total connections does the investigated group have
+  double               epsilon;                       // Ergodicity tuning parameter
+  double               cummulative_prob;              // Varibale to accumulate probabilities over sum
+  
+  epsilon = 0.01; // This will eventually be passed to function
+  cummulative_prob = 0.0; // Start out sum at 0.
   
   // Parse through all groups to check
   for(group_it = groups_to_check.begin(); group_it != groups_to_check.end(); ++group_it){
-    current_group = *group_it;
+    group_being_checked = *group_it;
     
     // Make sure we're only looking at groups of type different than node.
-    if(current_group->type == type) continue;
+    if(group_being_checked->type == type) continue;
     
     // What proportion of this node's edges are to nodes in current group?
-    node_to_current_connections = this->connections_to_node(current_group);
-    frac_connections_in_group = double(node_to_current_connections.n_between) / double(node_to_current_connections.n_total);
+    node_to_checked_connections = this->connections_to_node(group_being_checked);
+    frac_connections_in_group = double(node_to_checked_connections.n_between) / double(node_to_checked_connections.n_total);
     
     // Grab info on how many edges are there between target group and current
     // and how many total edges does the current group has
-    current_to_target_connections = current_group->connections_to_node(target_group);
-    n_between_current_target = current_to_target_connections.n_between;
-    n_total_current = current_to_target_connections.n_total;
+    checked_to_target_connections = group_being_checked->connections_to_node(target_group);
+    n_between_checked_target = checked_to_target_connections.n_between;
+    n_total_current = checked_to_target_connections.n_total;
     
-    cummulative_prob += frac_connections_in_group * (n_between_current_target + epsilon) / (n_total_current + epsilon*(total_possible_groups + 1));
+    cummulative_prob += frac_connections_in_group * (n_between_checked_target + epsilon) / (n_total_current + epsilon*(total_possible_groups + 1));
   }
   
   return cummulative_prob;

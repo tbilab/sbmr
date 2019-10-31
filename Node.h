@@ -16,6 +16,7 @@ struct connection_info;
 
 // For a bit of clarity
 typedef vector<Node*> NodeList;
+typedef unordered_set<Node*> ChildSet;
 
 //=================================
 // Main node class declaration
@@ -32,7 +33,7 @@ class Node {
     int                  level;       // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
     Node*                parent;      // What node contains this node (aka its cluster)
     bool                 has_parent;  // Does this node have a parent or is it the currently highest level?
-    unordered_set<Node*> children;    // Nodes that are contained within node (if node is cluster)
+    ChildSet             children;    // Nodes that are contained within node (if node is cluster)
     int                  type;        // What type of node is this?
 
     // ==========================================
@@ -49,6 +50,7 @@ class Node {
     double           prob_of_joining_group(Node*, NodeList, int); // Get probability node transitions to a given group
 };
 
+// Structure for returning info about connection between two nodes
 struct connection_info {
   int n_between;
   int n_total;
