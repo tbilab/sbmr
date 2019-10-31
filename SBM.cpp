@@ -31,6 +31,6 @@ List load_data(vector<string> edges_a, vector<string> edges_b){
 
 
 /*** R
-data <- readr::read_csv('../southern_women.csv', col_types = readr::cols(event = 'c', individual = 'c')) 
+data <- readr::read_csv('southern_women.csv', col_types = readr::cols(event = 'c', individual = 'c')) 
 load_data(data$event, data$individual)
 */

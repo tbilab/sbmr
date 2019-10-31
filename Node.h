@@ -6,6 +6,7 @@
 #define __NODE_INCLUDED__
 using std::string;
 using std::vector;
+using std::unordered_set;
 using std::map;
 
 
@@ -13,17 +14,7 @@ using std::map;
 // What this file declares
 //=================================
 class  Node;
-struct Edge;
-
-//=================================
-// Edge structure for holding pointer to connected 
-// node and how many edges between
-//=================================
-struct Edge {
-  Node* node;
-  int   count;
-};
-
+struct connection_info;
 
 //=================================
 // Main node class declaration
@@ -31,29 +22,35 @@ struct Edge {
 class Node {
   public:
     // Node();
-    Node(string, bool);   
+    Node(string, int);       // Constructor function takes ID, node hiearchy level, and assumes default 0 for type
+    Node(string, int, int);  // Constructor function takes ID, node hiearchy level, and specification of type as integer
     // ==========================================
     // Attributes
-    string              id;          // Unique integer id for node
-    bool                is_type_a;   // Is the node the arbitrary "a" type?
-    Node*               cluster;     // What node(cluster) is this node contained in?
-    map<string, Node*>  members;     // What nodes are contained within this node?
-    map<string, Edge>   edges;       // What nodes is this node connected to and how many times?
-    int                 degree;      // How many total connection are there to this node
-    
+    string               id;          // Unique integer id for node
+    vector<Node*>        connections; // Nodes that are connected to this node  
+    int                  level;       // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
+    Node*                parent;      // What node contains this node (aka its cluster)
+    bool                 has_parent;  // Does this node have a parent or is it the currently highest level?
+    unordered_set<Node*> children;    // Nodes that are contained within node (if node is cluster)
+    int                  type;        // What type of node is this?
+
     // ==========================================
     // Methods   
-    void            remove_edge(Node*, bool);     // Remove a connection from edge map
-    int             num_edges_to_node(Node*);     // How many total edges to another node?
-    Node*           get_random_neighbor();        // Find a random neighbor node
-    void            add_member(Node*);            // Add a node to the members map
-    void            swap_clusters(Node*);         // Swap current cluster with a new one
-    vector<string>  neighbor_clusters();          // Ids of every neighbor's cluster
-    static void     connect_nodes(Node*, Node*);  // Static method to connect two nodes to each other with edge
-    
-  private:
-    void            add_edge(Node*);              // Add connection to edge map
-    
+    void             set_parent(Node*);               // Set current node parent/cluster
+    void             add_child(Node*);                // Add a node to the children vector
+    void             remove_child(Node*);             // Remove a child node 
+    void             add_connection(Node*);           // Add connection to another node
+    vector<Node*>    get_children_at_level(int);      // Get all member nodes of current node at a given level
+    Node*            get_parent_at_level(int);        // Get parent of node at a given level
+    vector<Node*>    get_connections_to_level(int);   // Get all nodes connected to Node at a given level
+    connection_info  connections_to_node(Node*);      // Get info on connection between any two nodes
+    double           prob_of_joining_group(Node*, vector<Node*>, int); // Get probability node transitions to a given group
+    static void      connect_nodes(Node*, Node*);     // Static method to connect two nodes to each other with edge
+};
+
+struct connection_info {
+  int n_between;
+  int n_total;
 };
 
 #endif
