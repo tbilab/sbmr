@@ -171,11 +171,12 @@ vector<Node*> Node::get_connections_to_level(int desired_level) {
   return connected_nodes;
 }
 
+
 // ======================================================= 
 // Get number of edges between and fraction of total for starting node
 // =======================================================
-connection_summary Node::connections_to_node(Node* target_node) {
-  connection_summary connections;
+connection_info Node::connections_to_node(Node* target_node) {
+  connection_info connections;
   vector<Node*>::iterator connections_it;
   
   int n_connections_to_target = 0;
@@ -187,7 +188,7 @@ connection_summary Node::connections_to_node(Node* target_node) {
     throw "Current node has no connections";
   }
   
-  // Go through all the connection
+  // Go through all the connections
   for (
       connections_it  = all_connections_to_level.begin();
       connections_it != all_connections_to_level.end();
@@ -202,12 +203,50 @@ connection_summary Node::connections_to_node(Node* target_node) {
     
   }
   
-  connections.count = all_connections_to_level.size();
-  connections.frac_of_total = double(n_connections_to_target) / double(all_connections_to_level.size());
-  
+  connections.n_total = all_connections_to_level.size();
+  connections.n_between = n_connections_to_target;
+
   return connections;
 }     
 
+
+
+// ======================================================= 
+// Probability node transitions to a given group
+// =======================================================
+double Node::prob_of_joining_group(Node* target_group, vector<Node*> groups_to_check, int total_possible_groups) {
+  double epsilon = 0.01; // This will eventually be passed to function
+  vector<Node*>::iterator group_it; 
+  Node* current_group;
+  double cummulative_prob = 0.0;
+  connection_info node_to_current_connections;
+  connection_info current_to_target_connections;
+  double frac_connections_in_group;
+  double n_between_current_target;
+  double n_total_current;
+  
+  // Parse through all available groups
+  for(group_it = groups_to_check.begin(); group_it != groups_to_check.end(); ++group_it){
+    current_group = *group_it;
+    
+    // Make sure we're only looking at groups of type different than node.
+    if(current_group->type == type) continue;
+    
+    // What proportion of this node's edges are to nodes in current group?
+    node_to_current_connections = this->connections_to_node(current_group);
+    frac_connections_in_group = double(node_to_current_connections.n_between) / double(node_to_current_connections.n_total);
+    
+    // Grab info on how many edges are there between target group and current
+    // and how many total edges does the current group has
+    current_to_target_connections = current_group->connections_to_node(target_group);
+    n_between_current_target = current_to_target_connections.n_between;
+    n_total_current = current_to_target_connections.n_total;
+    
+    cummulative_prob += frac_connections_in_group * (n_between_current_target + epsilon) / (n_total_current + epsilon*(total_possible_groups + 1));
+  }
+  
+  return cummulative_prob;
+} 
 
  
 // =======================================================
@@ -278,7 +317,7 @@ List make_node_and_print( ) {
     _["n1 l1 cons"]          = print_node_ids(n1.get_connections_to_level(1)),
     _["c1 l0 cons"]          = print_node_ids(c1.get_connections_to_level(0)),
     _["c1 children"]         = print_node_ids(c1.children),
-    _["frac of n1 to d2"]    = n1.connections_to_node(&d2).frac_of_total,
+//    _["frac of n1 to d2"]    = n1.connections_to_node(&d2).frac_of_total,
     _["parent_num_kids"]     = c1.get_children_at_level(0).size()
   );
 }
