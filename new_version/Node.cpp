@@ -181,6 +181,11 @@ double Node::frac_connections_to_node(Node* target_parent_node) {
   int level_of_target = target_parent_node->level;
   vector<Node*> all_connections_to_level = this->get_connections_to_level(level_of_target);
   
+  // Make sure that there are actually connections for us to look through
+  if (all_connections_to_level.size() == 0) {
+    throw "Current node has no connections";
+  }
+  
   // Go through all the connection
   for (
     connections_it  = all_connections_to_level.begin();
