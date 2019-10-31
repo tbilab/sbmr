@@ -103,7 +103,6 @@ vector<Node*> Node::get_children_at_level(int desired_level) {
   return children_nodes;
 }
 
-
 // =======================================================
 // Get parent of current node at a given level
 // =======================================================
@@ -150,6 +149,7 @@ vector<Node*> Node::get_connections_to_level(int desired_level) {
     
     // Go through every child node's connections vector
     for (connection_it = (*child_it)->connections.begin(); connection_it != (*child_it)->connections.end(); ++connection_it) {
+      
       // For each connection of current child, find parent at desired level and
       // place in connected nodes vector
       connected_nodes.push_back(
@@ -157,101 +157,28 @@ vector<Node*> Node::get_connections_to_level(int desired_level) {
       );
       
     } // End child connection loop
-    
   } // End child loop
   
   return connected_nodes;
 }
 
-//vector<Node*> Node::get_all_connections(int desired_level) {
-//  
-//  vector<Node*> connected_nodes;
-//  
-//  // Grab all the level 0 (or data) member of this node
-//  vector<Node*> member_nodes = this->get_members_at_level(0);
-//  
-//  
-//  std::queue<Node*> members_to_process;
-//  std::queue<Node*> connections_to_process; 
-//  
-//  vector<Node*>::iterator member_iterator;
-//  
-//  // Start by placing the current node into member queue
-//  members_to_process.push(this);
-//  
-//  // While the member queue is not empty, pop off a node reference
-//  // check if that node has member nodes (aka it is a cluster node)
-//  // if node has member nodes, add those nodes to the queue
-//  // if the node doesn't have member nodes (aka it is a level 0 node)
-//  // then send it to the 
-//  
-//
-//  // Start by placing all members of this node into the process queue.
-//  for(member_iterator = members.begin(); member_iterator != members.end(); ++ member_iterator){
-//    members_to_process.push(*member_iterator);
-//  }
-//  
-//  // Work through the process queue, adding more nodes when nodes have members
-//  // If the node looked at is at level 0, aka data, add it to the connections to
-//  // process queue
-//  
-//  
-//  // Start processing through the connections from all level-0 children, 
-//  // Continuing to add to the queue until we have reached the desired connection
-//  // level, then add nodes to the connected_nodes return vector
-//  
-//  // Return the vector of these connected nodes at the desired level. 
-//  
-//  
-//  return connected_nodes;
-//}
 
 // =======================================================
-// Build a map of cluster -> # connections for current node
+// Print vector of node ids, for debugging
 // =======================================================
-//void Node::build_counts_to_clusters() {
-//  
-//  // Start by flushing counts to clusters map incase it was previously set
-//  counts_to_clusters.clear();
-//  vector<Node*> nodes_to_scan;
-//  vector<Node*>::iterator connection_it;
-//  Node* connected_cluster;
-//  
-//  // If Node is a cluster, gather nodes to scan from its members
-//  if(is_cluster) {
-//    vector<Node*>::iterator member_it; // Iterator for member nodes
-//    vector<Node*> member_connections; // Pointer to member's connections vector
-//    
-//    // First loop over each member of this cluster
-//    for(member_it = members.begin(); member_it != members.end(); ++member_it){
-//      // Grab pointer to member connections vector. First we de-reference the
-//      // pointer to each member, which is itself a pointer to a node. We then
-//      // enter the node itself to get its connections with ->
-//      member_connections = (*member_it)->connections; 
-//      
-//      // Loop over the member connections vector
-//      for(connection_it = member_connections.begin(); connection_it != member_connections.end(); ++connection_it) {
-//        // Convert the current connected node to a real pointer from iterator
-//        // and send to the nodes-to-scan vector
-//        nodes_to_scan.push_back(*connection_it);
-//      }
-//    } // end member loop
-//  } else {
-//    // If the current node is just a normal node we don't need to run into its
-//    // members before looping over connections
-//    for(connection_it = connections.begin(); connection_it != connections.end(); ++connection_it) {
-//      nodes_to_scan.push_back(*connection_it);
-//    }
-//  } // end else statement
-//  
-//  // Finally, loop over all the connections and record the cluster membership
-//  for(connection_it = nodes_to_scan.begin(); connection_it != nodes_to_scan.end(); ++connection_it) {
-//    connected_cluster = (*connection_it)->cluster;
-//    counts_to_clusters[connected_cluster] += 1;
-//  }
-//  
-//}
-
+template <class container> 
+string print_node_ids(container nodes) {
+  // Template works for iteratable types like vector and sets
+  string                  node_ids;
+  typename container::iterator node_it;
+  
+  for (node_it = nodes.begin(); node_it != nodes.end(); ++node_it) {
+    // Append node id to return string.
+    node_ids.append((*node_it)->id + ", ");
+  }
+  
+  return node_ids;
+}
 
 // =======================================================
 // Print cluster connections, for debugging
@@ -313,12 +240,12 @@ List make_node_and_print( ) {
   return List::create(
     _["id"]                  = n1.id,
     _["parent"]              = n1.parent->id,
-    _["num_edges"]           = n1.connections.size(),
+    _["edges"]               = print_node_ids(n1.connections),
     _["n1 parent"]           = n1.get_parent_at_level(1)->id,
-    _["n1 l1 cons"]          = n1.get_connections_to_level(1).size(),
-    _["c1 l1 cons"]          = c1.get_connections_to_level(1).size(),
+    _["n1 l1 cons"]          = print_node_ids(n1.get_connections_to_level(1)),
+    _["c1 l1 cons"]          = print_node_ids(c1.get_connections_to_level(1)),
     // _["n1 parent*2"]         = n1.get_parent_at_level(2)->id,
-    _["c1 children"]         = c1.children.size(),
+    _["c1 children"]         = print_node_ids(c1.children),
     _["parent_num_kids"]     = c1.get_children_at_level(0).size()
   );
 }
