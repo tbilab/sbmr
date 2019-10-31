@@ -123,6 +123,9 @@ Node* Node::get_parent_at_level(int level_of_parent) {
   
   // Traverse up parents until we've reached just below where we want to go
   for(int i = 0; i < level_delta; i++){
+    if(!current_node->has_parent) {
+      throw "No parent present at requested level";
+    }
     current_node = current_node->parent;
   }
   
@@ -130,6 +133,35 @@ Node* Node::get_parent_at_level(int level_of_parent) {
   return current_node;
 }
 
+// =======================================================
+// Get all nodes connected to Node at a given level
+// =======================================================
+vector<Node*> Node::get_connections_to_level(int desired_level) {
+  vector<Node*>            connected_nodes; 
+  vector<Node*>            leaf_children;
+  vector<Node*>::iterator  child_it;
+  vector<Node*>::iterator  connection_it;
+
+  // Start by getting all of the level zero children of this node
+  leaf_children = get_children_at_level(0);
+  
+  // Go through every child
+  for (child_it = leaf_children.begin(); child_it != leaf_children.end(); ++child_it) {
+    
+    // Go through every child node's connections vector
+    for (connection_it = (*child_it)->connections.begin(); connection_it != (*child_it)->connections.end(); ++connection_it) {
+      // For each connection of current child, find parent at desired level and
+      // place in connected nodes vector
+      connected_nodes.push_back(
+        (*connection_it)->get_parent_at_level(desired_level)
+      );
+      
+    } // End child connection loop
+    
+  } // End child loop
+  
+  return connected_nodes;
+}
 
 //vector<Node*> Node::get_all_connections(int desired_level) {
 //  
@@ -255,26 +287,37 @@ List make_node_and_print( ) {
   Node n1("n1", 0),
        n2("n2", 0),
        n3("n3", 0),
+       m1("m1", 0),
+       m2("m2", 0),
+       m3("m3", 0),
        c1("c1", 1),
        c2("c2", 1),
-       c11("c11", 2);
-  
+       d1("d1", 1),
+       d2("d2", 1);
+
   n1.set_parent(&c1);
   n2.set_parent(&c1);
   n3.set_parent(&c2);
-  c1.set_parent(&c11);
   
-  Node::connect_nodes(&n1, &n2);
-  Node::connect_nodes(&n1, &n3);
+  m1.set_parent(&d1);
+  m2.set_parent(&d2);
+  m3.set_parent(&d2);
   
-//  n1.build_counts_to_clusters();
+  Node::connect_nodes(&n1, &m1);
+  Node::connect_nodes(&n1, &m3);
+  Node::connect_nodes(&n2, &m1);
+  Node::connect_nodes(&n3, &m2);
+  Node::connect_nodes(&n3, &m3);
   
+
   return List::create(
     _["id"]                  = n1.id,
     _["parent"]              = n1.parent->id,
     _["num_edges"]           = n1.connections.size(),
     _["n1 parent"]           = n1.get_parent_at_level(1)->id,
-    _["n1 parent*2"]         = n1.get_parent_at_level(2)->id,
+    _["n1 l1 cons"]          = n1.get_connections_to_level(1).size(),
+    _["c1 l1 cons"]          = c1.get_connections_to_level(1).size(),
+    // _["n1 parent*2"]         = n1.get_parent_at_level(2)->id,
     _["c1 children"]         = c1.children.size(),
     _["parent_num_kids"]     = c1.get_children_at_level(0).size()
   );

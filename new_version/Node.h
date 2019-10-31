@@ -34,15 +34,15 @@ class Node {
 
     // ==========================================
     // Methods   
-    void            set_parent(Node*);            // Set current node parent/cluster
-    void            add_child(Node*);             // Add a node to the children vector
-    void            remove_child(Node*);          // Remove a child node 
-    void            add_connection(Node*);        // Add connection to another node
-    vector<Node*>   get_children_at_level(int);   // Get all member nodes of current node at a given level
-    Node*           get_parent_at_level(int);     // Get parent of node at a given level
-    vector<Node*>   get_all_connections(int);     // Get all nodes connected to Node at a given level
+    void            set_parent(Node*);              // Set current node parent/cluster
+    void            add_child(Node*);               // Add a node to the children vector
+    void            remove_child(Node*);            // Remove a child node 
+    void            add_connection(Node*);          // Add connection to another node
+    vector<Node*>   get_children_at_level(int);     // Get all member nodes of current node at a given level
+    Node*           get_parent_at_level(int);       // Get parent of node at a given level
+    vector<Node*>   get_connections_to_level(int);  // Get all nodes connected to Node at a given level
     //string          print_counts_to_clusters();   // Print cluster counts for debugging
-    static void     connect_nodes(Node*, Node*);  // Static method to connect two nodes to each other with edge
+    static void     connect_nodes(Node*, Node*);   // Static method to connect two nodes to each other with edge
   
 };
 
