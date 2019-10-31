@@ -13,7 +13,8 @@ using std::map;
 //=================================
 // What this file declares
 //=================================
-//class  Node;
+class  Node;
+struct connection_summary;
 
 //=================================
 // Main node class declaration
@@ -42,10 +43,15 @@ class Node {
     vector<Node*>   get_children_at_level(int);      // Get all member nodes of current node at a given level
     Node*           get_parent_at_level(int);        // Get parent of node at a given level
     vector<Node*>   get_connections_to_level(int);   // Get all nodes connected to Node at a given level
+    connection_summary    connections_to_node(Node*);      // Get info on connection between any two nodes
     double          frac_connections_to_node(Node*); // What fraction of a nodes connection have a given parent node
     //string          print_counts_to_clusters();    // Print cluster counts for debugging
     static void     connect_nodes(Node*, Node*);     // Static method to connect two nodes to each other with edge
-  
+};
+
+struct connection_summary {
+  int count;
+  double frac_of_total;
 };
 
 #endif

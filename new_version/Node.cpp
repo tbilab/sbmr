@@ -172,13 +172,14 @@ vector<Node*> Node::get_connections_to_level(int desired_level) {
 }
 
 // ======================================================= 
-// What fraction of a nodes connection have a given parent node
+// Get number of edges between and fraction of total for starting node
 // =======================================================
-double Node::frac_connections_to_node(Node* target_parent_node) {
+connection_summary Node::connections_to_node(Node* target_node) {
+  connection_summary connections;
   vector<Node*>::iterator connections_it;
   
   int n_connections_to_target = 0;
-  int level_of_target = target_parent_node->level;
+  int level_of_target = target_node->level;
   vector<Node*> all_connections_to_level = this->get_connections_to_level(level_of_target);
   
   // Make sure that there are actually connections for us to look through
@@ -188,23 +189,27 @@ double Node::frac_connections_to_node(Node* target_parent_node) {
   
   // Go through all the connection
   for (
-    connections_it  = all_connections_to_level.begin();
-    connections_it != all_connections_to_level.end();
-    ++connections_it
+      connections_it  = all_connections_to_level.begin();
+      connections_it != all_connections_to_level.end();
+      ++connections_it
   ) { 
     
     // If connection at level matches the target node, increment target
     // connection counter
-    if (*connections_it == target_parent_node) {
+    if (*connections_it == target_node) {
       n_connections_to_target++;
     }
     
   }
   
-  return double(n_connections_to_target) / double(all_connections_to_level.size());
-} 
+  connections.count = all_connections_to_level.size();
+  connections.frac_of_total = double(n_connections_to_target) / double(all_connections_to_level.size());
+  
+  return connections;
+}     
 
 
+ 
 // =======================================================
 // Print vector of node ids, for debugging
 // =======================================================
@@ -273,7 +278,7 @@ List make_node_and_print( ) {
     _["n1 l1 cons"]          = print_node_ids(n1.get_connections_to_level(1)),
     _["c1 l0 cons"]          = print_node_ids(c1.get_connections_to_level(0)),
     _["c1 children"]         = print_node_ids(c1.children),
-    _["frac of n1 to d2"]    = n1.frac_connections_to_node(&d2),
+    _["frac of n1 to d2"]    = n1.connections_to_node(&d2).frac_of_total,
     _["parent_num_kids"]     = c1.get_children_at_level(0).size()
   );
 }
