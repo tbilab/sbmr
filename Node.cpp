@@ -1,13 +1,11 @@
 // [[Rcpp::plugins(cpp11)]]
 #include <Rcpp.h>
-#include <random>
 #include <queue> 
 #include "Node.h" 
 
 using namespace Rcpp;
 using std::string;
 using std::vector;
-using std::map;
 using std::unordered_set;
 
 // For a bit of clarity
