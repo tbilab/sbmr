@@ -10,6 +10,8 @@ using std::vector;
 using std::map;
 using std::unordered_set;
 
+// For a bit of clarity
+typedef vector<Node*> NodeList;
 
 // =======================================================
 // Constructor that takes the nodes id and level. Assumes default 0 type. 
@@ -75,8 +77,8 @@ void Node::remove_child(Node* child_node) {
 // =======================================================
 // Get all member nodes of current node at a given level
 // =======================================================
-vector<Node*> Node::get_children_at_level(int desired_level) {
-  vector<Node*>                   children_nodes;
+NodeList Node::get_children_at_level(int desired_level) {
+  NodeList                   children_nodes;
   unordered_set<Node*>::iterator  child_it;
   Node*                           current_node;
   bool                            at_desired_level;
@@ -144,11 +146,11 @@ Node* Node::get_parent_at_level(int level_of_parent) {
 // =======================================================
 // Get all nodes connected to Node at a given level
 // =======================================================
-vector<Node*> Node::get_connections_to_level(int desired_level) {
-  vector<Node*>            connected_nodes; 
-  vector<Node*>            leaf_children;
-  vector<Node*>::iterator  child_it;
-  vector<Node*>::iterator  connection_it;
+NodeList Node::get_connections_to_level(int desired_level) {
+  NodeList            connected_nodes; 
+  NodeList            leaf_children;
+  NodeList::iterator  child_it;
+  NodeList::iterator  connection_it;
 
   // Start by getting all of the level zero children of this node
   leaf_children = get_children_at_level(0);
@@ -177,11 +179,11 @@ vector<Node*> Node::get_connections_to_level(int desired_level) {
 // =======================================================
 connection_info Node::connections_to_node(Node* target_node) {
   connection_info connections;
-  vector<Node*>::iterator connections_it;
+  NodeList::iterator connections_it;
   
   int n_connections_to_target = 0;
   int level_of_target = target_node->level;
-  vector<Node*> all_connections_to_level = this->get_connections_to_level(level_of_target);
+  NodeList all_connections_to_level = this->get_connections_to_level(level_of_target);
   
   // Make sure that there are actually connections for us to look through
   if (all_connections_to_level.size() == 0) {
@@ -214,9 +216,9 @@ connection_info Node::connections_to_node(Node* target_node) {
 // ======================================================= 
 // Probability node transitions to a given group
 // =======================================================
-double Node::prob_of_joining_group(Node* target_group, vector<Node*> groups_to_check, int total_possible_groups) {
+double Node::prob_of_joining_group(Node* target_group, NodeList groups_to_check, int total_possible_groups) {
   double epsilon = 0.01; // This will eventually be passed to function
-  vector<Node*>::iterator group_it; 
+  NodeList::iterator group_it; 
   Node* current_group;
   double cummulative_prob = 0.0;
   connection_info node_to_current_connections;
