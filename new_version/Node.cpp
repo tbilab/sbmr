@@ -34,6 +34,45 @@ void Node::set_cluster(Node* cluster_node_ptr) {
   cluster = cluster_node_ptr;
 }
 
+// =======================================================
+// Get all member nodes of current node at a given level
+// =======================================================
+vector<Node*> Node::get_members_at_level(int desired_level) {
+  vector<Node*> member_nodes;
+  Node* current_node;
+  bool at_desired_level;
+  std::queue<Node*> members_queue;
+  vector<Node*>::iterator member_it;
+
+  // Start by placing the current node into member queue
+  members_queue.push(this);
+  
+  // While the member queue is not empty, pop off a node reference
+  while (!members_queue.empty()) {
+    // Grab top reference
+    current_node = members_queue.front(); 
+    
+    // Remove reference from queue
+    members_queue.pop(); 
+    
+    // check if that node is at desired level
+    at_desired_level = current_node->level == desired_level;
+    
+    // if node is at desired level, add it to the return vector
+    if (at_desired_level) {
+      member_nodes.push_back(current_node);
+    } else {
+      // Otherwise, add each of the member nodes to queue 
+      for (member_it  = (current_node->members).begin(); member_it != (current_node->members).end(); ++member_it) {
+        members_queue.push(*member_it);
+      }
+    }
+    
+  } // End queue processing loop
+  
+  // Return the vector of member nodes
+  return member_nodes;
+}
 
 vector<Node*> Node::get_all_connections(int desired_level) {
   
@@ -43,8 +82,16 @@ vector<Node*> Node::get_all_connections(int desired_level) {
   
   vector<Node*>::iterator member_iterator;
   
-  int i = 0;
+  // Start by placing the current node into member queue
+  members_to_process.push(this);
   
+  // While the member queue is not empty, pop off a node reference
+  // check if that node has member nodes (aka it is a cluster node)
+  // if node has member nodes, add those nodes to the queue
+  // if the node doesn't have member nodes (aka it is a level 0 node)
+  // then send it to the 
+  
+
   // Start by placing all members of this node into the process queue.
   for(member_iterator = members.begin(); member_iterator != members.end(); ++ member_iterator){
     members_to_process.push(*member_iterator);

@@ -37,10 +37,12 @@ class Node {
     void            set_cluster(Node*);           // Set current node cluster
     void            add_connection(Node*);        // Add connection to another node
     void            add_member(Node*);            // Add a node to the members map
+    vector<Node*>   get_members_at_level(int);    // Get all member nodes of current node at a given level
     vector<Node*>   get_all_connections(int);     // Get all nodes connected to Node at a given level
     void            build_counts_to_clusters();   // Get map of counts to connected clusters
     string          print_counts_to_clusters();   // Print cluster counts for debugging
     static void     connect_nodes(Node*, Node*);  // Static method to connect two nodes to each other with edge
+  
 };
 
 #endif
