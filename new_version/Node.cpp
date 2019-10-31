@@ -103,6 +103,34 @@ vector<Node*> Node::get_children_at_level(int desired_level) {
   return children_nodes;
 }
 
+
+// =======================================================
+// Get parent of current node at a given level
+// =======================================================
+Node* Node::get_parent_at_level(int level_of_parent) {
+  
+  // How many levels up do we need to go?
+  int level_delta = level_of_parent - level;
+  
+  // First we need to make sure that the requested level is not less than that
+  // of the current node.
+  if (level_delta < 0) {
+    throw "Requested parent level lower than current node level.";
+  }
+  
+  // Start with this node as current node
+  Node* current_node = this;
+  
+  // Traverse up parents until we've reached just below where we want to go
+  for(int i = 0; i < level_delta; i++){
+    current_node = current_node->parent;
+  }
+  
+  // Return the final node, aka the parent at desired level
+  return current_node;
+}
+
+
 //vector<Node*> Node::get_all_connections(int desired_level) {
 //  
 //  vector<Node*> connected_nodes;
@@ -228,11 +256,13 @@ List make_node_and_print( ) {
        n2("n2", 0),
        n3("n3", 0),
        c1("c1", 1),
-       c2("c2", 1);
+       c2("c2", 1),
+       c11("c11", 2);
   
   n1.set_parent(&c1);
   n2.set_parent(&c1);
   n3.set_parent(&c2);
+  c1.set_parent(&c11);
   
   Node::connect_nodes(&n1, &n2);
   Node::connect_nodes(&n1, &n3);
@@ -243,6 +273,8 @@ List make_node_and_print( ) {
     _["id"]                  = n1.id,
     _["parent"]              = n1.parent->id,
     _["num_edges"]           = n1.connections.size(),
+    _["n1 parent"]           = n1.get_parent_at_level(1)->id,
+    _["n1 parent*2"]         = n1.get_parent_at_level(2)->id,
     _["c1 children"]         = c1.children.size(),
     _["parent_num_kids"]     = c1.get_children_at_level(0).size()
   );
