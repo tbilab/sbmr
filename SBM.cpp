@@ -20,6 +20,7 @@ SBM::SBM(){
   nodes.push_back(*(new NodeList()));
 }
 
+
 // =======================================================
 // Grabs nodes from desired level, if level doesn't exist, it makes it
 // =======================================================
@@ -79,6 +80,7 @@ Node* SBM::get_node_by_id(string desired_id, int node_type){
   return desired_node;
 }
 
+
 // =======================================================
 // Return nodes of a desired type from level
 // =======================================================
@@ -103,8 +105,6 @@ NodeList SBM::get_nodes_of_type(int type, int level) {
 }   
 
 
-
-
 // =======================================================
 // Creates a new group node and adds it to its neccesary level
 // =======================================================
@@ -122,7 +122,7 @@ Node* SBM::create_group_node(int level, int type) {
   n_groups_at_level = group_level.size();
   
   // Build group_id
-  group_id = "g" + std::to_string(level) + "_" + std::to_string(type) + "_" + std::to_string(n_groups_at_level);
+  group_id = std::to_string(type) + "-" + std::to_string(level) + "_" + std::to_string(n_groups_at_level);
   
   // Initialize new node
   new_group = new Node(group_id, level, type);
@@ -168,10 +168,9 @@ List setup_SBM(){
   
   // Create a group node
   my_SBM.create_group_node(1, 0);
-  
+  my_SBM.create_group_node(1, 1);
   
   return List::create(
-    //_["test"]                 = test_map.size(),
     _["num_nodes"]            = my_SBM.nodes[0].size(),
     _["level 0"]              = print_node_ids(my_SBM.get_node_level(0)),
     _["level 1"]              = print_node_ids(my_SBM.get_node_level(1)),
