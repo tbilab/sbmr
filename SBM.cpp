@@ -16,22 +16,17 @@ typedef vector<NodeList> NodeMap;
 // Constructor that takes the nodes unique id integer and type
 // =======================================================
 SBM::SBM(){
-  // Kick off node vector with empty array
-  nodes.push_back(*(new NodeList()));
+  // Nothing needs doin'
 }
 
 
 // =======================================================
 // Grabs nodes from desired level, if level doesn't exist, it makes it
 // =======================================================
-NodeList SBM::get_node_level(int level) {
-  
-  bool level_doesnt_exist;
-  
-  level_doesnt_exist = nodes.size() < (level + 1);
+NodeList* SBM::get_node_level(int level) {
   
   // If desired level is missing, create it
-  if (level_doesnt_exist) {
+  if (nodes.size() < (level + 1)) {
     
     if (nodes.size() < level) throw "Requested unavailable level";
     
@@ -39,7 +34,7 @@ NodeList SBM::get_node_level(int level) {
     nodes.push_back(*(new NodeList()));
   }
   
-  return nodes.at(level);
+  return &nodes.at(level);
 };            
 
 
@@ -50,7 +45,7 @@ Node* SBM::get_node_by_id(string desired_id, int node_type){
   NodeList::iterator  node_it;
   Node*               desired_node;
   bool                node_missing;
-  NodeList            node_level;
+  NodeList*           node_level;
   
   // Start by assuming we couldn't find desired node
   node_missing = true;
@@ -59,22 +54,30 @@ Node* SBM::get_node_by_id(string desired_id, int node_type){
   node_level = get_node_level(0);
   
   // Search for node in level zero of the node data
-  for (node_it = node_level.begin(); node_it != node_level.end(); ++node_it) {
+  for (node_it = node_level->begin(); node_it != node_level->end(); ++node_it) {
     
+    // Check if our current node id matches the desired id
     if ((*node_it)->id == desired_id) {
+      
+      // If it matches, assign it as desired node
       desired_node = *node_it;
+      
+      // Let method know we found node
       node_missing = false;
+      
+      // No need to continue since we found node
       break;
     }
 
   }
   
   if (node_missing) {
+    
     // Create node
     desired_node = new Node(desired_id, 0, node_type);
     
     // Add node to node list
-    nodes.at(0).push_back(desired_node);
+    node_level->push_back(desired_node);
   }
   
   return desired_node;
@@ -87,18 +90,20 @@ Node* SBM::get_node_by_id(string desired_id, int node_type){
 NodeList SBM::get_nodes_of_type(int type, int level) {
   NodeList            nodes_to_return;
   NodeList::iterator  node_it;
-  NodeList            node_level;
+  NodeList*           node_level;
   
+  // Grab desired level reference
   node_level = get_node_level(0);
   
   // Loop through every node belonging to the desired level
-  for (node_it = node_level.begin(); node_it != node_level.end(); ++node_it) {
+  for (node_it = node_level->begin(); node_it != node_level->end(); ++node_it) {
     
-    // If the current node is of desired type, place it in returning vector
+    // If the current node is of desired type...
     if((*node_it)->type == type) {
+      
+      // ...Place it in returning vector
       nodes_to_return.push_back(*node_it);
     }
-    
   }
   
   return nodes_to_return;
@@ -110,16 +115,16 @@ NodeList SBM::get_nodes_of_type(int type, int level) {
 // =======================================================
 Node* SBM::create_group_node(int level, int type) {
   
-  NodeList group_level;
-  int      n_groups_at_level;
-  string   group_id;
-  Node*    new_group;
+  NodeList*  group_level;
+  int        n_groups_at_level;
+  string     group_id;
+  Node*      new_group;
   
   // Grab level for group node
   group_level = get_node_level(level);
   
   // Find how many groups are in the current level
-  n_groups_at_level = group_level.size();
+  n_groups_at_level = group_level->size();
   
   // Build group_id
   group_id = std::to_string(type) + "-" + std::to_string(level) + "_" + std::to_string(n_groups_at_level);
@@ -128,7 +133,7 @@ Node* SBM::create_group_node(int level, int type) {
   new_group = new Node(group_id, level, type);
   
   // Add group node to SBM
-  nodes.at(level).push_back(new_group);
+  group_level->push_back(new_group);
   
   return new_group;
 };
@@ -172,8 +177,8 @@ List setup_SBM(){
   
   return List::create(
     _["num_nodes"]            = my_SBM.nodes[0].size(),
-    _["level 0"]              = print_node_ids(my_SBM.get_node_level(0)),
-    _["level 1"]              = print_node_ids(my_SBM.get_node_level(1)),
+    _["level 0"]              = print_node_ids(*my_SBM.get_node_level(0)),
+    _["level 1"]              = print_node_ids(*my_SBM.get_node_level(1)),
     _["nodes of first type"]  = print_node_ids(my_SBM.get_nodes_of_type(0,0)),
     _["nodes of second type"] = print_node_ids(my_SBM.get_nodes_of_type(1,0)),
     _["num levels"]           = my_SBM.nodes.size()
