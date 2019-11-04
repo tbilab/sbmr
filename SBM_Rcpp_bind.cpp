@@ -12,7 +12,7 @@ using namespace Rcpp;
 List setup_SBM(){
   SBM my_SBM;
   
-  // Add some nodes to SBM
+  // // Add some nodes to SBM
   my_SBM.get_node_by_id("n1", 0);
   my_SBM.get_node_by_id("n2", 0);
   my_SBM.get_node_by_id("n3", 0);
@@ -23,9 +23,9 @@ List setup_SBM(){
   my_SBM.get_node_by_id("m4", 1);
   
   // Create a group node
-  my_SBM.create_group_node(1, 0);
+  my_SBM.create_group_node(0, 1);
   my_SBM.create_group_node(1, 1);
-  
+
   return List::create(
     _["num_nodes"]            = my_SBM.nodes[0].size(),
     _["level 0"]              = print_node_ids(*my_SBM.get_node_level(0)),
