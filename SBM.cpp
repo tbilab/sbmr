@@ -21,7 +21,7 @@ SBM::SBM(){
 // =======================================================
 // Grabs nodes from desired level, if level doesn't exist, it makes it
 // =======================================================
-NodeList* SBM::get_node_level(int level) {
+NodeList* SBM::get_nodes_at_level(int level) {
   
   // If desired level is missing, create it
   if (nodes.size() < (level + 1)) {
@@ -36,17 +36,18 @@ NodeList* SBM::get_node_level(int level) {
   return &nodes.at(level);
 };            
 
+
 // =======================================================
 // Find and return a node by its id
 // =======================================================
-Node* SBM::find_node_by_id(string desired_id) {
+Node* SBM::get_node_by_id(string desired_id) {
   NodeList::iterator  node_it;
   NodeList*           node_level;
   bool                node_missing;
   Node*               desired_node;
   
   // Grab the bottom "data" level of nodes
-  node_level = get_node_level(0);
+  node_level = get_nodes_at_level(0);
   
   // Search for node in level zero of the node data
   for (node_it = node_level->begin(); node_it != node_level->end(); ++node_it) {
@@ -82,7 +83,7 @@ Node* SBM::add_node(string id, int type){
   new_node = new Node(id, 0, type);
   
   // Add node to node list
-  get_node_level(0)->push_back(new_node);
+  get_nodes_at_level(0)->push_back(new_node);
   
   return new_node;
 }; 
@@ -97,7 +98,7 @@ NodeList SBM::get_nodes_of_type_at_level(int type, int level) {
   NodeList*           node_level;
   
   // Grab desired level reference
-  node_level = get_node_level(level);
+  node_level = get_nodes_at_level(level);
   
   // Loop through every node belonging to the desired level
   for (node_it = node_level->begin(); node_it != node_level->end(); ++node_it) {
@@ -128,7 +129,7 @@ Node* SBM::create_group_node(int type, int level) {
   if(level == 0) throw "Can't create group node at first level";
   
   // Grab level for group node
-  group_level = get_node_level(level);
+  group_level = get_nodes_at_level(level);
   
   // Find how many groups are already in the current level (all types)
   n_groups_in_level = group_level->size();
@@ -149,11 +150,10 @@ Node* SBM::create_group_node(int type, int level) {
 // Adds a connection between two nodes based on their ids
 // =======================================================
 void SBM::add_connection(string node1_id, string node2_id){
-  Node* node1;
-  Node* node2;
+
+  Node::connect_nodes(
+    this->get_node_by_id(node1_id), 
+    this->get_node_by_id(node2_id)
+  );
   
-  // node1 = this->get_node_by_id(node1_id);
-  // node2 = this->get_node_by_id(node2_id);
-  // 
-  // Node::connect_nodes(Node* node1, Node* node2);
 };       

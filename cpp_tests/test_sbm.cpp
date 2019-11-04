@@ -22,10 +22,10 @@ TEST(testSBM, basic){
   // How many nodes at the 'data' level do we have?
   EXPECT_EQ(7, my_SBM.nodes[0].size());
   
-  EXPECT_EQ("n1, n2, n3, m1, m2, m3, m4", print_node_ids(*my_SBM.get_node_level(0)));
+  EXPECT_EQ("n1, n2, n3, m1, m2, m3, m4", print_node_ids(*my_SBM.get_nodes_at_level(0)));
   
   // Group name convention <type>-<level>_<id>
-  EXPECT_EQ("0-1_0, 1-1_1", print_node_ids(*my_SBM.get_node_level(1)));
+  EXPECT_EQ("0-1_0, 1-1_1", print_node_ids(*my_SBM.get_nodes_at_level(1)));
   
   // Filter to a given node type
   EXPECT_EQ("n1, n2, n3", print_node_ids(my_SBM.get_nodes_of_type_at_level(0,0)));
@@ -71,65 +71,63 @@ TEST(testSBM, building_network){
   EXPECT_EQ(1, my_SBM.get_nodes_of_type_at_level(1,1).size());
   
   // Should be a total of 2 group nodes for level 1
-  EXPECT_EQ(2, my_SBM.get_node_level(1)->size());
+  EXPECT_EQ(2, my_SBM.get_nodes_at_level(1)->size());
 }
 
 TEST(testSBM, build_with_connections){
   SBM my_SBM;
   
   // Add nodes to graph first
-  my_SBM.add_node("1", 1);
-  my_SBM.add_node("2", 1);
-  my_SBM.add_node("3", 1);
-  my_SBM.add_node("4", 1);
-  my_SBM.add_node("5", 1);
-  my_SBM.add_node("10", 1);
-  my_SBM.add_node("11", 1);
-  my_SBM.add_node("12", 1);
-  my_SBM.add_node("13", 1);
-  my_SBM.add_node("14", 1);
-  my_SBM.add_node("6", 1);
-  my_SBM.add_node("7", 1);
-  my_SBM.add_node("8", 1);
-  my_SBM.add_node("9", 1);
-  my_SBM.add_node("1", 0);
-  my_SBM.add_node("2", 0);
-  my_SBM.add_node("3", 0);
-  my_SBM.add_node("4", 0);
+  my_SBM.add_node("a1", 1);
+  my_SBM.add_node("a2", 1);
+  my_SBM.add_node("a3", 1);
+  my_SBM.add_node("a4", 1);
+  my_SBM.add_node("a5", 1);
+  my_SBM.add_node("a10", 1);
+  my_SBM.add_node("a11", 1);
+  my_SBM.add_node("a13", 1);
+  my_SBM.add_node("a14", 1);
+  my_SBM.add_node("a6", 1);
+  my_SBM.add_node("a7", 1);
+  my_SBM.add_node("a8", 1);
+  my_SBM.add_node("a9", 1);
+  my_SBM.add_node("a12", 1);
+  my_SBM.add_node("b1", 0);
+  my_SBM.add_node("b2", 0);
+  my_SBM.add_node("b3", 0);
+  my_SBM.add_node("b4", 0);
   
   // Add connections
-  my_SBM.add_connection("1", "1");
-  my_SBM.add_connection("2", "1");
-  my_SBM.add_connection("3", "1");
-  my_SBM.add_connection("4", "1");
-  my_SBM.add_connection("5", "1");
-  my_SBM.add_connection("1", "2");
-  my_SBM.add_connection("2", "2");
-  my_SBM.add_connection("3", "2");
-  my_SBM.add_connection("4", "2");
-  my_SBM.add_connection("5", "2");
-  my_SBM.add_connection("10", "2");
-  my_SBM.add_connection("11", "2");
-  my_SBM.add_connection("12", "2");
-  my_SBM.add_connection("13", "2");
-  my_SBM.add_connection("14", "2");
-  my_SBM.add_connection("6", "3");
-  my_SBM.add_connection("7", "3");
-  my_SBM.add_connection("8", "3");
-  my_SBM.add_connection("9", "3");
-  my_SBM.add_connection("10", "3");
-  my_SBM.add_connection("11", "3");
-  my_SBM.add_connection("12", "3");
-  my_SBM.add_connection("13", "3");
-  my_SBM.add_connection("14", "3");
-  my_SBM.add_connection("8", "4");
-  my_SBM.add_connection("10", "4");
-  my_SBM.add_connection("11", "4");
-  my_SBM.add_connection("12", "4");
-  my_SBM.add_connection("13", "4");
+  my_SBM.add_connection("a1", "b1");
+  my_SBM.add_connection("a2", "b1");
+  my_SBM.add_connection("a3", "b1");
+  my_SBM.add_connection("a4", "b1");
+  my_SBM.add_connection("a5", "b1");
+  my_SBM.add_connection("a1", "b2");
+  my_SBM.add_connection("a2", "b2");
+  my_SBM.add_connection("a3", "b2");
+  my_SBM.add_connection("a4", "b2");
+  my_SBM.add_connection("a5", "b2");
+  my_SBM.add_connection("a10", "b2");
+  my_SBM.add_connection("a11", "b2");
+  my_SBM.add_connection("a13", "b2");
+  my_SBM.add_connection("a14", "b2");
+  my_SBM.add_connection("a6", "b3");
+  my_SBM.add_connection("a7", "b3");
+  my_SBM.add_connection("a8", "b3");
+  my_SBM.add_connection("a9", "b3");
+  my_SBM.add_connection("a10", "b3");
+  my_SBM.add_connection("a12", "b3");
+  my_SBM.add_connection("a13", "b3");
+  my_SBM.add_connection("a14", "b3");
+  my_SBM.add_connection("a10", "b4");
+  my_SBM.add_connection("a11", "b4");
+  my_SBM.add_connection("a12", "b4");
+  my_SBM.add_connection("a13", "b4");
+  my_SBM.add_connection("a14", "b4");
   
-  // There should be a total of 14 nodes
-  EXPECT_EQ(14, my_SBM.nodes.at(0).size());
+  // There should be a total of 18 nodes
+  EXPECT_EQ(18, my_SBM.nodes.at(0).size());
   
 }
 
