@@ -7,14 +7,13 @@ TEST(testSBM, basic){
   SBM my_SBM;
   
   // Add some nodes to SBM
-  my_SBM.get_node_by_id("n1", 0);
-  my_SBM.get_node_by_id("n2", 0);
-  my_SBM.get_node_by_id("n3", 0);
-  my_SBM.get_node_by_id("n3", 0); // Duplicate node
-  my_SBM.get_node_by_id("m1", 1);
-  my_SBM.get_node_by_id("m2", 1);
-  my_SBM.get_node_by_id("m3", 1);
-  my_SBM.get_node_by_id("m4", 1);
+  my_SBM.add_node("n1", 0);
+  my_SBM.add_node("n2", 0);
+  my_SBM.add_node("n3", 0);
+  my_SBM.add_node("m1", 1);
+  my_SBM.add_node("m2", 1);
+  my_SBM.add_node("m3", 1);
+  my_SBM.add_node("m4", 1);
   
   // Create a group node
   my_SBM.create_group_node(0, 1);
@@ -42,22 +41,18 @@ TEST(testSBM, building_network){
   SBM my_SBM;
   
   // Start with a single node in the network
-  my_SBM.get_node_by_id("n1", 0);
+  my_SBM.add_node("n1", 0);
 
   EXPECT_EQ(1, my_SBM.nodes[0].size());
   
   // Add a few more
-  my_SBM.get_node_by_id("n2", 0);
-  my_SBM.get_node_by_id("n3", 0);
-  my_SBM.get_node_by_id("m1", 1);
-  my_SBM.get_node_by_id("m2", 1);
-  my_SBM.get_node_by_id("m3", 1);
-  my_SBM.get_node_by_id("m4", 1);
+  my_SBM.add_node("n2", 0);
+  my_SBM.add_node("n3", 0);
+  my_SBM.add_node("m1", 1);
+  my_SBM.add_node("m2", 1);
+  my_SBM.add_node("m3", 1);
+  my_SBM.add_node("m4", 1);
   
-  EXPECT_EQ(7, my_SBM.nodes[0].size());
-  
-  // Make sure duplicates get ignored
-  my_SBM.get_node_by_id("n3", 0); // Duplicate node
   EXPECT_EQ(7, my_SBM.nodes[0].size());
   
   // We should start off with a single level as no group nodes are added
@@ -78,6 +73,67 @@ TEST(testSBM, building_network){
   // Should be a total of 2 group nodes for level 1
   EXPECT_EQ(2, my_SBM.get_node_level(1)->size());
 }
+
+TEST(testSBM, build_with_connections){
+  SBM my_SBM;
+  
+  // Add nodes to graph first
+  my_SBM.add_node("1", 1);
+  my_SBM.add_node("2", 1);
+  my_SBM.add_node("3", 1);
+  my_SBM.add_node("4", 1);
+  my_SBM.add_node("5", 1);
+  my_SBM.add_node("10", 1);
+  my_SBM.add_node("11", 1);
+  my_SBM.add_node("12", 1);
+  my_SBM.add_node("13", 1);
+  my_SBM.add_node("14", 1);
+  my_SBM.add_node("6", 1);
+  my_SBM.add_node("7", 1);
+  my_SBM.add_node("8", 1);
+  my_SBM.add_node("9", 1);
+  my_SBM.add_node("1", 0);
+  my_SBM.add_node("2", 0);
+  my_SBM.add_node("3", 0);
+  my_SBM.add_node("4", 0);
+  
+  // Add connections
+  my_SBM.add_connection("1", "1");
+  my_SBM.add_connection("2", "1");
+  my_SBM.add_connection("3", "1");
+  my_SBM.add_connection("4", "1");
+  my_SBM.add_connection("5", "1");
+  my_SBM.add_connection("1", "2");
+  my_SBM.add_connection("2", "2");
+  my_SBM.add_connection("3", "2");
+  my_SBM.add_connection("4", "2");
+  my_SBM.add_connection("5", "2");
+  my_SBM.add_connection("10", "2");
+  my_SBM.add_connection("11", "2");
+  my_SBM.add_connection("12", "2");
+  my_SBM.add_connection("13", "2");
+  my_SBM.add_connection("14", "2");
+  my_SBM.add_connection("6", "3");
+  my_SBM.add_connection("7", "3");
+  my_SBM.add_connection("8", "3");
+  my_SBM.add_connection("9", "3");
+  my_SBM.add_connection("10", "3");
+  my_SBM.add_connection("11", "3");
+  my_SBM.add_connection("12", "3");
+  my_SBM.add_connection("13", "3");
+  my_SBM.add_connection("14", "3");
+  my_SBM.add_connection("8", "4");
+  my_SBM.add_connection("10", "4");
+  my_SBM.add_connection("11", "4");
+  my_SBM.add_connection("12", "4");
+  my_SBM.add_connection("13", "4");
+  
+  // There should be a total of 14 nodes
+  EXPECT_EQ(14, my_SBM.nodes.at(0).size());
+  
+}
+
+
 
 int main(int argc, char* argv[]){
   testing::InitGoogleTest(&argc, argv);

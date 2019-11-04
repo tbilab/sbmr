@@ -1,5 +1,3 @@
-#include <queue> 
-#include <unordered_set>
 #include <string>
 #include <vector>
 
@@ -38,18 +36,14 @@ NodeList* SBM::get_node_level(int level) {
   return &nodes.at(level);
 };            
 
-
 // =======================================================
-// Grabs and returns node of specified id, if node doesn't exist, node is created first
+// Find and return a node by its id
 // =======================================================
-Node* SBM::get_node_by_id(string desired_id, int node_type){
+Node* SBM::find_node_by_id(string desired_id) {
   NodeList::iterator  node_it;
-  Node*               desired_node;
-  bool                node_missing;
   NodeList*           node_level;
-  
-  // Start by assuming we couldn't find desired node
-  node_missing = true;
+  bool                node_missing;
+  Node*               desired_node;
   
   // Grab the bottom "data" level of nodes
   node_level = get_node_level(0);
@@ -69,20 +63,29 @@ Node* SBM::get_node_by_id(string desired_id, int node_type){
       // No need to continue since we found node
       break;
     }
-
+    
   }
   
-  if (node_missing) {
-    
-    // Create node
-    desired_node = new Node(desired_id, 0, node_type);
-    
-    // Add node to node list
-    node_level->push_back(desired_node);
-  }
+  if (node_missing) throw "Could not find requested node";
   
   return desired_node;
 }
+
+
+// =======================================================
+// Adds a node with an id and type to network
+// =======================================================
+Node* SBM::add_node(string id, int type){
+  Node* new_node;
+  
+  // Create node
+  new_node = new Node(id, 0, type);
+  
+  // Add node to node list
+  get_node_level(0)->push_back(new_node);
+  
+  return new_node;
+}; 
 
 
 // =======================================================
@@ -142,3 +145,15 @@ Node* SBM::create_group_node(int type, int level) {
   return new_group;
 };
 
+// =======================================================
+// Adds a connection between two nodes based on their ids
+// =======================================================
+void SBM::add_connection(string node1_id, string node2_id){
+  Node* node1;
+  Node* node2;
+  
+  // node1 = this->get_node_by_id(node1_id);
+  // node2 = this->get_node_by_id(node2_id);
+  // 
+  // Node::connect_nodes(Node* node1, Node* node2);
+};       
