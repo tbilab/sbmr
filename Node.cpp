@@ -1,10 +1,16 @@
 // [[Rcpp::plugins(cpp11)]]
-#include <Rcpp.h>
-#include <queue> 
+// #include <Rcpp.h>
+
 #include "Node.h" 
 #include "helpers.cpp"
 
-using namespace Rcpp;
+#include <queue> 
+#include <unordered_set>
+#include <string>
+#include <vector>
+
+
+// using namespace Rcpp;
 using std::string;
 using std::vector;
 using std::unordered_set;
@@ -270,50 +276,3 @@ void Node::connect_nodes(Node* node1_ptr, Node* node2_ptr) {
   node2_ptr->add_connection(node1_ptr);
 }
 
-
-// [[Rcpp::export]]
-List make_node_and_print( ) {
-  Node n1("n1", 0, 1),
-       n2("n2", 0, 1),
-       n3("n3", 0, 1),
-       m1("m1", 0, 2),
-       m2("m2", 0, 2),
-       m3("m3", 0, 2),
-       c1("c1", 1, 1),
-       c2("c2", 1, 1),
-       d1("d1", 1, 2),
-       d2("d2", 1, 2);
-
-  n1.set_parent(&c1);
-  n2.set_parent(&c1);
-  n3.set_parent(&c2);
-  
-  m1.set_parent(&d1);
-  m2.set_parent(&d2);
-  m3.set_parent(&d2);
-  
-  Node::connect_nodes(&n1, &m1);
-  Node::connect_nodes(&n1, &m3);
-  Node::connect_nodes(&n2, &m1);
-  Node::connect_nodes(&n3, &m2);
-  Node::connect_nodes(&n3, &m3);
-  
-
-  return List::create(
-    _["id"]                  = n1.id,
-    _["parent"]              = n1.parent->id,
-    _["edges"]               = print_node_ids(n1.connections),
-    _["n1 parent"]           = n1.get_parent_at_level(1)->id,
-    _["n1 l1 cons"]          = print_node_ids(n1.get_connections_to_level(1)),
-    _["c1 l0 cons"]          = print_node_ids(c1.get_connections_to_level(0)),
-    _["c1 children"]         = print_node_ids(c1.children),
-//    _["frac of n1 to d2"]    = n1.connections_to_node(&d2).frac_of_total,
-    _["parent_num_kids"]     = c1.get_children_at_level(0).size()
-  );
-}
-
-
-
-/*** R
-make_node_and_print()
-*/

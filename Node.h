@@ -4,6 +4,10 @@
 //=================================
 #ifndef __NODE_INCLUDED__
 #define __NODE_INCLUDED__
+
+#include <unordered_set>
+#include <string>
+#include <vector>
 using std::string;
 using std::vector;
 using std::unordered_set;

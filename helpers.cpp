@@ -2,10 +2,13 @@
 // include guard
 //=================================
 
-#include <Rcpp.h>
+// #include <Rcpp.h>
 #include "Node.h" 
+#include <map>
+#include <string>
+#include <vector>
 
-using namespace Rcpp;
+// using namespace Rcpp;
 using std::string;
 using std::vector;
 using std::map;
