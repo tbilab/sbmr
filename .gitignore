@@ -3,3 +3,4 @@
 .RData
 .Ruserdata
 *.o
+my_googletest
