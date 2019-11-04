@@ -1,12 +1,7 @@
 #include<gtest/gtest.h>
-#include "Node.cpp"
+#include "../Node.cpp"
 
-//The only function: simply multiplies a number by 2
-double timesTwo(double x){
-  return x*2;
-}
-
-TEST(testTimesTwo, integerTests){
+TEST(testNode, basic){
   
     Node n1("n1", 0, 1),
          n2("n2", 0, 1),
@@ -33,11 +28,13 @@ TEST(testTimesTwo, integerTests){
     Node::connect_nodes(&n3, &m2);
     Node::connect_nodes(&n3, &m3);
     
-    
+    // Get basic info out of the nodes
     EXPECT_EQ("n1", n1.id);
     EXPECT_EQ(n1.get_parent_at_level(1)->id, n1.parent->id);
     EXPECT_EQ(2, c1.get_children_at_level(0).size()); 
     EXPECT_EQ(1, d1.get_children_at_level(0).size()); 
+    
+    // Make sure the connection propigate properly. 
     EXPECT_EQ(
       "m1, m3",
       print_node_ids(n1.get_connections_to_level(0))
