@@ -1,5 +1,7 @@
 #include<gtest/gtest.h>
-#include "../Node.cpp"
+#include "../helpers.cpp"
+#include "../Node.h"
+
 
 TEST(testNode, basic){
   

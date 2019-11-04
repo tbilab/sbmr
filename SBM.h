@@ -1,12 +1,7 @@
-// [[Rcpp::plugins(cpp11)]]
-//=================================
-// include guard
-//=================================
 #ifndef __SBM_INCLUDED__
 #define __SBM_INCLUDED__
 
 #include "Node.h" 
-using std::map;
 
 typedef vector<Node*> NodeList;
 typedef vector<NodeList> NodeMap;

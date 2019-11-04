@@ -3,14 +3,11 @@
 #include <string>
 #include <vector>
 
-#include "Node.h" 
+#include "Node.h"
 #include "SBM.h" 
-#include "Node.cpp"
-#include "helpers.cpp"
 
 using std::string;
 using std::vector;
-using std::map;
 
 typedef vector<Node*> NodeList;
 typedef vector<NodeList> NodeMap;

@@ -1,8 +1,4 @@
-// [[Rcpp::plugins(cpp11)]]
-// #include <Rcpp.h>
-
 #include "Node.h" 
-#include "helpers.cpp"
 
 #include <queue> 
 #include <unordered_set>

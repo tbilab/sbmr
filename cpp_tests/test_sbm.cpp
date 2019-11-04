@@ -1,6 +1,6 @@
 #include<gtest/gtest.h>
-#include "../Node.h"
-#include "../SBM.cpp"
+#include "../helpers.cpp"
+#include "../SBM.h"
 
 
 TEST(testSBM, basic){
