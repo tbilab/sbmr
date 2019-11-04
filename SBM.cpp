@@ -28,6 +28,7 @@ NodeList* SBM::get_node_level(int level) {
   // If desired level is missing, create it
   if (nodes.size() < (level + 1)) {
     
+    // Make sure that the requested level isn't too far away
     if (nodes.size() < level) throw "Requested unavailable level";
     
     // Create a new node list and insert into node map
