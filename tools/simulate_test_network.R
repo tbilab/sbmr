@@ -19,14 +19,18 @@ simple_data <- tribble(
     binary_connections = TRUE
   ) %>% 
   filter(num_edges > 0) %>% 
-  select(a, b)
+  select(a, b) %>% 
+  transmute(
+    a = paste0('a',a),
+    b = paste0('b', b)
+  )
 
 simple_data %>% 
   gather(key = 'type', value = 'id') %>% 
   distinct() %>% 
   mutate(type = ifelse(type == 'a', 1, 0)) %>% 
   glue::glue_data(
-    "my_SBM.get_node_by_id(\"{id}\", {type});"
+    "my_SBM.add_node(\"{id}\", {type});"
   )
 
 simple_data %>% 
