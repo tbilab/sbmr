@@ -12,11 +12,10 @@ using namespace Rcpp;
 List setup_SBM(){
   SBM my_SBM;
   
-  // // Add some nodes to SBM
+  // Add some nodes to SBM
   my_SBM.get_node_by_id("n1", 0);
   my_SBM.get_node_by_id("n2", 0);
   my_SBM.get_node_by_id("n3", 0);
-  my_SBM.get_node_by_id("n3", 0); // Duplicate node
   my_SBM.get_node_by_id("m1", 1);
   my_SBM.get_node_by_id("m2", 1);
   my_SBM.get_node_by_id("m3", 1);

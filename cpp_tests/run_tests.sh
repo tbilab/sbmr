@@ -23,3 +23,7 @@ g++ -std=c++11 \
   /home/nick/cpp_dev/gtest_build/lib/libgtest.a \
   -o my_googletest 
 ./my_googletest
+
+
+# Cleanup the compiled files so RCpp doesn't get mad
+rm *.o
