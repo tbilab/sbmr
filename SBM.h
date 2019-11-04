@@ -6,9 +6,6 @@
 #define __SBM_INCLUDED__
 
 #include "Node.h" 
-//using std::string;
-//using std::tuple;
-//using std::vector;
 using std::map;
 
 typedef vector<Node*> NodeList;
@@ -34,7 +31,7 @@ class SBM {
     // ==========================================
     // Methods
     NodeList*  get_node_level(int);            // Grabs reference to nodes at desired level, if level doesn't exist, it makes it
-    NodeList   get_nodes_of_type(int, int);    // Return nodes of a desired type from level
+    NodeList   get_nodes_of_type_at_level(int, int);    // Return nodes of a desired type from level
     Node*      create_group_node(int, int);    // Creates a new group node and adds it to its neccesary level
     int        clean_empty_groups();           // Parses through network and removes all empty groups from network, returns num culled
     Node*      get_node_by_id(string, int);    // Grabs and returns node of specified id, if node doesn't exist, node is created first
