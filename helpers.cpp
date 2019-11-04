@@ -1,6 +1,7 @@
 //=================================
 // include guard
 //=================================
+#pragma once
 
 // #include <Rcpp.h>
 #include "Node.h" 
