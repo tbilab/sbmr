@@ -22,15 +22,6 @@ SBM::SBM(){
 
 
 // =======================================================
-// Grabs nodes from desired level, if level doesn't exist, it makes it
-// =======================================================
-// NodeLevel* SBM::get_nodes_at_level(int level) {
-//   
-//   return &nodes[level];
-// };            
-
-
-// =======================================================
 // Find and return a node by its id
 // =======================================================
 Node* SBM::get_node_by_id(string desired_id) {
@@ -106,19 +97,31 @@ list<Node*> SBM::get_nodes_of_type_at_level(int type, int level) {
 // =======================================================
 Node* SBM::create_group_node(int type, int level) {
   
-  NodeLevel  group_level;
-  int        n_groups_in_level;
-  string     group_id;
-  Node*      new_group;
+  LevelMap::iterator  group_level;
+  int                 n_groups_in_level;
+  string              group_id;
+  Node*               new_group;
+  bool                first_in_level;
   
   // Make sure requested level is not 0
   if(level == 0) throw "Can't create group node at first level";
   
   // Grab level for group node
-  group_level = nodes[level];
+  group_level = nodes.find(level);
+  
+  // Is this the very first element in this level? 
+  first_in_level = group_level == nodes.end();
+  
+  if (first_in_level) {
+    // Add a new node level 
+    nodes.emplace(level, *(new NodeLevel));
+    
+    // 'find' that new level
+    group_level = nodes.find(level);
+  }
   
   // Find how many groups are already in the current level (all types)
-  n_groups_in_level = group_level.size();
+  n_groups_in_level = group_level->second.size();
   
   // Build group_id
   group_id = std::to_string(type) + "-" + std::to_string(level) + "_" + std::to_string(n_groups_in_level);
@@ -127,7 +130,7 @@ Node* SBM::create_group_node(int type, int level) {
   new_group = new Node(group_id, level, type);
   
   // Add group node to SBM
-  group_level.emplace(group_id, new_group);
+  group_level->second.emplace(group_id, new_group);
   
   return new_group;
 };
