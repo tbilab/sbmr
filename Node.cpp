@@ -185,7 +185,7 @@ connection_info Node::connections_to_node(Node* target_node) {
   connection_info         connections;               // connection info struct we're returning
   vector<Node*>::iterator connections_it;            // For iterating through all connected nodes 
   int                     n_connections_to_target;   // How many connection for node are to our target node
-  vector<Node*>           all_connections_to_level;  // List of every connection from node to leel of target node
+  vector<Node*>           all_connections_to_level;  // List of every connection from node to level of target node
   
   // Grab all the nodes connected to node at the level of the target node
   all_connections_to_level = this->get_connections_to_level(target_node->level);
@@ -223,7 +223,7 @@ connection_info Node::connections_to_node(Node* target_node) {
 // ======================================================= 
 // Probability node transitions to a given group
 // =======================================================
-double Node::prob_of_joining_group(Node* target_group, list<Node*> groups_to_check, int total_possible_groups) {
+double Node::prob_of_joining_group(Node* target_group, list<Node*> groups_of_connections, int n_target_groups) {
   list<Node*>::iterator  group_it;                      // For parsing through all groups to check
   Node*                  group_being_checked;           // What group are we currently comparing to target      
   connection_info        node_to_checked_connections;   // Connection stats for this node to group we're investigating
@@ -238,7 +238,7 @@ double Node::prob_of_joining_group(Node* target_group, list<Node*> groups_to_che
   cummulative_prob = 0.0; // Start out sum at 0.
   
   // Parse through all groups to check
-  for(group_it = groups_to_check.begin(); group_it != groups_to_check.end(); ++group_it){
+  for(group_it = groups_of_connections.begin(); group_it != groups_of_connections.end(); ++group_it){
     group_being_checked = *group_it;
     
     // Make sure we're only looking at groups of type different than node.
@@ -254,7 +254,7 @@ double Node::prob_of_joining_group(Node* target_group, list<Node*> groups_to_che
     n_between_checked_target = checked_to_target_connections.n_between;
     n_total_current = checked_to_target_connections.n_total;
     
-    cummulative_prob += frac_connections_in_group * (n_between_checked_target + epsilon) / (n_total_current + epsilon*(total_possible_groups + 1));
+    cummulative_prob += frac_connections_in_group * (n_between_checked_target + epsilon) / (n_total_current + epsilon*(n_target_groups + 1));
   }
   
   return cummulative_prob;
