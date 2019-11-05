@@ -6,6 +6,7 @@
 
 using std::string;
 using std::vector;
+using std::map;
 
 // A map keyed by ID of nodes that live on a given level of the SBM
 typedef std::map<string, Node*>  NodeLevel;
@@ -80,14 +81,16 @@ void SBM::check_level_has_nodes(const NodeLevel& level_to_check){
   }
 };    
 
-
 // =======================================================
-// Return nodes of a desired type from level
+// Return nodes of a desired type from level. If match_type = true
+// then the nodes returned are of the same type as specified, otherwise
+// the nodes returned are _not_of the same type.
 // =======================================================
-list<Node*> SBM::get_nodes_of_type_at_level(int type, int level) {
+list<Node*> SBM::get_nodes_from_level(int type, int level, bool match_type) {
   list<Node*>           nodes_to_return;
   NodeLevel::iterator   node_it;
   NodeLevel             node_level;
+  bool                  keep_node; 
   
   // Grab desired level reference
   node_level = nodes.at(level);
@@ -98,15 +101,33 @@ list<Node*> SBM::get_nodes_of_type_at_level(int type, int level) {
   // Loop through every node belonging to the desired level
   for (node_it = node_level.begin(); node_it != node_level.end(); ++node_it) {
     
-    // If the current node is of desired type...
-    if(node_it->second->type == type) {
-      
+    // Decide to keep the node or not based on if it matches or doesn't and our
+    // keeping preferance
+    keep_node = match_type ? 
+    (node_it->second->type == type) : 
+    (node_it->second->type != type);
+    
+    if(keep_node) {
       // ...Place it in returning list
       nodes_to_return.push_back(node_it->second);
     }
   }
   
   return nodes_to_return;
+} 
+
+// =======================================================
+// Return nodes of a desired type from level. 
+// =======================================================
+list<Node*> SBM::get_nodes_of_type_at_level(int type, int level) {
+  return get_nodes_from_level(type, level, true);
+}   
+
+// =======================================================
+// Return nodes _not_ of a specified type from level
+// =======================================================
+list<Node*> SBM::get_nodes_not_of_type_at_level(int type, int level) {
+  return get_nodes_from_level(type, level, false);
 }   
 
 
@@ -198,4 +219,109 @@ void SBM::give_every_node_a_group_at_level(int level) {
 // =======================================================
 Node* SBM::get_node_from_level(int level) {
   return nodes.at(level).begin()->second;
+}
+
+// =======================================================
+// Calculates probabilities for joining a given new group based on current SBM state
+// =======================================================
+Transition_Probs SBM::get_transition_probs_for_groups(Node* node_to_move) {
+  list<Node*>                 neighboring_groups;        // Groups of connection to search over, will be all for unipartite, but a subset for polypartite networks
+  list<Node*>::iterator       neighbor_group_it;         // For parsing through all groups to check
+  Node*                       neighbor_group; 
+  list<Node*>                 potential_groups;          // Groups that the node can join
+  list<Node*>::iterator       potential_group_it;        // For parsing through all groups to check
+  Node*                       potential_group;
+  bool                        is_polypartite;            // Is this SBM polypartite
+  int                         type_to_ignore;            // What type of nodes do we want to avoid when finding connections?
+  double                      epsilon;                   // Ergodicity tuning parameter
+  double                      cummulative_prob;          // Variable to accumulate probabilities over sum
+  int                         B;        // Number of potential groups
+  map<Node*, connection_info> node_outward_connections;  // Map for precalculating the connections between node and all neighbor groups
+  connection_info             potential_to_neighbor_connections; 
+  connection_info             node_to_neighbor_connections; 
+  Transition_Probs            transition_probs;
+  
+  // Some variables that make the final calculation a bit clearer to understand
+  // fraction node connections to neighbor
+  double P_si;
+  // number connections between neighbor and potential
+  double e_sr;
+  // total connections for neighbor
+  double e_s;
+  
+  epsilon = 0.01; // This will eventually be passed to function
+
+  // First check what type of network we're working with
+  is_polypartite = unique_node_types.size() > 1;
+  
+  // If we have a polypartite network we want to avoid that type when finding
+  // neighbor nodes to look at. Otherwise we want to get all types, which we do
+  // by supplying the 'null' type of -1.
+  type_to_ignore = is_polypartite ? node_to_move->type : -1;
+  
+  // Grab all groups that could belong to connections
+  neighboring_groups = get_nodes_not_of_type_at_level(type_to_ignore, node_to_move->level + 1);
+  
+  // First we gather info on how the node to move is connected in terms of its
+  // neighbors's groups
+  for (neighbor_group_it = neighboring_groups.begin(); neighbor_group_it != neighboring_groups.end(); ++neighbor_group_it) {
+    neighbor_group = *neighbor_group_it;
+    
+    // What proportion of this node's edges are to nodes in current group?
+    node_outward_connections.emplace(
+      neighbor_group,
+      node_to_move->connections_to_node(neighbor_group)
+    );
+  }
+  
+  // Now loop through all the groups that the node could join
+  potential_groups = get_nodes_of_type_at_level(type_to_ignore, node_to_move->level + 1);
+  
+  B = potential_groups.size();
+  
+  // Reserve proper number of elements for the two info holding vectors
+  transition_probs.probability.reserve(B);
+  transition_probs.group.reserve(B);
+  
+  // Start main loop over all the potential groups that the node could join
+  for (potential_group_it = potential_groups.begin(); potential_group_it != potential_groups.end(); ++potential_group_it) {
+    potential_group = *potential_group_it;
+    
+    // Send currently investigated group to groups vector
+    transition_probs.group.push_back(potential_group);
+    
+    // Start out sum at 0.
+    cummulative_prob = 0.0;
+    
+    // Loop over the neighbor groups again
+    for (neighbor_group_it = neighboring_groups.begin(); neighbor_group_it != neighboring_groups.end(); ++neighbor_group_it) {
+      neighbor_group = *neighbor_group_it;
+      
+      // Get connection info for the potential group to the neighbor group
+      potential_to_neighbor_connections = neighbor_group->connections_to_node(potential_group);
+      
+      // Grab pre-calculated connection info from node to this neighbor
+      node_to_neighbor_connections = node_outward_connections.at(neighbor_group);
+      
+      // Get fraction of the nodes connections to the current neighbor. This
+      // serves as an indicator of how close we should consider the connections
+      // of this neighbor node when deciding the new group.
+      P_si = double(node_to_neighbor_connections.n_between) / double(node_to_neighbor_connections.n_total);
+      
+      // How many connections there are between our neighbor group and the potential group
+      e_sr = double(potential_to_neighbor_connections.n_between);
+      
+      // How many total connection the neighbor node has
+      e_s = double(potential_to_neighbor_connections.n_total);
+      
+      // Finally calculate partial probability and add to cummulative sum 
+      cummulative_prob += P_si * (e_sr + epsilon) / (e_s + epsilon*(B + 1));
+    }
+    
+    // Add the final cumulative probabiltiy sum to potential group's element in probability vector
+    transition_probs.probability.push_back(cummulative_prob);
+    
+  }
+  
+  return transition_probs;
 }
