@@ -5,14 +5,13 @@
 #include <string>
 #include <vector>
 
-
 // using namespace Rcpp;
 using std::string;
 using std::vector;
+using std::list;
 using std::unordered_set;
 
 // For a bit of clarity
-typedef vector<Node*> NodeList;
 typedef unordered_set<Node*> ChildSet;
 
 // =======================================================
@@ -37,7 +36,7 @@ Node::Node(string node_id, int level, int type):
 // Add connection to another node
 // =======================================================
 void Node::add_connection(Node* node_ptr) {
-  // Add element to connections array
+  // Add element to connections list
   connections.push_back(node_ptr);
 }          
 
@@ -65,7 +64,7 @@ void Node::set_parent(Node* parent_node_ptr) {
 // =======================================================
 void Node::add_child(Node* new_child_node) {
   // Add new child node to the set of children. An unordered set is used because
-  // repeat children cant happen.
+  // repeat children can't happen.
   (this->children).insert(new_child_node);
 }
 
@@ -79,8 +78,8 @@ void Node::remove_child(Node* child_node) {
 // =======================================================
 // Get all member nodes of current node at a given level
 // =======================================================
-NodeList Node::get_children_at_level(int desired_level) {
-  NodeList            children_nodes;
+ChildSet Node::get_children_at_level(int desired_level) {
+  ChildSet            children_nodes;
   ChildSet::iterator  child_it;
   Node*               current_node;
   bool                at_desired_level;
@@ -102,7 +101,7 @@ NodeList Node::get_children_at_level(int desired_level) {
     
     // if node is at desired level, add it to the return vector
     if (at_desired_level) {
-      children_nodes.push_back(current_node);
+      children_nodes.insert(current_node);
     } else {
       // Otherwise, add each of the member nodes to queue 
       for (child_it = (current_node->children).begin(); child_it != (current_node->children).end(); ++child_it) {
@@ -148,12 +147,14 @@ Node* Node::get_parent_at_level(int level_of_parent) {
 
 // =======================================================
 // Get all nodes connected to Node at a given level
+//   We return a vector because we need random access to elements in this array
+// and that isn't provided to us with the list format.
 // =======================================================
-NodeList Node::get_connections_to_level(int desired_level) {
-  NodeList            connected_nodes; 
-  NodeList            leaf_children;
-  NodeList::iterator  child_it;
-  NodeList::iterator  connection_it;
+vector<Node*> Node::get_connections_to_level(int desired_level) {
+  ChildSet                 leaf_children;   // All the children for a given level
+  ChildSet::iterator       child_it;        // Iterator for moving through child nodes
+  list<Node*>::iterator    connection_it;   // Iterator for moving through each child's connection list
+  vector<Node*>            connected_nodes; // Vector to return containing parents at desired level for connections
 
   // Start by getting all of the level zero children of this node
   leaf_children = get_children_at_level(0);
@@ -161,7 +162,7 @@ NodeList Node::get_connections_to_level(int desired_level) {
   // Go through every child
   for (child_it = leaf_children.begin(); child_it != leaf_children.end(); ++child_it) {
     
-    // Go through every child node's connections vector
+    // Go through every child node's connections list
     for (connection_it = (*child_it)->connections.begin(); connection_it != (*child_it)->connections.end(); ++connection_it) {
       
       // For each connection of current child, find parent at desired level and
@@ -181,11 +182,10 @@ NodeList Node::get_connections_to_level(int desired_level) {
 // Get number of edges between and fraction of total for starting node
 // =======================================================
 connection_info Node::connections_to_node(Node* target_node) {
-  connection_info    connections;               // connection info struct we're returning
-  NodeList::iterator connections_it;            // For iterating through all connected nodes 
-  int                n_connections_to_target;   // How many connection for node are to our target node
-  NodeList           all_connections_to_level;  // List of every connection from node to leel of target node
-  
+  connection_info         connections;               // connection info struct we're returning
+  vector<Node*>::iterator connections_it;            // For iterating through all connected nodes 
+  int                     n_connections_to_target;   // How many connection for node are to our target node
+  vector<Node*>           all_connections_to_level;  // List of every connection from node to leel of target node
   
   // Grab all the nodes connected to node at the level of the target node
   all_connections_to_level = this->get_connections_to_level(target_node->level);
@@ -223,16 +223,16 @@ connection_info Node::connections_to_node(Node* target_node) {
 // ======================================================= 
 // Probability node transitions to a given group
 // =======================================================
-double Node::prob_of_joining_group(Node* target_group, NodeList groups_to_check, int total_possible_groups) {
-  NodeList::iterator   group_it;                      // For parsing through all groups to check
-  Node*                group_being_checked;           // What group are we currently comparing to target      
-  connection_info      node_to_checked_connections;   // Connection stats for this node to group we're investigating
-  connection_info      checked_to_target_connections; // Connection stats for group we're investigating to potential move group
-  double               frac_connections_in_group;     // Proportion of connections of node belonging to investigated group
-  double               n_between_checked_target;      // How many connections are there between the investigated group and potential move group
-  double               n_total_current;               // How many total connections does the investigated group have
-  double               epsilon;                       // Ergodicity tuning parameter
-  double               cummulative_prob;              // Varibale to accumulate probabilities over sum
+double Node::prob_of_joining_group(Node* target_group, list<Node*> groups_to_check, int total_possible_groups) {
+  list<Node*>::iterator  group_it;                      // For parsing through all groups to check
+  Node*                  group_being_checked;           // What group are we currently comparing to target      
+  connection_info        node_to_checked_connections;   // Connection stats for this node to group we're investigating
+  connection_info        checked_to_target_connections; // Connection stats for group we're investigating to potential move group
+  double                 frac_connections_in_group;     // Proportion of connections of node belonging to investigated group
+  double                 n_between_checked_target;      // How many connections are there between the investigated group and potential move group
+  double                 n_total_current;               // How many total connections does the investigated group have
+  double                 epsilon;                       // Ergodicity tuning parameter
+  double                 cummulative_prob;              // Varibale to accumulate probabilities over sum
   
   epsilon = 0.01; // This will eventually be passed to function
   cummulative_prob = 0.0; // Start out sum at 0.
