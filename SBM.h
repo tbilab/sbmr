@@ -2,6 +2,7 @@
 #define __SBM_INCLUDED__
 
 #include <map>
+#include <set>
 #include "Node.h" 
 
 // A map keyed by ID of nodes that live on a given level of the SBM
@@ -25,7 +26,8 @@ class SBM {
     SBM(); 
     // ==========================================
     // Attributes
-    LevelMap   nodes;                          // A map keyed by level integer of each level of nodes 
+    LevelMap      nodes;                          // A map keyed by level integer of each level of nodes 
+    std::set<int> unique_node_types;              // Vector storing all the unique types of nodes seen. Used to make sure the correct move proposals are made
 
     // ==========================================
     // Methods
@@ -38,6 +40,7 @@ class SBM {
     Node*       add_node(string, int);                   // Grabs and returns node of specified id, if node doesn't exist, node is created first
     void        add_connection(string, string);          // Adds a connection between two nodes based on their ids
     void        give_every_node_a_group_at_level(int);   // Builds and assigns a group node for every node in a given level
+    Node*       get_node_from_level(int);                // Grabs the first node found at a given level, used in testing.
 };
 
 #endif

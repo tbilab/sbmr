@@ -138,7 +138,10 @@ TEST(testSBM, build_with_connections){
   my_SBM.give_every_node_a_group_at_level(0);
 
   // There should be a total of 18 nodes at level 1
-  EXPECT_EQ(18, my_SBM.nodes.at(0).size());
+  EXPECT_EQ(18, my_SBM.nodes.at(1).size());
+  
+  // A node from this new level should have a single child
+  EXPECT_EQ(1, my_SBM.get_node_from_level(1)->children.size());
 
 }
 

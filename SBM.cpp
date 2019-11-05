@@ -187,4 +187,12 @@ void SBM::give_every_node_a_group_at_level(int level) {
     node_it->second->set_parent(new_group);
   }
   
-}      
+}    
+
+
+// =======================================================
+// Grabs the first node found at a given level, used in testing.
+// =======================================================
+Node* SBM::get_node_from_level(int level) {
+  return nodes.at(level).begin()->second;
+}

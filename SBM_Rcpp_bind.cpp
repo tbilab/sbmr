@@ -24,8 +24,7 @@ List setup_SBM(){
   my_SBM.add_node("m4", 1);
 
   // Create a group node
-  my_SBM.create_group_node(0, 1);
-  my_SBM.create_group_node(1, 1);
+  my_SBM.give_every_node_a_group_at_level(0);
 
   return List::create(
     _["num_nodes"]            = my_SBM.nodes[0].size(),
