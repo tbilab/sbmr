@@ -29,6 +29,7 @@ class SBM {
 
     // ==========================================
     // Methods
+    void        add_level(int);                          // Setup a new Node level
     void        check_level_has_nodes(const NodeLevel&); // Validates that a given level has nodes and throws error if it doesn;t
     list<Node*> get_nodes_of_type_at_level(int, int);    // Return nodes of a desired type from level
     Node*       create_group_node(int, int);             // Creates a new group node and adds it to its neccesary level

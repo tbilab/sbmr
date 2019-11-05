@@ -17,7 +17,22 @@ typedef std::map<int, NodeLevel> LevelMap;
 // Constructor that takes the nodes unique id integer and type
 // =======================================================
 SBM::SBM(){
-  // Nothing needs doin'
+  // Setup first level of the node map
+  add_level(0);
+}
+
+// =======================================================
+// Setup a new Node level
+// =======================================================
+void SBM::add_level(int level) {
+  
+  // First, make sure level doesn't already exist
+  if (nodes.find(level) != nodes.end()) {
+    throw "Requested level to create already exists.";
+  }
+  
+  // Setup first level of the node map
+  nodes.emplace(level, *(new NodeLevel));
 }
 
 
@@ -28,7 +43,7 @@ Node* SBM::get_node_by_id(string desired_id) {
   
   try {
     // Attempt to find node on the 'node level' of the SBM
-    return nodes[0].at(desired_id);
+    return nodes.at(0).at(desired_id);
   } catch (...) {
     // Throw informative error if it fails
     throw "Could not find requested node";
@@ -47,7 +62,7 @@ Node* SBM::add_node(string id, int type){
   new_node = new Node(id, 0, type);
   
   // Add node to node list
-  nodes[0].emplace(id, new_node);
+  nodes.at(0).emplace(id, new_node);
 
   return new_node;
 }; 
@@ -72,7 +87,7 @@ list<Node*> SBM::get_nodes_of_type_at_level(int type, int level) {
   NodeLevel             node_level;
   
   // Grab desired level reference
-  node_level = nodes[level];
+  node_level = nodes.at(level);
   
   // Make sure level has nodes before looping through it
   check_level_has_nodes(node_level);
@@ -114,7 +129,7 @@ Node* SBM::create_group_node(int type, int level) {
   
   if (first_in_level) {
     // Add a new node level 
-    nodes.emplace(level, *(new NodeLevel));
+    add_level(level);
     
     // 'find' that new level
     group_level = nodes.find(level);
@@ -157,7 +172,7 @@ void SBM::give_every_node_a_group_at_level(int level) {
   Node*                new_group;
   
   // Grab all the nodes for the desired level
-  node_level = nodes[level];
+  node_level = nodes.at(level);
   
   // Make sure level has nodes before looping through it
   check_level_has_nodes(node_level);
