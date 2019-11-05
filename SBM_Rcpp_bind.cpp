@@ -32,7 +32,8 @@ List setup_SBM(){
     _["level 1"]              = print_node_ids(my_SBM.nodes[1]),
     _["nodes of first type"]  = print_node_ids(my_SBM.get_nodes_of_type_at_level(0,0)),
     _["nodes of second type"] = print_node_ids(my_SBM.get_nodes_of_type_at_level(1,0)),
-    _["num levels"]           = my_SBM.nodes.size()
+    _["num levels"]           = my_SBM.nodes.size(),
+    _["num types"]            = my_SBM.unique_node_types.size()
   );
 }
 
