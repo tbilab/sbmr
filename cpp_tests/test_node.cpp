@@ -1,5 +1,5 @@
 #include<gtest/gtest.h>
-#include "../helpers.cpp"
+#include "../helpers.h"
 #include "../Node.h"
 
 
