@@ -37,7 +37,41 @@ TEST(testSBM, basic){
   
   // Get number of levels
   EXPECT_EQ(2, my_SBM.nodes.size());
+  
+  // There should be two types of nodes
+  EXPECT_EQ(2, my_SBM.unique_node_types.size());
+  
 }
+
+TEST(testSBM, tracking_node_types){
+  SBM my_SBM;
+  
+  // Add some nodes to SBM
+  my_SBM.add_node("n1", 0);
+  my_SBM.add_node("n2", 0);
+  
+  // There should only be one type of node so far
+  EXPECT_EQ(1, my_SBM.unique_node_types.size());
+  
+  my_SBM.add_node("m1", 1);
+  
+  // There should now be two types of nodes
+  EXPECT_EQ(2, my_SBM.unique_node_types.size());
+  
+  my_SBM.add_node("m2", 1);
+  my_SBM.add_node("n3", 0);
+  
+  // There should still just be two types of nodes
+  EXPECT_EQ(2, my_SBM.unique_node_types.size());
+  
+  my_SBM.add_node("m3", 1);
+  my_SBM.add_node("o1", 2);
+  my_SBM.add_node("o2", 2);
+  
+  // There should now be three types of nodes
+  EXPECT_EQ(3, my_SBM.unique_node_types.size());
+}
+
 
 
 TEST(testSBM, building_network){

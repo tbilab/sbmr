@@ -63,7 +63,10 @@ Node* SBM::add_node(string id, int type){
   
   // Add node to node list
   nodes.at(0).emplace(id, new_node);
-
+  
+  // Send node type to the types set
+  unique_node_types.insert(type);
+  
   return new_node;
 }; 
 
