@@ -1,21 +1,4 @@
-#include <string>
-#include <vector>
-
-#include "Node.h"
 #include "SBM.h" 
-
-#include <memory>
-typedef std::shared_ptr<Node> NodePtr;
-
-using std::string;
-using std::vector;
-using std::map;
-
-// A map keyed by ID of nodes that live on a given level of the SBM
-typedef std::map<string, NodePtr>  NodeLevel;
-
-// A map keyed by level integer of each level of nodes 
-typedef std::map<int, NodeLevel> LevelMap;
 
 // =======================================================
 // Constructor that takes the nodes unique id integer and type
@@ -38,7 +21,6 @@ void SBM::add_level(int level) {
   // Setup first level of the node map
   nodes.emplace(level, *(new NodeLevel));
 }
-
 
 // =======================================================
 // Find and return a node by its id
@@ -183,8 +165,8 @@ NodePtr SBM::create_group_node(int type, int level) {
 void SBM::add_connection(string node1_id, string node2_id) {
 
   Node::connect_nodes(
-    this->get_node_by_id(node1_id), 
-    this->get_node_by_id(node2_id)
+    get_node_by_id(node1_id), 
+    get_node_by_id(node2_id)
   );
   
 };       

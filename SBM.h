@@ -1,20 +1,10 @@
 #ifndef __SBM_INCLUDED__
 #define __SBM_INCLUDED__
 
+#include "Node.h" 
 #include <map>
 #include <set>
-#include "Node.h" 
-
 #include <memory>
-typedef std::shared_ptr<Node> NodePtr;
-
-
-// A map keyed by ID of nodes that live on a given level of the SBM
-typedef std::map<string, NodePtr>  NodeLevel;
-
-// A map keyed by level integer of each level of nodes 
-typedef std::map<int, NodeLevel> LevelMap;
-
 
 //=================================
 // What this file declares
@@ -22,6 +12,22 @@ typedef std::map<int, NodeLevel> LevelMap;
 class SBM;
 struct Transition_Probs;
 
+typedef std::shared_ptr<Node> NodePtr;
+
+
+//=================================
+// Some type definitions for clarity
+//=================================
+
+// A map keyed by ID of nodes that live on a given level of the SBM
+typedef std::map<string, NodePtr>  NodeLevel;
+
+// A map keyed by level integer of each level of nodes 
+typedef std::map<int, NodeLevel> LevelMap;
+
+using std::string;
+using std::vector;
+using std::map;
 
 //=================================
 // Main node class declaration
