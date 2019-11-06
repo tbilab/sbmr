@@ -53,6 +53,24 @@ std::string print_node_ids(std::list<NodePtr> nodes) {
 }
 
 // =======================================================
+// unordered set Version
+std::string print_node_ids(std::unordered_set<NodePtr> nodes) {
+  // Vector of node ids to be filled in
+  std::vector<std::string> node_ids;
+  
+  // Add node ids to containing vector
+  for (auto node_it  = nodes.begin(); 
+       node_it != nodes.end(); 
+       ++node_it) 
+  {
+    // Append node id to return string.
+    node_ids.push_back((*node_it)->id);
+  }
+  
+  return print_ids_to_string(node_ids);
+}
+
+// =======================================================
 // Vector Version
 std::string print_node_ids(std::vector<NodePtr> nodes) {
   // Vector of node ids to be filled in

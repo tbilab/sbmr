@@ -27,6 +27,8 @@ std::string print_ids_to_string(std::vector<std::string>);
 // List Version
 std::string print_node_ids(std::list<NodePtr>);
 
+std::string print_node_ids(std::unordered_set<NodePtr>);
+
 // =======================================================
 // Vector Version
 std::string print_node_ids(std::vector<NodePtr>);
