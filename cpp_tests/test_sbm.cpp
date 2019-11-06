@@ -223,65 +223,104 @@ TEST(testSBM, calculating_transition_probs){
   EXPECT_EQ(6, my_SBM.nodes.at(1).size());
   
   // Assign nodes to their groups
-  a2->set_parent(a1_1);
-  a3->set_parent(a1_1);
-  a4->set_parent(a1_2);
+  a1->set_parent(a1_1);
+  a2->set_parent(a1_2);
+  a3->set_parent(a1_2);
+  a4->set_parent(a1_3);
   
   b1->set_parent(b1_1);
   b2->set_parent(b1_1);
   b3->set_parent(b1_2);
   b4->set_parent(b1_3);
 
-  // Give a1 a throwaway group
-  a1->set_parent(a1_3);
-  
-  // There should be a total of 5 level one groups
-  EXPECT_EQ(a1_1, a2->parent);
-  
+
   // The group we hope a1 wants to join should have two members
-  EXPECT_EQ("a2, a3", print_node_ids(a1_1->children));
+  EXPECT_EQ("a2, a3", print_node_ids(a1_2->children));
   
   // There should be 4 total connections between first a group and first b group
   
   // ... and 5 total out of the first a group
-  EXPECT_EQ(5, a1_1->connections_to_node(b1_1).n_total);
-  EXPECT_EQ(1, a1_2->connections_to_node(b1_1).n_total);
+  EXPECT_EQ(2, a1_1->connections_to_node(b1_1).n_total);
+  EXPECT_EQ(5, a1_2->connections_to_node(b1_1).n_total);
+  EXPECT_EQ(1, a1_3->connections_to_node(b1_1).n_total);
 
-  EXPECT_EQ(6, b1_1->connections_to_node(a1_1).n_total);
-  EXPECT_EQ(1, b1_2->connections_to_node(a1_1).n_total);
-  EXPECT_EQ(1, b1_3->connections_to_node(a1_1).n_total);
+  EXPECT_EQ(6, b1_1->connections_to_node(a1_2).n_total);
+  EXPECT_EQ(1, b1_2->connections_to_node(a1_2).n_total);
+  EXPECT_EQ(1, b1_3->connections_to_node(a1_2).n_total);
 
   
   // Check connection counts between groups... E.g. there should be no
   // connections between first a group and second b group
-  EXPECT_EQ(4, a1_1->connections_to_node(b1_1).n_between);
-  EXPECT_EQ(a1_1->connections_to_node(b1_1).n_between, 
-            b1_1->connections_to_node(a1_1).n_between);
-
+  EXPECT_EQ(2, a1_1->connections_to_node(b1_1).n_between);
   EXPECT_EQ(0, a1_1->connections_to_node(b1_2).n_between);
-  EXPECT_EQ(a1_1->connections_to_node(b1_2).n_between,
-            b1_2->connections_to_node(a1_1).n_between);
-
-  EXPECT_EQ(1, a1_1->connections_to_node(b1_3).n_between);
-  EXPECT_EQ(a1_1->connections_to_node(b1_3).n_between,
-            b1_3->connections_to_node(a1_1).n_between);
-
-  EXPECT_EQ(0, a1_2->connections_to_node(b1_1).n_between);
-  EXPECT_EQ(a1_2->connections_to_node(b1_1).n_between,
-            b1_1->connections_to_node(a1_2).n_between);
-
-  EXPECT_EQ(1, a1_2->connections_to_node(b1_2).n_between);
-  EXPECT_EQ(a1_2->connections_to_node(b1_2).n_between,
-            b1_2->connections_to_node(a1_2).n_between);
-
-  EXPECT_EQ(0, a1_2->connections_to_node(b1_3).n_between);
-  EXPECT_EQ(a1_2->connections_to_node(b1_3).n_between,
-            b1_3->connections_to_node(a1_2).n_between);
+  EXPECT_EQ(0, a1_1->connections_to_node(b1_3).n_between);
   
-    // Calculate move probabilities for node a1
+  EXPECT_EQ(4, a1_2->connections_to_node(b1_1).n_between);
+  EXPECT_EQ(0, a1_2->connections_to_node(b1_2).n_between);
+  EXPECT_EQ(1, a1_2->connections_to_node(b1_3).n_between);
   
-  // EXPECT_EQ("0-1_0, 0-1_1", print_node_ids(my_SBM.get_transition_probs_for_groups(a1)));
+  EXPECT_EQ(0, a1_3->connections_to_node(b1_1).n_between);
+  EXPECT_EQ(1, a1_3->connections_to_node(b1_2).n_between);
+  EXPECT_EQ(0, a1_3->connections_to_node(b1_3).n_between);
   
+  EXPECT_EQ(b1_1->connections_to_node(a1_1).n_between, 
+            a1_1->connections_to_node(b1_1).n_between);
+  
+  EXPECT_EQ(b1_2->connections_to_node(a1_1).n_between, 
+            a1_1->connections_to_node(b1_2).n_between);
+  
+  EXPECT_EQ(b1_3->connections_to_node(a1_1).n_between, 
+            a1_1->connections_to_node(b1_3).n_between);
+  
+  EXPECT_EQ(b1_1->connections_to_node(a1_2).n_between, 
+            a1_2->connections_to_node(b1_1).n_between);
+  
+  EXPECT_EQ(b1_2->connections_to_node(a1_2).n_between, 
+            a1_2->connections_to_node(b1_2).n_between);
+  
+  EXPECT_EQ(b1_3->connections_to_node(a1_2).n_between, 
+            a1_2->connections_to_node(b1_3).n_between);
+  
+  EXPECT_EQ(b1_1->connections_to_node(a1_3).n_between, 
+            a1_3->connections_to_node(b1_1).n_between);
+  
+  EXPECT_EQ(b1_2->connections_to_node(a1_3).n_between, 
+            a1_3->connections_to_node(b1_2).n_between);
+  
+  EXPECT_EQ(b1_3->connections_to_node(a1_3).n_between, 
+            a1_3->connections_to_node(b1_3).n_between);
+  
+  // Calculate move probabilities for node a1
+  Trans_Probs a1_move_probs = my_SBM.get_transition_probs_for_groups(a1);
+  EXPECT_EQ("0-1_0, 0-1_1, 0-1_2", print_node_ids(a1_move_probs.group));
+  EXPECT_EQ("0-1_0, 0-1_1, 0-1_2", print_node_ids(a1_move_probs.group));
+  
+  double two = 2;
+  double six = 6;
+  double four = 4;
+  double eps = 0.01;
+  double tolerance = 0.0001;
+  
+  // Prob of a1 staying in a1_1 should be approximately (2 + eps)/(6 + 4*eps)
+  ASSERT_NEAR(
+    (two + eps)/(six + four*eps), 
+    a1_move_probs.probability[0],
+    tolerance
+  );
+  
+  // Prob of a1 joining a1_2 should be approximately (4 + eps)/(6 + 4*eps)
+  ASSERT_NEAR(
+    (four + eps)/(six + four*eps), 
+    a1_move_probs.probability[1],
+    tolerance
+  );
+  
+  // Prob of a1 joining a1_3 should be approximately (0 + eps)/(6 + 4*eps)
+  ASSERT_NEAR(
+    (eps)/(six + four*eps), 
+    a1_move_probs.probability[2],
+    tolerance
+  );
   
 }
 
