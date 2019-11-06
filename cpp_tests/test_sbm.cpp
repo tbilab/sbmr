@@ -329,6 +329,12 @@ TEST(testSBM, calculating_transition_probs){
     tolerance
   );
   
+  // Roll a 'Random' dice and choose which group to move the node to
+  a1->set_parent(a1_2);
+  
+  // Make sure this transition was respected
+  EXPECT_EQ("a1, a2, a3", print_node_ids(a1_2->children));
+  
 }
 
 
