@@ -72,10 +72,10 @@ void SBM::check_level_has_nodes(const NodeLevel& level_to_check){
 // the nodes returned are _not_of the same type.
 // =======================================================
 list<NodePtr> SBM::get_nodes_from_level(int type, int level, bool match_type) {
-  list<NodePtr>           nodes_to_return;
-  NodeLevel::iterator   node_it;
-  NodeLevel             node_level;
-  bool                  keep_node; 
+  list<NodePtr>        nodes_to_return;
+  NodeLevel::iterator  node_it;
+  NodeLevel            node_level;
+  bool                 keep_node; 
   
   // Grab desired level reference
   node_level = nodes.at(level);
@@ -120,11 +120,10 @@ list<NodePtr> SBM::get_nodes_not_of_type_at_level(int type, int level) {
 // Creates a new group node and add it to its neccesary level
 // =======================================================
 NodePtr SBM::create_group_node(int type, int level) {
-  
   LevelMap::iterator  group_level;
   int                 n_groups_in_level;
   string              group_id;
-  NodePtr               new_group;
+  NodePtr             new_group;
   bool                first_in_level;
   
   // Make sure requested level is not 0
@@ -178,7 +177,7 @@ void SBM::add_connection(string node1_id, string node2_id) {
 void SBM::give_every_node_a_group_at_level(int level) {
   NodeLevel            node_level;
   NodeLevel::iterator  node_it;
-  NodePtr                new_group;
+  NodePtr              new_group;
   
   // Grab all the nodes for the desired level
   node_level = nodes.at(level);
@@ -209,22 +208,22 @@ NodePtr SBM::get_node_from_level(int level) {
 // =======================================================
 // Calculates probabilities for joining a given new group based on current SBM state
 // =======================================================
-Transition_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
-  list<NodePtr>                 neighboring_groups;        // Groups of connection to search over, will be all for unipartite, but a subset for polypartite networks
-  list<NodePtr>::iterator       neighbor_group_it;         // For parsing through all groups to check
-  NodePtr                       neighbor_group; 
-  list<NodePtr>                 potential_groups;          // Groups that the node can join
-  list<NodePtr>::iterator       potential_group_it;        // For parsing through all groups to check
-  NodePtr                       potential_group;
-  bool                        is_polypartite;            // Is this SBM polypartite
-  int                         type_to_ignore;            // What type of nodes do we want to avoid when finding connections?
-  double                      epsilon;                   // Ergodicity tuning parameter
-  double                      cummulative_prob;          // Variable to accumulate probabilities over sum
-  int                         B;        // Number of potential groups
+Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
+  list<NodePtr>             neighboring_groups;        // Groups of connection to search over, will be all for unipartite, but a subset for polypartite networks
+  list<NodePtr>::iterator   neighbor_group_it;         // For parsing through all groups to check
+  NodePtr                   neighbor_group; 
+  list<NodePtr>             potential_groups;          // Groups that the node can join
+  list<NodePtr>::iterator   potential_group_it;        // For parsing through all groups to check
+  NodePtr                   potential_group;
+  bool                      is_polypartite;            // Is this SBM polypartite
+  int                       type_to_ignore;            // What type of nodes do we want to avoid when finding connections?
+  double                    epsilon;                   // Ergodicity tuning parameter
+  double                    cummulative_prob;          // Variable to accumulate probabilities over sum
+  int                       B;                         // Number of potential groups
+  connection_info           potential_to_neighbor_connections; 
+  connection_info           node_to_neighbor_connections; 
+  Trans_Probs               transition_probs;
   map<NodePtr, connection_info> node_outward_connections;  // Map for precalculating the connections between node and all neighbor groups
-  connection_info             potential_to_neighbor_connections; 
-  connection_info             node_to_neighbor_connections; 
-  Transition_Probs            transition_probs;
   
   // Some variables that make the final calculation a bit clearer to understand
   // fraction node connections to neighbor

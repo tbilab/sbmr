@@ -71,11 +71,11 @@ void Node::remove_child(NodePtr child_node) {
 // Get all member nodes of current node at a given level
 // =======================================================
 ChildSet Node::get_children_at_level(int desired_level) {
-  ChildSet            children_nodes;
-  ChildSet::iterator  child_it;
-  NodePtr               current_node;
-  bool                at_desired_level;
-  std::queue<NodePtr>   children_queue;
+  ChildSet             children_nodes;
+  ChildSet::iterator   child_it;
+  NodePtr              current_node;
+  bool                 at_desired_level;
+  std::queue<NodePtr>  children_queue;
 
   // Start by placing the current node into children queue
   children_queue.push(this_ptr());
@@ -111,7 +111,7 @@ ChildSet Node::get_children_at_level(int desired_level) {
 // Get parent of current node at a given level
 // =======================================================
 NodePtr Node::get_parent_at_level(int level_of_parent) {
-  int    level_delta;    // How many levels up do we need to go?
+  int      level_delta;    // How many levels up do we need to go?
   NodePtr  current_node;   // What node are we currently looking at?
   
   level_delta = level_of_parent - level;
@@ -143,10 +143,10 @@ NodePtr Node::get_parent_at_level(int level_of_parent) {
 // and that isn't provided to us with the list format.
 // =======================================================
 vector<NodePtr> Node::get_connections_to_level(int desired_level) {
-  ChildSet                 leaf_children;   // All the children for a given level
-  ChildSet::iterator       child_it;        // Iterator for moving through child nodes
-  list<NodePtr>::iterator    connection_it;   // Iterator for moving through each child's connection list
-  vector<NodePtr>            connected_nodes; // Vector to return containing parents at desired level for connections
+  ChildSet                  leaf_children;   // All the children for a given level
+  ChildSet::iterator        child_it;        // Iterator for moving through child nodes
+  list<NodePtr>::iterator   connection_it;   // Iterator for moving through each child's connection list
+  vector<NodePtr>           connected_nodes; // Vector to return containing parents at desired level for connections
 
   // Start by getting all of the level zero children of this node
   leaf_children = get_children_at_level(0);
@@ -174,9 +174,9 @@ vector<NodePtr> Node::get_connections_to_level(int desired_level) {
 // Get number of edges between and fraction of total for starting node
 // =======================================================
 connection_info Node::connections_to_node(NodePtr target_node) {
-  connection_info         connections;               // connection info struct we're returning
+  connection_info           connections;               // connection info struct we're returning
   vector<NodePtr>::iterator connections_it;            // For iterating through all connected nodes 
-  int                     n_connections_to_target;   // How many connection for node are to our target node
+  int                       n_connections_to_target;   // How many connection for node are to our target node
   vector<NodePtr>           all_connections_to_level;  // List of every connection from node to level of target node
   
   // Grab all the nodes connected to node at the level of the target node
