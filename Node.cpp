@@ -38,7 +38,7 @@ void Node::add_connection(NodePtr node_ptr) {
 void Node::set_parent(NodePtr parent_node_ptr) {
   // Remove self from previous parents children list (if it existed)
   if(has_parent){
-    parent_node_ptr->remove_child(this_ptr());
+    parent->remove_child(this_ptr());
   }
 
   // Set this node's parent
