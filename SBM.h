@@ -5,6 +5,8 @@
 #include <map>
 #include <set>
 #include <memory>
+#include <numeric>
+
 
 //=================================
 // What this file declares

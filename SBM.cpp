@@ -296,9 +296,16 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
       // Get fraction of the nodes connections to the current neighbor. This
       // serves as an indicator of how close we should consider the connections
       // of this neighbor node when deciding the new group.
-      double P_si = double(node_to_neighbor_connections.n_between) /
-                    double(node_to_neighbor_connections.n_total);
-
+      // double P_si = double(node_to_neighbor_connections.n_between) /
+      //               double(node_to_neighbor_connections.n_total);      
+      
+      // We can just calculate this value instead of the prob because the denominator of the 
+      // probability is the same for every iteration so we can just use the numerator and 
+      // then the normalization of vector to 1 at end will take care of this scalar. 
+      
+      // How many connections does this node have to group of interest? 
+      double e_si = node_to_neighbor_connections.n_between;
+      
       // How many connections there are between our neighbor group and the
       // potential group
       double e_sr = potential_to_neighbor_connections.n_between;
@@ -307,13 +314,20 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
       double e_s = potential_to_neighbor_connections.n_total;
 
       // Finally calculate partial probability and add to cummulative sum
-      cummulative_prob += P_si * (e_sr + epsilon) / (e_s + epsilon*(B + 1));
+      cummulative_prob += e_si * ( (e_sr + epsilon) / (e_s + epsilon*(B + 1)) );
     }
 
     // Add the final cumulative probabiltiy sum to potential group's element in
     // probability vector
     probabilities.push_back(cummulative_prob);
   }
-
+  
+  // Normalize vector to sum to 1
+  double total_of_probs = std::accumulate(probabilities.begin(), probabilities.end(), double(0));
+  for (auto prob = probabilities.begin(); prob != probabilities.end(); ++prob)
+  {
+    *prob = *prob/total_of_probs;
+  }
+  
   return Trans_Probs(probabilities, groups);
 }
