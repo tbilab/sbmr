@@ -62,6 +62,9 @@ class SBM {
 struct Trans_Probs {
   vector<double>  probability;
   vector<NodePtr> group;
+  Trans_Probs(vector<double> p, vector<NodePtr> g):
+    probability(p),
+    group(g){};
 };
 
 
