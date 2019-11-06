@@ -219,49 +219,6 @@ connection_info Node::connections_to_node(Node* target_node) {
 }     
 
 
-
-// ======================================================= 
-// Probability node transitions to a given group
-// =======================================================
-double Node::prob_of_joining_group(Node* target_group, list<Node*> groups_of_connections, int n_target_groups) {
-  list<Node*>::iterator  group_it;                      // For parsing through all groups to check
-  Node*                  group_being_checked;           // What group are we currently comparing to target      
-  connection_info        node_to_checked_connections;   // Connection stats for this node to group we're investigating
-  connection_info        checked_to_target_connections; // Connection stats for group we're investigating to potential move group
-  double                 frac_connections_in_group;     // Proportion of connections of node belonging to investigated group
-  double                 n_between_checked_target;      // How many connections are there between the investigated group and potential move group
-  double                 n_total_current;               // How many total connections does the investigated group have
-  double                 epsilon;                       // Ergodicity tuning parameter
-  double                 cummulative_prob;              // Varibale to accumulate probabilities over sum
-  
-  epsilon = 0.01; // This will eventually be passed to function
-  cummulative_prob = 0.0; // Start out sum at 0.
-  
-  // Parse through all groups to check
-  for(group_it = groups_of_connections.begin(); group_it != groups_of_connections.end(); ++group_it){
-    group_being_checked = *group_it;
-    
-    // Make sure we're only looking at groups of type different than node.
-    if(group_being_checked->type == type) continue;
-    
-    // What proportion of this node's edges are to nodes in current group?
-    node_to_checked_connections = this->connections_to_node(group_being_checked);
-    frac_connections_in_group = double(node_to_checked_connections.n_between) / double(node_to_checked_connections.n_total);
-    
-    // Grab info on how many edges are there between target group and current
-    // and how many total edges does the current group has
-    checked_to_target_connections = group_being_checked->connections_to_node(target_group);
-    n_between_checked_target = checked_to_target_connections.n_between;
-    n_total_current = checked_to_target_connections.n_total;
-    
-    cummulative_prob += frac_connections_in_group * (n_between_checked_target + epsilon) / (n_total_current + epsilon*(n_target_groups + 1));
-  }
-  
-  return cummulative_prob;
-} 
-
-
-
 // =======================================================
 // Static method to connect two nodes to each other with edge
 // =======================================================

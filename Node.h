@@ -52,7 +52,6 @@ class Node {
     vector<Node*>    get_connections_to_level(int);   // Get all nodes connected to Node at a given level
     connection_info  connections_to_node(Node*);      // Get info on connection between any two nodes
     static void      connect_nodes(Node*, Node*);     // Static method to connect two nodes to each other with edge
-    double           prob_of_joining_group(Node*, list<Node*>, int); // Get probability node transitions to a given group
 };
 
 // Structure for returning info about connection between two nodes
