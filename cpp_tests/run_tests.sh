@@ -3,7 +3,7 @@ echo $PWD
 
 # Compile files so we can link
 g++ -std=c++11 -c Node.cpp SBM.cpp helpers.cpp
-# g++ -std=c++11 -c Node.cpp
+# g++ -std=c++11 -c Node.cpp helpers.cpp
 
 
 echo "========================================\nTesting Node.cpp"
