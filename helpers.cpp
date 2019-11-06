@@ -1,16 +1,5 @@
 #include "helpers.h"
 
-#include <string>
-#include <algorithm>    // std::sort
-#include <vector>
-#include <map>
-#include <memory>
-#include "Node.h"
-
-
-typedef std::shared_ptr<Node> NodePtr;
-
-
 // =======================================================
 // Takes a vector of node ids and returns a single string of them pasted together
 // =======================================================
