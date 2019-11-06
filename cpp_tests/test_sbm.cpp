@@ -180,6 +180,112 @@ TEST(testSBM, build_with_connections){
 }
 
 
+TEST(testSBM, calculating_transition_probs){
+  SBM my_SBM;
+  
+  // Add nodes to graph first
+  NodePtr a1 = my_SBM.add_node("a1", 0);
+  NodePtr a2 = my_SBM.add_node("a2", 0);
+  NodePtr a3 = my_SBM.add_node("a3", 0);
+  NodePtr a4 = my_SBM.add_node("a4", 0);
+  NodePtr b1 = my_SBM.add_node("b1", 1);
+  NodePtr b2 = my_SBM.add_node("b2", 1);
+  NodePtr b3 = my_SBM.add_node("b3", 1);
+  NodePtr b4 = my_SBM.add_node("b4", 1);
+
+  // There should be a total of 8 nodes
+  EXPECT_EQ(8, my_SBM.nodes.at(0).size());
+  
+  // Add connections
+  my_SBM.add_connection(a1, b1);
+  my_SBM.add_connection(a1, b2);
+  my_SBM.add_connection(a2, b1);
+  my_SBM.add_connection(a2, b2);
+  my_SBM.add_connection(a3, b1);
+  my_SBM.add_connection(a3, b2);
+  my_SBM.add_connection(a3, b4);
+  my_SBM.add_connection(a4, b3);
+  
+  // Create groups
+  
+  // Make 2 type 0/a groups
+  NodePtr a1_1 = my_SBM.create_group_node(0, 1);
+  NodePtr a1_2 = my_SBM.create_group_node(0, 1);
+  NodePtr a1_3 = my_SBM.create_group_node(0, 1);
+  
+  // Make 3 type 1/b groups
+  NodePtr b1_1 = my_SBM.create_group_node(1, 1);
+  NodePtr b1_2 = my_SBM.create_group_node(1, 1);
+  NodePtr b1_3 = my_SBM.create_group_node(1, 1);
+  
+  
+  // There should be a total of 6 level one groups
+  EXPECT_EQ(6, my_SBM.nodes.at(1).size());
+  
+  // Assign nodes to their groups
+  a2->set_parent(a1_1);
+  a3->set_parent(a1_1);
+  a4->set_parent(a1_2);
+  
+  b1->set_parent(b1_1);
+  b2->set_parent(b1_1);
+  b3->set_parent(b1_2);
+  b4->set_parent(b1_3);
+
+  // Give a1 a throwaway group
+  a1->set_parent(a1_3);
+  
+  // There should be a total of 5 level one groups
+  EXPECT_EQ(a1_1, a2->parent);
+  
+  // The group we hope a1 wants to join should have two members
+  EXPECT_EQ("a2, a3", print_node_ids(a1_1->children));
+  
+  // There should be 4 total connections between first a group and first b group
+  
+  // ... and 5 total out of the first a group
+  EXPECT_EQ(5, a1_1->connections_to_node(b1_1).n_total);
+  EXPECT_EQ(1, a1_2->connections_to_node(b1_1).n_total);
+
+  EXPECT_EQ(6, b1_1->connections_to_node(a1_1).n_total);
+  EXPECT_EQ(1, b1_2->connections_to_node(a1_1).n_total);
+  EXPECT_EQ(1, b1_3->connections_to_node(a1_1).n_total);
+
+  
+  // Check connection counts between groups... E.g. there should be no
+  // connections between first a group and second b group
+  EXPECT_EQ(4, a1_1->connections_to_node(b1_1).n_between);
+  EXPECT_EQ(a1_1->connections_to_node(b1_1).n_between, 
+            b1_1->connections_to_node(a1_1).n_between);
+
+  EXPECT_EQ(0, a1_1->connections_to_node(b1_2).n_between);
+  EXPECT_EQ(a1_1->connections_to_node(b1_2).n_between,
+            b1_2->connections_to_node(a1_1).n_between);
+
+  EXPECT_EQ(1, a1_1->connections_to_node(b1_3).n_between);
+  EXPECT_EQ(a1_1->connections_to_node(b1_3).n_between,
+            b1_3->connections_to_node(a1_1).n_between);
+
+  EXPECT_EQ(0, a1_2->connections_to_node(b1_1).n_between);
+  EXPECT_EQ(a1_2->connections_to_node(b1_1).n_between,
+            b1_1->connections_to_node(a1_2).n_between);
+
+  EXPECT_EQ(1, a1_2->connections_to_node(b1_2).n_between);
+  EXPECT_EQ(a1_2->connections_to_node(b1_2).n_between,
+            b1_2->connections_to_node(a1_2).n_between);
+
+  EXPECT_EQ(0, a1_2->connections_to_node(b1_3).n_between);
+  EXPECT_EQ(a1_2->connections_to_node(b1_3).n_between,
+            b1_3->connections_to_node(a1_2).n_between);
+  
+    // Calculate move probabilities for node a1
+  
+  // EXPECT_EQ("0-1_0, 0-1_1", print_node_ids(my_SBM.get_transition_probs_for_groups(a1)));
+  
+  
+}
+
+
 
 int main(int argc, char* argv[]){
   testing::InitGoogleTest(&argc, argv);
