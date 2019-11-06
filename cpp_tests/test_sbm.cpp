@@ -299,26 +299,33 @@ TEST(testSBM, calculating_transition_probs){
   double six = 6;
   double four = 4;
   double eps = 0.01;
-  double tolerance = 0.0001;
+  double tolerance = 0.005;
   
   // Prob of a1 staying in a1_1 should be approximately (2 + eps)/(6 + 4*eps)
   ASSERT_NEAR(
-    (two + eps)/(six + four*eps), 
+    (two + eps)/(six + four*eps),
     a1_move_probs.probability[0],
     tolerance
   );
-  
+
   // Prob of a1 joining a1_2 should be approximately (4 + eps)/(6 + 4*eps)
   ASSERT_NEAR(
-    (four + eps)/(six + four*eps), 
+    (four + eps)/(six + four*eps),
     a1_move_probs.probability[1],
     tolerance
   );
-  
+
   // Prob of a1 joining a1_3 should be approximately (0 + eps)/(6 + 4*eps)
   ASSERT_NEAR(
-    (eps)/(six + four*eps), 
+    (eps)/(six + four*eps),
     a1_move_probs.probability[2],
+    tolerance
+  );
+  
+  // Probabilities for transition should sum to 1
+  ASSERT_NEAR(
+    a1_move_probs.probability[0] + a1_move_probs.probability[1] + a1_move_probs.probability[2], 
+    1,
     tolerance
   );
   
