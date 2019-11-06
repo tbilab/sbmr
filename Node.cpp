@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <string>
 #include <vector>
+#include <memory>
 
 // using namespace Rcpp;
 using std::string;
@@ -11,8 +12,11 @@ using std::vector;
 using std::list;
 using std::unordered_set;
 
+// Smart pointer to node instance
+typedef std::shared_ptr<Node> NodePtr;
+
 // For a bit of clarity
-typedef unordered_set<Node*> ChildSet;
+typedef unordered_set<NodePtr> ChildSet;
 
 // =======================================================
 // Constructor that takes the nodes id and level. Assumes default 0 type. 
@@ -32,10 +36,15 @@ Node::Node(string node_id, int level, int type):
   type(type),
   has_parent(false){}
 
+
+NodePtr Node::this_ptr() {
+  return shared_from_this();
+}
+
 // =======================================================
 // Add connection to another node
 // =======================================================
-void Node::add_connection(Node* node_ptr) {
+void Node::add_connection(NodePtr node_ptr) {
   // Add element to connections list
   connections.push_back(node_ptr);
 }          
@@ -43,35 +52,35 @@ void Node::add_connection(Node* node_ptr) {
 // =======================================================
 // Set current node parent/cluster
 // =======================================================
-void Node::set_parent(Node* parent_node_ptr) {
+void Node::set_parent(NodePtr parent_node_ptr) {
   // Remove self from previous parents children list (if it existed)
   if(has_parent){
-    parent_node_ptr->remove_child(this);
+    parent_node_ptr->remove_child(this_ptr());
   }
-  
+
   // Set this node's parent
   parent = parent_node_ptr;
-  
+
   // Node for sure has parent now so make sure it's noted
   has_parent = true;
-  
+
   // Add this node to new parent's children list
-  parent_node_ptr->add_child(this);
+  parent_node_ptr->add_child(this_ptr());
 }
 
 // =======================================================
 // Add a node to the children vector
 // =======================================================
-void Node::add_child(Node* new_child_node) {
+void Node::add_child(NodePtr new_child_node) {
   // Add new child node to the set of children. An unordered set is used because
   // repeat children can't happen.
-  (this->children).insert(new_child_node);
+  (this_ptr()->children).insert(new_child_node);
 }
 
 // =======================================================
 // Find and erase a child node
 // =======================================================
-void Node::remove_child(Node* child_node) {
+void Node::remove_child(NodePtr child_node) {
   children.erase(children.find(child_node)); 
 }
 
@@ -81,12 +90,12 @@ void Node::remove_child(Node* child_node) {
 ChildSet Node::get_children_at_level(int desired_level) {
   ChildSet            children_nodes;
   ChildSet::iterator  child_it;
-  Node*               current_node;
+  NodePtr               current_node;
   bool                at_desired_level;
-  std::queue<Node*>   children_queue;
+  std::queue<NodePtr>   children_queue;
 
   // Start by placing the current node into children queue
-  children_queue.push(this);
+  children_queue.push(this_ptr());
   
   // While the member queue is not empty, pop off a node reference
   while (!children_queue.empty()) {
@@ -118,9 +127,9 @@ ChildSet Node::get_children_at_level(int desired_level) {
 // =======================================================
 // Get parent of current node at a given level
 // =======================================================
-Node* Node::get_parent_at_level(int level_of_parent) {
+NodePtr Node::get_parent_at_level(int level_of_parent) {
   int    level_delta;    // How many levels up do we need to go?
-  Node*  current_node;   // What node are we currently looking at?
+  NodePtr  current_node;   // What node are we currently looking at?
   
   level_delta = level_of_parent - level;
   
@@ -131,7 +140,7 @@ Node* Node::get_parent_at_level(int level_of_parent) {
   }
   
   // Start with this node as current node
-  current_node = this;
+  current_node = this_ptr();
   
   // Traverse up parents until we've reached just below where we want to go
   for(int i = 0; i < level_delta; i++){
@@ -150,11 +159,11 @@ Node* Node::get_parent_at_level(int level_of_parent) {
 //   We return a vector because we need random access to elements in this array
 // and that isn't provided to us with the list format.
 // =======================================================
-vector<Node*> Node::get_connections_to_level(int desired_level) {
+vector<NodePtr> Node::get_connections_to_level(int desired_level) {
   ChildSet                 leaf_children;   // All the children for a given level
   ChildSet::iterator       child_it;        // Iterator for moving through child nodes
-  list<Node*>::iterator    connection_it;   // Iterator for moving through each child's connection list
-  vector<Node*>            connected_nodes; // Vector to return containing parents at desired level for connections
+  list<NodePtr>::iterator    connection_it;   // Iterator for moving through each child's connection list
+  vector<NodePtr>            connected_nodes; // Vector to return containing parents at desired level for connections
 
   // Start by getting all of the level zero children of this node
   leaf_children = get_children_at_level(0);
@@ -181,14 +190,14 @@ vector<Node*> Node::get_connections_to_level(int desired_level) {
 // ======================================================= 
 // Get number of edges between and fraction of total for starting node
 // =======================================================
-connection_info Node::connections_to_node(Node* target_node) {
+connection_info Node::connections_to_node(NodePtr target_node) {
   connection_info         connections;               // connection info struct we're returning
-  vector<Node*>::iterator connections_it;            // For iterating through all connected nodes 
+  vector<NodePtr>::iterator connections_it;            // For iterating through all connected nodes 
   int                     n_connections_to_target;   // How many connection for node are to our target node
-  vector<Node*>           all_connections_to_level;  // List of every connection from node to level of target node
+  vector<NodePtr>           all_connections_to_level;  // List of every connection from node to level of target node
   
   // Grab all the nodes connected to node at the level of the target node
-  all_connections_to_level = this->get_connections_to_level(target_node->level);
+  all_connections_to_level = this_ptr()->get_connections_to_level(target_node->level);
   
   // Make sure that there are actually connections for us to look through
   if (all_connections_to_level.size() == 0) {
@@ -222,7 +231,7 @@ connection_info Node::connections_to_node(Node* target_node) {
 // =======================================================
 // Static method to connect two nodes to each other with edge
 // =======================================================
-void Node::connect_nodes(Node* node1_ptr, Node* node2_ptr) {
+void Node::connect_nodes(NodePtr node1_ptr, NodePtr node2_ptr) {
   // Add node2 to connections of node1
   node1_ptr->add_connection(node2_ptr);
   // Do the same for node2

@@ -5,7 +5,12 @@
 #include <vector>
 #include <map>
 #include <algorithm>    // std::sort
+
 #include "Node.h"
+
+
+#include <memory>
+typedef std::shared_ptr<Node> NodePtr;
 
 
 // =======================================================
@@ -20,12 +25,12 @@ std::string print_ids_to_string(std::vector<std::string>);
 
 // =======================================================
 // List Version
-std::string print_node_ids(std::list<Node*>);
+std::string print_node_ids(std::list<NodePtr>);
 
 // =======================================================
 // Vector Version
-std::string print_node_ids(std::vector<Node*>);
+std::string print_node_ids(std::vector<NodePtr>);
 
 // =======================================================
 // Map version
-std::string print_node_ids(std::map<std::string, Node*>);
+std::string print_node_ids(std::map<std::string, NodePtr>);

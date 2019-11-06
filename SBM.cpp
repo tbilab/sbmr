@@ -4,12 +4,15 @@
 #include "Node.h"
 #include "SBM.h" 
 
+#include <memory>
+typedef std::shared_ptr<Node> NodePtr;
+
 using std::string;
 using std::vector;
 using std::map;
 
 // A map keyed by ID of nodes that live on a given level of the SBM
-typedef std::map<string, Node*>  NodeLevel;
+typedef std::map<string, NodePtr>  NodeLevel;
 
 // A map keyed by level integer of each level of nodes 
 typedef std::map<int, NodeLevel> LevelMap;
@@ -40,7 +43,7 @@ void SBM::add_level(int level) {
 // =======================================================
 // Find and return a node by its id
 // =======================================================
-Node* SBM::get_node_by_id(string desired_id) {
+NodePtr SBM::get_node_by_id(string desired_id) {
   
   try {
     // Attempt to find node on the 'node level' of the SBM
@@ -56,12 +59,12 @@ Node* SBM::get_node_by_id(string desired_id) {
 // =======================================================
 // Adds a node with an id and type to network
 // =======================================================
-Node* SBM::add_node(string id, int type){
-  Node* new_node;
+NodePtr SBM::add_node(string id, int type){
+  NodePtr new_node;
   
   // Create node
-  new_node = new Node(id, 0, type);
-  
+  new_node = std::make_shared<Node>(id, 0, type);
+
   // Add node to node list
   nodes.at(0).emplace(id, new_node);
   
@@ -86,8 +89,8 @@ void SBM::check_level_has_nodes(const NodeLevel& level_to_check){
 // then the nodes returned are of the same type as specified, otherwise
 // the nodes returned are _not_of the same type.
 // =======================================================
-list<Node*> SBM::get_nodes_from_level(int type, int level, bool match_type) {
-  list<Node*>           nodes_to_return;
+list<NodePtr> SBM::get_nodes_from_level(int type, int level, bool match_type) {
+  list<NodePtr>           nodes_to_return;
   NodeLevel::iterator   node_it;
   NodeLevel             node_level;
   bool                  keep_node; 
@@ -119,14 +122,14 @@ list<Node*> SBM::get_nodes_from_level(int type, int level, bool match_type) {
 // =======================================================
 // Return nodes of a desired type from level. 
 // =======================================================
-list<Node*> SBM::get_nodes_of_type_at_level(int type, int level) {
+list<NodePtr> SBM::get_nodes_of_type_at_level(int type, int level) {
   return get_nodes_from_level(type, level, true);
 }   
 
 // =======================================================
 // Return nodes _not_ of a specified type from level
 // =======================================================
-list<Node*> SBM::get_nodes_not_of_type_at_level(int type, int level) {
+list<NodePtr> SBM::get_nodes_not_of_type_at_level(int type, int level) {
   return get_nodes_from_level(type, level, false);
 }   
 
@@ -134,12 +137,12 @@ list<Node*> SBM::get_nodes_not_of_type_at_level(int type, int level) {
 // =======================================================
 // Creates a new group node and add it to its neccesary level
 // =======================================================
-Node* SBM::create_group_node(int type, int level) {
+NodePtr SBM::create_group_node(int type, int level) {
   
   LevelMap::iterator  group_level;
   int                 n_groups_in_level;
   string              group_id;
-  Node*               new_group;
+  NodePtr               new_group;
   bool                first_in_level;
   
   // Make sure requested level is not 0
@@ -166,7 +169,7 @@ Node* SBM::create_group_node(int type, int level) {
   group_id = std::to_string(type) + "-" + std::to_string(level) + "_" + std::to_string(n_groups_in_level);
   
   // Initialize new node
-  new_group = new Node(group_id, level, type);
+  new_group = std::make_shared<Node>(group_id, level, type);
   
   // Add group node to SBM
   group_level->second.emplace(group_id, new_group);
@@ -193,7 +196,7 @@ void SBM::add_connection(string node1_id, string node2_id) {
 void SBM::give_every_node_a_group_at_level(int level) {
   NodeLevel            node_level;
   NodeLevel::iterator  node_it;
-  Node*                new_group;
+  NodePtr                new_group;
   
   // Grab all the nodes for the desired level
   node_level = nodes.at(level);
@@ -217,26 +220,26 @@ void SBM::give_every_node_a_group_at_level(int level) {
 // =======================================================
 // Grabs the first node found at a given level, used in testing.
 // =======================================================
-Node* SBM::get_node_from_level(int level) {
+NodePtr SBM::get_node_from_level(int level) {
   return nodes.at(level).begin()->second;
 }
 
 // =======================================================
 // Calculates probabilities for joining a given new group based on current SBM state
 // =======================================================
-Transition_Probs SBM::get_transition_probs_for_groups(Node* node_to_move) {
-  list<Node*>                 neighboring_groups;        // Groups of connection to search over, will be all for unipartite, but a subset for polypartite networks
-  list<Node*>::iterator       neighbor_group_it;         // For parsing through all groups to check
-  Node*                       neighbor_group; 
-  list<Node*>                 potential_groups;          // Groups that the node can join
-  list<Node*>::iterator       potential_group_it;        // For parsing through all groups to check
-  Node*                       potential_group;
+Transition_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
+  list<NodePtr>                 neighboring_groups;        // Groups of connection to search over, will be all for unipartite, but a subset for polypartite networks
+  list<NodePtr>::iterator       neighbor_group_it;         // For parsing through all groups to check
+  NodePtr                       neighbor_group; 
+  list<NodePtr>                 potential_groups;          // Groups that the node can join
+  list<NodePtr>::iterator       potential_group_it;        // For parsing through all groups to check
+  NodePtr                       potential_group;
   bool                        is_polypartite;            // Is this SBM polypartite
   int                         type_to_ignore;            // What type of nodes do we want to avoid when finding connections?
   double                      epsilon;                   // Ergodicity tuning parameter
   double                      cummulative_prob;          // Variable to accumulate probabilities over sum
   int                         B;        // Number of potential groups
-  map<Node*, connection_info> node_outward_connections;  // Map for precalculating the connections between node and all neighbor groups
+  map<NodePtr, connection_info> node_outward_connections;  // Map for precalculating the connections between node and all neighbor groups
   connection_info             potential_to_neighbor_connections; 
   connection_info             node_to_neighbor_connections; 
   Transition_Probs            transition_probs;
