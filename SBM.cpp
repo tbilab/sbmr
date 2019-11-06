@@ -164,13 +164,22 @@ NodePtr SBM::create_group_node(int type, int level) {
 // Adds a connection between two nodes based on their ids
 // =======================================================
 void SBM::add_connection(string node1_id, string node2_id) {
-
+  
   Node::connect_nodes(
     get_node_by_id(node1_id), 
     get_node_by_id(node2_id)
   );
   
-};       
+};    
+
+void SBM::add_connection(NodePtr node1, NodePtr node2) {
+  
+  Node::connect_nodes(
+    node1, 
+    node2
+  );
+  
+};  
 
 
 // =======================================================
@@ -213,25 +222,25 @@ NodePtr SBM::get_node_from_level(int level) {
 Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
   // Ergodicity tuning parameter
   double epsilon = 0.01;
-  
+
   // If we have a polypartite network we want to avoid that type when finding
   // neighbor nodes to look at. Otherwise we want to get all types, which we do
   // by supplying the 'null' type of -1.
   int type_to_ignore = unique_node_types.size() > 1 ? node_to_move->type : -1;
-  
+
   // Grab all groups that could belong to connections
   list<NodePtr> neighboring_groups = get_nodes_not_of_type_at_level(
-    type_to_ignore, 
+    type_to_ignore,
     node_to_move->level + 1 );
-  
+
   // Map for precalculating the connections between node and all neighbor groups
-  map<NodePtr, connection_info> node_outward_connections;  
-  
+  map<NodePtr, connection_info> node_outward_connections;
+
   // First we gather info on how the node to move is connected in terms of its
   // neighbors's groups
-  for (auto neighbor_group_it  = neighboring_groups.begin(); 
-            neighbor_group_it != neighboring_groups.end(); 
-            ++neighbor_group_it) 
+  for (auto neighbor_group_it  = neighboring_groups.begin();
+            neighbor_group_it != neighboring_groups.end();
+            ++neighbor_group_it)
   {
     // What proportion of this node's edges are to nodes in current group?
     node_outward_connections.emplace(
@@ -239,72 +248,72 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
       node_to_move->connections_to_node(*neighbor_group_it)
     );
   }
-  
+
   // Now loop through all the groups that the node could join
   list<NodePtr> potential_groups = get_nodes_of_type_at_level(
-    type_to_ignore, 
+    type_to_ignore,
     node_to_move->level + 1);
-  
+
   // Number of potential groups
   int B = potential_groups.size();
   
   // Initialize holder of transition probabilities
   vector<double> probabilities;
   probabilities.reserve(B);
-  
+
   // Initialize holder of groups to match transition probs
   vector<NodePtr> groups;
   groups.reserve(B);
 
   // Start main loop over all the potential groups that the node could join
-  for (auto potential_group_it  = potential_groups.begin(); 
-            potential_group_it != potential_groups.end(); 
-            ++potential_group_it) 
+  for (auto potential_group_it  = potential_groups.begin();
+            potential_group_it != potential_groups.end();
+            ++potential_group_it)
   {
     NodePtr potential_group = *potential_group_it;
-    
+
     // Send currently investigated group to groups vector
     groups.push_back(potential_group);
-    
+
     // Start out sum at 0.
-    double cummulative_prob = 0.0;
-    
+    double cummulative_prob = 0;
+
     // Loop over the neighbor groups again
-    for (auto neighbor_group_it  = neighboring_groups.begin(); 
-              neighbor_group_it != neighboring_groups.end(); 
-              ++neighbor_group_it) 
+    for (auto neighbor_group_it  = neighboring_groups.begin();
+              neighbor_group_it != neighboring_groups.end();
+              ++neighbor_group_it)
     {
       NodePtr neighbor_group = *neighbor_group_it;
-      
+
       // Get connection info for the potential group to the neighbor group
       connection_info potential_to_neighbor_connections = neighbor_group->
         connections_to_node(potential_group);
-      
+
       // Grab pre-calculated connection info from node to this neighbor
       connection_info node_to_neighbor_connections = node_outward_connections
         .at(neighbor_group);
-      
+
       // Get fraction of the nodes connections to the current neighbor. This
       // serves as an indicator of how close we should consider the connections
       // of this neighbor node when deciding the new group.
-      double P_si = double(node_to_neighbor_connections.n_between) / 
+      double P_si = double(node_to_neighbor_connections.n_between) /
                     double(node_to_neighbor_connections.n_total);
-      
+
       // How many connections there are between our neighbor group and the
       // potential group
       double e_sr = potential_to_neighbor_connections.n_between;
-      
+
       // How many total connection the neighbor node has
       double e_s = potential_to_neighbor_connections.n_total;
-      
-      // Finally calculate partial probability and add to cummulative sum 
+
+      // Finally calculate partial probability and add to cummulative sum
       cummulative_prob += P_si * (e_sr + epsilon) / (e_s + epsilon*(B + 1));
     }
-    
+
     // Add the final cumulative probabiltiy sum to potential group's element in
     // probability vector
     probabilities.push_back(cummulative_prob);
   }
-  
+
   return Trans_Probs(probabilities, groups);
 }
