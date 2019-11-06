@@ -70,7 +70,11 @@ void SBM::check_level_has_nodes(const NodeLevel& level_to_check){
 // then the nodes returned are of the same type as specified, otherwise
 // the nodes returned are _not_of the same type.
 // =======================================================
-list<NodePtr> SBM::get_nodes_from_level(int type, int level, bool match_type) {
+list<NodePtr> SBM::get_nodes_from_level(
+    int type, 
+    int level, 
+    bool match_type) 
+{
   // Where we will store all the nodes found from level
   list<NodePtr> nodes_to_return;
 
@@ -81,8 +85,10 @@ list<NodePtr> SBM::get_nodes_from_level(int type, int level, bool match_type) {
   check_level_has_nodes(node_level);
   
   // Loop through every node belonging to the desired level
-  for (NodeLevel::iterator node_it = node_level.begin(); node_it != node_level.end(); ++node_it) {
-    
+  for (auto node_it  = node_level.begin(); 
+            node_it != node_level.end(); 
+            ++node_it) 
+  {
     // Decide to keep the node or not based on if it matches or doesn't and our
     // keeping preferance
     bool keep_node = match_type ? 
@@ -119,7 +125,9 @@ list<NodePtr> SBM::get_nodes_not_of_type_at_level(int type, int level) {
 NodePtr SBM::create_group_node(int type, int level) {
 
   // Make sure requested level is not 0
-  if(level == 0) throw "Can't create group node at first level";
+  if(level == 0) {
+    throw "Can't create group node at first level"; 
+  }
   
   // Grab level for group node
   LevelMap::iterator group_level = nodes.find(level);
@@ -139,7 +147,9 @@ NodePtr SBM::create_group_node(int type, int level) {
   int n_groups_in_level = group_level->second.size();
   
   // Build group_id
-  string group_id = std::to_string(type) + "-" + std::to_string(level) + "_" + std::to_string(n_groups_in_level);
+  string group_id = std::to_string(type)  + "-" + 
+                    std::to_string(level) + "_" + 
+                    std::to_string(n_groups_in_level);
   
   // Initialize new node
   NodePtr new_group = std::make_shared<Node>(group_id, level, type);
@@ -175,8 +185,10 @@ void SBM::give_every_node_a_group_at_level(int level) {
   check_level_has_nodes(node_level);
   
   // Loop through each of the nodes,
-  for (NodeLevel::iterator  node_it = node_level.begin(); node_it != node_level.end(); ++node_it) {
-
+  for (auto node_it  = node_level.begin(); 
+            node_it != node_level.end(); 
+            ++node_it) 
+  {
     // build a group node at the next level
     NodePtr new_group = create_group_node(node_it->second->type, level + 1);
 
@@ -195,7 +207,8 @@ NodePtr SBM::get_node_from_level(int level) {
 }
 
 // =======================================================
-// Calculates probabilities for joining a given new group based on current SBM state
+// Calculates probabilities for joining a given new group based on current SBM
+// state
 // =======================================================
 Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
   // Ergodicity tuning parameter
@@ -207,25 +220,30 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
   int type_to_ignore = unique_node_types.size() > 1 ? node_to_move->type : -1;
   
   // Grab all groups that could belong to connections
-  list<NodePtr> neighboring_groups = get_nodes_not_of_type_at_level(type_to_ignore, node_to_move->level + 1);
+  list<NodePtr> neighboring_groups = get_nodes_not_of_type_at_level(
+    type_to_ignore, 
+    node_to_move->level + 1 );
   
   // Map for precalculating the connections between node and all neighbor groups
   map<NodePtr, connection_info> node_outward_connections;  
   
   // First we gather info on how the node to move is connected in terms of its
   // neighbors's groups
-  for (list<NodePtr>::iterator neighbor_group_it = neighboring_groups.begin(); neighbor_group_it != neighboring_groups.end(); ++neighbor_group_it) {
-    NodePtr neighbor_group = *neighbor_group_it;
-    
+  for (auto neighbor_group_it  = neighboring_groups.begin(); 
+            neighbor_group_it != neighboring_groups.end(); 
+            ++neighbor_group_it) 
+  {
     // What proportion of this node's edges are to nodes in current group?
     node_outward_connections.emplace(
-      neighbor_group,
-      node_to_move->connections_to_node(neighbor_group)
+      *neighbor_group_it,
+      node_to_move->connections_to_node(*neighbor_group_it)
     );
   }
   
   // Now loop through all the groups that the node could join
-  list<NodePtr> potential_groups = get_nodes_of_type_at_level(type_to_ignore, node_to_move->level + 1);
+  list<NodePtr> potential_groups = get_nodes_of_type_at_level(
+    type_to_ignore, 
+    node_to_move->level + 1);
   
   // Number of potential groups
   int B = potential_groups.size();
@@ -239,7 +257,10 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
   groups.reserve(B);
 
   // Start main loop over all the potential groups that the node could join
-  for (list<NodePtr>::iterator potential_group_it = potential_groups.begin(); potential_group_it != potential_groups.end(); ++potential_group_it) {
+  for (auto potential_group_it  = potential_groups.begin(); 
+            potential_group_it != potential_groups.end(); 
+            ++potential_group_it) 
+  {
     NodePtr potential_group = *potential_group_it;
     
     // Send currently investigated group to groups vector
@@ -249,21 +270,28 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
     double cummulative_prob = 0.0;
     
     // Loop over the neighbor groups again
-    for (list<NodePtr>::iterator neighbor_group_it = neighboring_groups.begin(); neighbor_group_it != neighboring_groups.end(); ++neighbor_group_it) {
+    for (auto neighbor_group_it  = neighboring_groups.begin(); 
+              neighbor_group_it != neighboring_groups.end(); 
+              ++neighbor_group_it) 
+    {
       NodePtr neighbor_group = *neighbor_group_it;
       
       // Get connection info for the potential group to the neighbor group
-      connection_info potential_to_neighbor_connections = neighbor_group->connections_to_node(potential_group);
+      connection_info potential_to_neighbor_connections = neighbor_group->
+        connections_to_node(potential_group);
       
       // Grab pre-calculated connection info from node to this neighbor
-      connection_info node_to_neighbor_connections = node_outward_connections.at(neighbor_group);
+      connection_info node_to_neighbor_connections = node_outward_connections
+        .at(neighbor_group);
       
       // Get fraction of the nodes connections to the current neighbor. This
       // serves as an indicator of how close we should consider the connections
       // of this neighbor node when deciding the new group.
-      double P_si = double(node_to_neighbor_connections.n_between) / double(node_to_neighbor_connections.n_total);
+      double P_si = double(node_to_neighbor_connections.n_between) / 
+                    double(node_to_neighbor_connections.n_total);
       
-      // How many connections there are between our neighbor group and the potential group
+      // How many connections there are between our neighbor group and the
+      // potential group
       double e_sr = potential_to_neighbor_connections.n_between;
       
       // How many total connection the neighbor node has
@@ -273,9 +301,9 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
       cummulative_prob += P_si * (e_sr + epsilon) / (e_s + epsilon*(B + 1));
     }
     
-    // Add the final cumulative probabiltiy sum to potential group's element in probability vector
+    // Add the final cumulative probabiltiy sum to potential group's element in
+    // probability vector
     probabilities.push_back(cummulative_prob);
-    
   }
   
   return Trans_Probs(probabilities, groups);

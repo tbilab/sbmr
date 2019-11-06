@@ -94,7 +94,10 @@ ChildSet Node::get_children_at_level(int desired_level) {
       children_nodes.insert(current_node);
     } else {
       // Otherwise, add each of the member nodes to queue 
-      for (ChildSet::iterator child_it = (current_node->children).begin(); child_it != (current_node->children).end(); ++child_it) {
+      for (auto child_it  = (current_node->children).begin(); 
+                child_it != (current_node->children).end(); 
+                ++child_it) 
+      {
         children_queue.push(*child_it);
       }
     }
@@ -143,11 +146,15 @@ vector<NodePtr> Node::get_connections_to_level(int desired_level) {
   ChildSet leaf_children = get_children_at_level(0);
   
   // Go through every child
-  for (ChildSet::iterator child_it = leaf_children.begin(); child_it != leaf_children.end(); ++child_it) {
-    
+  for (auto child_it  = leaf_children.begin(); 
+            child_it != leaf_children.end(); 
+            ++child_it) 
+  {
     // Go through every child node's connections list
-    for (list<NodePtr>::iterator connection_it = (*child_it)->connections.begin(); connection_it != (*child_it)->connections.end(); ++connection_it) {
-      
+    for (auto connection_it  = (*child_it)->connections.begin(); 
+              connection_it != (*child_it)->connections.end(); 
+              ++connection_it) 
+    {
       // For each connection of current child, find parent at desired level and
       // place in connected nodes vector
       connected_nodes.push_back(
@@ -179,10 +186,10 @@ connection_info Node::connections_to_node(NodePtr target_node) {
   
   // Go through all the connections
   for (
-      vector<NodePtr>::iterator connections_it = all_connections_to_level.begin();
-      connections_it != all_connections_to_level.end();
-      ++connections_it
-  ) { 
+      auto connections_it  = all_connections_to_level.begin();
+           connections_it != all_connections_to_level.end();
+           ++connections_it) 
+  { 
     // If connection at level matches the target node, increment target
     // connection counter
     if (*connections_it == target_node) {
