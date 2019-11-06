@@ -64,6 +64,9 @@ class Node: public std::enable_shared_from_this<Node> {
 struct connection_info {
   int n_between;
   int n_total;
+  connection_info(int between, int total): 
+    n_between(between),
+    n_total(total){}
 };
 
 #endif

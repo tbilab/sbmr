@@ -220,8 +220,6 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
   double                    epsilon;                   // Ergodicity tuning parameter
   double                    cummulative_prob;          // Variable to accumulate probabilities over sum
   int                       B;                         // Number of potential groups
-  connection_info           potential_to_neighbor_connections; 
-  connection_info           node_to_neighbor_connections; 
   Trans_Probs               transition_probs;
   map<NodePtr, connection_info> node_outward_connections;  // Map for precalculating the connections between node and all neighbor groups
   
@@ -282,10 +280,10 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
       neighbor_group = *neighbor_group_it;
       
       // Get connection info for the potential group to the neighbor group
-      potential_to_neighbor_connections = neighbor_group->connections_to_node(potential_group);
+      connection_info potential_to_neighbor_connections = neighbor_group->connections_to_node(potential_group);
       
       // Grab pre-calculated connection info from node to this neighbor
-      node_to_neighbor_connections = node_outward_connections.at(neighbor_group);
+      connection_info node_to_neighbor_connections = node_outward_connections.at(neighbor_group);
       
       // Get fraction of the nodes connections to the current neighbor. This
       // serves as an indicator of how close we should consider the connections

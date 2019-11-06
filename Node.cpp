@@ -71,32 +71,30 @@ void Node::remove_child(NodePtr child_node) {
 // Get all member nodes of current node at a given level
 // =======================================================
 ChildSet Node::get_children_at_level(int desired_level) {
-  ChildSet             children_nodes;
-  ChildSet::iterator   child_it;
-  NodePtr              current_node;
-  bool                 at_desired_level;
-  std::queue<NodePtr>  children_queue;
-
-  // Start by placing the current node into children queue
-  children_queue.push(this_ptr());
+  // Set to hold all the nodes that are found as children
+  ChildSet children_nodes;
   
+  // Start by placing the current node into children queue
+  std::queue<NodePtr> children_queue;
+  children_queue.push(this_ptr());
+
   // While the member queue is not empty, pop off a node reference
   while (!children_queue.empty()) {
     // Grab top reference
-    current_node = children_queue.front(); 
+    NodePtr current_node = children_queue.front(); 
     
     // Remove reference from queue
     children_queue.pop(); 
     
     // check if that node is at desired level
-    at_desired_level = current_node->level == desired_level;
+    bool at_desired_level = current_node->level == desired_level;
     
     // if node is at desired level, add it to the return vector
     if (at_desired_level) {
       children_nodes.insert(current_node);
     } else {
       // Otherwise, add each of the member nodes to queue 
-      for (child_it = (current_node->children).begin(); child_it != (current_node->children).end(); ++child_it) {
+      for (ChildSet::iterator child_it = (current_node->children).begin(); child_it != (current_node->children).end(); ++child_it) {
         children_queue.push(*child_it);
       }
     }
@@ -111,25 +109,20 @@ ChildSet Node::get_children_at_level(int desired_level) {
 // Get parent of current node at a given level
 // =======================================================
 NodePtr Node::get_parent_at_level(int level_of_parent) {
-  int      level_delta;    // How many levels up do we need to go?
-  NodePtr  current_node;   // What node are we currently looking at?
-  
-  level_delta = level_of_parent - level;
   
   // First we need to make sure that the requested level is not less than that
   // of the current node.
-  if (level_delta < 0) {
+  if (level_of_parent < level) {
     throw "Requested parent level lower than current node level.";
   }
   
   // Start with this node as current node
-  current_node = this_ptr();
+  NodePtr current_node = this_ptr();
   
-  // Traverse up parents until we've reached just below where we want to go
-  for(int i = 0; i < level_delta; i++){
-    if(!current_node->has_parent) {
-      throw "No parent present at requested level";
-    }
+  while(current_node->level != level_of_parent) {
+    if(!current_node->has_parent) throw "No parent present at requested level";
+    
+    // Traverse up parents until we've reached just below where we want to go
     current_node = current_node->parent;
   }
   
@@ -143,19 +136,17 @@ NodePtr Node::get_parent_at_level(int level_of_parent) {
 // and that isn't provided to us with the list format.
 // =======================================================
 vector<NodePtr> Node::get_connections_to_level(int desired_level) {
-  ChildSet                  leaf_children;   // All the children for a given level
-  ChildSet::iterator        child_it;        // Iterator for moving through child nodes
-  list<NodePtr>::iterator   connection_it;   // Iterator for moving through each child's connection list
-  vector<NodePtr>           connected_nodes; // Vector to return containing parents at desired level for connections
+  // Vector to return containing parents at desired level for connections
+  vector<NodePtr> connected_nodes; 
 
   // Start by getting all of the level zero children of this node
-  leaf_children = get_children_at_level(0);
+  ChildSet leaf_children = get_children_at_level(0);
   
   // Go through every child
-  for (child_it = leaf_children.begin(); child_it != leaf_children.end(); ++child_it) {
+  for (ChildSet::iterator child_it = leaf_children.begin(); child_it != leaf_children.end(); ++child_it) {
     
     // Go through every child node's connections list
-    for (connection_it = (*child_it)->connections.begin(); connection_it != (*child_it)->connections.end(); ++connection_it) {
+    for (list<NodePtr>::iterator connection_it = (*child_it)->connections.begin(); connection_it != (*child_it)->connections.end(); ++connection_it) {
       
       // For each connection of current child, find parent at desired level and
       // place in connected nodes vector
@@ -174,13 +165,9 @@ vector<NodePtr> Node::get_connections_to_level(int desired_level) {
 // Get number of edges between and fraction of total for starting node
 // =======================================================
 connection_info Node::connections_to_node(NodePtr target_node) {
-  connection_info           connections;               // connection info struct we're returning
-  vector<NodePtr>::iterator connections_it;            // For iterating through all connected nodes 
-  int                       n_connections_to_target;   // How many connection for node are to our target node
-  vector<NodePtr>           all_connections_to_level;  // List of every connection from node to level of target node
-  
+
   // Grab all the nodes connected to node at the level of the target node
-  all_connections_to_level = this_ptr()->get_connections_to_level(target_node->level);
+  vector<NodePtr> all_connections_to_level = this_ptr()->get_connections_to_level(target_node->level);
   
   // Make sure that there are actually connections for us to look through
   if (all_connections_to_level.size() == 0) {
@@ -188,11 +175,11 @@ connection_info Node::connections_to_node(NodePtr target_node) {
   }
   
   // Start with no connection to target...
-  n_connections_to_target = 0;
+  int n_connections_to_target = 0;
   
   // Go through all the connections
   for (
-      connections_it  = all_connections_to_level.begin();
+      vector<NodePtr>::iterator connections_it = all_connections_to_level.begin();
       connections_it != all_connections_to_level.end();
       ++connections_it
   ) { 
@@ -204,10 +191,7 @@ connection_info Node::connections_to_node(NodePtr target_node) {
     
   }
   
-  connections.n_total = all_connections_to_level.size();
-  connections.n_between = n_connections_to_target;
-
-  return connections;
+  return connection_info(n_connections_to_target, all_connections_to_level.size());
 }     
 
 
