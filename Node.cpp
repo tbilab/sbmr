@@ -157,9 +157,15 @@ vector<NodePtr> Node::get_connections_to_level(int desired_level) {
     {
       // For each connection of current child, find parent at desired level and
       // place in connected nodes vector
-      connected_nodes.push_back(
-        (*connection_it)->get_parent_at_level(desired_level)
-      );
+      try {
+        connected_nodes.push_back(
+          (*connection_it)->get_parent_at_level(desired_level)
+        );
+        
+      } catch(...) {
+        // A node doesn't have a parent at desired level
+        throw "A connected node doesn't have a parent at the desired level.";
+      }
       
     } // End child connection loop
   } // End child loop
