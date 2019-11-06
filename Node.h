@@ -6,6 +6,7 @@
 #define __NODE_INCLUDED__
 
 #include <unordered_set>
+#include <queue> 
 #include <string>
 #include <vector>
 #include <list>

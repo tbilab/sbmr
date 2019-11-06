@@ -1,22 +1,5 @@
 #include "Node.h" 
 
-#include <queue> 
-#include <unordered_set>
-#include <string>
-#include <vector>
-#include <memory>
-
-// using namespace Rcpp;
-using std::string;
-using std::vector;
-using std::list;
-using std::unordered_set;
-
-// Smart pointer to node instance
-typedef std::shared_ptr<Node> NodePtr;
-
-// For a bit of clarity
-typedef unordered_set<NodePtr> ChildSet;
 
 // =======================================================
 // Constructor that takes the nodes id and level. Assumes default 0 type. 
