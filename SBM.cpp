@@ -331,3 +331,53 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
   
   return Trans_Probs(probabilities, groups);
 }
+
+
+// =======================================================
+// Scan through levels and remove all group nodes that have no children. Returns # removed
+// =======================================================
+int SBM::clean_empty_groups(){
+  
+  int num_levels = nodes.size();
+  int total_deleted = 0;
+  
+  // Scan through all levels up to final
+  for (int level = 1; level < num_levels; ++level) 
+  {
+    // Grab desired level
+    NodeLevel* group_level = &nodes.at(level);
+    
+    // Create a vector to store group ids that we want to delete
+    vector<string> groups_to_delete;
+    
+    // Loop through every node at level
+    for (auto group_it = group_level->begin(); group_it != group_level->end(); ++group_it)
+    {
+      NodePtr current_group = group_it->second;
+      
+      // If there are no children for the current group
+      if (current_group->children.size() == 0) 
+      {
+        // Remove group from children of its parent (if it has one)
+        if (level < num_levels - 1) 
+        {
+          current_group->parent->remove_child(current_group);
+        }
+        
+        // Add current group to the removal list
+        groups_to_delete.push_back(current_group->id);
+      }
+    }
+    
+    // Remove all the groups in the removal list
+    for (auto group_id : groups_to_delete)
+    {
+      group_level->erase(group_id);
+    }
+    
+    // Increment total groups deleted counter
+    total_deleted += groups_to_delete.size();
+  }
+  
+  return total_deleted;
+}                     
