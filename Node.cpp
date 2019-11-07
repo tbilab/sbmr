@@ -19,7 +19,9 @@ Node::Node(string node_id, int level, int type):
   type(type),
   has_parent(false){}
 
-
+// =======================================================
+// Replace 'this' with a shared smart pointer
+// =======================================================
 NodePtr Node::this_ptr() {
   return shared_from_this();
 }
