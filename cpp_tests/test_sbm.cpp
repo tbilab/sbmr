@@ -524,7 +524,16 @@ TEST(testSBM, edge_count_map){
   EXPECT_EQ(l1_edges[id_pair("b12", "b12")], 3);
   EXPECT_EQ(l1_edges[id_pair("b13", "b13")], 1);
   
+  // Repeat for level 2
+  EdgeCounts l2_edges = my_SBM.gather_edge_counts(2);
   
+  // Check num edges between groups
+  EXPECT_EQ(l2_edges[id_pair("a21", "b21")], 2);
+  EXPECT_EQ(l2_edges[id_pair("a22", "b21")], 9);
+  
+  EXPECT_EQ(l2_edges[id_pair("a21", "a21")], 2);
+  EXPECT_EQ(l2_edges[id_pair("a22", "a22")], 9);
+  EXPECT_EQ(l2_edges[id_pair("b21", "b21")], 11);
   
 }
 
