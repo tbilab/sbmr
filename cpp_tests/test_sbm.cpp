@@ -195,7 +195,7 @@ TEST(testSBM, calculating_transition_probs){
 
   // There should be a total of 8 nodes
   EXPECT_EQ(8, my_SBM.nodes.at(0)->size());
-  
+
   // Add connections
   my_SBM.add_connection(a1, b1);
   my_SBM.add_connection(a1, b2);
@@ -205,40 +205,40 @@ TEST(testSBM, calculating_transition_probs){
   my_SBM.add_connection(a3, b2);
   my_SBM.add_connection(a3, b4);
   my_SBM.add_connection(a4, b3);
-  
+
   // Create groups
-  
+
   // Make 2 type 0/a groups
   NodePtr a1_1 = my_SBM.create_group_node(0, 1);
   NodePtr a1_2 = my_SBM.create_group_node(0, 1);
   NodePtr a1_3 = my_SBM.create_group_node(0, 1);
-  
+
   // Make 3 type 1/b groups
   NodePtr b1_1 = my_SBM.create_group_node(1, 1);
   NodePtr b1_2 = my_SBM.create_group_node(1, 1);
   NodePtr b1_3 = my_SBM.create_group_node(1, 1);
-  
-  
+
+
   // There should be a total of 6 level one groups
   EXPECT_EQ(6, my_SBM.nodes.at(1)->size());
-  
+
   // Assign nodes to their groups
   a1->set_parent(a1_1);
   a2->set_parent(a1_2);
   a3->set_parent(a1_2);
   a4->set_parent(a1_3);
-  
+
   b1->set_parent(b1_1);
   b2->set_parent(b1_1);
   b3->set_parent(b1_2);
   b4->set_parent(b1_3);
 
-
   // The group we hope a1 wants to join should have two members
   EXPECT_EQ("a2, a3", print_node_ids(a1_2->children));
-  
+    
+
   // There should be 4 total connections between first a group and first b group
-  
+
   // ... and 5 total out of the first a group
   EXPECT_EQ(2, a1_1->connections_to_node(b1_1).n_total);
   EXPECT_EQ(5, a1_2->connections_to_node(b1_1).n_total);
@@ -248,59 +248,59 @@ TEST(testSBM, calculating_transition_probs){
   EXPECT_EQ(1, b1_2->connections_to_node(a1_2).n_total);
   EXPECT_EQ(1, b1_3->connections_to_node(a1_2).n_total);
 
-  
+
   // Check connection counts between groups... E.g. there should be no
   // connections between first a group and second b group
   EXPECT_EQ(2, a1_1->connections_to_node(b1_1).n_between);
   EXPECT_EQ(0, a1_1->connections_to_node(b1_2).n_between);
   EXPECT_EQ(0, a1_1->connections_to_node(b1_3).n_between);
-  
+
   EXPECT_EQ(4, a1_2->connections_to_node(b1_1).n_between);
   EXPECT_EQ(0, a1_2->connections_to_node(b1_2).n_between);
   EXPECT_EQ(1, a1_2->connections_to_node(b1_3).n_between);
-  
+
   EXPECT_EQ(0, a1_3->connections_to_node(b1_1).n_between);
   EXPECT_EQ(1, a1_3->connections_to_node(b1_2).n_between);
   EXPECT_EQ(0, a1_3->connections_to_node(b1_3).n_between);
-  
-  EXPECT_EQ(b1_1->connections_to_node(a1_1).n_between, 
+
+  EXPECT_EQ(b1_1->connections_to_node(a1_1).n_between,
             a1_1->connections_to_node(b1_1).n_between);
-  
-  EXPECT_EQ(b1_2->connections_to_node(a1_1).n_between, 
+
+  EXPECT_EQ(b1_2->connections_to_node(a1_1).n_between,
             a1_1->connections_to_node(b1_2).n_between);
-  
-  EXPECT_EQ(b1_3->connections_to_node(a1_1).n_between, 
+
+  EXPECT_EQ(b1_3->connections_to_node(a1_1).n_between,
             a1_1->connections_to_node(b1_3).n_between);
-  
-  EXPECT_EQ(b1_1->connections_to_node(a1_2).n_between, 
+
+  EXPECT_EQ(b1_1->connections_to_node(a1_2).n_between,
             a1_2->connections_to_node(b1_1).n_between);
-  
-  EXPECT_EQ(b1_2->connections_to_node(a1_2).n_between, 
+
+  EXPECT_EQ(b1_2->connections_to_node(a1_2).n_between,
             a1_2->connections_to_node(b1_2).n_between);
-  
-  EXPECT_EQ(b1_3->connections_to_node(a1_2).n_between, 
+
+  EXPECT_EQ(b1_3->connections_to_node(a1_2).n_between,
             a1_2->connections_to_node(b1_3).n_between);
-  
-  EXPECT_EQ(b1_1->connections_to_node(a1_3).n_between, 
+
+  EXPECT_EQ(b1_1->connections_to_node(a1_3).n_between,
             a1_3->connections_to_node(b1_1).n_between);
-  
-  EXPECT_EQ(b1_2->connections_to_node(a1_3).n_between, 
+
+  EXPECT_EQ(b1_2->connections_to_node(a1_3).n_between,
             a1_3->connections_to_node(b1_2).n_between);
-  
-  EXPECT_EQ(b1_3->connections_to_node(a1_3).n_between, 
+
+  EXPECT_EQ(b1_3->connections_to_node(a1_3).n_between,
             a1_3->connections_to_node(b1_3).n_between);
-  
+
   // Calculate move probabilities for node a1
   Trans_Probs a1_move_probs = my_SBM.get_transition_probs_for_groups(a1);
   EXPECT_EQ("0-1_0, 0-1_1, 0-1_2", print_node_ids(a1_move_probs.group));
   EXPECT_EQ("0-1_0, 0-1_1, 0-1_2", print_node_ids(a1_move_probs.group));
-  
+
   double two = 2;
   double six = 6;
   double four = 4;
   double eps = 0.01;
   double tolerance = 0.005;
-  
+
   // Prob of a1 staying in a1_1 should be approximately (2 + eps)/(6 + 4*eps)
   ASSERT_NEAR(
     (two + eps)/(six + four*eps),
@@ -321,17 +321,17 @@ TEST(testSBM, calculating_transition_probs){
     a1_move_probs.probability[2],
     tolerance
   );
-  
+
   // Probabilities for transition should sum to 1
   ASSERT_NEAR(
-    a1_move_probs.probability[0] + a1_move_probs.probability[1] + a1_move_probs.probability[2], 
+    a1_move_probs.probability[0] + a1_move_probs.probability[1] + a1_move_probs.probability[2],
     1,
     tolerance
   );
-  
+
   // Roll a 'Random' dice and choose which group to move the node to
   a1->set_parent(a1_2);
-  
+
   // Make sure this transition was respected
   EXPECT_EQ("a1, a2, a3", print_node_ids(a1_2->children));
   
@@ -394,6 +394,138 @@ TEST(testSBM, cleaning_empty_groups){
   
   // No groups should have been culled
   EXPECT_EQ(0, num_culled_clean);
+}
+
+
+TEST(testSBM, edge_count_map){
+  SBM my_SBM;
+  
+  // Base-level nodes
+  NodePtr a1 = my_SBM.add_node("a1", 0);
+  NodePtr a2 = my_SBM.add_node("a2", 0);
+  NodePtr a3 = my_SBM.add_node("a3", 0);
+  NodePtr a4 = my_SBM.add_node("a4", 0);
+  NodePtr b1 = my_SBM.add_node("b1", 1);
+  NodePtr b2 = my_SBM.add_node("b2", 1);
+  NodePtr b3 = my_SBM.add_node("b3", 1);
+  NodePtr b4 = my_SBM.add_node("b4", 1);
+  
+
+  // level one groups
+  NodePtr a11 = my_SBM.add_node("a11", 0, 1);
+  NodePtr a12 = my_SBM.add_node("a12", 0, 1);
+  NodePtr a13 = my_SBM.add_node("a13", 0, 1);
+  NodePtr b11 = my_SBM.add_node("b11", 1, 1);
+  NodePtr b12 = my_SBM.add_node("b12", 1, 1);
+  NodePtr b13 = my_SBM.add_node("b13", 1, 1);
+
+  // level two groups
+  NodePtr a21 = my_SBM.add_node("a21", 0, 2);
+  NodePtr a22 = my_SBM.add_node("a22", 0, 2);
+  NodePtr b21 = my_SBM.add_node("b21", 1, 2);
+
+  // Add connections
+  my_SBM.add_connection(a1, b1);
+  my_SBM.add_connection(a1, b2);
+
+  my_SBM.add_connection(a2, b1);
+  my_SBM.add_connection(a2, b2);
+  my_SBM.add_connection(a2, b3);
+  my_SBM.add_connection(a2, b4);
+
+  my_SBM.add_connection(a3, b1);
+  my_SBM.add_connection(a3, b2);
+  my_SBM.add_connection(a3, b3);
+
+  my_SBM.add_connection(a4, b1);
+  my_SBM.add_connection(a4, b3);
+
+  // Set hierarchy
+
+  // Nodes -> level 1
+  a1->set_parent(a11);
+  a2->set_parent(a12);
+  a3->set_parent(a12);
+  a4->set_parent(a13);
+  b1->set_parent(b11);
+  b2->set_parent(b11);
+  b3->set_parent(b12);
+  b4->set_parent(b13);
+
+  // level 1 -> level 2
+  a11->set_parent(a21);
+  a12->set_parent(a22);
+  a13->set_parent(a22);
+  b11->set_parent(b21);
+  b12->set_parent(b21);
+  b13->set_parent(b21);
+
+  // Make sure our network is the proper size
+  EXPECT_EQ(3, my_SBM.nodes.size());
+  EXPECT_EQ(8, my_SBM.nodes.at(0)->size());
+  EXPECT_EQ(6, my_SBM.nodes.at(1)->size());
+  EXPECT_EQ(3, my_SBM.nodes.at(2)->size());
+  
+  // Build the network connection map for first level
+  EdgeCounts l1_edges = my_SBM.gather_edge_counts(1);
+  
+  // The edge count map should have 12 non-empty entries 
+  // 6 off diagonal + 6 total node counts.
+  EXPECT_EQ(12, l1_edges.size());
+  
+  // Check num edges between groups
+  EXPECT_EQ(l1_edges[id_pair("a11", "b11")], 2 );
+  EXPECT_EQ(l1_edges[id_pair("a11", "b12")], 0 );
+  EXPECT_EQ(l1_edges[id_pair("a11", "b13")], 0 );
+  
+  EXPECT_EQ(l1_edges[id_pair("a12", "b11")], 4 );
+  EXPECT_EQ(l1_edges[id_pair("a12", "b12")], 2 );
+  EXPECT_EQ(l1_edges[id_pair("a12", "b13")], 1 );
+  
+  EXPECT_EQ(l1_edges[id_pair("a13", "b11")], 1 );
+  EXPECT_EQ(l1_edges[id_pair("a13", "b12")], 1 );
+  EXPECT_EQ(l1_edges[id_pair("a13", "b13")], 0 );
+ 
+  // Direction shouldn't matter
+  EXPECT_EQ(l1_edges[id_pair("a11", "b11")],
+            l1_edges[id_pair("b11", "a11")]);
+
+  EXPECT_EQ(l1_edges[id_pair("a11", "b12")],
+            l1_edges[id_pair("b12", "a11")]);
+
+  EXPECT_EQ(l1_edges[id_pair("a11", "b13")],
+            l1_edges[id_pair("b13", "a11")]);
+
+  EXPECT_EQ(l1_edges[id_pair("a12", "b11")],
+            l1_edges[id_pair("b11", "a12")]);
+
+  EXPECT_EQ(l1_edges[id_pair("a12", "b12")],
+            l1_edges[id_pair("b12", "a12")]);
+
+  EXPECT_EQ(l1_edges[id_pair("a12", "b13")],
+            l1_edges[id_pair("b13", "a12")]);
+
+  EXPECT_EQ(l1_edges[id_pair("a13", "b11")],
+            l1_edges[id_pair("b11", "a13")]);
+
+  EXPECT_EQ(l1_edges[id_pair("a13", "b12")],
+            l1_edges[id_pair("b12", "a13")]);
+
+  EXPECT_EQ(l1_edges[id_pair("a13", "b13")],
+            l1_edges[id_pair("b13", "a13")]);
+
+
+  // Diagonals should hold total edge counts for group
+  EXPECT_EQ(l1_edges[id_pair("a11", "a11")], 2);
+  EXPECT_EQ(l1_edges[id_pair("a12", "a12")], 7);
+  EXPECT_EQ(l1_edges[id_pair("a13", "a13")], 2);
+  
+  EXPECT_EQ(l1_edges[id_pair("b11", "b11")], 7);
+  EXPECT_EQ(l1_edges[id_pair("b12", "b12")], 3);
+  EXPECT_EQ(l1_edges[id_pair("b13", "b13")], 1);
+  
+  
+  
 }
 
 
