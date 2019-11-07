@@ -4,8 +4,7 @@
 // Constructor that takes the nodes unique id integer and type
 // =======================================================
 SBM::SBM(){
-  // Setup first level of the node map
-  add_level(0);
+  // Nothing needs doin'
 }
 
 // =======================================================
@@ -21,6 +20,30 @@ void SBM::add_level(int level) {
   // Setup first level of the node map
   nodes.emplace(level, std::make_shared<NodeLevel>());
 }
+
+// =======================================================
+// Grab reference to a desired level map. If level doesn't exist yet, this
+// method will create it
+// =======================================================
+LevelPtr SBM::get_level(int level) {
+  
+  // Grab level for group node
+  LevelMap::iterator group_level = nodes.find(level);
+
+  // Is this a new level?
+  bool level_doesnt_exist = group_level == nodes.end();
+
+  if (level_doesnt_exist) {
+    // Add a new node level
+    add_level(level);
+
+    // 'find' that new level
+    group_level = nodes.find(level);
+  }
+  
+  return group_level->second;
+}
+
 
 // =======================================================
 // Find and return a node by its id
@@ -39,21 +62,61 @@ NodePtr SBM::get_node_by_id(string desired_id) {
 
 
 // =======================================================
+// Builds a group id from a scaffold for generated new groups
+// =======================================================
+string SBM::build_group_id(int type, int level, int index) {
+  return std::to_string(type)  + "-" +
+    std::to_string(level) + "_" +
+    std::to_string(index);
+}
+
+
+// =======================================================
 // Adds a node with an id and type to network
 // =======================================================
-NodePtr SBM::add_node(string id, int type){
-
-  // Create node
-  NodePtr new_node = std::make_shared<Node>(id, 0, type);
-
-  // Add node to node list
-  nodes.at(0)->emplace(id, new_node);
+NodePtr SBM::add_node(string id, int type, int level){
   
-  // Send node type to the types set
+  // Grab level
+  LevelPtr node_level = get_level(level);
+
+  // Check if we need to make the id or not
+  string node_id = id == "new group" ?
+    build_group_id(type, level, node_level->size()):
+    id;
+  
+  // Create node
+  NodePtr new_node = std::make_shared<Node>(node_id, level, type);
+  
+  node_level->emplace(node_id, new_node);
+ 
+  // Update node types set with new node's type
   unique_node_types.insert(type);
   
   return new_node;
 }; 
+
+
+// =======================================================
+// Adds a node with an id and type to network at level 0
+// =======================================================
+NodePtr SBM::add_node(string id, int type){
+  return add_node(id, type, 0);
+}; 
+
+
+// =======================================================
+// Creates a new group node and add it to its neccesary level
+// =======================================================
+NodePtr SBM::create_group_node(int type, int level) {
+
+  // Make sure requested level is not 0
+  if(level == 0) {
+    throw "Can't create group node at first level";
+  }
+  
+  // Initialize new node
+  return add_node("new group", type, level);
+};
 
 
 // =======================================================
@@ -64,6 +127,7 @@ void SBM::check_level_has_nodes(const LevelPtr level_to_check){
     throw "Requested level is empty.";
   }
 };    
+
 
 // =======================================================
 // Return nodes of a desired type from level. If match_type = true
@@ -111,6 +175,7 @@ list<NodePtr> SBM::get_nodes_of_type_at_level(int type, int level) {
   return get_nodes_from_level(type, level, true);
 }   
 
+
 // =======================================================
 // Return nodes _not_ of a specified type from level
 // =======================================================
@@ -118,47 +183,6 @@ list<NodePtr> SBM::get_nodes_not_of_type_at_level(int type, int level) {
   return get_nodes_from_level(type, level, false);
 }   
 
-
-// =======================================================
-// Creates a new group node and add it to its neccesary level
-// =======================================================
-NodePtr SBM::create_group_node(int type, int level) {
-
-  // Make sure requested level is not 0
-  if(level == 0) {
-    throw "Can't create group node at first level"; 
-  }
-  
-  // Grab level for group node
-  LevelMap::iterator group_level = nodes.find(level);
-  
-  // Is this the very first element in this level? 
-  bool first_in_level = group_level == nodes.end();
-  
-  if (first_in_level) {
-    // Add a new node level 
-    add_level(level);
-    
-    // 'find' that new level
-    group_level = nodes.find(level);
-  }
-  
-  // Find how many groups are already in the current level (all types)
-  int n_groups_in_level = group_level->second->size();
-  
-  // Build group_id
-  string group_id = std::to_string(type)  + "-" + 
-                    std::to_string(level) + "_" + 
-                    std::to_string(n_groups_in_level);
-  
-  // Initialize new node
-  NodePtr new_group = std::make_shared<Node>(group_id, level, type);
-  
-  // Add group node to SBM
-  group_level->second->emplace(group_id, new_group);
-  
-  return new_group;
-};
 
 // =======================================================
 // Adds a connection between two nodes based on their ids
@@ -172,6 +196,10 @@ void SBM::add_connection(string node1_id, string node2_id) {
   
 };    
 
+
+// =======================================================
+// Adds a connection between two nodes based on their references
+// =======================================================
 void SBM::add_connection(NodePtr node1, NodePtr node2) {
   
   Node::connect_nodes(
@@ -334,7 +362,8 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
 
 
 // =======================================================
-// Scan through levels and remove all group nodes that have no children. Returns # removed
+// Scan through levels and remove all group nodes that have no children. Returns
+// the number removed
 // =======================================================
 int SBM::clean_empty_groups(){
   
@@ -381,3 +410,62 @@ int SBM::clean_empty_groups(){
   
   return total_deleted;
 }                     
+
+
+// ======================================================= 
+// Helper to ensure desired id pair is always the same 
+// regardless of passed order
+// =======================================================
+std::pair<string, string> id_pair(string a, string b) {
+  return (a < b) ?
+  std::pair<string, string>(a,b):
+  std::pair<string, string>(b,a);
+}
+
+
+// ======================================================= 
+// Builds a id-id paired map of edge counts between nodes of the same level
+// =======================================================
+EdgeCounts SBM::gather_edge_counts(int level){
+  
+  // Setup our edge count map: 
+  EdgeCounts e_rs;
+  
+  // Grab current level
+  LevelPtr node_level = nodes.at(level);
+  
+  // Loop through all groups (r)
+  for (auto group_it = node_level->begin(); group_it != node_level->end(); ++group_it) 
+  {
+    NodePtr group_r = group_it->second;
+    string group_r_id = group_it->first;
+    
+    // Get all the edges for group r to its level
+    vector<NodePtr> group_r_cons = group_r->get_connections_to_level(level);
+    
+    // Set total number of edges for group r
+    e_rs.at(id_pair(group_r_id, group_r_id)) = group_r_cons.size();
+    
+    // Loop over all edges
+    for (auto group_s = group_r_cons.begin(); group_s != group_r_cons.end(); ++group_s) 
+    {
+      // Add connection counts to the map
+      e_rs.at(id_pair(group_r_id, (*group_s)->id))++;
+    }
+    
+  } // end group r loop
+  
+  // All the off-diagonal elements will be doubled because they were added for
+  // r->s and s->r, so divide them by two
+  for (auto node_pair = e_rs.begin(); node_pair != e_rs.end(); ++node_pair)
+  {
+    // Make sure we're not on a diagonal
+    if (node_pair->first.first != node_pair->first.second)
+    {
+      node_pair->second /= 2;
+    }
+  }
+  
+  return e_rs;
+}                   
+
