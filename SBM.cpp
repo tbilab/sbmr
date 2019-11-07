@@ -444,13 +444,13 @@ EdgeCounts SBM::gather_edge_counts(int level){
     vector<NodePtr> group_r_cons = group_r->get_connections_to_level(level);
     
     // Set total number of edges for group r
-    e_rs.at(id_pair(group_r_id, group_r_id)) = group_r_cons.size();
+    e_rs[id_pair(group_r_id, group_r_id)] = group_r_cons.size();
     
     // Loop over all edges
     for (auto group_s = group_r_cons.begin(); group_s != group_r_cons.end(); ++group_s) 
     {
       // Add connection counts to the map
-      e_rs.at(id_pair(group_r_id, (*group_s)->id))++;
+      e_rs[id_pair(group_r_id, (*group_s)->id)]++;
     }
     
   } // end group r loop
