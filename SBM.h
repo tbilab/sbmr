@@ -15,16 +15,13 @@ class SBM;
 struct Trans_Probs;
 typedef std::shared_ptr<Node> NodePtr;
 
-
-//=================================
-// Some type definitions for clarity
-//=================================
-
 // A map keyed by ID of nodes that live on a given level of the SBM
-typedef std::map<string, NodePtr>  NodeLevel;
+typedef std::map<string, NodePtr> NodeLevel;
+
+typedef std::shared_ptr<NodeLevel> LevelPtr;
 
 // A map keyed by level integer of each level of nodes 
-typedef std::map<int, NodeLevel> LevelMap;
+typedef std::map<int, LevelPtr> LevelMap;
 
 using std::string;
 using std::vector;
@@ -44,7 +41,7 @@ class SBM {
     // ==========================================
     // Methods
     void           add_level(int);                            // Setup a new Node level
-    void           check_level_has_nodes(const NodeLevel&);   // Validates that a given level has nodes and throws error if it doesn;t
+    void           check_level_has_nodes(const LevelPtr);     // Validates that a given level has nodes and throws error if it doesn;t
     list<NodePtr>  get_nodes_from_level(int, int, bool);      // Return nodes of a desired type from level can be switched from matching or not ma
     list<NodePtr>  get_nodes_of_type_at_level(int, int);      // Return nodes of a desired type from level can be switched from matching or not ma
     list<NodePtr>  get_nodes_not_of_type_at_level(int, int);  // Return nodes node of a specified type from level

@@ -20,15 +20,15 @@ TEST(testSBM, basic){
   my_SBM.create_group_node(1, 1);
   
   // How many nodes at the 'data' level do we have?
-  EXPECT_EQ(7, my_SBM.nodes[0].size());
+  EXPECT_EQ(7, my_SBM.nodes.at(0)->size());
   
-  EXPECT_EQ("m1, m2, m3, m4, n1, n2, n3", print_node_ids(my_SBM.nodes.at(0)));
+  EXPECT_EQ("m1, m2, m3, m4, n1, n2, n3", print_node_ids(*my_SBM.nodes.at(0)));
   
   // We should have two levels
   EXPECT_EQ(2, my_SBM.nodes.size());
   
   // Group name convention <type>-<level>_<id>
-  EXPECT_EQ("0-1_0, 1-1_1", print_node_ids(my_SBM.nodes[1]));
+  EXPECT_EQ("0-1_0, 1-1_1", print_node_ids(*my_SBM.nodes.at(1)));
 
   // Filter to a given node type
   EXPECT_EQ("n1, n2, n3", print_node_ids(my_SBM.get_nodes_of_type_at_level(0,0)));
@@ -38,7 +38,7 @@ TEST(testSBM, basic){
   // Get number of levels
   EXPECT_EQ(2, my_SBM.nodes.size());
   
-  // There should be two types of nodes
+  // There should be two types of print_node_ids(*my_SBM.nodes.at(0))nodes
   EXPECT_EQ(2, my_SBM.unique_node_types.size());
   
 }
@@ -80,7 +80,7 @@ TEST(testSBM, building_network){
   // Start with a single node in the network
   my_SBM.add_node("n1", 0);
 
-  EXPECT_EQ(1, my_SBM.nodes[0].size());
+  EXPECT_EQ(1, my_SBM.nodes[0]->size());
 
   // Add a few more
   my_SBM.add_node("n2", 0);
@@ -90,7 +90,7 @@ TEST(testSBM, building_network){
   my_SBM.add_node("m3", 1);
   my_SBM.add_node("m4", 1);
 
-  EXPECT_EQ(7, my_SBM.nodes[0].size());
+  EXPECT_EQ(7, my_SBM.nodes[0]->size());
 
   // We should start off with a single level as no group nodes are added
   EXPECT_EQ(1, my_SBM.nodes.size());
@@ -108,7 +108,7 @@ TEST(testSBM, building_network){
   EXPECT_EQ(1, my_SBM.get_nodes_of_type_at_level(1,1).size());
 
   // Should be a total of 2 group nodes for level 1
-  EXPECT_EQ(2, my_SBM.nodes.at(1).size());
+  EXPECT_EQ(2, my_SBM.nodes.at(1)->size());
 }
 
 
@@ -165,14 +165,14 @@ TEST(testSBM, build_with_connections){
   my_SBM.add_connection("a14", "b4");
 
   // There should be a total of 18 nodes
-  EXPECT_EQ(18, my_SBM.nodes.at(0).size());
+  EXPECT_EQ(18, my_SBM.nodes.at(0)->size());
 
   // Now start initialization of the MCMC chain by assigning every node their
   // own parent group
   my_SBM.give_every_node_a_group_at_level(0);
 
   // There should be a total of 18 nodes at level 1
-  EXPECT_EQ(18, my_SBM.nodes.at(1).size());
+  EXPECT_EQ(18, my_SBM.nodes.at(1)->size());
   
   // A node from this new level should have a single child
   EXPECT_EQ(1, my_SBM.get_node_from_level(1)->children.size());
@@ -194,7 +194,7 @@ TEST(testSBM, calculating_transition_probs){
   NodePtr b4 = my_SBM.add_node("b4", 1);
 
   // There should be a total of 8 nodes
-  EXPECT_EQ(8, my_SBM.nodes.at(0).size());
+  EXPECT_EQ(8, my_SBM.nodes.at(0)->size());
   
   // Add connections
   my_SBM.add_connection(a1, b1);
@@ -220,7 +220,7 @@ TEST(testSBM, calculating_transition_probs){
   
   
   // There should be a total of 6 level one groups
-  EXPECT_EQ(6, my_SBM.nodes.at(1).size());
+  EXPECT_EQ(6, my_SBM.nodes.at(1)->size());
   
   // Assign nodes to their groups
   a1->set_parent(a1_1);
@@ -372,9 +372,9 @@ TEST(testSBM, cleaning_empty_groups){
   
   // Make sure our network is the proper size
   EXPECT_EQ(3, my_SBM.nodes.size());
-  EXPECT_EQ(4, my_SBM.nodes.at(0).size());
-  EXPECT_EQ(4, my_SBM.nodes.at(1).size());
-  EXPECT_EQ(2, my_SBM.nodes.at(2).size());
+  EXPECT_EQ(4, my_SBM.nodes.at(0)->size());
+  EXPECT_EQ(4, my_SBM.nodes.at(1)->size());
+  EXPECT_EQ(2, my_SBM.nodes.at(2)->size());
   
   
   // Run group cleanup
@@ -384,10 +384,10 @@ TEST(testSBM, cleaning_empty_groups){
   EXPECT_EQ(3, num_culled);
   
   // Two should have been taken from the first group level
-  EXPECT_EQ(2, my_SBM.nodes.at(1).size());
+  EXPECT_EQ(2, my_SBM.nodes.at(1)->size());
   
   // And 1 should have been taken from the second group level
-  EXPECT_EQ(1, my_SBM.nodes.at(2).size());
+  EXPECT_EQ(1, my_SBM.nodes.at(2)->size());
   
   // Run group cleanup again
   int num_culled_clean = my_SBM.clean_empty_groups();

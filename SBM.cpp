@@ -19,7 +19,7 @@ void SBM::add_level(int level) {
   }
   
   // Setup first level of the node map
-  nodes.emplace(level, *(new NodeLevel));
+  nodes.emplace(level, std::make_shared<NodeLevel>());
 }
 
 // =======================================================
@@ -29,7 +29,7 @@ NodePtr SBM::get_node_by_id(string desired_id) {
   
   try {
     // Attempt to find node on the 'node level' of the SBM
-    return nodes.at(0).at(desired_id);
+    return nodes.at(0)->at(desired_id);
   } catch (...) {
     // Throw informative error if it fails
     throw "Could not find requested node";
@@ -47,7 +47,7 @@ NodePtr SBM::add_node(string id, int type){
   NodePtr new_node = std::make_shared<Node>(id, 0, type);
 
   // Add node to node list
-  nodes.at(0).emplace(id, new_node);
+  nodes.at(0)->emplace(id, new_node);
   
   // Send node type to the types set
   unique_node_types.insert(type);
@@ -59,8 +59,8 @@ NodePtr SBM::add_node(string id, int type){
 // =======================================================
 // Validates that a given level has nodes and throws error if it doesn't
 // =======================================================
-void SBM::check_level_has_nodes(const NodeLevel& level_to_check){
-  if (level_to_check.size() == 0) {
+void SBM::check_level_has_nodes(const LevelPtr level_to_check){
+  if (level_to_check->size() == 0) {
     throw "Requested level is empty.";
   }
 };    
@@ -79,14 +79,14 @@ list<NodePtr> SBM::get_nodes_from_level(
   list<NodePtr> nodes_to_return;
 
   // Grab desired level reference
-  NodeLevel node_level = nodes.at(level);
+  LevelPtr node_level = nodes.at(level);
   
   // Make sure level has nodes before looping through it
   check_level_has_nodes(node_level);
   
   // Loop through every node belonging to the desired level
-  for (auto node_it  = node_level.begin(); 
-            node_it != node_level.end(); 
+  for (auto node_it  = node_level->begin(); 
+            node_it != node_level->end(); 
             ++node_it) 
   {
     // Decide to keep the node or not based on if it matches or doesn't and our
@@ -144,7 +144,7 @@ NodePtr SBM::create_group_node(int type, int level) {
   }
   
   // Find how many groups are already in the current level (all types)
-  int n_groups_in_level = group_level->second.size();
+  int n_groups_in_level = group_level->second->size();
   
   // Build group_id
   string group_id = std::to_string(type)  + "-" + 
@@ -155,7 +155,7 @@ NodePtr SBM::create_group_node(int type, int level) {
   NodePtr new_group = std::make_shared<Node>(group_id, level, type);
   
   // Add group node to SBM
-  group_level->second.emplace(group_id, new_group);
+  group_level->second->emplace(group_id, new_group);
   
   return new_group;
 };
@@ -188,14 +188,14 @@ void SBM::add_connection(NodePtr node1, NodePtr node2) {
 void SBM::give_every_node_a_group_at_level(int level) {
 
   // Grab all the nodes for the desired level
-  NodeLevel node_level = nodes.at(level);
+  LevelPtr node_level = nodes.at(level);
   
   // Make sure level has nodes before looping through it
   check_level_has_nodes(node_level);
   
   // Loop through each of the nodes,
-  for (auto node_it  = node_level.begin(); 
-            node_it != node_level.end(); 
+  for (auto node_it  = node_level->begin(); 
+            node_it != node_level->end(); 
             ++node_it) 
   {
     // build a group node at the next level
@@ -212,7 +212,7 @@ void SBM::give_every_node_a_group_at_level(int level) {
 // Grabs the first node found at a given level, used in testing.
 // =======================================================
 NodePtr SBM::get_node_from_level(int level) {
-  return nodes.at(level).begin()->second;
+  return nodes.at(level)->begin()->second;
 }
 
 // =======================================================
@@ -345,7 +345,7 @@ int SBM::clean_empty_groups(){
   for (int level = 1; level < num_levels; ++level) 
   {
     // Grab desired level
-    NodeLevel* group_level = &nodes.at(level);
+    LevelPtr group_level = nodes.at(level);
     
     // Create a vector to store group ids that we want to delete
     vector<string> groups_to_delete;
