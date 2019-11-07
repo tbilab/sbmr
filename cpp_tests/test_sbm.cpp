@@ -338,6 +338,65 @@ TEST(testSBM, calculating_transition_probs){
 }
 
 
+TEST(testSBM, cleaning_empty_groups){
+  SBM my_SBM;
+  
+  // Start with a few nodes in the network
+  NodePtr n1 = my_SBM.add_node("n1", 0);
+  NodePtr n2 = my_SBM.add_node("n2", 0);
+  NodePtr n3 = my_SBM.add_node("n3", 0);
+  NodePtr n4 = my_SBM.add_node("n4", 0);
+
+  // Create a few group nodes at first level
+  NodePtr g1_1 = my_SBM.create_group_node(0, 1);
+  NodePtr g1_2 = my_SBM.create_group_node(0, 1);
+  NodePtr g1_3 = my_SBM.create_group_node(0, 1);
+  NodePtr g1_4 = my_SBM.create_group_node(0, 1);
+  
+  // Create two groups for second level
+  NodePtr g2_1 = my_SBM.create_group_node(0, 2);  
+  NodePtr g2_2 = my_SBM.create_group_node(0, 2);
+  
+  // Add children to groups 1 and two at first level
+  n1->set_parent(g1_1);
+  n2->set_parent(g1_1);
+  n3->set_parent(g1_2);
+  n4->set_parent(g1_2);
+  
+  // Add children to both level two groups
+  g1_1->set_parent(g2_1);
+  g1_2->set_parent(g2_1);
+  g1_3->set_parent(g2_1);
+  g1_4->set_parent(g2_2);
+  
+  
+  // Make sure our network is the proper size
+  EXPECT_EQ(3, my_SBM.nodes.size());
+  EXPECT_EQ(4, my_SBM.nodes.at(0).size());
+  EXPECT_EQ(4, my_SBM.nodes.at(1).size());
+  EXPECT_EQ(2, my_SBM.nodes.at(2).size());
+  
+  
+  // Run group cleanup
+  int num_culled = my_SBM.clean_empty_groups();
+  
+  // Three groups should have been cleaned
+  EXPECT_EQ(3, num_culled);
+  
+  // Two should have been taken from the first group level
+  EXPECT_EQ(2, my_SBM.nodes.at(1).size());
+  
+  // And 1 should have been taken from the second group level
+  EXPECT_EQ(1, my_SBM.nodes.at(2).size());
+  
+  // Run group cleanup again
+  int num_culled_clean = my_SBM.clean_empty_groups();
+  
+  // No groups should have been culled
+  EXPECT_EQ(0, num_culled_clean);
+}
+
+
 
 int main(int argc, char* argv[]){
   testing::InitGoogleTest(&argc, argv);
