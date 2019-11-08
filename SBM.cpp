@@ -506,10 +506,10 @@ void SBM::update_edge_counts(
 // Attempts to move a node to new group, returns true if node moved, false if it stays.
 // ======================================================= 
 bool SBM::attempt_move(
-    NodePtr node_to_move, 
-    EdgeCounts & group_edge_counts, 
-    bool dry_run, 
-    Weighted_Sampler & sampler) 
+    NodePtr            node_to_move, 
+    EdgeCounts &       group_edge_counts, 
+    Weighted_Sampler & sampler, 
+    bool               dry_run) 
 {
   int level_of_move = node_to_move->level + 1;
 
@@ -548,12 +548,15 @@ bool SBM::attempt_move(
   return node_is_moved;
 }; 
 
-// bool SBM::attempt_move(NodePtr node_to_move, EdgeCounts* group_edge_counts)
-// {
-//   // Call move attempt with dry run disabled (aka will move node if needed)
-//   return attempt_move(node_to_move, group_edge_counts, false);
-//   
-// }
-//   
+// If dry_run argument is ommitted make default false. 
+bool SBM::attempt_move(
+    NodePtr            node_to_move, 
+    EdgeCounts &       group_edge_counts, 
+    Weighted_Sampler & sampler) 
+{
+  // Call move attempt with dry run disabled (aka will move node if needed)
+  return attempt_move(node_to_move, group_edge_counts, sampler, false);
+}
+
 
 

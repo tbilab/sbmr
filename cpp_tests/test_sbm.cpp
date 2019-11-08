@@ -43,6 +43,7 @@ TEST(testSBM, basic){
   
 }
 
+
 TEST(testSBM, tracking_node_types){
   SBM my_SBM;
   
@@ -71,7 +72,6 @@ TEST(testSBM, tracking_node_types){
   // There should now be three types of nodes
   EXPECT_EQ(3, my_SBM.unique_node_types.size());
 }
-
 
 
 TEST(testSBM, building_network){
@@ -569,6 +569,7 @@ TEST(testSBM, edge_count_map){
   EXPECT_EQ(l2_edges[find_edges(b21)], 11);
 }
 
+
 TEST(testSBM, node_move_attempts){
   double tol = 0.01;
   SBM my_SBM;
@@ -624,7 +625,7 @@ TEST(testSBM, node_move_attempts){
   for (int i = 0; i < num_trials; ++i)
   {
     // Do move attempt (dry run)
-    bool a1_moved = my_SBM.attempt_move(a1, l1_edges, true, my_sampler);
+    bool a1_moved = my_SBM.attempt_move(a1, l1_edges, my_sampler, true);
 
     if (!a1_moved) num_times_no_move++;
   }
