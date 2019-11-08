@@ -15,17 +15,14 @@
 //=================================
 class SBM;
 struct Trans_Probs;
+
+
 typedef std::shared_ptr<Node> NodePtr;
-
-// A map keyed by ID of nodes that live on a given level of the SBM
 typedef std::map<string, NodePtr> NodeLevel;
-
 typedef std::shared_ptr<NodeLevel> LevelPtr;
-
-// A map keyed by level integer of each level of nodes 
 typedef std::map<int, LevelPtr> LevelMap;
-
 typedef std::map<std::pair<string, string>, int> EdgeCounts;
+
 
 using std::string;
 using std::vector;
@@ -36,7 +33,6 @@ using std::map;
 //=================================
 class SBM {
   public:
-    SBM(); 
     // ==========================================
     // Attributes
     LevelMap       nodes;               // A map keyed by level integer of each level of nodes 
@@ -64,7 +60,6 @@ class SBM {
     
     static void    update_edge_counts(EdgeCounts&, int, NodePtr, NodePtr, NodePtr); // Update an EdgeCount map after moving a node around to avoid rescanning
     static string  build_group_id(int, int, int);             // Builds a group id from a scaffold for generated new groups
-      
 };
 
 

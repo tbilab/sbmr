@@ -1,13 +1,6 @@
 #include "SBM.h" 
 
 // =======================================================
-// Constructor that takes the nodes unique id integer and type
-// =======================================================
-SBM::SBM(){
-  // Nothing needs doin'
-}
-
-// =======================================================
 // Setup a new Node level
 // =======================================================
 void SBM::add_level(int level) {
