@@ -334,7 +334,6 @@ TEST(testSBM, calculating_transition_probs){
 
   // Make sure this transition was respected
   EXPECT_EQ("a1, a2, a3", print_node_ids(a1_2->children));
-  
 }
 
 
@@ -568,6 +567,81 @@ TEST(testSBM, edge_count_map){
   EXPECT_EQ(l2_edges[find_edges(a21, a21)], 2);
   EXPECT_EQ(l2_edges[find_edges(a22, a22)], 9);
   EXPECT_EQ(l2_edges[find_edges(b21)], 11);
+}
+
+TEST(testSBM, node_move_attempts){
+  double tol = 0.01;
+  SBM my_SBM;
+  
+  // Add nodes to graph first
+  NodePtr a1 = my_SBM.add_node("a1", 0);
+  NodePtr a2 = my_SBM.add_node("a2", 0);
+  NodePtr a3 = my_SBM.add_node("a3", 0);
+  NodePtr a4 = my_SBM.add_node("a4", 0);
+  NodePtr b1 = my_SBM.add_node("b1", 1);
+  NodePtr b2 = my_SBM.add_node("b2", 1);
+  NodePtr b3 = my_SBM.add_node("b3", 1);
+  NodePtr b4 = my_SBM.add_node("b4", 1);
+  
+  // Add connections
+  my_SBM.add_connection(a1, b1);
+  my_SBM.add_connection(a1, b2);
+  my_SBM.add_connection(a2, b1);
+  my_SBM.add_connection(a2, b2);
+  my_SBM.add_connection(a3, b1);
+  my_SBM.add_connection(a3, b2);
+  my_SBM.add_connection(a3, b4);
+  my_SBM.add_connection(a4, b3);
+  
+  // Make 2 type 0/a groups
+  NodePtr a1_1 = my_SBM.create_group_node(0, 1);
+  NodePtr a1_2 = my_SBM.create_group_node(0, 1);
+  NodePtr a1_3 = my_SBM.create_group_node(0, 1);
+  NodePtr b1_1 = my_SBM.create_group_node(1, 1);
+  NodePtr b1_2 = my_SBM.create_group_node(1, 1);
+  NodePtr b1_3 = my_SBM.create_group_node(1, 1);
+  
+  // Assign nodes to their groups
+  a1->set_parent(a1_1);
+  a2->set_parent(a1_2);
+  a3->set_parent(a1_2);
+  a4->set_parent(a1_3);
+  b1->set_parent(b1_1);
+  b2->set_parent(b1_1);
+  b3->set_parent(b1_2);
+  b4->set_parent(b1_3);
+  
+
+  EdgeCounts l1_edges = my_SBM.gather_edge_counts(1);
+
+  // Initialize a sampler to choose group
+  Weighted_Sampler my_sampler;
+  
+  int num_trials = 1000;
+  int num_times_no_move = 0;
+
+  // Run multiple trials and of move and see how often a given
+  for (int i = 0; i < num_trials; ++i)
+  {
+    // Do move attempt (dry run)
+    bool a1_moved = my_SBM.attempt_move(a1, l1_edges, true, my_sampler);
+
+    if (!a1_moved) num_times_no_move++;
+  }
+  
+  // Prob of a1 staying in a1_1 should be approximately (2 + eps)/(6 + 4*eps)
+  // Make sure model's decisions to move a1 reflects this.
+  double two = 2;
+  double six = 6;
+  double four = 4;
+  double eps = 0.01;
+
+  ASSERT_NEAR(
+    (two + eps)/(six + four*eps),
+    double(num_times_no_move)/double(num_trials),
+    tol
+  );
+  
 }
 
 
