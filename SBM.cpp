@@ -525,39 +525,9 @@ NodePtr SBM::attempt_move(
   NodePtr new_group = move_probs.group[chosen_group_index];
   
   return new_group;
-  
-  // // Node old group
-  // NodePtr old_group = node_to_move->parent;
-  // 
-  // // Check if the chosen group is different than the current group for the node
-  // bool node_is_moved = new_group->id != old_group->id;
-  // 
-  // // If node has moved and we're not doing a dry-run, move node and update counts
-  // if (node_is_moved & !dry_run)
-  // {
-  //   // Swap parent for newly chosen group
-  //   node_to_move->set_parent(new_group);
-  // 
-  //   // Update edge counts with this move
-  //   update_edge_counts(group_edge_counts,
-  //                      level_of_move,
-  //                      node_to_move,
-  //                      old_group,
-  //                      new_group);
-  // }
-  // 
-  // return node_is_moved;
 }; 
 
-// // If dry_run argument is ommitted make default false. 
-// bool SBM::attempt_move(
-//     NodePtr            node_to_move, 
-//     EdgeCounts &       group_edge_counts, 
-//     Weighted_Sampler & sampler) 
-// {
-//   // Call move attempt with dry run disabled (aka will move node if needed)
-//   return attempt_move(node_to_move, group_edge_counts, sampler, false);
-// }
+
 
 // ======================================================= 
 // Run through all nodes in a given level and attempt a group move on each one in turn.
@@ -597,6 +567,23 @@ int SBM::run_move_sweep(int level)
   {
     // Attempt group move
     NodePtr new_group = attempt_move(*node_to_move, group_edges, my_sampler);
+    
+    // // Check if the chosen group is different than the current group for the node
+    // bool node_is_moved = new_group->id != old_group->id;
+    // 
+    // // If node has moved and we're not doing a dry-run, move node and update counts
+    // if (node_is_moved & !dry_run)
+    // {
+    //   // Swap parent for newly chosen group
+    //   node_to_move->set_parent(new_group);
+    // 
+    //   // Update edge counts with this move
+    //   update_edge_counts(group_edge_counts,
+    //                      level_of_move,
+    //                      node_to_move,
+    //                      old_group,
+    //                      new_group);
+    // }
     
     // Record attempt result
   }
