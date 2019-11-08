@@ -2,6 +2,7 @@
 #define __SBM_INCLUDED__
 
 #include "Node.h" 
+#include "helpers.h" 
 #include <map>
 #include <set>
 #include <memory>
@@ -77,8 +78,7 @@ struct Trans_Probs {
     group(g){};
 };
 
-// Helper function that insures order doesn't matter for EdgeCount key pair
-std::pair<string, string> id_pair(string, string);
+
 
 
 #endif

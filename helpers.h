@@ -36,3 +36,10 @@ std::string print_node_ids(std::vector<NodePtr>);
 // =======================================================
 // Map version
 std::string print_node_ids(std::map<std::string, NodePtr>);
+
+
+// Helper function that insures order doesn't matter for EdgeCount key pair
+std::pair<string, string> find_edges(string, string);
+std::pair<string, string> find_edges(NodePtr, NodePtr);
+std::pair<string, string> find_edges(string);
+std::pair<string, string> find_edges(NodePtr);

@@ -106,3 +106,27 @@ std::string print_node_ids(std::map<std::string, NodePtr> nodes) {
   return print_ids_to_string(node_ids);
 }
 
+
+// ======================================================= 
+// Helper to ensure desired id pair is always the same 
+// regardless of passed order
+// =======================================================
+std::pair<string, string> find_edges(string a, string b) {
+  return (a < b) ?
+  std::pair<string, string>(a,b):
+  std::pair<string, string>(b,a);
+}
+
+// When we're just looking for a single node's connections
+std::pair<string, string> find_edges(string a) {
+  return find_edges(a, a);
+}
+
+// Also make it work with pointers to nodes, which can be more natural 
+std::pair<string, string> find_edges(NodePtr a, NodePtr b) {
+  return find_edges(a->id, b->id);
+}
+
+std::pair<string, string> find_edges(NodePtr a) {
+  return find_edges(a->id, a->id);
+}
