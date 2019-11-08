@@ -409,7 +409,6 @@ TEST(testSBM, edge_count_map){
   NodePtr b2 = my_SBM.add_node("b2", 1);
   NodePtr b3 = my_SBM.add_node("b3", 1);
   NodePtr b4 = my_SBM.add_node("b4", 1);
-  
 
   // level one groups
   NodePtr a11 = my_SBM.add_node("a11", 0, 1);
@@ -535,6 +534,40 @@ TEST(testSBM, edge_count_map){
   EXPECT_EQ(l2_edges[id_pair("a22", "a22")], 9);
   EXPECT_EQ(l2_edges[id_pair("b21", "b21")], 11);
   
+  
+  // Now we will change the group for a node and make sure the changes are
+  // updated properly with the update_edge_counts() function
+  
+  // Change a3's parent from a12 to a13.
+  a3->set_parent(a13);
+  
+  // Update the level 1 edge counts
+  SBM::update_edge_counts(l1_edges, 1, a3, a12, a13);
+  
+  // Make sure that the needed change were made to a12's connections:
+  EXPECT_EQ(l1_edges[id_pair("a12", "b11")], 2);
+  EXPECT_EQ(l1_edges[id_pair("a12", "b12")], 1);
+  EXPECT_EQ(l1_edges[id_pair("a12", "b13")], 1);
+  EXPECT_EQ(l1_edges[id_pair("a12", "a12")], 4);
+  
+  // And to a13's as well...
+  EXPECT_EQ(l1_edges[id_pair("a13", "b11")], 3);
+  EXPECT_EQ(l1_edges[id_pair("a13", "b12")], 2);
+  EXPECT_EQ(l1_edges[id_pair("a13", "b13")], 0);
+  EXPECT_EQ(l1_edges[id_pair("a13", "a13")], 5);
+  
+  
+  // Nothing should have changed for the level 2 connections
+  
+  // Update the level 2 edge counts
+  SBM::update_edge_counts(l2_edges, 2, a3, a12, a13);
+  
+  // Check num edges between groups
+  EXPECT_EQ(l2_edges[id_pair("a21", "b21")], 2);
+  EXPECT_EQ(l2_edges[id_pair("a22", "b21")], 9);
+  EXPECT_EQ(l2_edges[id_pair("a21", "a21")], 2);
+  EXPECT_EQ(l2_edges[id_pair("a22", "a22")], 9);
+  EXPECT_EQ(l2_edges[id_pair("b21", "b21")], 11);
 }
 
 
