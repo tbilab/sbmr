@@ -240,22 +240,24 @@ NodePtr SBM::get_node_from_level(int level) {
 // Calculates probabilities for joining a given new group based on current SBM
 // state
 // =======================================================
-Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
+
+Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move, EdgeCounts group_edge_counts) 
+{
   // Ergodicity tuning parameter
   double epsilon = 0.01;
   
   int group_level = node_to_move->level + 1;
-
+  
   // If we have a polypartite network we want to avoid that type when finding
   // neighbor nodes to look at. Otherwise we want to get all types, which we do
   // by supplying the 'null' type of -1.
   int type_to_ignore = unique_node_types.size() > 1 ? node_to_move->type : -1;
-
+  
   // Grab all groups that could belong to connections
   list<NodePtr> neighboring_groups = get_nodes_not_of_type_at_level(
     type_to_ignore,
     group_level);
-
+  
   // Map for precalculating the connections between node and all neighbor groups
   //map<NodePtr, connection_info> node_outward_connections;
   map<string, int> node_outward_connections;
@@ -266,49 +268,46 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
   // First we gather info on how the node to move is connected in terms of its
   // neighbors's groups
   for (auto neighbor_group_it  = neighbor_group_connections.begin();
-            neighbor_group_it != neighbor_group_connections.end();
-            ++neighbor_group_it)
+       neighbor_group_it != neighbor_group_connections.end();
+       ++neighbor_group_it)
   {
     // Count edges to current group
     node_outward_connections[(*neighbor_group_it)->id]++;
   }
-
+  
   // Now loop through all the groups that the node could join
   list<NodePtr> potential_groups = get_nodes_of_type_at_level(
     type_to_ignore,
     node_to_move->level + 1);
-
+  
   // Number of potential groups
   int B = potential_groups.size();
   
   // Initialize holder of transition probabilities
   vector<double> probabilities;
   probabilities.reserve(B);
-
+  
   // Initialize holder of groups to match transition probs
   vector<NodePtr> groups;
   groups.reserve(B);
   
-  // Gather all the group connection counts at the group level
-  EdgeCounts level_counts = gather_edge_counts(group_level);
-
   // Start main loop over all the potential groups that the node could join
   for (auto potential_group_it  = potential_groups.begin();
-            potential_group_it != potential_groups.end();
-            ++potential_group_it)
+       potential_group_it != potential_groups.end();
+       ++potential_group_it)
   {
     NodePtr potential_group = *potential_group_it;
-
+    
     // Send currently investigated group to groups vector
     groups.push_back(potential_group);
-
+    
     // Start out sum at 0.
     double cummulative_prob = 0;
-
+    
     // Loop over the neighbor groups again
     for (auto neighbor_group_it  = neighboring_groups.begin();
-              neighbor_group_it != neighboring_groups.end();
-              ++neighbor_group_it)
+         neighbor_group_it != neighboring_groups.end();
+         ++neighbor_group_it)
     {
       NodePtr neighbor_group = *neighbor_group_it;
       
@@ -317,20 +316,21 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
       
       // How many connections there are between our neighbor group and the
       // potential group
-      double e_sr = level_counts[find_edges(potential_group, neighbor_group)];
-
+      double e_sr = group_edge_counts[find_edges(potential_group, neighbor_group)];
+      
       // How many total connections the neighbor node has
-      double e_s = level_counts[find_edges(neighbor_group)];
-
+      double e_s = group_edge_counts[find_edges(neighbor_group)];
+      
       // Finally calculate partial probability and add to cummulative sum
       cummulative_prob += e_si * ( (e_sr + epsilon) / (e_s + epsilon*(B + 1)) );
     }
-
+    
     // Add the final cumulative probabiltiy sum to potential group's element in
     // probability vector
     probabilities.push_back(cummulative_prob);
   }
   
+  // Our sampling algorithm just needs unormalized weights so we don't actually have to normalize. 
   // Normalize vector to sum to 1
   double total_of_probs = std::accumulate(probabilities.begin(), probabilities.end(), double(0));
   for (auto prob = probabilities.begin(); prob != probabilities.end(); ++prob)
@@ -339,6 +339,14 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
   }
   
   return Trans_Probs(probabilities, groups);
+}
+
+Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
+
+  // Gather all the group connection counts at the group level
+  EdgeCounts level_counts = gather_edge_counts(node_to_move->level + 1);
+  
+  return get_transition_probs_for_groups(node_to_move, level_counts);
 }
 
 
@@ -492,4 +500,60 @@ void SBM::update_edge_counts(
   level_counts[find_edges(old_group_id, old_group_id)] -= total_moved;
   level_counts[find_edges(new_group_id, new_group_id)] += total_moved;
 }
+
+
+// ======================================================= 
+// Attempts to move a node to new group, returns true if node moved, false if it stays.
+// ======================================================= 
+bool SBM::attempt_move(
+    NodePtr node_to_move, 
+    EdgeCounts & group_edge_counts, 
+    bool dry_run, 
+    Weighted_Sampler & sampler) 
+{
+  int level_of_move = node_to_move->level + 1;
+
+  // Calculate the transition probabilities for all possible groups node could join
+  Trans_Probs move_probs = get_transition_probs_for_groups(node_to_move, group_edge_counts);
+
+  // Initialize a sampler to choose group
+  Weighted_Sampler my_sampler;
+
+  // Sample probabilies to choose index of new group
+  int chosen_group_index = sampler.sample(move_probs.probability);
+
+  // Extract new group
+  NodePtr new_group = move_probs.group[chosen_group_index];
+
+  // Node old group
+  NodePtr old_group = node_to_move->parent;
+
+  // Check if the chosen group is different than the current group for the node
+  bool node_is_moved = new_group->id != old_group->id;
+
+  // If node has moved and we're not doing a dry-run, move node and update counts
+  if (node_is_moved & !dry_run)
+  {
+    // Swap parent for newly chosen group
+    node_to_move->set_parent(new_group);
+
+    // Update edge counts with this move
+    update_edge_counts(group_edge_counts,
+                       level_of_move,
+                       node_to_move,
+                       old_group,
+                       new_group);
+  }
+
+  return node_is_moved;
+}; 
+
+// bool SBM::attempt_move(NodePtr node_to_move, EdgeCounts* group_edge_counts)
+// {
+//   // Call move attempt with dry run disabled (aka will move node if needed)
+//   return attempt_move(node_to_move, group_edge_counts, false);
+//   
+// }
+//   
+
 

@@ -3,6 +3,8 @@
 
 #include "Node.h" 
 #include "helpers.h" 
+#include "Weighted_Sampler.h"
+
 #include <map>
 #include <set>
 #include <memory>
@@ -55,8 +57,11 @@ class SBM {
     void           give_every_node_a_group_at_level(int);     // Builds and assigns a group node for every node in a given level
     NodePtr        get_node_from_level(int);                  // Grabs the first node found at a given level, used in testing.
     Trans_Probs    get_transition_probs_for_groups(NodePtr);  // Calculates probabilities for joining a given new group based on current SBM state
+    Trans_Probs    get_transition_probs_for_groups(NodePtr, EdgeCounts);  // Calculates probabilities for joining a given new group based on current SBM state
     int            clean_empty_groups();                      // Scan through levels and remove all group nodes that have no children. Returns # removed
     EdgeCounts     gather_edge_counts(int);                   // Builds a id-id paired map of edge counts between nodes of the same level
+    bool           attempt_move(NodePtr, EdgeCounts&, bool, Weighted_Sampler&);  // Attempts to move a node to new group, returns true if node moved, false if it stays.
+   // bool           attempt_move(NodePtr, EdgeCounts*, Weighted_Sampler);        // Attempts to move a node to new group, returns true if node moved, false if it stays.
     
     static void    update_edge_counts(EdgeCounts&, int, NodePtr, NodePtr, NodePtr); // Update an EdgeCount map after moving a node around to avoid rescanning
     static string  build_group_id(int, int, int);             // Builds a group id from a scaffold for generated new groups
