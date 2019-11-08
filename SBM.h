@@ -61,6 +61,7 @@ class SBM {
     int            clean_empty_groups();                      // Scan through levels and remove all group nodes that have no children. Returns # removed
     EdgeCounts     gather_edge_counts(int);                   // Builds a id-id paired map of edge counts between nodes of the same level
     
+    static void    update_edge_counts(EdgeCounts&, int, NodePtr, NodePtr, NodePtr); // Update an EdgeCount map after moving a node around to avoid rescanning
     static string  build_group_id(int, int, int);             // Builds a group id from a scaffold for generated new groups
       
 };

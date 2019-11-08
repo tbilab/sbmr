@@ -467,5 +467,59 @@ EdgeCounts SBM::gather_edge_counts(int level){
   }
   
   return e_rs;
-}                   
+}   
+
+
+// ======================================================= 
+// Builds a id-id paired map of edge counts between nodes of the same level
+// =======================================================
+void SBM::update_edge_counts(
+    EdgeCounts& level_counts, 
+    int         level, 
+    NodePtr     updated_node, 
+    NodePtr     old_group, 
+    NodePtr     new_group) 
+{
+  // Get ids of groups moved, at the level of the move
+  string old_group_id = old_group->get_parent_at_level(level)->id;
+  string new_group_id = new_group->get_parent_at_level(level)->id;
+  
+  // Gather all connections from the moved node to the level of the groups we're
+  // working with
+  vector<NodePtr> moved_connections = updated_node->get_connections_to_level(level);
+  
+  // Setup an edge count map for node
+  std::map<string, int> moved_connections_counts;
+  
+  // Fill out edge count map
+  for(auto moved_connection  = moved_connections.begin(); 
+           moved_connection != moved_connections.end();
+           ++moved_connection )
+  {
+    moved_connections_counts[(*moved_connection)->id]++;
+  }
+  
+  // Now we can loop through all the groups that the moved node was connected to
+  // and subtract their counts from the from-group's edges and add their counts
+  // to the to-group's
+  // Fill out edge count map
+  for(auto changed_group  = moved_connections_counts.begin(); 
+           changed_group != moved_connections_counts.end();
+           ++changed_group )
+  {
+    string changed_id = changed_group->first;
+    int amount_changed = changed_group->second;
+    
+    // Subtract from old group...
+    level_counts[id_pair(changed_id, old_group_id)] -= amount_changed;
+    
+    // ...Add to new group
+    level_counts[id_pair(changed_id, new_group_id)] += amount_changed;
+  }
+  
+  // Finally update the total counts for the old and new group
+  int total_moved = moved_connections.size();
+  level_counts[id_pair(old_group_id, old_group_id)] -= total_moved;
+  level_counts[id_pair(new_group_id, new_group_id)] += total_moved;
+}
 
