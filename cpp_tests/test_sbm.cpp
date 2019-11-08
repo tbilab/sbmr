@@ -473,66 +473,66 @@ TEST(testSBM, edge_count_map){
   EXPECT_EQ(12, l1_edges.size());
   
   // Check num edges between groups
-  EXPECT_EQ(l1_edges[id_pair("a11", "b11")], 2 );
-  EXPECT_EQ(l1_edges[id_pair("a11", "b12")], 0 );
-  EXPECT_EQ(l1_edges[id_pair("a11", "b13")], 0 );
+  EXPECT_EQ(l1_edges[find_edges("a11", "b11")], 2 );
+  EXPECT_EQ(l1_edges[find_edges("a11", "b12")], 0 );
+  EXPECT_EQ(l1_edges[find_edges("a11", "b13")], 0 );
   
-  EXPECT_EQ(l1_edges[id_pair("a12", "b11")], 4 );
-  EXPECT_EQ(l1_edges[id_pair("a12", "b12")], 2 );
-  EXPECT_EQ(l1_edges[id_pair("a12", "b13")], 1 );
+  EXPECT_EQ(l1_edges[find_edges("a12", "b11")], 4 );
+  EXPECT_EQ(l1_edges[find_edges("a12", "b12")], 2 );
+  EXPECT_EQ(l1_edges[find_edges("a12", "b13")], 1 );
   
-  EXPECT_EQ(l1_edges[id_pair("a13", "b11")], 1 );
-  EXPECT_EQ(l1_edges[id_pair("a13", "b12")], 1 );
-  EXPECT_EQ(l1_edges[id_pair("a13", "b13")], 0 );
+  EXPECT_EQ(l1_edges[find_edges("a13", "b11")], 1 );
+  EXPECT_EQ(l1_edges[find_edges("a13", "b12")], 1 );
+  EXPECT_EQ(l1_edges[find_edges("a13", "b13")], 0 );
  
   // Direction shouldn't matter
-  EXPECT_EQ(l1_edges[id_pair("a11", "b11")],
-            l1_edges[id_pair("b11", "a11")]);
+  EXPECT_EQ(l1_edges[find_edges("a11", "b11")],
+            l1_edges[find_edges("b11", "a11")]);
 
-  EXPECT_EQ(l1_edges[id_pair("a11", "b12")],
-            l1_edges[id_pair("b12", "a11")]);
+  EXPECT_EQ(l1_edges[find_edges("a11", "b12")],
+            l1_edges[find_edges("b12", "a11")]);
 
-  EXPECT_EQ(l1_edges[id_pair("a11", "b13")],
-            l1_edges[id_pair("b13", "a11")]);
+  EXPECT_EQ(l1_edges[find_edges("a11", "b13")],
+            l1_edges[find_edges("b13", "a11")]);
 
-  EXPECT_EQ(l1_edges[id_pair("a12", "b11")],
-            l1_edges[id_pair("b11", "a12")]);
+  EXPECT_EQ(l1_edges[find_edges("a12", "b11")],
+            l1_edges[find_edges("b11", "a12")]);
 
-  EXPECT_EQ(l1_edges[id_pair("a12", "b12")],
-            l1_edges[id_pair("b12", "a12")]);
+  EXPECT_EQ(l1_edges[find_edges("a12", "b12")],
+            l1_edges[find_edges("b12", "a12")]);
 
-  EXPECT_EQ(l1_edges[id_pair("a12", "b13")],
-            l1_edges[id_pair("b13", "a12")]);
+  EXPECT_EQ(l1_edges[find_edges("a12", "b13")],
+            l1_edges[find_edges("b13", "a12")]);
 
-  EXPECT_EQ(l1_edges[id_pair("a13", "b11")],
-            l1_edges[id_pair("b11", "a13")]);
+  EXPECT_EQ(l1_edges[find_edges("a13", "b11")],
+            l1_edges[find_edges("b11", "a13")]);
 
-  EXPECT_EQ(l1_edges[id_pair("a13", "b12")],
-            l1_edges[id_pair("b12", "a13")]);
+  EXPECT_EQ(l1_edges[find_edges("a13", "b12")],
+            l1_edges[find_edges("b12", "a13")]);
 
-  EXPECT_EQ(l1_edges[id_pair("a13", "b13")],
-            l1_edges[id_pair("b13", "a13")]);
+  EXPECT_EQ(l1_edges[find_edges("a13", "b13")],
+            l1_edges[find_edges("b13", "a13")]);
 
 
   // Diagonals should hold total edge counts for group
-  EXPECT_EQ(l1_edges[id_pair("a11", "a11")], 2);
-  EXPECT_EQ(l1_edges[id_pair("a12", "a12")], 7);
-  EXPECT_EQ(l1_edges[id_pair("a13", "a13")], 2);
-  
-  EXPECT_EQ(l1_edges[id_pair("b11", "b11")], 7);
-  EXPECT_EQ(l1_edges[id_pair("b12", "b12")], 3);
-  EXPECT_EQ(l1_edges[id_pair("b13", "b13")], 1);
+  EXPECT_EQ(l1_edges[find_edges("a11")], 2);
+  EXPECT_EQ(l1_edges[find_edges("a12")], 7);
+  EXPECT_EQ(l1_edges[find_edges("a13")], 2);
+
+  EXPECT_EQ(l1_edges[find_edges("b11")], 7);
+  EXPECT_EQ(l1_edges[find_edges("b12")], 3);
+  EXPECT_EQ(l1_edges[find_edges("b13")], 1);
   
   // Repeat for level 2
   EdgeCounts l2_edges = my_SBM.gather_edge_counts(2);
   
   // Check num edges between groups
-  EXPECT_EQ(l2_edges[id_pair("a21", "b21")], 2);
-  EXPECT_EQ(l2_edges[id_pair("a22", "b21")], 9);
+  EXPECT_EQ(l2_edges[find_edges("a21", "b21")], 2);
+  EXPECT_EQ(l2_edges[find_edges("a22", "b21")], 9);
   
-  EXPECT_EQ(l2_edges[id_pair("a21", "a21")], 2);
-  EXPECT_EQ(l2_edges[id_pair("a22", "a22")], 9);
-  EXPECT_EQ(l2_edges[id_pair("b21", "b21")], 11);
+  EXPECT_EQ(l2_edges[find_edges("a21", "a21")], 2);
+  EXPECT_EQ(l2_edges[find_edges("a22", "a22")], 9);
+  EXPECT_EQ(l2_edges[find_edges("b21", "b21")], 11);
   
   
   // Now we will change the group for a node and make sure the changes are
@@ -545,16 +545,16 @@ TEST(testSBM, edge_count_map){
   SBM::update_edge_counts(l1_edges, 1, a3, a12, a13);
   
   // Make sure that the needed change were made to a12's connections:
-  EXPECT_EQ(l1_edges[id_pair("a12", "b11")], 2);
-  EXPECT_EQ(l1_edges[id_pair("a12", "b12")], 1);
-  EXPECT_EQ(l1_edges[id_pair("a12", "b13")], 1);
-  EXPECT_EQ(l1_edges[id_pair("a12", "a12")], 4);
+  EXPECT_EQ(l1_edges[find_edges("a12", "b11")], 2);
+  EXPECT_EQ(l1_edges[find_edges("a12", "b12")], 1);
+  EXPECT_EQ(l1_edges[find_edges("a12", "b13")], 1);
+  EXPECT_EQ(l1_edges[find_edges("a12")], 4);
   
   // And to a13's as well...
-  EXPECT_EQ(l1_edges[id_pair("a13", "b11")], 3);
-  EXPECT_EQ(l1_edges[id_pair("a13", "b12")], 2);
-  EXPECT_EQ(l1_edges[id_pair("a13", "b13")], 0);
-  EXPECT_EQ(l1_edges[id_pair("a13", "a13")], 5);
+  EXPECT_EQ(l1_edges[find_edges("a13", "b11")], 3);
+  EXPECT_EQ(l1_edges[find_edges("a13", "b12")], 2);
+  EXPECT_EQ(l1_edges[find_edges("a13", "b13")], 0);
+  EXPECT_EQ(l1_edges[find_edges("a13")], 5);
   
   
   // Nothing should have changed for the level 2 connections
@@ -563,11 +563,11 @@ TEST(testSBM, edge_count_map){
   SBM::update_edge_counts(l2_edges, 2, a3, a12, a13);
   
   // Check num edges between groups
-  EXPECT_EQ(l2_edges[id_pair("a21", "b21")], 2);
-  EXPECT_EQ(l2_edges[id_pair("a22", "b21")], 9);
-  EXPECT_EQ(l2_edges[id_pair("a21", "a21")], 2);
-  EXPECT_EQ(l2_edges[id_pair("a22", "a22")], 9);
-  EXPECT_EQ(l2_edges[id_pair("b21", "b21")], 11);
+  EXPECT_EQ(l2_edges[find_edges("a21", "b21")], 2);
+  EXPECT_EQ(l2_edges[find_edges("a22", "b21")], 9);
+  EXPECT_EQ(l2_edges[find_edges("a21", "a21")], 2);
+  EXPECT_EQ(l2_edges[find_edges("a22", "a22")], 9);
+  EXPECT_EQ(l2_edges[find_edges("b21")], 11);
 }
 
 
