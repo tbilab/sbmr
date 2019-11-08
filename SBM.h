@@ -60,8 +60,8 @@ class SBM {
     Trans_Probs    get_transition_probs_for_groups(NodePtr, EdgeCounts);  // Calculates probabilities for joining a given new group based on current SBM state
     int            clean_empty_groups();                      // Scan through levels and remove all group nodes that have no children. Returns # removed
     EdgeCounts     gather_edge_counts(int);                   // Builds a id-id paired map of edge counts between nodes of the same level
-    bool           attempt_move(NodePtr, EdgeCounts&, Weighted_Sampler&, bool);  // Attempts to move a node to new group, returns true if node moved, false if it stays.
-    bool           attempt_move(NodePtr, EdgeCounts&, Weighted_Sampler&);        // Attempts to move a node to new group, returns true if node moved, false if it stays.
+    NodePtr        attempt_move(NodePtr, EdgeCounts&, Weighted_Sampler&);        // Attempts to move a node to new group, returns true if node moved, false if it stays.
+    int            run_move_sweep(int);                       // Run through all nodes in a given level and attempt a group move on each one in turn.
     
     static void    update_edge_counts(EdgeCounts&, int, NodePtr, NodePtr, NodePtr); // Update an EdgeCount map after moving a node around to avoid rescanning
     static string  build_group_id(int, int, int);             // Builds a group id from a scaffold for generated new groups

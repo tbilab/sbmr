@@ -505,11 +505,10 @@ void SBM::update_edge_counts(
 // ======================================================= 
 // Attempts to move a node to new group, returns true if node moved, false if it stays.
 // ======================================================= 
-bool SBM::attempt_move(
+NodePtr SBM::attempt_move(
     NodePtr            node_to_move, 
     EdgeCounts &       group_edge_counts, 
-    Weighted_Sampler & sampler, 
-    bool               dry_run) 
+    Weighted_Sampler & sampler) 
 {
   int level_of_move = node_to_move->level + 1;
 
@@ -524,39 +523,88 @@ bool SBM::attempt_move(
 
   // Extract new group
   NodePtr new_group = move_probs.group[chosen_group_index];
-
-  // Node old group
-  NodePtr old_group = node_to_move->parent;
-
-  // Check if the chosen group is different than the current group for the node
-  bool node_is_moved = new_group->id != old_group->id;
-
-  // If node has moved and we're not doing a dry-run, move node and update counts
-  if (node_is_moved & !dry_run)
-  {
-    // Swap parent for newly chosen group
-    node_to_move->set_parent(new_group);
-
-    // Update edge counts with this move
-    update_edge_counts(group_edge_counts,
-                       level_of_move,
-                       node_to_move,
-                       old_group,
-                       new_group);
-  }
-
-  return node_is_moved;
+  
+  return new_group;
+  
+  // // Node old group
+  // NodePtr old_group = node_to_move->parent;
+  // 
+  // // Check if the chosen group is different than the current group for the node
+  // bool node_is_moved = new_group->id != old_group->id;
+  // 
+  // // If node has moved and we're not doing a dry-run, move node and update counts
+  // if (node_is_moved & !dry_run)
+  // {
+  //   // Swap parent for newly chosen group
+  //   node_to_move->set_parent(new_group);
+  // 
+  //   // Update edge counts with this move
+  //   update_edge_counts(group_edge_counts,
+  //                      level_of_move,
+  //                      node_to_move,
+  //                      old_group,
+  //                      new_group);
+  // }
+  // 
+  // return node_is_moved;
 }; 
 
-// If dry_run argument is ommitted make default false. 
-bool SBM::attempt_move(
-    NodePtr            node_to_move, 
-    EdgeCounts &       group_edge_counts, 
-    Weighted_Sampler & sampler) 
-{
-  // Call move attempt with dry run disabled (aka will move node if needed)
-  return attempt_move(node_to_move, group_edge_counts, sampler, false);
-}
+// // If dry_run argument is ommitted make default false. 
+// bool SBM::attempt_move(
+//     NodePtr            node_to_move, 
+//     EdgeCounts &       group_edge_counts, 
+//     Weighted_Sampler & sampler) 
+// {
+//   // Call move attempt with dry run disabled (aka will move node if needed)
+//   return attempt_move(node_to_move, group_edge_counts, sampler, false);
+// }
 
+// ======================================================= 
+// Run through all nodes in a given level and attempt a group move on each one in turn.
+// ======================================================= 
+int SBM::run_move_sweep(int level) 
+{
+  // Get all the nodes at the given level in a shuffleable vector format
+  
+  // Grab level map
+  LevelPtr node_map = get_level(level);
+  
+  // Initialize vector to hold nodes
+  vector<NodePtr> node_vec;
+  node_vec.reserve(node_map->size());
+  
+  // Fill in vector with map elements
+  for (auto node_it = node_map->begin(); node_it != node_map->end(); ++node_it)
+  {
+    node_vec.push_back(node_it->second);
+  }
+  
+  // Shuffle node order
+  std::random_shuffle(node_vec.begin(), node_vec.end());
+  
+  // Build starting edge counts
+  int group_level = level + 1;
+  EdgeCounts group_edges = gather_edge_counts(group_level);
+  
+  // Setup random sampler
+  Weighted_Sampler my_sampler;
+  
+  // Keep track of how many moves were made
+  int num_moves_made = 0;
+  
+  // Loop through randomly ordered nodes
+  for (auto node_to_move = node_vec.begin(); node_to_move != node_vec.end(); ++node_to_move)
+  {
+    // Attempt group move
+    NodePtr new_group = attempt_move(*node_to_move, group_edges, my_sampler);
+    
+    // Record attempt result
+  }
+    
+  
+  
+  // Return number of nodes that were moved
+  
+}  
 
 

@@ -620,14 +620,15 @@ TEST(testSBM, node_move_attempts){
   
   int num_trials = 1000;
   int num_times_no_move = 0;
+  NodePtr old_group = a1->parent;
 
   // Run multiple trials and of move and see how often a given
   for (int i = 0; i < num_trials; ++i)
   {
     // Do move attempt (dry run)
-    bool a1_moved = my_SBM.attempt_move(a1, l1_edges, my_sampler, true);
+    NodePtr new_group = my_SBM.attempt_move(a1, l1_edges, my_sampler);
 
-    if (!a1_moved) num_times_no_move++;
+    if (new_group->id == old_group->id) num_times_no_move++;
   }
   
   // Prob of a1 staying in a1_1 should be approximately (2 + eps)/(6 + 4*eps)
