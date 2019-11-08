@@ -130,3 +130,26 @@ std::pair<string, string> find_edges(NodePtr a, NodePtr b) {
 std::pair<string, string> find_edges(NodePtr a) {
   return find_edges(a->id, a->id);
 }
+
+
+// Normalize a vector and return a new copy
+std::vector<double> normalize_vector(std::vector<double> const &vec) 
+{
+  // Get sum of elements
+  double weights_sum = 0.0;
+  for (auto el = vec.begin(); el != vec.end(); ++el) 
+  {
+    weights_sum += *el;
+  }
+  
+  std::vector<double> normalized_vec;
+  normalized_vec.reserve(vec.size());
+  
+  for (auto el = vec.begin(); el != vec.end(); ++el)
+  {
+    normalized_vec.push_back(*el/weights_sum);
+  }
+
+  
+  return normalized_vec;
+}
