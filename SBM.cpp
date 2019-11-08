@@ -250,6 +250,8 @@ NodePtr SBM::get_node_from_level(int level) {
 Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
   // Ergodicity tuning parameter
   double epsilon = 0.01;
+  
+  int group_level = node_to_move->level + 1;
 
   // If we have a polypartite network we want to avoid that type when finding
   // neighbor nodes to look at. Otherwise we want to get all types, which we do
@@ -259,22 +261,23 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
   // Grab all groups that could belong to connections
   list<NodePtr> neighboring_groups = get_nodes_not_of_type_at_level(
     type_to_ignore,
-    node_to_move->level + 1 );
+    group_level);
 
   // Map for precalculating the connections between node and all neighbor groups
-  map<NodePtr, connection_info> node_outward_connections;
-
+  //map<NodePtr, connection_info> node_outward_connections;
+  map<string, int> node_outward_connections;
+  
+  // Gather all connections node has to the next level up (its group level)
+  vector<NodePtr> neighbor_group_connections = node_to_move->get_connections_to_level(group_level);
+  
   // First we gather info on how the node to move is connected in terms of its
   // neighbors's groups
-  for (auto neighbor_group_it  = neighboring_groups.begin();
-            neighbor_group_it != neighboring_groups.end();
+  for (auto neighbor_group_it  = neighbor_group_connections.begin();
+            neighbor_group_it != neighbor_group_connections.end();
             ++neighbor_group_it)
   {
-    // What proportion of this node's edges are to nodes in current group?
-    node_outward_connections.emplace(
-      *neighbor_group_it,
-      node_to_move->connections_to_node(*neighbor_group_it)
-    );
+    // Count edges to current group
+    node_outward_connections[(*neighbor_group_it)->id]++;
   }
 
   // Now loop through all the groups that the node could join
@@ -292,6 +295,9 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
   // Initialize holder of groups to match transition probs
   vector<NodePtr> groups;
   groups.reserve(B);
+  
+  // Gather all the group connection counts at the group level
+  EdgeCounts level_counts = gather_edge_counts(group_level);
 
   // Start main loop over all the potential groups that the node could join
   for (auto potential_group_it  = potential_groups.begin();
@@ -312,34 +318,16 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
               ++neighbor_group_it)
     {
       NodePtr neighbor_group = *neighbor_group_it;
-
-      // Get connection info for the potential group to the neighbor group
-      connection_info potential_to_neighbor_connections = neighbor_group->
-        connections_to_node(potential_group);
-
-      // Grab pre-calculated connection info from node to this neighbor
-      connection_info node_to_neighbor_connections = node_outward_connections
-        .at(neighbor_group);
-
-      // Get fraction of the nodes connections to the current neighbor. This
-      // serves as an indicator of how close we should consider the connections
-      // of this neighbor node when deciding the new group.
-      // double P_si = double(node_to_neighbor_connections.n_between) /
-      //               double(node_to_neighbor_connections.n_total);      
-      
-      // We can just calculate this value instead of the prob because the denominator of the 
-      // probability is the same for every iteration so we can just use the numerator and 
-      // then the normalization of vector to 1 at end will take care of this scalar. 
       
       // How many connections does this node have to group of interest? 
-      double e_si = node_to_neighbor_connections.n_between;
+      double e_si = node_outward_connections[neighbor_group->id];
       
       // How many connections there are between our neighbor group and the
       // potential group
-      double e_sr = potential_to_neighbor_connections.n_between;
+      double e_sr = level_counts[find_edges(potential_group, neighbor_group)];
 
-      // How many total connection the neighbor node has
-      double e_s = potential_to_neighbor_connections.n_total;
+      // How many total connections the neighbor node has
+      double e_s = level_counts[find_edges(neighbor_group)];
 
       // Finally calculate partial probability and add to cummulative sum
       cummulative_prob += e_si * ( (e_sr + epsilon) / (e_s + epsilon*(B + 1)) );
@@ -412,16 +400,6 @@ int SBM::clean_empty_groups(){
 }                     
 
 
-// ======================================================= 
-// Helper to ensure desired id pair is always the same 
-// regardless of passed order
-// =======================================================
-std::pair<string, string> id_pair(string a, string b) {
-  return (a < b) ?
-  std::pair<string, string>(a,b):
-  std::pair<string, string>(b,a);
-}
-
 
 // ======================================================= 
 // Builds a id-id paired map of edge counts between nodes of the same level
@@ -438,19 +416,18 @@ EdgeCounts SBM::gather_edge_counts(int level){
   for (auto group_it = node_level->begin(); group_it != node_level->end(); ++group_it) 
   {
     NodePtr group_r = group_it->second;
-    string group_r_id = group_it->first;
-    
+
     // Get all the edges for group r to its level
     vector<NodePtr> group_r_cons = group_r->get_connections_to_level(level);
     
     // Set total number of edges for group r
-    e_rs[id_pair(group_r_id, group_r_id)] = group_r_cons.size();
+    e_rs[find_edges(group_r)] = group_r_cons.size();
     
     // Loop over all edges
     for (auto group_s = group_r_cons.begin(); group_s != group_r_cons.end(); ++group_s) 
     {
       // Add connection counts to the map
-      e_rs[id_pair(group_r_id, (*group_s)->id)]++;
+      e_rs[find_edges(group_r, *group_s)]++;
     }
     
   } // end group r loop
@@ -511,15 +488,15 @@ void SBM::update_edge_counts(
     int amount_changed = changed_group->second;
     
     // Subtract from old group...
-    level_counts[id_pair(changed_id, old_group_id)] -= amount_changed;
+    level_counts[find_edges(changed_id, old_group_id)] -= amount_changed;
     
     // ...Add to new group
-    level_counts[id_pair(changed_id, new_group_id)] += amount_changed;
+    level_counts[find_edges(changed_id, new_group_id)] += amount_changed;
   }
   
   // Finally update the total counts for the old and new group
   int total_moved = moved_connections.size();
-  level_counts[id_pair(old_group_id, old_group_id)] -= total_moved;
-  level_counts[id_pair(new_group_id, new_group_id)] += total_moved;
+  level_counts[find_edges(old_group_id, old_group_id)] -= total_moved;
+  level_counts[find_edges(new_group_id, new_group_id)] += total_moved;
 }
 
