@@ -594,6 +594,9 @@ int SBM::run_move_sweep(int level)
     }
   } // Ends current sweep loop
   
+  // Cleanup any now empty groups
+  clean_empty_groups();
+  
   // Return number of nodes that were moved
   return num_moves_made;
 }  
