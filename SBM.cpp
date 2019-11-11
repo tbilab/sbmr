@@ -532,7 +532,8 @@ NodePtr SBM::attempt_move(
 
 
 // ======================================================= 
-// Run through all nodes in a given level and attempt a group move on each one in turn.
+// Run through all nodes in a given level and attempt a group move on each one
+// in turn.
 // ======================================================= 
 int SBM::run_move_sweep(int level) 
 {
@@ -600,5 +601,49 @@ int SBM::run_move_sweep(int level)
   // Return number of nodes that were moved
   return num_moves_made;
 }  
+
+
+// ======================================================= 
+// Export current state of nodes in model
+// ======================================================= 
+State_Dump SBM::get_sbm_state(){
+  // Initialize the return struct
+  State_Dump state; 
+  
+  // Keep track of how many nodes we've seen so we can preallocate vector sizes
+  int n_nodes_seen = 0;
+  
+  // Loop through all the levels present in SBM
+  for (auto level_it = nodes.begin(); level_it != nodes.end(); ++level_it) 
+  {
+    int level = level_it->first;
+    LevelPtr node_level = level_it->second;
+    
+    // Add level's nodes to current total
+    n_nodes_seen += node_level->size();
+    
+    // Update sizes of the state vectors
+    state.id.reserve(n_nodes_seen);
+    state.level.reserve(n_nodes_seen);
+    state.parent.reserve(n_nodes_seen);
+    state.type.reserve(n_nodes_seen);
+    
+    // Loop through each node in level
+    for (auto node_it = node_level->begin(); node_it != node_level->end(); ++node_it )
+    {
+      // Get currrent node
+      NodePtr current_node = node_it->second;
+      
+      // Dump all its desired info into its element in the state vectors
+      state.id.push_back(current_node->id);
+      state.level.push_back(level);
+      state.parent.push_back(current_node->parent->id);
+      state.type.push_back(current_node->type);
+      
+    } // End node loop
+  } // End level loop
+  
+  return state;
+}                          
 
 

@@ -17,6 +17,7 @@
 //=================================
 class SBM;
 struct Trans_Probs;
+struct State_Dump;
 
 
 typedef std::shared_ptr<Node> NodePtr;
@@ -62,6 +63,7 @@ class SBM {
     EdgeCounts     gather_edge_counts(int);                   // Builds a id-id paired map of edge counts between nodes of the same level
     NodePtr        attempt_move(NodePtr, EdgeCounts&, Weighted_Sampler&);        // Attempts to move a node to new group, returns true if node moved, false if it stays.
     int            run_move_sweep(int);                       // Run through all nodes in a given level and attempt a group move on each one in turn.
+    State_Dump     get_sbm_state();                           // Export current state of nodes in model
     
     static void    update_edge_counts(EdgeCounts&, int, NodePtr, NodePtr, NodePtr); // Update an EdgeCount map after moving a node around to avoid rescanning
     static string  build_group_id(int, int, int);             // Builds a group id from a scaffold for generated new groups
@@ -76,6 +78,13 @@ struct Trans_Probs {
   Trans_Probs(vector<double> p, vector<NodePtr> g):
     probability(p),
     group(g){};
+};
+
+struct State_Dump {
+  vector<string> id;
+  vector<string> parent;
+  vector<int>    level;
+  vector<int>    type;
 };
 
 
