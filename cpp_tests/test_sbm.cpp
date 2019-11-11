@@ -74,6 +74,7 @@ TEST(testSBM, tracking_node_types){
   EXPECT_EQ(3, my_SBM.unique_node_types.size());
 }
 
+
 TEST(testSBM, state_dumping){
   SBM my_SBM;
   
@@ -678,8 +679,7 @@ TEST(testSBM, edge_count_map){
 }
 
 
-TEST(testSBM, node_move_attempts){
-  double tol = 0.01;
+SBM build_simple_SBM(){
   SBM my_SBM;
   
   // Add nodes to graph first
@@ -720,7 +720,16 @@ TEST(testSBM, node_move_attempts){
   b3->set_parent(b1_2);
   b4->set_parent(b1_3);
   
+  return my_SBM;
+}
 
+
+TEST(testSBM, node_move_attempts){
+  double tol = 0.01;
+  SBM my_SBM = build_simple_SBM();
+
+  NodePtr a1 = my_SBM.get_node_by_id("a1");
+  
   EdgeCounts l1_edges = my_SBM.gather_edge_counts(1);
 
   // Initialize a sampler to choose group
@@ -730,7 +739,7 @@ TEST(testSBM, node_move_attempts){
   int num_times_no_move = 0;
   NodePtr old_group = a1->parent;
 
-  // Run multiple trials and of move and see how often a given
+  // Run multiple trials and of move and see how often a given node is moved
   for (int i = 0; i < num_trials; ++i)
   {
     // Do move attempt (dry run)
@@ -753,6 +762,70 @@ TEST(testSBM, node_move_attempts){
   );
   
 }
+
+
+
+TEST(testSBM, node_move_sweeps){
+  double tol = 0.01;
+  
+  int n_trials = 100;
+  
+  std::set<int> num_nodes_moved;
+  
+  // Run a node sweep on the same SBM model a bunch of times
+  for (int i = 0; i < n_trials; i++)
+  {
+    // Setup simple SBM model
+    SBM my_SBM = build_simple_SBM();
+    
+    // Run a single sweep at the node-level
+    int nodes_moved = my_SBM.run_move_sweep(0);
+    
+    // Record how many were moved here
+    num_nodes_moved.insert(nodes_moved);
+  }
+  
+  // Make sure the number of nodes moved isn't constant
+  EXPECT_NE(num_nodes_moved.size(), 1);
+  
+  // Make sure that if we do the sweep a bunch of times that the later parts
+  // sweeps will be more stable because of convergence
+  
+  // Setup simple SBM model
+  SBM my_SBM = build_simple_SBM();
+  int n_sweeps = 100;
+  vector<int> n_moved_first_third;
+  vector<int> n_moved_last_third;
+  
+  for (int i = 0; i < n_sweeps; i++)
+  {
+    // Run a single sweep at the node-level
+    int n_moved = my_SBM.run_move_sweep(0);
+    
+    // If we're in first third of sweeps push to first thirds vector
+    if(i < (n_sweeps/3)) n_moved_first_third.push_back(n_moved);
+    
+    // If we're in the last third of sweeps, push to last thirds vector
+    if(i > (2*n_sweeps/3)) n_moved_last_third.push_back(n_moved);
+  }
+  
+  // Calculate average num moves for both thirds
+  float first_third_avg_moves = std::accumulate(n_moved_first_third.begin(), 
+                                                n_moved_first_third.end(), 
+                                                0.0 ) / n_moved_first_third.size(); 
+  
+  float last_third_avg_moves = std::accumulate(n_moved_last_third.begin(), 
+                                               n_moved_last_third.end(), 
+                                               0.0 ) / n_moved_last_third.size(); 
+  
+  std::cout << "First third avg num moves: " << first_third_avg_moves << std::endl;
+  std::cout << "Last third avg num moves: " << last_third_avg_moves << std::endl;
+  
+  // Hope that the first third is more "volitile" than the last
+  ASSERT_TRUE(first_third_avg_moves > last_third_avg_moves);
+  
+};
+
 
 
 
