@@ -680,6 +680,30 @@ TEST(testSBM, edge_count_map){
 
 
 SBM build_simple_SBM(){
+  
+  // This function builds a network with the following structure
+/*
+             +----+               +----+
+    +----+   |    |---------------|    |
+    |    |   | a1 |-----      ----| b1 |   +----+
+    |a11 |---|    |      \  /    -|    |---|    |
+    |    |   +----+       \/   /  +----+   |b11 |
+    +----+   +----+       /\  /   +----+   |    |
+             |    |----- /  \ ----|    |---|    |
+    +----+   | a2 |---------------| b2 |   +----+      
+    |    |---|    |       /    ---|    |   
+    |a12 |   +----+      /   /    +----+   +----+
+    |    |   +----+     /   /     +----+   |    |
+    |    |---|    |----    /      |    |   |b12 |
+    +----+   | a3 |-------        | b3 |---|    |
+             |    |------    -----|    |   +----+      
+    +----+   +----+      \  /     +----+   +----+
+    |    |   +----+       \/      +----+   |    |
+    |a13 |---|    |       /\      |    |   |b13 |
+    |    |   | a4 |------/  \-----| b4 |---|    |
+    +----+   |    |               |    |   +----+
+             +----+               +----+
+*/   
   SBM my_SBM;
   
   // Add nodes to graph first
@@ -764,7 +788,6 @@ TEST(testSBM, node_move_attempts){
 }
 
 
-
 TEST(testSBM, node_move_sweeps){
   double tol = 0.01;
   
@@ -818,16 +841,65 @@ TEST(testSBM, node_move_sweeps){
                                                n_moved_last_third.end(), 
                                                0.0 ) / n_moved_last_third.size(); 
   
-  std::cout << "First third avg num moves: " << first_third_avg_moves << std::endl;
-  std::cout << "Last third avg num moves: " << last_third_avg_moves << std::endl;
+  // std::cout << "First third avg num moves: " << first_third_avg_moves << std::endl;
+  // std::cout << "Last third avg num moves: " << last_third_avg_moves << std::endl;
   
   // Hope that the first third is more "volitile" than the last
   ASSERT_TRUE(first_third_avg_moves > last_third_avg_moves);
   
 };
 
+float avg_last_n(vector<int> vec, int n){
+  return std::accumulate(vec.end() - n, 
+                         vec.end(), 
+                         0.0 ) / float(n);
+}
 
-
+TEST(testSBM, mcmc_chain_initialization){
+ 
+  // Setup simple SBM model
+  SBM my_SBM = build_simple_SBM();
+  
+  // Start with every node in its own group
+  my_SBM.give_every_node_a_group_at_level(0);
+  
+  int n_sweeps = 100;
+  vector<int> n_moved;
+  
+  for (int i = 0; i < n_sweeps; i++)
+  {
+    // Record how many nodes were moved
+    n_moved.push_back( my_SBM.run_move_sweep(0));
+    
+    // Check if structure hasn't changed in last 5 sweeps
+    float avg_num_moves = avg_last_n(n_moved, 5);
+    
+    if (avg_num_moves == 0.00) 
+    {
+      std::cout << "Model convered after " << i+1 << " sweeps" << std::endl;
+      break;
+    } 
+    
+    if (i == (n_sweeps - 1)) 
+    {
+      std::cout << "Model failed to converge in after " << n_sweeps << "sweeps" << "avg num moves at end: "<< avg_num_moves << std::endl;
+    }
+  }
+  
+  // Make sure we combined at least some groups
+  ASSERT_TRUE(
+    my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size()
+  );
+  
+  // // Dump state for printing
+  // State_Dump model_state = my_SBM.get_sbm_state();
+  // 
+  // for (int i = 0; i < model_state.id.size(); i++)
+  // {
+  //   std::cout << model_state.id[i] << ", " << model_state.parent[i] << std::endl;
+  // }
+  
+};
 
 int main(int argc, char* argv[]){
   testing::InitGoogleTest(&argc, argv);
