@@ -135,16 +135,20 @@ TEST(testSBM, state_dumping){
   // See if state dump adjust accordingly
   State_Dump second_state = my_SBM.get_sbm_state();
   
-  // Grab location of node a1 in state
-  index_of_a1 = std::distance(
-    second_state.id.begin(), 
-    std::find(second_state.id.begin(), second_state.id.end(), "a1")
+  // Grab location of node a1 in state and Make sure a1 has parent node of a11
+  EXPECT_EQ(
+    second_state.parent[std::distance(
+                        second_state.id.begin(), 
+                        std::find(second_state.id.begin(), second_state.id.end(), "a1"))],
+    "a12"
   );
   
-  // Make sure a1 has parent node of a11
+  // Make sure a11 has parent of "none"
   EXPECT_EQ(
-    second_state.parent[index_of_a1],
-    "a12"
+    second_state.parent[std::distance(
+                        second_state.id.begin(), 
+                        std::find(second_state.id.begin(), second_state.id.end(), "a11"))],
+    "none"
   );
   
   // Add a new level to SBM by making a second level of a node
@@ -164,6 +168,15 @@ TEST(testSBM, state_dumping){
   EXPECT_EQ(
     *max_element(third_state.level.begin(), third_state.level.end()),
     2
+  );
+  
+  // Make sure that a11 now has a parent node
+  // Make sure a11 has parent of "a21"
+  EXPECT_EQ(
+    third_state.parent[std::distance(
+                          third_state.id.begin(), 
+                          std::find(third_state.id.begin(), third_state.id.end(), "a11"))],
+   "a21"
   );
   
 }
