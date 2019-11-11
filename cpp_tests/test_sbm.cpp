@@ -1,4 +1,5 @@
 #include<gtest/gtest.h>
+#include <iostream>
 #include "../helpers.h"
 #include "../SBM.h"
 
@@ -71,6 +72,100 @@ TEST(testSBM, tracking_node_types){
   
   // There should now be three types of nodes
   EXPECT_EQ(3, my_SBM.unique_node_types.size());
+}
+
+TEST(testSBM, state_dumping){
+  SBM my_SBM;
+  
+  // Add nodes to graph first
+  NodePtr a1 = my_SBM.add_node("a1", 0);
+  NodePtr a2 = my_SBM.add_node("a2", 0);
+  NodePtr a3 = my_SBM.add_node("a3", 0);
+  
+  NodePtr b1 = my_SBM.add_node("b1", 1);
+  NodePtr b2 = my_SBM.add_node("b2", 1);
+  NodePtr b3 = my_SBM.add_node("b3", 1);
+  
+  // Make some first level parents
+  NodePtr a11 = my_SBM.add_node("a11", 0, 1);
+  NodePtr a12 = my_SBM.add_node("a12", 0, 1);
+  
+  NodePtr b11 = my_SBM.add_node("b11", 1, 1);
+  NodePtr b12 = my_SBM.add_node("b12", 1, 1);
+  
+  // Assign nodes to their groups
+  a1->set_parent(a11);
+  a2->set_parent(a11);
+  a3->set_parent(a12);
+  
+  b1->set_parent(b11);
+  b2->set_parent(b12);
+  b3->set_parent(b12);
+   
+  // Dump state
+  State_Dump first_state = my_SBM.get_sbm_state();
+  
+  // Make sure that there is one entry for each node in the data
+  EXPECT_EQ(
+    print_ids_to_string(first_state.id),
+    "a1, a11, a12, a2, a3, b1, b11, b12, b2, b3"
+  );
+  
+  // Grab location of node a1 in state
+  int index_of_a1 = std::distance(
+    first_state.id.begin(), 
+    std::find(first_state.id.begin(), first_state.id.end(), "a1")
+  );
+  
+  // Make sure a1 has parent node of a11
+  EXPECT_EQ(
+    first_state.parent[index_of_a1],
+    "a11"
+  );
+  
+  // Highest level should be 1
+  EXPECT_EQ(
+    *max_element(first_state.level.begin(), first_state.level.end()),
+    1
+  );
+  
+  // Now update model by swapping in a12 as parent of a1
+  a1->set_parent(a12);
+  
+  // See if state dump adjust accordingly
+  State_Dump second_state = my_SBM.get_sbm_state();
+  
+  // Grab location of node a1 in state
+  index_of_a1 = std::distance(
+    second_state.id.begin(), 
+    std::find(second_state.id.begin(), second_state.id.end(), "a1")
+  );
+  
+  // Make sure a1 has parent node of a11
+  EXPECT_EQ(
+    second_state.parent[index_of_a1],
+    "a12"
+  );
+  
+  // Add a new level to SBM by making a second level of a node
+  NodePtr a21 = my_SBM.add_node("a21", 1, 2);
+  a11->set_parent(a21);
+  a12->set_parent(a21);
+  
+  // See if state dump adds node accordingly
+  State_Dump third_state = my_SBM.get_sbm_state();
+
+  EXPECT_EQ(
+    print_ids_to_string(third_state.id),
+    "a1, a11, a12, a2, a21, a3, b1, b11, b12, b2, b3"
+  );
+
+  // Highest level should be 2 now
+  EXPECT_EQ(
+    *max_element(third_state.level.begin(), third_state.level.end()),
+    2
+  );
+  
 }
 
 
