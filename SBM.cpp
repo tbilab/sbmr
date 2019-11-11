@@ -633,12 +633,14 @@ State_Dump SBM::get_sbm_state(){
     {
       // Get currrent node
       NodePtr current_node = node_it->second;
-      
+
       // Dump all its desired info into its element in the state vectors
       state.id.push_back(current_node->id);
       state.level.push_back(level);
-      state.parent.push_back(current_node->parent->id);
       state.type.push_back(current_node->type);
+      
+      // Record parent if node has one
+      state.parent.push_back(current_node->parent ? current_node->parent->id: "none");
       
     } // End node loop
   } // End level loop
