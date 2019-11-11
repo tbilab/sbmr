@@ -448,6 +448,7 @@ EdgeCounts SBM::gather_edge_counts(int level){
 }   
 
 
+
 // ======================================================= 
 // Builds a id-id paired map of edge counts between nodes of the same level
 // =======================================================
@@ -502,6 +503,7 @@ void SBM::update_edge_counts(
 }
 
 
+
 // ======================================================= 
 // Attempts to move a node to new group, returns true if node moved, false if it stays.
 // ======================================================= 
@@ -534,11 +536,10 @@ NodePtr SBM::attempt_move(
 // ======================================================= 
 int SBM::run_move_sweep(int level) 
 {
-  // Get all the nodes at the given level in a shuffleable vector format
-  
   // Grab level map
   LevelPtr node_map = get_level(level);
   
+  // Get all the nodes at the given level in a shuffleable vector format
   // Initialize vector to hold nodes
   vector<NodePtr> node_vec;
   node_vec.reserve(node_map->size());
@@ -563,35 +564,38 @@ int SBM::run_move_sweep(int level)
   int num_moves_made = 0;
   
   // Loop through randomly ordered nodes
-  for (auto node_to_move = node_vec.begin(); node_to_move != node_vec.end(); ++node_to_move)
+  for (auto node_it = node_vec.begin(); node_it != node_vec.end(); ++node_it)
   {
+    // Get direct pointer to current node
+    NodePtr node_to_move = *node_it;
+    
+    // Note the current group of the node
+    NodePtr old_group = node_to_move->parent;
+    
     // Attempt group move
-    NodePtr new_group = attempt_move(*node_to_move, group_edges, my_sampler);
+    NodePtr new_group = attempt_move(node_to_move, group_edges, my_sampler);
     
-    // // Check if the chosen group is different than the current group for the node
-    // bool node_is_moved = new_group->id != old_group->id;
-    // 
-    // // If node has moved and we're not doing a dry-run, move node and update counts
-    // if (node_is_moved & !dry_run)
-    // {
-    //   // Swap parent for newly chosen group
-    //   node_to_move->set_parent(new_group);
-    // 
-    //   // Update edge counts with this move
-    //   update_edge_counts(group_edge_counts,
-    //                      level_of_move,
-    //                      node_to_move,
-    //                      old_group,
-    //                      new_group);
-    // }
-    
-    // Record attempt result
-  }
-    
-  
+    // Check if chosen group is different than the current group for the node.
+    // If group has changed, Update the node's parent and update counts map
+    if (new_group->id != old_group->id)
+    {
+      // Swap parent for newly chosen group
+      node_to_move->set_parent(new_group);
+
+      // Update edge counts with this move
+      update_edge_counts(group_edges,
+                         group_level,
+                         node_to_move,
+                         old_group,
+                         new_group);
+      
+      // Add to moves made counter
+      num_moves_made++;
+    }
+  } // Ends current sweep loop
   
   // Return number of nodes that were moved
-  
+  return num_moves_made;
 }  
 
 
