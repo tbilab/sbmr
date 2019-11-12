@@ -30,6 +30,8 @@ class Weighted_Sampler {
     // Methods   
     void     initialize_seed(int random_seed);                // Sets stuff up for us, used to decide if we want to have deterministic seeding
     double   draw_unif();                                     // Return random uniform value between 0 and 1.
+    int      draw_unif_int(int max_val);                      // Sample from discrete random uniform from 0 to max
+      
     int      sample(std::vector<double> const &weights);
       
   };
