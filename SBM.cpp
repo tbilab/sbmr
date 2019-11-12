@@ -652,8 +652,10 @@ State_Dump SBM::get_sbm_state(){
 // ======================================================= 
 // Runs efficient MCMC sweep algorithm on desired node level
 // ======================================================= 
-int SBM::mcmc_sweep(int level) {
-  double epsilon = 0.01;
+int SBM::mcmc_sweep(int level, bool variable_num_groups) {
+  double eps = 0.01;
+  int num_changes = 0;
+  int group_level = level + 1;
   
   // Grab level map
   LevelPtr node_map = get_level(level);
@@ -672,56 +674,60 @@ int SBM::mcmc_sweep(int level) {
   // Shuffle node order
   std::random_shuffle(node_vec.begin(), node_vec.end());
   
-  // Setup weighted sampler (but no weights needed)
+  // Setup sampler
   Sampler sampler;
   
   // Loop through each node
   for (auto node_it = node_vec.begin(); node_it != node_vec.end(); ++node_it)
   {
     NodePtr curr_node = *node_it;
+    
+    // Check if we're running sweep with variable group numbers. If we are, we
+    // need to remove empty groups and add a new group as a potential for the
+    // node to enter
+    if (variable_num_groups) 
+    {
+      // Clean up empty groups
+      clean_empty_groups();
+      
+      // Add a new group node for the current node type
+      create_group_node(curr_node->type, group_level);
+    }
 
-    // Now loop through all the groups that the node could join
+    // Grab a list of all the groups that the node could join
     list<NodePtr> potential_groups = get_nodes_of_type_at_level(
       curr_node->type,
-      level + 1);
-    
-    int n_possible_groups = potential_groups.size();
-    
+      group_level);
+ 
     // Sample a random neighbor of the current node
-    vector<NodePtr> neighbors = curr_node->get_connections_to_level(level);
-    NodePtr rand_neighbor = neighbors.at(sampler.sample(neighbors.size()));
+    NodePtr rand_neighbor = sampler.sample(curr_node->get_connections_to_level(level));
     
-    // Grab group of neighbor
+    // Get group of that neighbor
     NodePtr neighbor_group = rand_neighbor->parent;
     
     // Get number total number connections for neighbor group
     int neighbor_group_degree = neighbor_group->get_connections_to_level(0).size();
     
     // Decide if we are going to choose a random group for our node
-    double ergodicity_scalar = epsilon*(n_possible_groups + 1);
+    double ergodicity_scalar = eps*potential_groups.size();
     double prob_of_random_group = ergodicity_scalar/(neighbor_group_degree + ergodicity_scalar);
 
-    if (sampler.draw_unif() < prob_of_random_group) {
-      // Select a random group from possible groups
-      int random_group_index = sampler.sample(n_possible_groups);
-      auto group_it = potential_groups.begin();
-      int step = 0;
-      while (step != random_group_index) 
-      {
-        step++;
-        group_it++;
-      }
-      
-  
-      
+    // Setup new group for node to join by choosing between a fully random group
+    // or a group sampled from the edges of the random neighbor
+    NodePtr new_group = sampler.draw_unif() < prob_of_random_group ? 
+      sampler.sample(potential_groups) :
+      sampler.sample(rand_neighbor->get_connections_to_level(group_level));
+    
+    // Check if we actually moved the node
+    if (curr_node->parent->id != new_group->id) 
+    {
+      // Update node with this new group
+      curr_node->set_parent(new_group);
+      num_changes++;
     }
-    
-    
-    
-  }
+  } // End loop over all nodes
   
-  
-  
+  return num_changes;
 }                           
 
 
