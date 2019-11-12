@@ -3,7 +3,7 @@
 
 #include "Node.h" 
 #include "helpers.h" 
-#include "Weighted_Sampler.h"
+#include "Sampler.h"
 
 #include <map>
 #include <set>
@@ -61,7 +61,7 @@ class SBM {
     Trans_Probs    get_transition_probs_for_groups(NodePtr, EdgeCounts);  // Calculates probabilities for joining a given new group based on current SBM state
     int            clean_empty_groups();                      // Scan through levels and remove all group nodes that have no children. Returns # removed
     EdgeCounts     gather_edge_counts(int);                   // Builds a id-id paired map of edge counts between nodes of the same level
-    NodePtr        attempt_move(NodePtr, EdgeCounts&, Weighted_Sampler&);        // Attempts to move a node to new group, returns true if node moved, false if it stays.
+    NodePtr        attempt_move(NodePtr, EdgeCounts&, Sampler&);        // Attempts to move a node to new group, returns true if node moved, false if it stays.
     int            run_move_sweep(int);                       // Run through all nodes in a given level and attempt a group move on each one in turn.
     State_Dump     get_sbm_state();                           // Export current state of nodes in model
     int            mcmc_sweep(int);                           // Runs efficient MCMC sweep algorithm on desired node level

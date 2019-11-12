@@ -1,8 +1,8 @@
 //=================================
 // include guard
 //=================================
-#ifndef __WEIGHTED_SAMPLER_INCLUDED__
-#define __WEIGHTED_SAMPLER_INCLUDED__
+#ifndef __SAMPLER_INCLUDED__
+#define __SAMPLER_INCLUDED__
 
 // #include <unordered_set>
 #include <random>
@@ -16,11 +16,11 @@ typedef std::uniform_real_distribution<> rand_unif_gen;
 //=================================
 // Main class declaration
 //=================================
-class Weighted_Sampler {
+class Sampler {
   public:
     // Constructor
-    Weighted_Sampler();
-    Weighted_Sampler(int random_seed);
+    Sampler();
+    Sampler(int random_seed);
      
     // ==========================================
     // Attributes

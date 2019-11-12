@@ -3,13 +3,13 @@
 #include <vector>
 #include <memory>
 
-#include "../Weighted_Sampler.h"
+#include "../Sampler.h"
 #include "../helpers.h"
 
 TEST(testSampler, vector_normalization){
   double tol = 0.01;
   // Setup generator
-  Weighted_Sampler my_sampler;
+  Sampler my_sampler;
   
   // Sample vector
   std::vector<double> vec_raw = {1.0, 2.0, 3.0, 4.0};
@@ -26,7 +26,7 @@ TEST(testSampler, vector_normalization){
 
 TEST(testSampler, basic){
   // Setup generator
-  Weighted_Sampler my_sampler;
+  Sampler my_sampler;
 
   double drawn_value = my_sampler.draw_unif();
 
@@ -36,8 +36,8 @@ TEST(testSampler, basic){
 TEST(testSampler, set_seeds){
   
   // Setup multuple generators with same seed
-  Weighted_Sampler sampler_1(42);
-  Weighted_Sampler sampler_2(42);
+  Sampler sampler_1(42);
+  Sampler sampler_2(42);
   
   // The two samplers should give back the same result
   EXPECT_TRUE(sampler_1.draw_unif() == sampler_2.draw_unif());
@@ -45,7 +45,7 @@ TEST(testSampler, set_seeds){
 
 TEST(testSampler, lots_of_samples){
   
-  Weighted_Sampler my_sampler;
+  Sampler my_sampler;
   
   int num_samples = 1000;
   double min_draw = 100;
@@ -66,7 +66,7 @@ TEST(testSampler, lots_of_samples){
 
 TEST(testSampler, drawing_from_weights){
 
-  Weighted_Sampler my_sampler;
+  Sampler my_sampler;
 
   // Setup some weights
   std::vector<double> weights {0.1, 0.4, 0.3, 0.2};
@@ -99,7 +99,7 @@ TEST(testSampler, drawing_from_weights){
 
 TEST(testSampler, uniform_integer_sampling){
   
-  Weighted_Sampler my_sampler;
+  Sampler my_sampler;
   
   int num_samples = 1000;
   int max_val = 12;
@@ -123,7 +123,7 @@ TEST(testSampler, uniform_integer_sampling){
 
 TEST(testSampler, node_list_sampling){
   
-  Weighted_Sampler my_sampler;
+  Sampler my_sampler;
   
   // Build three nodes
   NodePtr n1 = std::make_shared<Node>("n1", 0, 1);

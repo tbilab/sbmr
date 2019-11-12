@@ -757,7 +757,7 @@ TEST(testSBM, node_move_attempts){
   EdgeCounts l1_edges = my_SBM.gather_edge_counts(1);
 
   // Initialize a sampler to choose group
-  Weighted_Sampler my_sampler;
+  Sampler my_sampler;
   
   int num_trials = 1000;
   int num_times_no_move = 0;

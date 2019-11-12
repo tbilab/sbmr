@@ -510,7 +510,7 @@ void SBM::update_edge_counts(
 NodePtr SBM::attempt_move(
     NodePtr            node_to_move, 
     EdgeCounts &       group_edge_counts, 
-    Weighted_Sampler & sampler) 
+    Sampler & sampler) 
 {
   int level_of_move = node_to_move->level + 1;
 
@@ -518,7 +518,7 @@ NodePtr SBM::attempt_move(
   Trans_Probs move_probs = get_transition_probs_for_groups(node_to_move, group_edge_counts);
 
   // Initialize a sampler to choose group
-  Weighted_Sampler my_sampler;
+  Sampler my_sampler;
 
   // Sample probabilies to choose index of new group
   int chosen_group_index = sampler.sample(move_probs.probability);
@@ -559,7 +559,7 @@ int SBM::run_move_sweep(int level)
   EdgeCounts group_edges = gather_edge_counts(group_level);
   
   // Setup random sampler
-  Weighted_Sampler my_sampler;
+  Sampler my_sampler;
   
   // Keep track of how many moves were made
   int num_moves_made = 0;
@@ -673,7 +673,7 @@ int SBM::mcmc_sweep(int level) {
   std::random_shuffle(node_vec.begin(), node_vec.end());
   
   // Setup weighted sampler (but no weights needed)
-  Weighted_Sampler sampler;
+  Sampler sampler;
   
   // Loop through each node
   for (auto node_it = node_vec.begin(); node_it != node_vec.end(); ++node_it)
@@ -723,7 +723,5 @@ int SBM::mcmc_sweep(int level) {
   
   
 }                           
-
-
 
 

@@ -1,22 +1,22 @@
-#include "Weighted_Sampler.h" 
+#include "Sampler.h" 
 
 
 // =======================================================
 // Constructor 
 // =======================================================
-Weighted_Sampler::Weighted_Sampler()
+Sampler::Sampler()
 {
    // Setup with the default random seed
   initialize_seed(-1);
 }
 
 // When seed is provided, pass onto initialize seed
-Weighted_Sampler::Weighted_Sampler(int random_seed)
+Sampler::Sampler(int random_seed)
 {
   initialize_seed(random_seed);
 }
 
-void Weighted_Sampler::initialize_seed(int random_seed) 
+void Sampler::initialize_seed(int random_seed) 
 {
   // If the random seed is the null value of -1, use the default
   // computer derived random seed. 
@@ -38,19 +38,19 @@ void Weighted_Sampler::initialize_seed(int random_seed)
   rand_unif_gen unif_gen(0.0, 1.0);
 }
 
-double Weighted_Sampler::draw_unif() 
+double Sampler::draw_unif() 
 {
   return unif_gen(int_gen);
 }
 
-int Weighted_Sampler::sample(int max_val) 
+int Sampler::sample(int max_val) 
 {
   std::uniform_int_distribution<int> dist(0, max_val);
   
   return dist(int_gen);
 }
 
-int Weighted_Sampler::sample(std::vector<double> const &weights) 
+int Sampler::sample(std::vector<double> const &weights) 
 {
   // Make sure weights sum to 1
   std::vector<double> weights_norm = normalize_vector(weights);
@@ -73,7 +73,7 @@ int Weighted_Sampler::sample(std::vector<double> const &weights)
 }
 
 
-NodePtr Weighted_Sampler::sample(list<NodePtr> node_list)
+NodePtr Sampler::sample(list<NodePtr> node_list)
 {
   // Select a random index to grab
   int random_index = sample(node_list.size()-1);
