@@ -1,6 +1,8 @@
 #include<gtest/gtest.h>
 #include <iostream>
 #include <vector>
+#include <memory>
+
 #include "../Weighted_Sampler.h"
 #include "../helpers.h"
 
@@ -116,6 +118,40 @@ TEST(testSampler, uniform_integer_sampling){
   
   EXPECT_TRUE(min_draw == 0);
   EXPECT_TRUE(max_draw == max_val);
+}
+
+
+TEST(testSampler, node_list_sampling){
+  
+  Weighted_Sampler my_sampler;
+  
+  // Build three nodes
+  NodePtr n1 = std::make_shared<Node>("n1", 0, 1);
+  NodePtr n2 = std::make_shared<Node>("n2", 0, 1);
+  NodePtr n3 = std::make_shared<Node>("n3", 0, 1);
+  
+  // Add three nodes to a list
+  std::list<NodePtr> my_nodes;
+  my_nodes.push_back(n1);
+  my_nodes.push_back(n2);
+  my_nodes.push_back(n3);
+  
+  // Run a bunch of samples and makes sure we grab a given element rougly 1/3rd of the time
+  int num_samples = 1000;
+  int times_n2_sampled = 0;
+
+  for (int i = 0; i < num_samples; ++i)
+  {
+    if (my_sampler.sample(my_nodes)->id == "n2") times_n2_sampled++;
+  }
+
+  double prop_n2_sampled = double(times_n2_sampled)/double(num_samples);
+
+  ASSERT_NEAR(
+    prop_n2_sampled,
+    0.333333,
+    0.03
+  );
 }
 
 int main(int argc, char* argv[]){

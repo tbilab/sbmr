@@ -73,3 +73,22 @@ int Weighted_Sampler::sample(std::vector<double> const &weights)
 }
 
 
+NodePtr Weighted_Sampler::sample(list<NodePtr> node_list)
+{
+  // Select a random index to grab
+  int random_index = sample(node_list.size()-1);
+  
+  // Start an iterator at begining of list
+  auto group_it = node_list.begin();
+  
+  // Step through list till we've walked the desired number of steps to the
+  // chosen index
+  int step = 0;
+  while (step != random_index) 
+  {
+    step++;
+    group_it++;
+  }
+  
+  return *group_it;
+}

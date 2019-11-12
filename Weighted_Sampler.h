@@ -8,6 +8,7 @@
 #include <random>
 #include <vector>
 #include "helpers.h"
+#include "Node.h"
 
 typedef std::mt19937 rand_int_gen;
 typedef std::uniform_real_distribution<> rand_unif_gen;
@@ -31,6 +32,7 @@ class Weighted_Sampler {
     void     initialize_seed(int random_seed);           // Sets stuff up for us, used to decide if we want to have deterministic seeding
     double   draw_unif();                                // Return random uniform value between 0 and 1.
     int      sample(int max_val);                        // Sample from discrete random uniform from 0 to max
+    NodePtr  sample(list<NodePtr>);                      // Sample random node from a list of nodes
       
     int      sample(std::vector<double> const &weights);
       
