@@ -94,6 +94,30 @@ TEST(testSampler, drawing_from_weights){
   );
 }
 
+
+TEST(testSampler, uniform_integer_sampling){
+  
+  Weighted_Sampler my_sampler;
+  
+  int num_samples = 1000;
+  int max_val = 12;
+  
+  int min_draw = 100;
+  int max_draw = -1;
+  
+
+  for (int i = 0; i < num_samples; ++i)
+  {
+    int current_draw = my_sampler.sample(max_val);
+    
+    if (current_draw < min_draw) min_draw = current_draw;
+    if (current_draw > max_draw) max_draw = current_draw;
+  }
+  
+  EXPECT_TRUE(min_draw == 0);
+  EXPECT_TRUE(max_draw == max_val);
+}
+
 int main(int argc, char* argv[]){
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

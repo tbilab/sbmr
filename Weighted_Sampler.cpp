@@ -43,7 +43,7 @@ double Weighted_Sampler::draw_unif()
   return unif_gen(int_gen);
 }
 
-int Weighted_Sampler::draw_unif_int(int max_val) 
+int Weighted_Sampler::sample(int max_val) 
 {
   std::uniform_int_distribution<int> dist(0, max_val);
   
