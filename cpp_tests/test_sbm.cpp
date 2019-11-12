@@ -290,6 +290,7 @@ TEST(testSBM, build_with_connections){
 
 
 TEST(testSBM, calculating_transition_probs){
+  
   SBM my_SBM;
   
   // Add nodes to graph first
@@ -679,7 +680,7 @@ TEST(testSBM, edge_count_map){
 }
 
 
-SBM build_simple_SBM(){
+SBM build_simple_SBM(bool add_hierarchy){
   
   // This function builds a network with the following structure
 /*
@@ -744,7 +745,25 @@ SBM build_simple_SBM(){
   b3->set_parent(b1_2);
   b4->set_parent(b1_3);
   
+  if (add_hierarchy) 
+  {
+    // Assign nodes to their groups
+    a1->set_parent(a1_1);
+    a2->set_parent(a1_2);
+    a3->set_parent(a1_2);
+    a4->set_parent(a1_3);
+    
+    b1->set_parent(b1_1);
+    b2->set_parent(b1_1);
+    b3->set_parent(b1_2);
+    b4->set_parent(b1_3);
+  }
+  
   return my_SBM;
+}
+
+SBM build_simple_SBM(){
+  return build_simple_SBM(false);
 }
 
 
@@ -898,6 +917,23 @@ TEST(testSBM, mcmc_chain_initialization){
   // {
   //   std::cout << model_state.id[i] << ", " << model_state.parent[i] << std::endl;
   // }
+  
+};
+
+TEST(testSBM, entropy_calculation){
+  
+  // Setup simple SBM model
+  SBM my_SBM = build_simple_SBM(true);
+  
+  // Compute entropy at first level of nodes
+  double model_entropy = my_SBM.compute_entropy(0);
+  
+  // Test entropy is near a hand-calculated value
+  ASSERT_NEAR(
+    model_entropy,
+    -1.509004,
+    0.1
+  );
   
 };
 
