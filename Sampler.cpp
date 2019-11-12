@@ -92,3 +92,13 @@ NodePtr Sampler::sample(list<NodePtr> node_list)
   
   return *group_it;
 }
+
+// Sample random node from vector of nodes
+NodePtr Sampler::sample(vector<NodePtr> node_vec)
+{
+  // Select a random index to grab
+  int random_index = sample(node_vec.size() - 1);
+  
+  // Return that element
+  return node_vec.at(random_index);
+}

@@ -33,6 +33,7 @@ class Sampler {
     double   draw_unif();                                // Return random uniform value between 0 and 1.
     int      sample(int max_val);                        // Sample from discrete random uniform from 0 to max
     NodePtr  sample(list<NodePtr>);                      // Sample random node from a list of nodes
+    NodePtr  sample(vector<NodePtr>);                    // Sample random node from vector of nodes
       
     int      sample(std::vector<double> const &weights);
       

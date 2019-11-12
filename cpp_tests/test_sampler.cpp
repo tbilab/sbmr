@@ -121,7 +121,7 @@ TEST(testSampler, uniform_integer_sampling){
 }
 
 
-TEST(testSampler, node_list_sampling){
+TEST(testSampler, node_list_and_vec_sampling){
   
   Sampler my_sampler;
   
@@ -131,28 +131,44 @@ TEST(testSampler, node_list_sampling){
   NodePtr n3 = std::make_shared<Node>("n3", 0, 1);
   
   // Add three nodes to a list
-  std::list<NodePtr> my_nodes;
-  my_nodes.push_back(n1);
-  my_nodes.push_back(n2);
-  my_nodes.push_back(n3);
+  std::list<NodePtr> nodes_list;
+  nodes_list.push_back(n1);
+  nodes_list.push_back(n2);
+  nodes_list.push_back(n3);
+  
+  // Add three nodes to vector
+  std::vector<NodePtr> nodes_vec;
+  nodes_vec.push_back(n1);
+  nodes_vec.push_back(n2);
+  nodes_vec.push_back(n3);
   
   // Run a bunch of samples and makes sure we grab a given element rougly 1/3rd of the time
   int num_samples = 1000;
-  int times_n2_sampled = 0;
-
+  int times_n2_sampled_list = 0;
+  int times_n2_sampled_vec = 0;
+  
   for (int i = 0; i < num_samples; ++i)
   {
-    if (my_sampler.sample(my_nodes)->id == "n2") times_n2_sampled++;
+    if (my_sampler.sample(nodes_list)->id == "n2") times_n2_sampled_list++;
+    if (my_sampler.sample(nodes_vec)->id == "n2") times_n2_sampled_vec++;
   }
-
-  double prop_n2_sampled = double(times_n2_sampled)/double(num_samples);
-
+  
+  // Make sure list sampled a given correct amount
   ASSERT_NEAR(
-    prop_n2_sampled,
+    double(times_n2_sampled_list)/double(num_samples),
+    0.333333,
+    0.03
+  );
+  
+  // Make sure vector sampled a given correct amount
+  ASSERT_NEAR(
+    double(times_n2_sampled_vec)/double(num_samples),
     0.333333,
     0.03
   );
 }
+
+
 
 int main(int argc, char* argv[]){
   testing::InitGoogleTest(&argc, argv);
