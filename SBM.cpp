@@ -422,7 +422,7 @@ EdgeCounts SBM::gather_edge_counts(int level){
     vector<NodePtr> group_r_cons = group_r->get_connections_to_level(level);
     
     // Set total number of edges for group r
-    e_rs[find_edges(group_r)] = group_r_cons.size();
+    e_rs[find_edges(group_r)] = group_r->degree;
     
     // Loop over all edges
     for (auto group_s = group_r_cons.begin(); group_s != group_r_cons.end(); ++group_s) 
@@ -702,11 +702,8 @@ int SBM::mcmc_sweep(int level, bool variable_num_groups) {
     // Sample a random neighbor of the current node
     NodePtr rand_neighbor = sampler.sample(curr_node->get_connections_to_level(level));
     
-    // Get group of that neighbor
-    NodePtr neighbor_group = rand_neighbor->parent;
-    
-    // Get number total number connections for neighbor group
-    int neighbor_group_degree = neighbor_group->get_connections_to_level(0).size();
+    // Get number total number connections for neighbor's group
+    int neighbor_group_degree = rand_neighbor->parent->degree;
     
     // Decide if we are going to choose a random group for our node
     double ergodicity_scalar = eps*potential_groups.size();
@@ -730,4 +727,81 @@ int SBM::mcmc_sweep(int level, bool variable_num_groups) {
   return num_changes;
 }                           
 
+
+// ======================================================= 
+// Compute microcononical entropy of current model state
+// Note that this is currently only the degree corrected entropy
+// ======================================================= 
+double SBM::compute_entropy(int level)
+{
+  
+  //==================================================================================
+  // First we calculate the number of total edges and build a degree->num nodes map
+  
+  // Build map of number of nodes with given degree
+  map<int, int> n_nodes_w_degree;
+
+  // Keep track of total number of edges as well
+  int sum_of_degrees = 0;
+  
+  // Grab pointer to current level and start loop
+  LevelPtr node_level = get_level(level);
+  for (auto node_it = node_level->begin(); node_it != node_level->end(); ++node_it)
+  {
+    int node_degree = node_it->second->degree;
+    sum_of_degrees += node_degree;
+    n_nodes_w_degree[node_degree]++;
+  }
+  
+  //==================================================================================
+  // Next, we calculate the summation of N_k*ln(K!) where K is degree size and
+  // N_k is the number of nodes of that degree
+  
+  // Compute total number of edges and convert to double
+  double n_total_edges = double(sum_of_degrees)/2.0;
+  
+  // Calculate first component (sum of node degree counts portion)
+  double degree_summation = 0.0;
+  for (auto degree_count =  n_nodes_w_degree.begin(); 
+            degree_count != n_nodes_w_degree.end(); 
+            ++degree_count)
+  {
+    int k = degree_count->first;
+    int num_nodes = degree_count->second;
+    degree_summation += num_nodes * log(factorial(k));
+  }
+  
+  //==================================================================================
+  // Last, we calculate the summation of e_rs*ln(e_rs/e_r*e_s) where e_rs is
+  // number of connections between groups r and s and e_r is the total number of
+  // edges for group r. Note that we dont divide this edge_entropy by 2 because
+  // we already accounted for repeats of edges by building a unique-pairs-only
+  // map of edges between groups
+  
+  // Calculate the edge connections between all groups 
+  EdgeCounts group_edge_counts = gather_edge_counts(level + 1);
+  
+  double edge_entropy = 0.0;
+  for (auto edge_it = group_edge_counts.begin(); 
+            edge_it != group_edge_counts.end(); 
+            ++edge_it)
+  {
+    string group_r_id = (edge_it->first).first;
+    string group_s_id = (edge_it->first).second;  
+    
+    // Skip entries for individual groups
+    if(group_r_id == group_s_id) continue;
+    
+    // Grab needed counts and convert to doubles
+    double e_rs = edge_it->second;
+    double e_r = group_edge_counts.at(find_edges(group_r_id));
+    double e_s = group_edge_counts.at(find_edges(group_s_id));
+    
+    // Compute this iteration's controbution to sum
+    edge_entropy += e_rs * log(e_rs/(e_r*e_s));
+  }
+  
+  // Add three components together to return
+  return -1 * (n_total_edges + degree_summation + edge_entropy);
+}
 
