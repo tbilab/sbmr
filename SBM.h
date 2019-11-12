@@ -65,6 +65,7 @@ class SBM {
     int            run_move_sweep(int);                       // Run through all nodes in a given level and attempt a group move on each one in turn.
     State_Dump     get_sbm_state();                           // Export current state of nodes in model
     int            mcmc_sweep(int, bool);                     // Runs efficient MCMC sweep algorithm on desired node level
+    double         compute_entropy();                         // Compute microcononical entropy of current model state.
     
     static void    update_edge_counts(EdgeCounts&, int, NodePtr, NodePtr, NodePtr); // Update an EdgeCount map after moving a node around to avoid rescanning
     static string  build_group_id(int, int, int);             // Builds a group id from a scaffold for generated new groups
