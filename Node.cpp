@@ -8,7 +8,7 @@ Node::Node(string node_id, int level):
   id(node_id),
   level(level),
   type(0),
-  has_parent(false){}
+  degree(0){}
 
 // =======================================================
 // Constructor that takes the node's id, level, and type. 
@@ -17,7 +17,7 @@ Node::Node(string node_id, int level, int type):
   id(node_id),
   level(level),
   type(type),
-  has_parent(false){}
+  degree(0){}
 
 // =======================================================
 // Replace 'this' with a shared smart pointer
@@ -32,22 +32,44 @@ NodePtr Node::this_ptr() {
 void Node::add_connection(NodePtr node_ptr) {
   // Add element to connections list
   connections.push_back(node_ptr);
+  
+  // propigate increase in degree upwards through hieararchy
+  update_degree(1);
 }          
+
+// =======================================================
+// Update node's and all its parents degree
+// =======================================================
+void Node::update_degree(int change_amnt) 
+{
+  // propigate increase in degree upwards through hieararchy
+  NodePtr current_node = this_ptr();
+  
+  while (current_node) 
+  {
+    current_node->degree += change_amnt;
+    current_node = current_node->parent;
+  }
+}
 
 // =======================================================
 // Set current node parent/cluster
 // =======================================================
 void Node::set_parent(NodePtr parent_node_ptr) {
   // Remove self from previous parents children list (if it existed)
-  if(has_parent){
+  if(parent){
+    // Remove this node's edges contribution from parent's degree count
+    parent->update_degree(-degree);
+    
+    // Remove self from previous children 
     parent->remove_child(this_ptr());
   }
 
   // Set this node's parent
   parent = parent_node_ptr;
-
-  // Node for sure has parent now so make sure it's noted
-  has_parent = true;
+  
+  // Add this node's edges to parent's degree count
+  parent->update_degree(degree);
 
   // Add this node to new parent's children list
   parent_node_ptr->add_child(this_ptr());
@@ -125,7 +147,7 @@ NodePtr Node::get_parent_at_level(int level_of_parent) {
   NodePtr current_node = this_ptr();
   
   while(current_node->level != level_of_parent) {
-    if(!current_node->has_parent) throw "No parent present at requested level";
+    if(!parent) throw "No parent present at requested level";
     
     // Traverse up parents until we've reached just below where we want to go
     current_node = current_node->parent;
