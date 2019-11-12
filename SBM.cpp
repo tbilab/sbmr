@@ -649,3 +649,81 @@ State_Dump SBM::get_sbm_state(){
 }                          
 
 
+// ======================================================= 
+// Runs efficient MCMC sweep algorithm on desired node level
+// ======================================================= 
+int SBM::mcmc_sweep(int level) {
+  double epsilon = 0.01;
+  
+  // Grab level map
+  LevelPtr node_map = get_level(level);
+  
+  // Get all the nodes at the given level in a shuffleable vector format
+  // Initialize vector to hold nodes
+  vector<NodePtr> node_vec;
+  node_vec.reserve(node_map->size());
+  
+  // Fill in vector with map elements
+  for (auto node_it = node_map->begin(); node_it != node_map->end(); ++node_it)
+  {
+    node_vec.push_back(node_it->second);
+  }
+  
+  // Shuffle node order
+  std::random_shuffle(node_vec.begin(), node_vec.end());
+  
+  // Setup weighted sampler (but no weights needed)
+  Weighted_Sampler sampler;
+  
+  // Loop through each node
+  for (auto node_it = node_vec.begin(); node_it != node_vec.end(); ++node_it)
+  {
+    NodePtr curr_node = *node_it;
+
+    // Now loop through all the groups that the node could join
+    list<NodePtr> potential_groups = get_nodes_of_type_at_level(
+      curr_node->type,
+      level + 1);
+    
+    int n_possible_groups = potential_groups.size();
+    
+    // Sample a random neighbor of the current node
+    vector<NodePtr> neighbors = curr_node->get_connections_to_level(level);
+    NodePtr rand_neighbor = neighbors.at(sampler.sample(neighbors.size()));
+    
+    // Grab group of neighbor
+    NodePtr neighbor_group = rand_neighbor->parent;
+    
+    // Get number total number connections for neighbor group
+    int neighbor_group_degree = neighbor_group->get_connections_to_level(0).size();
+    
+    // Decide if we are going to choose a random group for our node
+    double ergodicity_scalar = epsilon*(n_possible_groups + 1);
+    double prob_of_random_group = ergodicity_scalar/(neighbor_group_degree + ergodicity_scalar);
+
+    if (sampler.draw_unif() < prob_of_random_group) {
+      // Select a random group from possible groups
+      int random_group_index = sampler.sample(n_possible_groups);
+      auto group_it = potential_groups.begin();
+      int step = 0;
+      while (step != random_group_index) 
+      {
+        step++;
+        group_it++;
+      }
+      
+  
+      
+    }
+    
+    
+    
+  }
+  
+  
+  
+}                           
+
+
+
+

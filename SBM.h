@@ -64,6 +64,7 @@ class SBM {
     NodePtr        attempt_move(NodePtr, EdgeCounts&, Weighted_Sampler&);        // Attempts to move a node to new group, returns true if node moved, false if it stays.
     int            run_move_sweep(int);                       // Run through all nodes in a given level and attempt a group move on each one in turn.
     State_Dump     get_sbm_state();                           // Export current state of nodes in model
+    int            mcmc_sweep(int);                           // Runs efficient MCMC sweep algorithm on desired node level
     
     static void    update_edge_counts(EdgeCounts&, int, NodePtr, NodePtr, NodePtr); // Update an EdgeCount map after moving a node around to avoid rescanning
     static string  build_group_id(int, int, int);             // Builds a group id from a scaffold for generated new groups
