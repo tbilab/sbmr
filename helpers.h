@@ -47,3 +47,4 @@ std::pair<string, string> find_edges(NodePtr);
 std::vector<double> normalize_vector(std::vector<double> const &vec);
 
 
+int factorial(int);

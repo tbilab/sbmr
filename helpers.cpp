@@ -153,3 +153,10 @@ std::vector<double> normalize_vector(std::vector<double> const &vec)
   
   return normalized_vec;
 }
+
+
+// Compute a factorial
+int factorial(int n)
+{
+  return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
+}
