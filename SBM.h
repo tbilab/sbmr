@@ -68,9 +68,12 @@ class SBM {
     State_Dump    get_sbm_state();                                      // Export current state of nodes in model
     int           mcmc_sweep(int, bool);                                // Runs efficient MCMC sweep algorithm on desired node level
     double        compute_entropy(int);                                 // Compute microcononical entropy of current model state at a level
+
+    static double  compute_entropy_delta(const EdgeCounts&, int, NodePtr, NodePtr, NodePtr); // Compute change in entropy caused by swapping a node's group
+    static double  compute_edge_entropy(const EdgeCounts&);                            // Compute change in entropy caused by swapping a node's group
     
-    static void    update_edge_counts(EdgeCounts&, int, NodePtr, NodePtr, NodePtr); // Update an EdgeCount map after moving a node around to avoid rescanning
-    static string  build_group_id(int, int, int);             // Builds a group id from a scaffold for generated new groups
+    static void    update_edge_counts(EdgeCounts&, int, NodePtr, NodePtr, NodePtr);    // Update an EdgeCount map after moving a node around to avoid rescanning
+    static string  build_group_id(int, int, int);                                     // Builds a group id from a scaffold for generated new groups
 };
 
 

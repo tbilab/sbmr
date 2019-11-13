@@ -469,7 +469,7 @@ EdgeCounts SBM::gather_edge_counts(int level){
 
 
 // =============================================================================
-// Builds a id-id paired map of edge counts between nodes of the same level
+// Updates supplied id-id paired map of edge counts between nodes 
 // =============================================================================
 void SBM::update_edge_counts(
     EdgeCounts& level_counts, 
@@ -478,26 +478,15 @@ void SBM::update_edge_counts(
     NodePtr     old_group, 
     NodePtr     new_group) 
 {
+  
+  // Get map of group -> num connections for updated node
+  std::map<string, int> moved_connections_counts = updated_node->
+    gather_connections_to_level(level);
+  
   // Get ids of groups moved, at the level of the move
   string old_group_id = old_group->get_parent_at_level(level)->id;
   string new_group_id = new_group->get_parent_at_level(level)->id;
-  
-  // Gather all connections from the moved node to the level of the groups we're
-  // working with
-  vector<NodePtr> moved_connections = updated_node->
-    get_connections_to_level(level);
-  
-  // Setup an edge count map for node
-  std::map<string, int> moved_connections_counts;
-  
-  // Fill out edge count map
-  for(auto moved_connection  = moved_connections.begin(); 
-           moved_connection != moved_connections.end();
-           ++moved_connection )
-  {
-    moved_connections_counts[(*moved_connection)->id]++;
-  }
-  
+ 
   // Now we can loop through all the groups that the moved node was connected to
   // and subtract their counts from the from-group's edges and add their counts
   // to the to-group's
@@ -517,9 +506,9 @@ void SBM::update_edge_counts(
   }
   
   // Finally update the total counts for the old and new group
-  int total_moved = moved_connections.size();
-  level_counts[find_edges(old_group_id, old_group_id)] -= total_moved;
-  level_counts[find_edges(new_group_id, new_group_id)] += total_moved;
+  int total_moved = updated_node->degree;
+  level_counts[find_edges(old_group_id)] -= total_moved;
+  level_counts[find_edges(new_group_id)] += total_moved;
 }
 
 
@@ -530,7 +519,7 @@ void SBM::update_edge_counts(
 NodePtr SBM::attempt_move(
     NodePtr            node_to_move, 
     EdgeCounts &       group_edge_counts, 
-    Sampler & sampler) 
+    Sampler &          sampler) 
 {
   int level_of_move = node_to_move->level + 1;
 
@@ -811,31 +800,99 @@ double SBM::compute_entropy(int level)
   // edges for group r. Note that we dont divide this edge_entropy by 2 because
   // we already accounted for repeats of edges by building a unique-pairs-only
   // map of edges between groups
+  double edge_entropy = compute_edge_entropy(gather_edge_counts(level + 1));
   
-  // Calculate the edge connections between all groups 
-  EdgeCounts group_edge_counts = gather_edge_counts(level + 1);
   
+  // Add three components together to return
+  return -1 * (n_total_edges + degree_summation + edge_entropy);
+}
+
+
+// =============================================================================
+// Calculates the delta in entropy for whole model caused by swapping the group
+// membership of a given node
+// =============================================================================
+double SBM::compute_entropy_delta(
+    const EdgeCounts& level_counts, 
+    int               level, 
+    NodePtr           updated_node, 
+    NodePtr           old_group, 
+    NodePtr           new_group) 
+{
+  // Get ids of groups moved, at the level of the move
+  string old_group_id = old_group->get_parent_at_level(level)->id;
+  string new_group_id = new_group->get_parent_at_level(level)->id;
+  
+  // Gather all connections from the moved node to the level of the groups we're
+  // working with by getting a map of group -> num connections for updated node
+  std::map<string, int> moved_connections_counts = updated_node->
+    gather_connections_to_level(level);
+  
+  // Setup a new edge count maps to keep track of changes
+  EdgeCounts old_edge_counts;
+  EdgeCounts new_edge_counts;
+  
+  // Now we can loop through all the groups that the moved node was connected to
+  // and subtract their counts from the from-group's edges and add their counts
+  // to the to-group's
+  for(auto changed_group  = moved_connections_counts.begin(); 
+           changed_group != moved_connections_counts.end();
+           ++changed_group )
+  {
+    string changed_id = changed_group->first;
+    int amount_changed = changed_group->second;
+    
+    auto changed_to_old = find_edges(changed_id, old_group_id);
+    auto changed_to_new = find_edges(changed_id, new_group_id);
+    
+    // Cant use square brackets here because level_counts is constant and the
+    // square bracket operator can modify
+    int prev_old_group_count = level_counts.at(changed_to_old);
+    int prev_new_group_count = level_counts.at(changed_to_new);
+    
+    // Copy changed edge count original values to a "old" edge count map...
+    old_edge_counts[changed_to_old] = prev_old_group_count;
+    old_edge_counts[changed_to_new] = prev_new_group_count;
+    
+    // Add updated edge counts to "new" edge count map...
+    new_edge_counts[changed_to_old] = prev_old_group_count - amount_changed;
+    new_edge_counts[changed_to_new] = prev_new_group_count + amount_changed;
+  }
+  
+  // Now calculate partial edge entropy from new counts.
+  double new_entropy_part = compute_edge_entropy(new_edge_counts);
+  double old_entropy_part = compute_edge_entropy(old_edge_counts);
+  
+  return old_entropy_part - new_entropy_part;
+}
+
+
+// =============================================================================
+// Takes a EdgeCount object and computes the total contribution to entropy from
+// edges contained
+// =============================================================================
+double SBM::compute_edge_entropy(const EdgeCounts& level_edge_counts) {
   double edge_entropy = 0.0;
-  for (auto edge_it = group_edge_counts.begin(); 
-            edge_it != group_edge_counts.end(); 
+  
+  for (auto edge_it  = level_edge_counts.begin(); 
+            edge_it != level_edge_counts.end(); 
             ++edge_it)
   {
     string group_r_id = (edge_it->first).first;
     string group_s_id = (edge_it->first).second;  
     
-    // Skip entries for individual groups
+    // Skip entries for individual groups. This may need to change
     if(group_r_id == group_s_id) continue;
     
     // Grab needed counts and convert to doubles
     double e_rs = edge_it->second;
-    double e_r = group_edge_counts.at(find_edges(group_r_id));
-    double e_s = group_edge_counts.at(find_edges(group_s_id));
+    double e_r = level_edge_counts.at(find_edges(group_r_id));
+    double e_s = level_edge_counts.at(find_edges(group_s_id));
     
     // Compute this iteration's controbution to sum
     edge_entropy += e_rs * log(e_rs/(e_r*e_s));
   }
   
-  // Add three components together to return
-  return -1 * (n_total_edges + degree_summation + edge_entropy);
+  return edge_entropy;
 }
 
