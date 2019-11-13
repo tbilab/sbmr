@@ -205,6 +205,30 @@ vector<NodePtr> Node::get_connections_to_level(int desired_level) {
 
 
 // =============================================================================
+// Collapse a nodes connection to a given level into a map of connected group id->count
+// =============================================================================
+std::map<string, int> Node::gather_connections_to_level(int level) 
+{
+  // Gather all connections from the moved node to the level of the groups we're
+  // working with
+  vector<NodePtr> all_connections = get_connections_to_level(level);
+  
+  // Setup an edge count map for node
+  std::map<string, int> connections_counts;
+  
+  // Fill out edge count map
+  for(auto curr_connection  = all_connections.begin(); 
+           curr_connection != all_connections.end();
+           ++curr_connection )
+  {
+    connections_counts[(*curr_connection)->id]++;
+  }
+  
+  return connections_counts;
+}
+
+
+// =============================================================================
 // Static method to connect two nodes to each other with edge
 // =============================================================================
 void Node::connect_nodes(NodePtr node1_ptr, NodePtr node2_ptr) {
