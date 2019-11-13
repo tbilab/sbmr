@@ -34,12 +34,12 @@ std::string print_node_ids(std::map<std::string, NodePtr>);
 // Builds an alphabetical pair of node ids for looking up edges between groups.
 // Insures order doesn't matter for EdgeCount key pair 
 // ============================================================================
-std::pair<string, string> find_edges(string, string);
-std::pair<string, string> find_edges(NodePtr, NodePtr);
+// std::pair<string, string> find_edges(string, string);
+std::pair<NodePtr, NodePtr> find_edges(NodePtr, NodePtr);
 
 // Single values return a double pair. e.g. find_edges('a') -> ['a','a']
-std::pair<string, string> find_edges(string);
-std::pair<string, string> find_edges(NodePtr);
+// std::pair<string, string> find_edges(string);
+// std::pair<string, string> find_edges(NodePtr);
 
 
 // ============================================================================

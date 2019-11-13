@@ -110,24 +110,27 @@ std::string print_node_ids(std::map<std::string, NodePtr> nodes) {
 // Builds an alphabetical pair of node ids for looking up edges between groups.
 // Insures order doesn't matter for EdgeCount key pair 
 // ============================================================================
-std::pair<string, string> find_edges(string a, string b) {
-  return (a < b) ?
-  std::pair<string, string>(a,b):
-  std::pair<string, string>(b,a);
-}
+// std::pair<string, string> find_edges(string a, string b) {
+//   return (a < b) ?
+//   std::pair<string, string>(a,b):
+//   std::pair<string, string>(b,a);
+// }
 
 // Also make it work with pointers to nodes, which can be more natural 
-std::pair<string, string> find_edges(NodePtr a, NodePtr b) {
-  return find_edges(a->id, b->id);
+std::pair<NodePtr, NodePtr> find_edges(NodePtr a, NodePtr b) {
+    return (a->id < b->id) ?
+      std::pair<NodePtr, NodePtr>(a,b):
+      std::pair<NodePtr, NodePtr>(b,a);
 }
 
-// Single values return a double pair. e.g. find_edges('a') -> ['a','a']
-std::pair<string, string> find_edges(string a) {
-  return find_edges(a, a);
-}
-std::pair<string, string> find_edges(NodePtr a) {
-  return find_edges(a->id, a->id);
-}
+
+// // Single values return a double pair. e.g. find_edges('a') -> ['a','a']
+// std::pair<string, string> find_edges(string a) {
+//   return find_edges(a, a);
+// }
+// std::pair<string, string> find_edges(NodePtr a) {
+//   return find_edges(a->id, a->id);
+// }
 
 
 
