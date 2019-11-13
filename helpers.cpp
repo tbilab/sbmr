@@ -1,9 +1,8 @@
 #include "helpers.h"
 
-// =======================================================
-// Takes a vector of node ids and returns a single string of them pasted
-// together
-// =======================================================
+// ============================================================================
+// Takes a vector of node ids and returns a string of them pasted together
+// ============================================================================
 std::string print_ids_to_string(std::vector<std::string> node_ids) {
   
   // Sort vector of id strings
@@ -30,9 +29,9 @@ std::string print_ids_to_string(std::vector<std::string> node_ids) {
 }
 
 
-// =======================================================
+// ============================================================================
 // Grab vector of node ids from a sequential container of nodes
-// =======================================================
+// ============================================================================
 
 // =======================================================
 // List Version
@@ -107,19 +106,14 @@ std::string print_node_ids(std::map<std::string, NodePtr> nodes) {
 }
 
 
-// ======================================================= 
-// Helper to ensure desired id pair is always the same 
-// regardless of passed order
-// =======================================================
+// ============================================================================
+// Builds an alphabetical pair of node ids for looking up edges between groups.
+// Insures order doesn't matter for EdgeCount key pair 
+// ============================================================================
 std::pair<string, string> find_edges(string a, string b) {
   return (a < b) ?
   std::pair<string, string>(a,b):
   std::pair<string, string>(b,a);
-}
-
-// When we're just looking for a single node's connections
-std::pair<string, string> find_edges(string a) {
-  return find_edges(a, a);
 }
 
 // Also make it work with pointers to nodes, which can be more natural 
@@ -127,12 +121,19 @@ std::pair<string, string> find_edges(NodePtr a, NodePtr b) {
   return find_edges(a->id, b->id);
 }
 
+// Single values return a double pair. e.g. find_edges('a') -> ['a','a']
+std::pair<string, string> find_edges(string a) {
+  return find_edges(a, a);
+}
 std::pair<string, string> find_edges(NodePtr a) {
   return find_edges(a->id, a->id);
 }
 
 
-// Normalize a vector and return a new copy
+
+// ============================================================================
+// Normalizes a vector of doubles so all elements sum to 1 
+// ============================================================================
 std::vector<double> normalize_vector(std::vector<double> const &vec) 
 {
   // Get sum of elements
@@ -155,7 +156,10 @@ std::vector<double> normalize_vector(std::vector<double> const &vec)
 }
 
 
-// Compute a factorial
+
+// ============================================================================
+// Compute's factorial of number by recursion
+// ============================================================================
 int factorial(int n)
 {
   return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
