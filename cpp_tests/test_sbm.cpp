@@ -871,10 +871,17 @@ TEST(testSBM, entropy_calculation){
     0.1
   );
   
+  // (2*log(2/12) + 4*log(4/30) + 1*log(1/5) + 1*log(1) )
+  
   // Calculate entropy delta caused by moving a node
   NodePtr node_to_move = my_SBM.get_node_by_id("a1");
   NodePtr from_group = node_to_move->parent;
   NodePtr to_group = my_SBM.get_node_by_id("a12", 1);
+
+  // Now calculate the actual entropy delta by fully calculating entropy before and after move
+  double original_entropy = my_SBM.compute_entropy(0);
+  double original_edge_entropy = my_SBM.compute_edge_entropy(l1_edges);
+  
   
   // Calculate the entropy delta
   double entropy_delta = my_SBM.compute_entropy_delta(
@@ -884,21 +891,22 @@ TEST(testSBM, entropy_calculation){
     from_group,
     to_group
   );
-  
-  // Now calculate the actual entropy delta by fully calculating entropy before and after move
-  double original_entropy = my_SBM.compute_entropy(0);
 
   // Move node
   node_to_move->set_parent(to_group);
-
+ 
   // Recalculate entropy
   double new_entropy = my_SBM.compute_entropy(0);
-
+  EdgeCounts new_l1_edges = my_SBM.gather_edge_counts(1);
+  double new_edge_entropy = my_SBM.compute_edge_entropy(new_l1_edges);
+  
+  // double real_entropy_delta = original_edge_entropy - new_edge_entropy;
   double real_entropy_delta = original_entropy - new_entropy;
-
-  EXPECT_EQ(
+  
+  EXPECT_NEAR(
     entropy_delta,
-    real_entropy_delta
+    real_entropy_delta,
+    0.1
   );
   
 };

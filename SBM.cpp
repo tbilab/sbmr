@@ -795,12 +795,13 @@ double SBM::compute_entropy_delta(
     EdgeCounts&  level_counts, 
     int          level, 
     NodePtr      updated_node, 
-    NodePtr      old_group, 
-    NodePtr      new_group) 
+    NodePtr      old_group_orig, 
+    NodePtr      new_group_orig) 
 {
-  // // Get ids of groups moved, at the level of the move
-  // NodePtr old_group = old_group->get_parent_at_level(level);
-  // NodePtr new_group = new_group->get_parent_at_level(level);
+  
+  // Get ids of groups moved, at the level of the move
+  NodePtr old_group = old_group_orig->get_parent_at_level(level);
+  NodePtr new_group = new_group_orig->get_parent_at_level(level);
   
   // Gather all connections from the moved node to the level of the groups we're
   // working with by getting a map of group -> num connections for updated node
@@ -832,9 +833,6 @@ double SBM::compute_entropy_delta(
     int new_old_group_count = prev_old_group_count - amount_changed;
     int new_new_group_count = prev_new_group_count + amount_changed;
 
-    std::cout << changed_group->id << "-" << old_group->id << " = " << prev_old_group_count << "->" << new_old_group_count << std::endl;
-    std::cout << changed_group->id << "-" << new_group->id << " = " << prev_new_group_count << "->" << new_new_group_count << std::endl;
-    
     // Copy changed edge count original values to a "old" edge count map...
     old_edge_counts[changed_to_old] = prev_old_group_count;
     old_edge_counts[changed_to_new] = prev_new_group_count;
@@ -845,13 +843,18 @@ double SBM::compute_entropy_delta(
   }
   
   // Now calculate partial edge entropy from new counts.
-  double new_entropy_part = compute_edge_entropy(new_edge_counts);
   double old_entropy_part = compute_edge_entropy(old_edge_counts);
   
-  std::cout << "new entropy partial = " << new_entropy_part << std::endl;
-  std::cout << "old entropy partial = " << old_entropy_part << std::endl;
+  // Temporarily swap node parent
+  updated_node->set_parent(new_group);
   
-  return old_entropy_part - new_entropy_part;
+  // Calculate the edge entropy of this new arrangement
+  double new_entropy_part = compute_edge_entropy(new_edge_counts);
+  
+  // Return parent
+  updated_node->set_parent(old_group);
+  
+  return new_entropy_part - old_entropy_part;
 }
 
 
