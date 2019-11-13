@@ -345,61 +345,7 @@ TEST(testSBM, calculating_transition_probs){
 
   // The group we hope a1 wants to join should have two members
   EXPECT_EQ("a2, a3", print_node_ids(a1_2->children));
-    
-
-  // There should be 4 total connections between first a group and first b group
-
-  // ... and 5 total out of the first a group
-  EXPECT_EQ(2, a1_1->connections_to_node(b1_1).n_total);
-  EXPECT_EQ(5, a1_2->connections_to_node(b1_1).n_total);
-  EXPECT_EQ(1, a1_3->connections_to_node(b1_1).n_total);
-
-  EXPECT_EQ(6, b1_1->connections_to_node(a1_2).n_total);
-  EXPECT_EQ(1, b1_2->connections_to_node(a1_2).n_total);
-  EXPECT_EQ(1, b1_3->connections_to_node(a1_2).n_total);
-
-
-  // Check connection counts between groups... E.g. there should be no
-  // connections between first a group and second b group
-  EXPECT_EQ(2, a1_1->connections_to_node(b1_1).n_between);
-  EXPECT_EQ(0, a1_1->connections_to_node(b1_2).n_between);
-  EXPECT_EQ(0, a1_1->connections_to_node(b1_3).n_between);
-
-  EXPECT_EQ(4, a1_2->connections_to_node(b1_1).n_between);
-  EXPECT_EQ(0, a1_2->connections_to_node(b1_2).n_between);
-  EXPECT_EQ(1, a1_2->connections_to_node(b1_3).n_between);
-
-  EXPECT_EQ(0, a1_3->connections_to_node(b1_1).n_between);
-  EXPECT_EQ(1, a1_3->connections_to_node(b1_2).n_between);
-  EXPECT_EQ(0, a1_3->connections_to_node(b1_3).n_between);
-
-  EXPECT_EQ(b1_1->connections_to_node(a1_1).n_between,
-            a1_1->connections_to_node(b1_1).n_between);
-
-  EXPECT_EQ(b1_2->connections_to_node(a1_1).n_between,
-            a1_1->connections_to_node(b1_2).n_between);
-
-  EXPECT_EQ(b1_3->connections_to_node(a1_1).n_between,
-            a1_1->connections_to_node(b1_3).n_between);
-
-  EXPECT_EQ(b1_1->connections_to_node(a1_2).n_between,
-            a1_2->connections_to_node(b1_1).n_between);
-
-  EXPECT_EQ(b1_2->connections_to_node(a1_2).n_between,
-            a1_2->connections_to_node(b1_2).n_between);
-
-  EXPECT_EQ(b1_3->connections_to_node(a1_2).n_between,
-            a1_2->connections_to_node(b1_3).n_between);
-
-  EXPECT_EQ(b1_1->connections_to_node(a1_3).n_between,
-            a1_3->connections_to_node(b1_1).n_between);
-
-  EXPECT_EQ(b1_2->connections_to_node(a1_3).n_between,
-            a1_3->connections_to_node(b1_2).n_between);
-
-  EXPECT_EQ(b1_3->connections_to_node(a1_3).n_between,
-            a1_3->connections_to_node(b1_3).n_between);
-
+ 
   // Calculate move probabilities for node a1
   Trans_Probs a1_move_probs = my_SBM.get_transition_probs_for_groups(a1);
   EXPECT_EQ("0-1_0, 0-1_1, 0-1_2", print_node_ids(a1_move_probs.group));
@@ -895,13 +841,13 @@ TEST(testSBM, mcmc_chain_initialization){
     
     if (avg_num_moves == 0.00) 
     {
-      std::cout << "Model convered after " << i+1 << " sweeps" << std::endl;
+      //std::cout << "Model convered after " << i+1 << " sweeps" << std::endl;
       break;
     } 
     
     if (i == (n_sweeps - 1)) 
     {
-      std::cout << "Model failed to converge in after " << n_sweeps << "sweeps" << "avg num moves at end: "<< avg_num_moves << std::endl;
+      //std::cout << "Model failed to converge in after " << n_sweeps << "sweeps" << "avg num moves at end: "<< avg_num_moves << std::endl;
     }
   }
   
