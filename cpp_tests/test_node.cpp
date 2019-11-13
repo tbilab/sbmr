@@ -101,49 +101,49 @@ TEST(testNode, edge_counts_to_level){
   Node::connect_nodes(a3, b3);
   
   // Gather all the edges from node a1 to level 1
-  std::map<string, int> a1_to_l1 = a1->gather_connections_to_level(1);
+  std::map<NodePtr, int> a1_to_l1 = a1->gather_connections_to_level(1);
   
   EXPECT_EQ(
-    a1_to_l1["b11"],
+    a1_to_l1[b11],
     2
   );
   
   EXPECT_EQ(
-    a1_to_l1["b12"],
+    a1_to_l1[b12],
     0
   );
   
   // now a3 to l1
-  std::map<string, int> a3_to_l1 = a3->gather_connections_to_level(1);
+  std::map<NodePtr, int> a3_to_l1 = a3->gather_connections_to_level(1);
   
   EXPECT_EQ(
-    a3_to_l1["b11"],
+    a3_to_l1[b11],
     1
   );
   
   EXPECT_EQ(
-    a3_to_l1["b12"],
+    a3_to_l1[b12],
     1
   );
   
   // now b2 to l1
-  std::map<string, int> b2_to_l1 = b2->gather_connections_to_level(1);
+  std::map<NodePtr, int> b2_to_l1 = b2->gather_connections_to_level(1);
   
   EXPECT_EQ(
-    b2_to_l1["a11"],
+    b2_to_l1[a11],
     1
   );
   
   EXPECT_EQ(
-    b2_to_l1["a12"],
+    b2_to_l1[a12],
     2
   );
   
   // Last b11 to a21
-  std::map<string, int> b11_to_l2 = b11->gather_connections_to_level(2);
+  std::map<NodePtr, int> b11_to_l2 = b11->gather_connections_to_level(2);
   
   EXPECT_EQ(
-    b11_to_l2["a21"],
+    b11_to_l2[a21],
     5
   );
 }
