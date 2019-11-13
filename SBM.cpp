@@ -1,8 +1,8 @@
 #include "SBM.h" 
 
-// =======================================================
+// =============================================================================
 // Setup a new Node level
-// =======================================================
+// =============================================================================
 void SBM::add_level(int level) {
   
   // First, make sure level doesn't already exist
@@ -14,10 +14,11 @@ void SBM::add_level(int level) {
   nodes.emplace(level, std::make_shared<NodeLevel>());
 }
 
-// =======================================================
-// Grab reference to a desired level map. If level doesn't exist yet, this
-// method will create it
-// =======================================================
+
+// =============================================================================
+// Grab reference to a desired level map. If level doesn't exist yet, it will be
+// created
+// =============================================================================
 LevelPtr SBM::get_level(int level) {
   
   // Grab level for group node
@@ -38,14 +39,14 @@ LevelPtr SBM::get_level(int level) {
 }
 
 
-// =======================================================
+// =============================================================================
 // Find and return a node by its id
-// =======================================================
-NodePtr SBM::get_node_by_id(string desired_id) {
+// =============================================================================
+NodePtr SBM::get_node_by_id(string desired_id, int level) {
   
   try {
     // Attempt to find node on the 'node level' of the SBM
-    return nodes.at(0)->at(desired_id);
+    return nodes.at(level)->at(desired_id);
   } catch (...) {
     // Throw informative error if it fails
     throw "Could not find requested node";
@@ -53,10 +54,15 @@ NodePtr SBM::get_node_by_id(string desired_id) {
   
 }
 
+// The default level to search is 0.
+NodePtr SBM::get_node_by_id(string desired_id) {
+  return get_node_by_id(desired_id, 0);
+}
 
-// =======================================================
+
+// =============================================================================
 // Builds a group id from a scaffold for generated new groups
-// =======================================================
+// =============================================================================
 string SBM::build_group_id(int type, int level, int index) {
   return std::to_string(type)  + "-" +
     std::to_string(level) + "_" +
@@ -64,9 +70,9 @@ string SBM::build_group_id(int type, int level, int index) {
 }
 
 
-// =======================================================
+// =============================================================================
 // Adds a node with an id and type to network
-// =======================================================
+// =============================================================================
 NodePtr SBM::add_node(string id, int type, int level){
   
   // Grab level
@@ -88,18 +94,15 @@ NodePtr SBM::add_node(string id, int type, int level){
   return new_node;
 }; 
 
-
-// =======================================================
-// Adds a node with an id and type to network at level 0
-// =======================================================
+// Default is adding node to level 0
 NodePtr SBM::add_node(string id, int type){
   return add_node(id, type, 0);
 }; 
 
 
-// =======================================================
+// =============================================================================
 // Creates a new group node and add it to its neccesary level
-// =======================================================
+// =============================================================================
 NodePtr SBM::create_group_node(int type, int level) {
 
   // Make sure requested level is not 0
@@ -112,9 +115,9 @@ NodePtr SBM::create_group_node(int type, int level) {
 };
 
 
-// =======================================================
+// =============================================================================
 // Validates that a given level has nodes and throws error if it doesn't
-// =======================================================
+// =============================================================================
 void SBM::check_level_has_nodes(const LevelPtr level_to_check){
   if (level_to_check->size() == 0) {
     throw "Requested level is empty.";
@@ -122,11 +125,11 @@ void SBM::check_level_has_nodes(const LevelPtr level_to_check){
 };    
 
 
-// =======================================================
-// Return nodes of a desired type from level. If match_type = true
-// then the nodes returned are of the same type as specified, otherwise
-// the nodes returned are _not_of the same type.
-// =======================================================
+// =============================================================================
+// Return nodes of a desired type from level. If match_type = true then the
+// nodes returned are of the same type as specified, otherwise the nodes
+// returned are _not_ of the same type.
+// =============================================================================
 list<NodePtr> SBM::get_nodes_from_level(
     int type, 
     int level, 
@@ -161,25 +164,26 @@ list<NodePtr> SBM::get_nodes_from_level(
   return nodes_to_return;
 } 
 
-// =======================================================
+
+// =============================================================================
 // Return nodes of a desired type from level. 
-// =======================================================
+// =============================================================================
 list<NodePtr> SBM::get_nodes_of_type_at_level(int type, int level) {
   return get_nodes_from_level(type, level, true);
 }   
 
 
-// =======================================================
+// =============================================================================
 // Return nodes _not_ of a specified type from level
-// =======================================================
+// =============================================================================
 list<NodePtr> SBM::get_nodes_not_of_type_at_level(int type, int level) {
   return get_nodes_from_level(type, level, false);
 }   
 
 
-// =======================================================
+// =============================================================================
 // Adds a connection between two nodes based on their ids
-// =======================================================
+// =============================================================================
 void SBM::add_connection(string node1_id, string node2_id) {
   
   Node::connect_nodes(
@@ -190,9 +194,9 @@ void SBM::add_connection(string node1_id, string node2_id) {
 };    
 
 
-// =======================================================
+// =============================================================================
 // Adds a connection between two nodes based on their references
-// =======================================================
+// =============================================================================
 void SBM::add_connection(NodePtr node1, NodePtr node2) {
   
   Node::connect_nodes(
@@ -203,9 +207,9 @@ void SBM::add_connection(NodePtr node1, NodePtr node2) {
 };  
 
 
-// =======================================================
+// =============================================================================
 // Builds and assigns a group node for every node in a given level
-// =======================================================
+// =============================================================================
 void SBM::give_every_node_a_group_at_level(int level) {
 
   // Grab all the nodes for the desired level
@@ -220,7 +224,8 @@ void SBM::give_every_node_a_group_at_level(int level) {
             ++node_it) 
   {
     // build a group node at the next level
-    NodePtr new_group = create_group_node(node_it->second->type, level + 1);
+    NodePtr new_group = create_group_node(node_it->second->type, 
+                                          level + 1);
 
     // assign that group node to the node
     node_it->second->set_parent(new_group);
@@ -229,19 +234,22 @@ void SBM::give_every_node_a_group_at_level(int level) {
 }    
 
 
-// =======================================================
+// =============================================================================
 // Grabs the first node found at a given level, used in testing.
-// =======================================================
+// =============================================================================
 NodePtr SBM::get_node_from_level(int level) {
   return nodes.at(level)->begin()->second;
 }
 
-// =======================================================
-// Calculates probabilities for joining a given new group based on current SBM
-// state
-// =======================================================
 
-Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move, EdgeCounts group_edge_counts) 
+// =============================================================================
+// Calculates probabilities for joining all possible new groups based on current
+// SBM state
+// =============================================================================
+Trans_Probs SBM::get_transition_probs_for_groups(
+    NodePtr    node_to_move, 
+    EdgeCounts group_edge_counts
+) 
 {
   // Ergodicity tuning parameter
   double epsilon = 0.01;
@@ -263,7 +271,8 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move, EdgeCount
   map<string, int> node_outward_connections;
   
   // Gather all connections node has to the next level up (its group level)
-  vector<NodePtr> neighbor_group_connections = node_to_move->get_connections_to_level(group_level);
+  vector<NodePtr> neighbor_group_connections = node_to_move->
+    get_connections_to_level(group_level);
   
   // First we gather info on how the node to move is connected in terms of its
   // neighbors's groups
@@ -330,9 +339,12 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move, EdgeCount
     probabilities.push_back(cummulative_prob);
   }
   
-  // Our sampling algorithm just needs unormalized weights so we don't actually have to normalize. 
-  // Normalize vector to sum to 1
-  double total_of_probs = std::accumulate(probabilities.begin(), probabilities.end(), double(0));
+  // Our sampling algorithm just needs unormalized weights so we don't actually
+  // have to normalize. Normalize vector to sum to 1
+  double total_of_probs = std::accumulate(
+    probabilities.begin(), 
+    probabilities.end(), 
+    double(0));
   for (auto prob = probabilities.begin(); prob != probabilities.end(); ++prob)
   {
     *prob = *prob/total_of_probs;
@@ -341,6 +353,7 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move, EdgeCount
   return Trans_Probs(probabilities, groups);
 }
 
+// Calculates its own edge counts if they arent provided
 Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
 
   // Gather all the group connection counts at the group level
@@ -350,10 +363,10 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
 }
 
 
-// =======================================================
-// Scan through levels and remove all group nodes that have no children. Returns
-// the number removed
-// =======================================================
+// =============================================================================
+// Scan through entire SBM and remove all group nodes that have no children. 
+// Returns the number removed
+// =============================================================================
 int SBM::clean_empty_groups(){
   
   int num_levels = nodes.size();
@@ -369,7 +382,9 @@ int SBM::clean_empty_groups(){
     vector<string> groups_to_delete;
     
     // Loop through every node at level
-    for (auto group_it = group_level->begin(); group_it != group_level->end(); ++group_it)
+    for (auto group_it = group_level->begin(); 
+              group_it != group_level->end(); 
+              ++group_it)
     {
       NodePtr current_group = group_it->second;
       
@@ -401,10 +416,9 @@ int SBM::clean_empty_groups(){
 }                     
 
 
-
-// ======================================================= 
+// =============================================================================
 // Builds a id-id paired map of edge counts between nodes of the same level
-// =======================================================
+// =============================================================================
 EdgeCounts SBM::gather_edge_counts(int level){
   
   // Setup our edge count map: 
@@ -414,7 +428,9 @@ EdgeCounts SBM::gather_edge_counts(int level){
   LevelPtr node_level = nodes.at(level);
   
   // Loop through all groups (r)
-  for (auto group_it = node_level->begin(); group_it != node_level->end(); ++group_it) 
+  for (auto group_it = node_level->begin(); 
+            group_it != node_level->end(); 
+            ++group_it) 
   {
     NodePtr group_r = group_it->second;
 
@@ -425,7 +441,9 @@ EdgeCounts SBM::gather_edge_counts(int level){
     e_rs[find_edges(group_r)] = group_r->degree;
     
     // Loop over all edges
-    for (auto group_s = group_r_cons.begin(); group_s != group_r_cons.end(); ++group_s) 
+    for (auto group_s = group_r_cons.begin(); 
+              group_s != group_r_cons.end(); 
+              ++group_s) 
     {
       // Add connection counts to the map
       e_rs[find_edges(group_r, *group_s)]++;
@@ -435,7 +453,9 @@ EdgeCounts SBM::gather_edge_counts(int level){
   
   // All the off-diagonal elements will be doubled because they were added for
   // r->s and s->r, so divide them by two
-  for (auto node_pair = e_rs.begin(); node_pair != e_rs.end(); ++node_pair)
+  for (auto node_pair = e_rs.begin(); 
+            node_pair != e_rs.end(); 
+            ++node_pair)
   {
     // Make sure we're not on a diagonal
     if (node_pair->first.first != node_pair->first.second)
@@ -448,10 +468,9 @@ EdgeCounts SBM::gather_edge_counts(int level){
 }   
 
 
-
-// ======================================================= 
+// =============================================================================
 // Builds a id-id paired map of edge counts between nodes of the same level
-// =======================================================
+// =============================================================================
 void SBM::update_edge_counts(
     EdgeCounts& level_counts, 
     int         level, 
@@ -465,7 +484,8 @@ void SBM::update_edge_counts(
   
   // Gather all connections from the moved node to the level of the groups we're
   // working with
-  vector<NodePtr> moved_connections = updated_node->get_connections_to_level(level);
+  vector<NodePtr> moved_connections = updated_node->
+    get_connections_to_level(level);
   
   // Setup an edge count map for node
   std::map<string, int> moved_connections_counts;
@@ -503,10 +523,10 @@ void SBM::update_edge_counts(
 }
 
 
-
-// ======================================================= 
-// Attempts to move a node to new group, returns true if node moved, false if it stays.
-// ======================================================= 
+// =============================================================================
+// Attempts to move a node to new group. 
+// Returns true if node moved, false if it stays.
+// =============================================================================
 NodePtr SBM::attempt_move(
     NodePtr            node_to_move, 
     EdgeCounts &       group_edge_counts, 
@@ -515,7 +535,8 @@ NodePtr SBM::attempt_move(
   int level_of_move = node_to_move->level + 1;
 
   // Calculate the transition probabilities for all possible groups node could join
-  Trans_Probs move_probs = get_transition_probs_for_groups(node_to_move, group_edge_counts);
+  Trans_Probs move_probs = get_transition_probs_for_groups(node_to_move, 
+                                                           group_edge_counts);
 
   // Initialize a sampler to choose group
   Sampler my_sampler;
@@ -530,11 +551,10 @@ NodePtr SBM::attempt_move(
 }; 
 
 
-
-// ======================================================= 
+// =============================================================================
 // Run through all nodes in a given level and attempt a group move on each one
 // in turn.
-// ======================================================= 
+// =============================================================================
 int SBM::run_move_sweep(int level) 
 {
   // Grab level map
@@ -546,7 +566,9 @@ int SBM::run_move_sweep(int level)
   node_vec.reserve(node_map->size());
   
   // Fill in vector with map elements
-  for (auto node_it = node_map->begin(); node_it != node_map->end(); ++node_it)
+  for (auto node_it = node_map->begin(); 
+            node_it != node_map->end(); 
+            ++node_it)
   {
     node_vec.push_back(node_it->second);
   }
@@ -565,7 +587,9 @@ int SBM::run_move_sweep(int level)
   int num_moves_made = 0;
   
   // Loop through randomly ordered nodes
-  for (auto node_it = node_vec.begin(); node_it != node_vec.end(); ++node_it)
+  for (auto node_it = node_vec.begin(); 
+            node_it != node_vec.end(); 
+            ++node_it)
   {
     // Get direct pointer to current node
     NodePtr node_to_move = *node_it;
@@ -603,9 +627,9 @@ int SBM::run_move_sweep(int level)
 }  
 
 
-// ======================================================= 
+// =============================================================================
 // Export current state of nodes in model
-// ======================================================= 
+// =============================================================================
 State_Dump SBM::get_sbm_state(){
   // Initialize the return struct
   State_Dump state; 
@@ -614,7 +638,9 @@ State_Dump SBM::get_sbm_state(){
   int n_nodes_seen = 0;
   
   // Loop through all the levels present in SBM
-  for (auto level_it = nodes.begin(); level_it != nodes.end(); ++level_it) 
+  for (auto level_it = nodes.begin(); 
+            level_it != nodes.end(); 
+            ++level_it) 
   {
     int level = level_it->first;
     LevelPtr node_level = level_it->second;
@@ -629,7 +655,9 @@ State_Dump SBM::get_sbm_state(){
     state.type.reserve(n_nodes_seen);
     
     // Loop through each node in level
-    for (auto node_it = node_level->begin(); node_it != node_level->end(); ++node_it )
+    for (auto node_it = node_level->begin(); 
+              node_it != node_level->end(); 
+              ++node_it )
     {
       // Get currrent node
       NodePtr current_node = node_it->second;
@@ -640,7 +668,9 @@ State_Dump SBM::get_sbm_state(){
       state.type.push_back(current_node->type);
       
       // Record parent if node has one
-      state.parent.push_back(current_node->parent ? current_node->parent->id: "none");
+      state.parent.push_back(
+        current_node->parent ? current_node->parent->id: "none"
+      );
       
     } // End node loop
   } // End level loop
@@ -649,9 +679,9 @@ State_Dump SBM::get_sbm_state(){
 }                          
 
 
-// ======================================================= 
+// =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
-// ======================================================= 
+// =============================================================================
 int SBM::mcmc_sweep(int level, bool variable_num_groups) {
   double eps = 0.01;
   int num_changes = 0;
@@ -700,14 +730,16 @@ int SBM::mcmc_sweep(int level, bool variable_num_groups) {
       group_level);
  
     // Sample a random neighbor of the current node
-    NodePtr rand_neighbor = sampler.sample(curr_node->get_connections_to_level(level));
+    NodePtr rand_neighbor = sampler.sample(
+      curr_node->get_connections_to_level(level)
+    );
     
     // Get number total number connections for neighbor's group
     int neighbor_group_degree = rand_neighbor->parent->degree;
     
     // Decide if we are going to choose a random group for our node
-    double ergodicity_scalar = eps*potential_groups.size();
-    double prob_of_random_group = ergodicity_scalar/(neighbor_group_degree + ergodicity_scalar);
+    double ergo_amnt = eps*potential_groups.size();
+    double prob_of_random_group = ergo_amnt/(neighbor_group_degree + ergo_amnt);
 
     // Setup new group for node to join by choosing between a fully random group
     // or a group sampled from the edges of the random neighbor
@@ -728,15 +760,15 @@ int SBM::mcmc_sweep(int level, bool variable_num_groups) {
 }                           
 
 
-// ======================================================= 
+// =============================================================================
 // Compute microcononical entropy of current model state
 // Note that this is currently only the degree corrected entropy
-// ======================================================= 
+// =============================================================================
 double SBM::compute_entropy(int level)
 {
   
-  //==================================================================================
-  // First we calculate the number of total edges and build a degree->num nodes map
+  //============================================================================
+  // First, calc the number of total edges and build a degree->num nodes map
   
   // Build map of number of nodes with given degree
   map<int, int> n_nodes_w_degree;
@@ -746,14 +778,16 @@ double SBM::compute_entropy(int level)
   
   // Grab pointer to current level and start loop
   LevelPtr node_level = get_level(level);
-  for (auto node_it = node_level->begin(); node_it != node_level->end(); ++node_it)
+  for (auto node_it = node_level->begin(); 
+            node_it != node_level->end(); 
+            ++node_it)
   {
     int node_degree = node_it->second->degree;
     sum_of_degrees += node_degree;
     n_nodes_w_degree[node_degree]++;
   }
   
-  //==================================================================================
+  //==========================================================================
   // Next, we calculate the summation of N_k*ln(K!) where K is degree size and
   // N_k is the number of nodes of that degree
   
@@ -771,7 +805,7 @@ double SBM::compute_entropy(int level)
     degree_summation += num_nodes * log(factorial(k));
   }
   
-  //==================================================================================
+  //============================================================================
   // Last, we calculate the summation of e_rs*ln(e_rs/e_r*e_s) where e_rs is
   // number of connections between groups r and s and e_r is the total number of
   // edges for group r. Note that we dont divide this edge_entropy by 2 because
