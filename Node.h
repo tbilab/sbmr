@@ -21,7 +21,6 @@ using std::unordered_set;
 // What this file declares
 //=================================
 class  Node;
-struct connection_info;
 
 // For a bit of clarity
 typedef std::shared_ptr<Node>  NodePtr;
@@ -33,18 +32,18 @@ typedef unordered_set<NodePtr> ChildSet;
 class Node: public std::enable_shared_from_this<Node> {
   public:
     // Constructors
-    Node(string, int);            // Constructor function takes ID, node hiearchy level, and assumes default 0 for type
-    Node(string, int, int);       // Constructor function takes ID, node hiearchy level, and specification of type as integer
+    Node(string, int);           // Constructor function takes ID, node hiearchy level, and assumes default 0 for type
+    Node(string, int, int);      // Constructor function takes ID, node hiearchy level, and specification of type as integer
     
     // ==========================================
     // Attributes
-    string           id;          // Unique integer id for node
-    list<NodePtr>    connections; // Nodes that are connected to this node  
-    int              level;       // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
-    NodePtr          parent;      // What node contains this node (aka its cluster)
-    ChildSet         children;    // Nodes that are contained within node (if node is cluster)
-    int              type;        // What type of node is this?
-    int              degree;      // How many connections/ edges does this node have?
+    string         id;           // Unique integer id for node
+    list<NodePtr>  connections;  // Nodes that are connected to this node  
+    int            level;        // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
+    NodePtr        parent;       // What node contains this node (aka its cluster)
+    ChildSet       children;     // Nodes that are contained within node (if node is cluster)
+    int            type;         // What type of node is this?
+    int            degree;       // How many connections/ edges does this node have?
 
     // ==========================================
     // Methods   
@@ -57,17 +56,7 @@ class Node: public std::enable_shared_from_this<Node> {
     ChildSet         get_children_at_level(int);       // Get all member nodes of current node at a given level
     NodePtr          get_parent_at_level(int);         // Get parent of node at a given level
     vector<NodePtr>  get_connections_to_level(int);    // Get all nodes connected to Node at a given level
-    connection_info  connections_to_node(NodePtr);     // Get info on connection between any two nodes
     static void      connect_nodes(NodePtr, NodePtr);  // Static method to connect two nodes to each other with edge
-};
-
-// Structure for returning info about connection between two nodes
-struct connection_info {
-  int n_between;
-  int n_total;
-  connection_info(int between, int total): 
-    n_between(between),
-    n_total(total){}
 };
 
 #endif

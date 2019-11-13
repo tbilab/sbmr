@@ -1,34 +1,34 @@
 #include "Node.h" 
 
 
-// =======================================================
+// ============================================================================
 // Constructor that takes the nodes id and level. Assumes default 0 type. 
-// =======================================================
+// ============================================================================
 Node::Node(string node_id, int level):
   id(node_id),
   level(level),
   type(0),
   degree(0){}
 
-// =======================================================
+// ============================================================================
 // Constructor that takes the node's id, level, and type. 
-// =======================================================
+// ============================================================================
 Node::Node(string node_id, int level, int type):
   id(node_id),
   level(level),
   type(type),
   degree(0){}
 
-// =======================================================
+// =============================================================================
 // Replace 'this' with a shared smart pointer
-// =======================================================
+// =============================================================================
 NodePtr Node::this_ptr() {
   return shared_from_this();
 }
 
-// =======================================================
+// =============================================================================
 // Add connection to another node
-// =======================================================
+// =============================================================================
 void Node::add_connection(NodePtr node_ptr) {
   // Add element to connections list
   connections.push_back(node_ptr);
@@ -37,9 +37,9 @@ void Node::add_connection(NodePtr node_ptr) {
   update_degree(1);
 }          
 
-// =======================================================
+// =============================================================================
 // Update node's and all its parents degree
-// =======================================================
+// =============================================================================
 void Node::update_degree(int change_amnt) 
 {
   // propigate increase in degree upwards through hieararchy
@@ -52,9 +52,10 @@ void Node::update_degree(int change_amnt)
   }
 }
 
-// =======================================================
+
+// =============================================================================
 // Set current node parent/cluster
-// =======================================================
+// =============================================================================
 void Node::set_parent(NodePtr parent_node_ptr) {
   // Remove self from previous parents children list (if it existed)
   if(parent){
@@ -75,25 +76,28 @@ void Node::set_parent(NodePtr parent_node_ptr) {
   parent_node_ptr->add_child(this_ptr());
 }
 
-// =======================================================
+
+// =============================================================================
 // Add a node to the children vector
-// =======================================================
+// =============================================================================
 void Node::add_child(NodePtr new_child_node) {
   // Add new child node to the set of children. An unordered set is used because
   // repeat children can't happen.
   (this_ptr()->children).insert(new_child_node);
 }
 
-// =======================================================
+
+// =============================================================================
 // Find and erase a child node
-// =======================================================
+// =============================================================================
 void Node::remove_child(NodePtr child_node) {
   children.erase(children.find(child_node)); 
 }
 
-// =======================================================
+
+// =============================================================================
 // Get all member nodes of current node at a given level
-// =======================================================
+// =============================================================================
 ChildSet Node::get_children_at_level(int desired_level) {
   // Set to hold all the nodes that are found as children
   ChildSet children_nodes;
@@ -132,9 +136,10 @@ ChildSet Node::get_children_at_level(int desired_level) {
   return children_nodes;
 }
 
-// =======================================================
+
+// =============================================================================
 // Get parent of current node at a given level
-// =======================================================
+// =============================================================================
 NodePtr Node::get_parent_at_level(int level_of_parent) {
   
   // First we need to make sure that the requested level is not less than that
@@ -157,11 +162,12 @@ NodePtr Node::get_parent_at_level(int level_of_parent) {
   return current_node;
 }
 
-// =======================================================
-// Get all nodes connected to Node at a given level
-//   We return a vector because we need random access to elements in this array
+
+// =============================================================================
+// Get all nodes connected to Node at a given level.
+// We return a vector because we need random access to elements in this array
 // and that isn't provided to us with the list format.
-// =======================================================
+// =============================================================================
 vector<NodePtr> Node::get_connections_to_level(int desired_level) {
   // Vector to return containing parents at desired level for connections
   vector<NodePtr> connected_nodes; 
@@ -198,43 +204,9 @@ vector<NodePtr> Node::get_connections_to_level(int desired_level) {
 }
 
 
-// ======================================================= 
-// Get number of edges between and fraction of total for starting node
-// =======================================================
-connection_info Node::connections_to_node(NodePtr target_node) {
-
-  // Grab all the nodes connected to node at the level of the target node
-  vector<NodePtr> all_connections_to_level = this_ptr()->get_connections_to_level(target_node->level);
-  
-  // Make sure that there are actually connections for us to look through
-  if (all_connections_to_level.size() == 0) {
-    throw "Current node has no connections";
-  }
-  
-  // Start with no connection to target...
-  int n_connections_to_target = 0;
-  
-  // Go through all the connections
-  for (
-      auto connections_it  = all_connections_to_level.begin();
-           connections_it != all_connections_to_level.end();
-           ++connections_it) 
-  { 
-    // If connection at level matches the target node, increment target
-    // connection counter
-    if (*connections_it == target_node) {
-      n_connections_to_target++;
-    }
-    
-  }
-  
-  return connection_info(n_connections_to_target, all_connections_to_level.size());
-}     
-
-
-// =======================================================
+// =============================================================================
 // Static method to connect two nodes to each other with edge
-// =======================================================
+// =============================================================================
 void Node::connect_nodes(NodePtr node1_ptr, NodePtr node2_ptr) {
   // Add node2 to connections of node1
   node1_ptr->add_connection(node2_ptr);
