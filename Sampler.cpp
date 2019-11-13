@@ -1,9 +1,9 @@
 #include "Sampler.h" 
 
 
-// =======================================================
+// =============================================================================
 // Constructor 
-// =======================================================
+// =============================================================================
 Sampler::Sampler()
 {
    // Setup with the default random seed
@@ -16,6 +16,11 @@ Sampler::Sampler(int random_seed)
   initialize_seed(random_seed);
 }
 
+
+// =============================================================================
+// Setup the integer seeding device with user provided random seed, or -- if the
+// random seed was passed as -1 -- with a computer generated seed
+// =============================================================================
 void Sampler::initialize_seed(int random_seed) 
 {
   // If the random seed is the null value of -1, use the default
@@ -38,11 +43,18 @@ void Sampler::initialize_seed(int random_seed)
   rand_unif_gen unif_gen(0.0, 1.0);
 }
 
+
+// =============================================================================
+// Draw a single sample from a random uniform (0 - 1] distribution
+// =============================================================================
 double Sampler::draw_unif() 
 {
   return unif_gen(int_gen);
 }
 
+// =============================================================================
+// Draw single sample from a discrete random uniform (0 - max_val] distribution
+// =============================================================================
 int Sampler::sample(int max_val) 
 {
   std::uniform_int_distribution<int> dist(0, max_val);
@@ -50,29 +62,10 @@ int Sampler::sample(int max_val)
   return dist(int_gen);
 }
 
-int Sampler::sample(std::vector<double> const &weights) 
-{
-  // Make sure weights sum to 1
-  std::vector<double> weights_norm = normalize_vector(weights);
 
-  // Draw a random uniform value
-  double random_value = draw_unif();
-
-  double current_sum = 0;
-  int current_pos;
-
-  // Scan up through weights, stopping when the current sum passes the drawn value
-  for (current_pos = 0; current_pos < weights_norm.size(); ++current_pos) {
-    current_sum += weights_norm[current_pos];
-
-    // If we've gone over the random value then we're done
-    if (current_sum >= random_value) break;
-  }
-
-  return current_pos;
-}
-
-
+// =============================================================================
+// Sample a random element from a list of node pointers
+// =============================================================================
 NodePtr Sampler::sample(list<NodePtr> node_list)
 {
   // Select a random index to grab
@@ -93,7 +86,11 @@ NodePtr Sampler::sample(list<NodePtr> node_list)
   return *group_it;
 }
 
+
+// =============================================================================
 // Sample random node from vector of nodes
+// Easier than list because we can just index to a spot
+// =============================================================================
 NodePtr Sampler::sample(vector<NodePtr> node_vec)
 {
   // Select a random index to grab
@@ -102,3 +99,31 @@ NodePtr Sampler::sample(vector<NodePtr> node_vec)
   // Return that element
   return node_vec.at(random_index);
 }
+
+// =============================================================================
+// Choose an index of a vector of weights based with probability proportional to
+// those weights
+// =============================================================================
+int Sampler::sample(std::vector<double> const &weights) 
+{
+  // Make sure weights sum to 1
+  std::vector<double> weights_norm = normalize_vector(weights);
+
+  // Draw a random uniform value
+  double random_value = draw_unif();
+
+  double current_sum = 0;
+  int current_pos;
+
+  // Scan up through weights, stopping when the current sum passes drawn value
+  for (current_pos = 0; current_pos < weights_norm.size(); ++current_pos) {
+    current_sum += weights_norm[current_pos];
+
+    // If we've gone over the random value then we're done
+    if (current_sum >= random_value) break;
+  }
+
+  return current_pos;
+}
+
+
