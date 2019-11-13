@@ -523,9 +523,8 @@ TEST(testSBM, edge_count_map){
   // Build the network connection map for first level
   EdgeCounts l1_edges = my_SBM.gather_edge_counts(1);
   
-  // The edge count map should have 12 non-empty entries 
-  // 6 off diagonal + 6 total node counts.
-  EXPECT_EQ(12, l1_edges.size());
+  // The edge count map should have 6 non-empty entries 
+  EXPECT_EQ(6, l1_edges.size());
   
   // Check num edges between groups
   EXPECT_EQ(l1_edges[find_edges(a11, b11)], 2 );
@@ -567,28 +566,13 @@ TEST(testSBM, edge_count_map){
 
   EXPECT_EQ(l1_edges[find_edges(a13, b13)],
             l1_edges[find_edges(b13, a13)]);
-
-
-  // Diagonals should hold total edge counts for group
-  EXPECT_EQ(l1_edges[find_edges(a11)], 2);
-  EXPECT_EQ(l1_edges[find_edges(a12)], 7);
-  EXPECT_EQ(l1_edges[find_edges(a13)], 2);
-
-  EXPECT_EQ(l1_edges[find_edges(b11)], 7);
-  EXPECT_EQ(l1_edges[find_edges(b12)], 3);
-  EXPECT_EQ(l1_edges[find_edges(b13)], 1);
   
   // Repeat for level 2
   EdgeCounts l2_edges = my_SBM.gather_edge_counts(2);
   
   // Check num edges between groups
-  EXPECT_EQ(l2_edges[find_edges(a21, b21)], 2);
   EXPECT_EQ(l2_edges[find_edges(a22, b21)], 9);
-  
-  EXPECT_EQ(l2_edges[find_edges(a21, a21)], 2);
-  EXPECT_EQ(l2_edges[find_edges(a22, a22)], 9);
-  EXPECT_EQ(l2_edges[find_edges(b21, b21)], 11);
-  
+
   
   // Now we will change the group for a node and make sure the changes are
   // updated properly with the update_edge_counts() function
@@ -603,14 +587,12 @@ TEST(testSBM, edge_count_map){
   EXPECT_EQ(l1_edges[find_edges(a12, b11)], 2);
   EXPECT_EQ(l1_edges[find_edges(a12, b12)], 1);
   EXPECT_EQ(l1_edges[find_edges(a12, b13)], 1);
-  EXPECT_EQ(l1_edges[find_edges(a12)], 4);
-  
+
   // And to a13's as well...
   EXPECT_EQ(l1_edges[find_edges(a13, b11)], 3);
   EXPECT_EQ(l1_edges[find_edges(a13, b12)], 2);
   EXPECT_EQ(l1_edges[find_edges(a13, b13)], 0);
-  EXPECT_EQ(l1_edges[find_edges(a13)], 5);
-  
+
   
   // Nothing should have changed for the level 2 connections
   
@@ -620,9 +602,6 @@ TEST(testSBM, edge_count_map){
   // Check num edges between groups
   EXPECT_EQ(l2_edges[find_edges(a21, b21)], 2);
   EXPECT_EQ(l2_edges[find_edges(a22, b21)], 9);
-  EXPECT_EQ(l2_edges[find_edges(a21, a21)], 2);
-  EXPECT_EQ(l2_edges[find_edges(a22, a22)], 9);
-  EXPECT_EQ(l2_edges[find_edges(b21)], 11);
 }
 
 
@@ -674,35 +653,35 @@ SBM build_simple_SBM(bool add_hierarchy){
   my_SBM.add_connection(a4, b3);
   
   // Make 2 type 0/a groups
-  NodePtr a1_1 = my_SBM.create_group_node(0, 1);
-  NodePtr a1_2 = my_SBM.create_group_node(0, 1);
-  NodePtr a1_3 = my_SBM.create_group_node(0, 1);
-  NodePtr b1_1 = my_SBM.create_group_node(1, 1);
-  NodePtr b1_2 = my_SBM.create_group_node(1, 1);
-  NodePtr b1_3 = my_SBM.create_group_node(1, 1);
+  NodePtr a11 = my_SBM.add_node("a11", 0, 1);
+  NodePtr a12 = my_SBM.add_node("a12", 0, 1);
+  NodePtr a13 = my_SBM.add_node("a13", 0, 1);
+  NodePtr b11 = my_SBM.add_node("b11", 1, 1);
+  NodePtr b12 = my_SBM.add_node("b12", 1, 1);
+  NodePtr b13 = my_SBM.add_node("b13", 1, 1);
   
   // Assign nodes to their groups
-  a1->set_parent(a1_1);
-  a2->set_parent(a1_2);
-  a3->set_parent(a1_2);
-  a4->set_parent(a1_3);
-  b1->set_parent(b1_1);
-  b2->set_parent(b1_1);
-  b3->set_parent(b1_2);
-  b4->set_parent(b1_3);
+  a1->set_parent(a11);
+  a2->set_parent(a12);
+  a3->set_parent(a12);
+  a4->set_parent(a13);
+  b1->set_parent(b11);
+  b2->set_parent(b11);
+  b3->set_parent(b12);
+  b4->set_parent(b13);
   
   if (add_hierarchy) 
   {
     // Assign nodes to their groups
-    a1->set_parent(a1_1);
-    a2->set_parent(a1_2);
-    a3->set_parent(a1_2);
-    a4->set_parent(a1_3);
+    a1->set_parent(a11);
+    a2->set_parent(a12);
+    a3->set_parent(a12);
+    a4->set_parent(a13);
     
-    b1->set_parent(b1_1);
-    b2->set_parent(b1_1);
-    b3->set_parent(b1_2);
-    b4->set_parent(b1_3);
+    b1->set_parent(b11);
+    b2->set_parent(b11);
+    b3->set_parent(b12);
+    b4->set_parent(b13);
   }
   
   return my_SBM;
@@ -871,14 +850,55 @@ TEST(testSBM, entropy_calculation){
   // Setup simple SBM model
   SBM my_SBM = build_simple_SBM(true);
   
-  // Compute entropy at first level of nodes
-  double model_entropy = my_SBM.compute_entropy(0);
+  // Compute just the edge-related entropy for first level
+  // Should be (2*log(2/12) + 4*log(4/30) + 1*log(1/5) + 1*log(1) ) = -13.25257
+  EdgeCounts l1_edges = my_SBM.gather_edge_counts(1);
+  double edge_entropy = my_SBM.compute_edge_entropy(l1_edges);
+  ASSERT_NEAR(
+    edge_entropy,
+    -13.25257,
+    0.1
+  );
   
+  // Compute full entropy at first level of nodes
+  double model_entropy = my_SBM.compute_entropy(0);
+ 
   // Test entropy is near a hand-calculated value
+  // Should be -8 - ( 2*log(2) + 3*log(6) ) - ( 2*log(2/12) + 4*log(4/30) + 1*log(1/5) + 1*log(1) ) = -1.509004
   ASSERT_NEAR(
     model_entropy,
     -1.509004,
     0.1
+  );
+  
+  // Calculate entropy delta caused by moving a node
+  NodePtr node_to_move = my_SBM.get_node_by_id("a1");
+  NodePtr from_group = node_to_move->parent;
+  NodePtr to_group = my_SBM.get_node_by_id("a12", 1);
+  
+  // Calculate the entropy delta
+  double entropy_delta = my_SBM.compute_entropy_delta(
+    l1_edges,
+    1,
+    node_to_move,
+    from_group,
+    to_group
+  );
+  
+  // Now calculate the actual entropy delta by fully calculating entropy before and after move
+  double original_entropy = my_SBM.compute_entropy(0);
+
+  // Move node
+  node_to_move->set_parent(to_group);
+
+  // Recalculate entropy
+  double new_entropy = my_SBM.compute_entropy(0);
+
+  double real_entropy_delta = original_entropy - new_entropy;
+
+  EXPECT_EQ(
+    entropy_delta,
+    real_entropy_delta
   );
   
 };
