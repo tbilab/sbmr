@@ -58,6 +58,97 @@ TEST(testNode, basic){
   );
 }
 
+TEST(testNode, edge_counts_to_level){
+  
+  // Node level
+  NodePtr a1 = std::make_shared<Node>("a1", 0, 1);
+  NodePtr a2 = std::make_shared<Node>("a2", 0, 1);
+  NodePtr a3 = std::make_shared<Node>("a3", 0, 1);
+  NodePtr b1 = std::make_shared<Node>("b1", 0, 2);
+  NodePtr b2 = std::make_shared<Node>("b2", 0, 2);
+  NodePtr b3 = std::make_shared<Node>("b3", 0, 2);
+  
+  // First level / groups
+  NodePtr a11 = std::make_shared<Node>("a11", 1, 1);
+  NodePtr a12 = std::make_shared<Node>("a12", 1, 1);
+  NodePtr b11 = std::make_shared<Node>("b11", 1, 2);
+  NodePtr b12 = std::make_shared<Node>("b12", 1, 2);
+  
+  // Second level / super groups
+  NodePtr a21 = std::make_shared<Node>("a21", 2, 1);
+  NodePtr b21 = std::make_shared<Node>("b21", 2, 2);
+  
+  
+  a1->set_parent(a11);
+  a2->set_parent(a12);
+  a3->set_parent(a12);
+  
+  b1->set_parent(b11);
+  b2->set_parent(b11);
+  b3->set_parent(b12);
+  
+  a11->set_parent(a21);
+  a12->set_parent(a21);
+  
+  b11->set_parent(b21);
+  b12->set_parent(b21);
+  
+  Node::connect_nodes(a1, b1);
+  Node::connect_nodes(a1, b2);
+  Node::connect_nodes(a2, b1);
+  Node::connect_nodes(a2, b2);
+  Node::connect_nodes(a3, b2);
+  Node::connect_nodes(a3, b3);
+  
+  // Gather all the edges from node a1 to level 1
+  std::map<string, int> a1_to_l1 = a1->gather_connections_to_level(1);
+  
+  EXPECT_EQ(
+    a1_to_l1["b11"],
+    2
+  );
+  
+  EXPECT_EQ(
+    a1_to_l1["b12"],
+    0
+  );
+  
+  // now a3 to l1
+  std::map<string, int> a3_to_l1 = a3->gather_connections_to_level(1);
+  
+  EXPECT_EQ(
+    a3_to_l1["b11"],
+    1
+  );
+  
+  EXPECT_EQ(
+    a3_to_l1["b12"],
+    1
+  );
+  
+  // now b2 to l1
+  std::map<string, int> b2_to_l1 = b2->gather_connections_to_level(1);
+  
+  EXPECT_EQ(
+    b2_to_l1["a11"],
+    1
+  );
+  
+  EXPECT_EQ(
+    b2_to_l1["a12"],
+    2
+  );
+  
+  // Last b11 to a21
+  std::map<string, int> b11_to_l2 = b11->gather_connections_to_level(2);
+  
+  EXPECT_EQ(
+    b11_to_l2["a21"],
+    5
+  );
+}
+
+
 TEST(testNode, degree_tracking){
   
   // Node level
