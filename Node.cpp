@@ -229,6 +229,31 @@ std::map<NodePtr, int> Node::gather_connections_to_level(int level)
 
 
 // =============================================================================
+// Find what proportions of a nodes edges go to another node
+// =============================================================================
+double Node::frac_of_connections_to_group(NodePtr target_node) {
+  // Gather all connections from the moved node to the level of the node we're
+  // targeting
+  vector<NodePtr> all_connections = get_connections_to_level(target_node->level);
+  
+  int connections_to_target = 0;
+  
+  // Parse through all connections
+  for(auto curr_connection  = all_connections.begin(); 
+           curr_connection != all_connections.end();
+           ++curr_connection )
+  {
+    if ((*curr_connection)->id == target_node->id) 
+    {
+      connections_to_target++;
+    }
+  }
+  
+  return double(connections_to_target)/double(all_connections.size());
+}
+
+
+// =============================================================================
 // Static method to connect two nodes to each other with edge
 // =============================================================================
 void Node::connect_nodes(NodePtr node1_ptr, NodePtr node2_ptr) {

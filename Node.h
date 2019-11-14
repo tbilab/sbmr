@@ -58,7 +58,7 @@ class Node: public std::enable_shared_from_this<Node> {
     NodePtr          get_parent_at_level(int);         // Get parent of node at a given level
     vector<NodePtr>  get_connections_to_level(int);    // Get all nodes connected to Node at a given level
     std::map<NodePtr, int> gather_connections_to_level(int); 
-    
+    double           frac_of_connections_to_group(NodePtr); // Find what proportions of a nodes edges go to another node 
     static void      connect_nodes(NodePtr, NodePtr);  // Static method to connect two nodes to each other with edge
 };
 

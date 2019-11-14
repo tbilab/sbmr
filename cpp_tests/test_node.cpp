@@ -146,8 +146,34 @@ TEST(testNode, edge_counts_to_level){
     b11_to_l2[a21],
     5
   );
+  
+  double tol = 0.01;
+  // Also make sure fraction of connections to a given node works as well. 
+  ASSERT_NEAR(
+    a1->frac_of_connections_to_group(b11),
+    1.0,
+    tol
+  );
+  
+  ASSERT_NEAR(
+    a1->frac_of_connections_to_group(b12),
+    0.0,
+    tol
+  );
+  
+  ASSERT_NEAR(
+    a3->frac_of_connections_to_group(b11),
+    0.5,
+    tol
+  );
+  
+  ASSERT_NEAR(
+    a3->frac_of_connections_to_group(a11),
+    0.0,
+    tol
+  );
+  
 }
-
 
 TEST(testNode, degree_tracking){
   
