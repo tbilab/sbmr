@@ -807,41 +807,58 @@ double SBM::compute_entropy_delta(
   // working with by getting a map of group -> num connections for updated node
   std::map<NodePtr, int> moved_connections_counts = updated_node->
     gather_connections_to_level(level);
-  
-  // Setup a new edge count maps to keep track of changes
+
+    // Setup a new edge count maps to keep track of changes
   EdgeCounts old_edge_counts;
   EdgeCounts new_edge_counts;
   
-  // Now we can loop through all the groups that the moved node was connected to
-  // and subtract their counts from the from-group's edges and add their counts
-  // to the to-group's
-  for(auto changed_group_it  = moved_connections_counts.begin(); 
-           changed_group_it != moved_connections_counts.end();
-           ++changed_group_it )
+  // Loop through all the edge counts and extract only the ones that belong to 
+  // the groups that have changes in them.
+  for(auto group_edges_it = level_counts.begin();
+           group_edges_it != level_counts.end();
+           ++group_edges_it)
   {
-    NodePtr changed_group = changed_group_it->first;
-    int amount_changed = changed_group_it->second;
+    NodePtr group_r = (group_edges_it->first).first;
+    NodePtr group_s = (group_edges_it->first).second;
+    const int old_edge_count = group_edges_it->second;
     
-    auto changed_to_old = find_edges(changed_group, old_group);
-    auto changed_to_new = find_edges(changed_group, new_group);
+    // Check if we should care about this edge combo. We only care about combos
+    // that contain one or more of the groups that were swapped
+    bool node_left_r = group_r == old_group;
+    bool node_left_s = group_s == old_group;
+    bool node_joined_r = group_r == new_group;
+    bool node_joined_s = group_s == new_group;
+    bool has_changed = node_left_r | node_joined_r | 
+                       node_left_s | node_joined_s;
     
-    // Gather neccesary counts from level counts
-    int prev_old_group_count = level_counts[changed_to_old];
-    int prev_new_group_count = level_counts[changed_to_new];
+    if (has_changed)
+    {
+      
+      int new_edge_count = old_edge_count;
+      
+      // If group r or s was the node that the node moved in or out of, we need
+      // to modify the edge connections for the other group. This is because the
+      // non-moved group will be loosing however many connections the node had
+      // to it from moved group when the node leaves it
+      if (node_left_r) new_edge_count -= moved_connections_counts[group_s];
+      if (node_left_s) new_edge_count -= moved_connections_counts[group_r];
+      
+      // The same logic applies in reverse. We will need to add the connections
+      // between the moved group and any groups the node was connected to
+      if (node_joined_r) new_edge_count += moved_connections_counts[group_s];
+      if (node_joined_s) new_edge_count += moved_connections_counts[group_r];
     
-    // Update counts with the amount changed due to moving node
-    int new_old_group_count = prev_old_group_count - amount_changed;
-    int new_new_group_count = prev_new_group_count + amount_changed;
-
-    // Copy changed edge count original values to a "old" edge count map...
-    old_edge_counts[changed_to_old] = prev_old_group_count;
-    old_edge_counts[changed_to_new] = prev_new_group_count;
-
-    // Add updated edge counts to "new" edge count map...
-    new_edge_counts[changed_to_old] = new_old_group_count;
-    new_edge_counts[changed_to_new] = new_new_group_count;
+      // Now update the changed edge count maps with counts. These could stay
+      // the same if the node had no connections to them. In that case we still
+      // need to include them in the delta calculation because the demonimator
+      // includes the raw counts in and out of each group
+      auto edge_pair_key = find_edges(group_r, group_s);
+      old_edge_counts[edge_pair_key] = old_edge_count;
+      new_edge_counts[edge_pair_key] = new_edge_count;
+     }
+                    
   }
-  
+
   // Now calculate partial edge entropy from new counts.
   double old_entropy_part = compute_edge_entropy(old_edge_counts);
   
