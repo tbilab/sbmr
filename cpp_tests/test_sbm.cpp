@@ -4,7 +4,7 @@
 #include "../SBM.h"
 
 // Loads a simple bipartite sbm model with optional hierarchy added
-SBM build_simple_SBM(bool add_hierarchy){
+SBM build_simple_SBM(){
   
   // This function builds a network with the following structure
   /*
@@ -69,19 +69,6 @@ SBM build_simple_SBM(bool add_hierarchy){
   b3->set_parent(b12);
   b4->set_parent(b13);
   
-  if (add_hierarchy) 
-  {
-    // Assign nodes to their groups
-    a1->set_parent(a11);
-    a2->set_parent(a12);
-    a3->set_parent(a12);
-    a4->set_parent(a13);
-    
-    b1->set_parent(b11);
-    b2->set_parent(b11);
-    b3->set_parent(b12);
-    b4->set_parent(b13);
-  }
   
   return my_SBM;
 }
@@ -660,9 +647,48 @@ TEST(testSBM, edge_count_map){
 }
 
 
+TEST(testSBM, node_move_proposals){
+  double tol = 0.01;
+  SBM my_SBM = build_simple_SBM();
+
+  NodePtr a1 = my_SBM.get_node_by_id("a1");
+
+  // Initialize a sampler to choose group
+  Sampler my_sampler;
+
+  int num_trials = 1000;
+  int num_times_no_move = 0;
+  NodePtr old_group = a1->parent;
+
+  // Run multiple trials and of move and see how often a given node is moved
+  for (int i = 0; i < num_trials; ++i)
+  {
+    // Do move attempt (dry run)
+    NodePtr new_group = my_SBM.propose_move_for_node(a1, my_sampler);
+
+    if (new_group->id == old_group->id) num_times_no_move++;
+  }
+  
+  double frac_of_time_no_change = double(num_times_no_move)/double(num_trials);
+
+  // Prob of a1 staying in a1_1 should be approximately (2 + eps)/(6 + 4*eps)
+  // Make sure model's decisions to move a1 reflects this.
+  double two = 2;
+  double six = 6;
+  double four = 4;
+  double eps = 0.01;
+  
+  ASSERT_NEAR(
+    (two + eps)/(six + four*eps),
+    frac_of_time_no_change,
+    tol
+  );
+}
+
+
 TEST(testSBM, node_move_attempts){
   double tol = 0.01;
-  SBM my_SBM = build_simple_SBM(false);
+  SBM my_SBM = build_simple_SBM();
 
   NodePtr a1 = my_SBM.get_node_by_id("a1");
   
@@ -711,7 +737,7 @@ TEST(testSBM, node_move_sweeps){
   for (int i = 0; i < n_trials; i++)
   {
     // Setup simple SBM model w/ no hierarchy
-    SBM my_SBM = build_simple_SBM(false);
+    SBM my_SBM = build_simple_SBM();
     
     // Run a single sweep at the node-level
     int nodes_moved = my_SBM.run_move_sweep(0);
@@ -727,7 +753,7 @@ TEST(testSBM, node_move_sweeps){
   // sweeps will be more stable because of convergence
   
   // Setup simple SBM model
-  SBM my_SBM = build_simple_SBM(false);
+  SBM my_SBM = build_simple_SBM();
   int n_sweeps = 100;
   vector<int> n_moved_first_third;
   vector<int> n_moved_last_third;
@@ -765,7 +791,7 @@ TEST(testSBM, node_move_sweeps){
 TEST(testSBM, mcmc_chain_initialization){
  
   // Setup simple SBM model
-  SBM my_SBM = build_simple_SBM(false);
+  SBM my_SBM = build_simple_SBM();
   
   // Start with every node in its own group
   my_SBM.give_every_node_a_group_at_level(0);
@@ -812,7 +838,7 @@ TEST(testSBM, mcmc_chain_initialization){
 TEST(testSBM, entropy_calculation){
   
   // Setup simple SBM model
-  SBM my_SBM = build_simple_SBM(true);
+  SBM my_SBM = build_simple_SBM();
   
   // Compute just the edge-related entropy for first level
   // Should be (2*log(2/12) + 4*log(4/30) + 1*log(1/5) + 1*log(1) ) = -13.25257

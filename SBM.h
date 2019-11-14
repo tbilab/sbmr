@@ -38,14 +38,18 @@ using std::map;
 // =============================================================================
 class SBM {
   public:
+    // Constructor
+    SBM();
+    
     // ==========================================
     // Attributes
     LevelMap       nodes;               // A map keyed by level integer of each level of nodes 
     std::set<int>  unique_node_types;   // Vector storing all the unique types of nodes seen. Used to make sure the correct move proposals are made
+    double         eps;                 // Parameter used to inforce ergodicity in MCMC sampling. Defaults to 0.01.
 
     // ==========================================
     // Methods
-    void          add_level(int);                            // Setup a new Node level
+    void          add_level(int);                                       // Setup a new Node level
     LevelPtr      get_level(int); 
     void          check_level_has_nodes(const LevelPtr);                // Validates that a given level has nodes and throws error if it doesn;t
     list<NodePtr> get_nodes_from_level(int, int, bool);                 // Return nodes of a desired type from level can be switched from matching or not ma
@@ -69,12 +73,14 @@ class SBM {
     State_Dump    get_sbm_state();                                      // Export current state of nodes in model
     int           mcmc_sweep(int, bool);                                // Runs efficient MCMC sweep algorithm on desired node level
     double        compute_entropy(int);                                 // Compute microcononical entropy of current model state at a level
+    NodePtr       propose_move_for_node(NodePtr, Sampler&);             // Propose a potential group move for a node.
 
-    static double  compute_entropy_delta(EdgeCounts&, int, NodePtr, NodePtr, NodePtr); // Compute change in entropy caused by swapping a node's group
-    static double  compute_edge_entropy(EdgeCounts&);                                 // Compute change in entropy caused by swapping a node's group
+    double  compute_entropy_delta(EdgeCounts&, int, NodePtr, NodePtr, NodePtr);   // Compute change in entropy caused by swapping a node's group
+    double  compute_acceptance_prob(EdgeCounts&, int, NodePtr, NodePtr, NodePtr); // Compute probability of accepting a node group swap
     
-    static void    update_edge_counts(EdgeCounts&, int, NodePtr, NodePtr, NodePtr);    // Update an EdgeCount map after moving a node around to avoid rescanning
-    static string  build_group_id(int, int, int);                                     // Builds a group id from a scaffold for generated new groups
+    static double  compute_edge_entropy(EdgeCounts&);                                // Compute change in entropy caused by swapping a node's group
+    static void    update_edge_counts(EdgeCounts&, int, NodePtr, NodePtr, NodePtr);  // Update an EdgeCount map after moving a node around to avoid rescanning
+    static string  build_group_id(int, int, int);                                    // Builds a group id from a scaffold for generated new groups
 };
 
 
