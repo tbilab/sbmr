@@ -3,6 +3,96 @@
 #include "../helpers.h"
 #include "../SBM.h"
 
+// Loads a simple bipartite sbm model with optional hierarchy added
+SBM build_simple_SBM(bool add_hierarchy){
+  
+  // This function builds a network with the following structure
+  /*
+   +----+               +----+
+   +----+   |    |---------------|    |
+   |    |   | a1 |-----      ----| b1 |   +----+
+   |a11 |---|    |      \  /    -|    |---|    |
+   |    |   +----+       \/   /  +----+   |b11 |
+   +----+   +----+       /\  /   +----+   |    |
+   |    |----- /  \ ----|    |---|    |
+   +----+   | a2 |---------------| b2 |   +----+      
+   |    |---|    |       /    ---|    |   
+   |a12 |   +----+      /   /    +----+   +----+
+   |    |   +----+     /   /     +----+   |    |
+   |    |---|    |----    /      |    |   |b12 |
+   +----+   | a3 |-------        | b3 |---|    |
+   |    |------    -----|    |   +----+      
+   +----+   +----+      \  /     +----+   +----+
+   |    |   +----+       \/      +----+   |    |
+   |a13 |---|    |       /\      |    |   |b13 |
+   |    |   | a4 |------/  \-----| b4 |---|    |
+   +----+   |    |               |    |   +----+
+   +----+               +----+
+   */   
+  SBM my_SBM;
+  
+  // Add nodes to graph first
+  NodePtr a1 = my_SBM.add_node("a1", 0);
+  NodePtr a2 = my_SBM.add_node("a2", 0);
+  NodePtr a3 = my_SBM.add_node("a3", 0);
+  NodePtr a4 = my_SBM.add_node("a4", 0);
+  NodePtr b1 = my_SBM.add_node("b1", 1);
+  NodePtr b2 = my_SBM.add_node("b2", 1);
+  NodePtr b3 = my_SBM.add_node("b3", 1);
+  NodePtr b4 = my_SBM.add_node("b4", 1);
+  
+  // Add connections
+  my_SBM.add_connection(a1, b1);
+  my_SBM.add_connection(a1, b2);
+  my_SBM.add_connection(a2, b1);
+  my_SBM.add_connection(a2, b2);
+  my_SBM.add_connection(a3, b1);
+  my_SBM.add_connection(a3, b2);
+  my_SBM.add_connection(a3, b4);
+  my_SBM.add_connection(a4, b3);
+  
+  // Make 2 type 0/a groups
+  NodePtr a11 = my_SBM.add_node("a11", 0, 1);
+  NodePtr a12 = my_SBM.add_node("a12", 0, 1);
+  NodePtr a13 = my_SBM.add_node("a13", 0, 1);
+  NodePtr b11 = my_SBM.add_node("b11", 1, 1);
+  NodePtr b12 = my_SBM.add_node("b12", 1, 1);
+  NodePtr b13 = my_SBM.add_node("b13", 1, 1);
+  
+  // Assign nodes to their groups
+  a1->set_parent(a11);
+  a2->set_parent(a12);
+  a3->set_parent(a12);
+  a4->set_parent(a13);
+  b1->set_parent(b11);
+  b2->set_parent(b11);
+  b3->set_parent(b12);
+  b4->set_parent(b13);
+  
+  if (add_hierarchy) 
+  {
+    // Assign nodes to their groups
+    a1->set_parent(a11);
+    a2->set_parent(a12);
+    a3->set_parent(a12);
+    a4->set_parent(a13);
+    
+    b1->set_parent(b11);
+    b2->set_parent(b11);
+    b3->set_parent(b12);
+    b4->set_parent(b13);
+  }
+  
+  return my_SBM;
+}
+
+// Gets average of the last n elements for a paseed vector of integers
+inline float avg_last_n(vector<int> vec, int n){
+  return std::accumulate(vec.end() - n, 
+                         vec.end(), 
+                         0.0 ) / float(n);
+}
+
 
 TEST(testSBM, basic){
   SBM my_SBM;
@@ -183,49 +273,14 @@ TEST(testSBM, state_dumping){
 }
 
 
-TEST(testSBM, building_network){
-  SBM my_SBM;
-
-  // Start with a single node in the network
-  my_SBM.add_node("n1", 0);
-
-  EXPECT_EQ(1, my_SBM.nodes[0]->size());
-
-  // Add a few more
-  my_SBM.add_node("n2", 0);
-  my_SBM.add_node("n3", 0);
-  my_SBM.add_node("m1", 1);
-  my_SBM.add_node("m2", 1);
-  my_SBM.add_node("m3", 1);
-  my_SBM.add_node("m4", 1);
-
-  EXPECT_EQ(7, my_SBM.nodes[0]->size());
-
-  // We should start off with a single level as no group nodes are added
-  EXPECT_EQ(1, my_SBM.nodes.size());
-
-  // Create a group node for type 0
-  my_SBM.create_group_node(0, 1);
-  EXPECT_EQ(2, my_SBM.nodes.size());
-  EXPECT_EQ(1, my_SBM.get_nodes_of_type_at_level(0,1).size());
-
-
-  // Create another group node for type 1
-  my_SBM.create_group_node(1, 1);
-
-  // Should be one group node for type 1 at level 1
-  EXPECT_EQ(1, my_SBM.get_nodes_of_type_at_level(1,1).size());
-
-  // Should be a total of 2 group nodes for level 1
-  EXPECT_EQ(2, my_SBM.nodes.at(1)->size());
-}
-
-
 TEST(testSBM, build_with_connections){
   SBM my_SBM;
 
-  // Add nodes to graph first
+    // Start with a single node in the network
   my_SBM.add_node("a1", 1);
+  EXPECT_EQ(1, my_SBM.nodes[0]->size());
+  
+  // Add more nodes
   my_SBM.add_node("a2", 1);
   my_SBM.add_node("a3", 1);
   my_SBM.add_node("a4", 1);
@@ -605,96 +660,9 @@ TEST(testSBM, edge_count_map){
 }
 
 
-SBM build_simple_SBM(bool add_hierarchy){
-  
-  // This function builds a network with the following structure
-/*
-             +----+               +----+
-    +----+   |    |---------------|    |
-    |    |   | a1 |-----      ----| b1 |   +----+
-    |a11 |---|    |      \  /    -|    |---|    |
-    |    |   +----+       \/   /  +----+   |b11 |
-    +----+   +----+       /\  /   +----+   |    |
-             |    |----- /  \ ----|    |---|    |
-    +----+   | a2 |---------------| b2 |   +----+      
-    |    |---|    |       /    ---|    |   
-    |a12 |   +----+      /   /    +----+   +----+
-    |    |   +----+     /   /     +----+   |    |
-    |    |---|    |----    /      |    |   |b12 |
-    +----+   | a3 |-------        | b3 |---|    |
-             |    |------    -----|    |   +----+      
-    +----+   +----+      \  /     +----+   +----+
-    |    |   +----+       \/      +----+   |    |
-    |a13 |---|    |       /\      |    |   |b13 |
-    |    |   | a4 |------/  \-----| b4 |---|    |
-    +----+   |    |               |    |   +----+
-             +----+               +----+
-*/   
-  SBM my_SBM;
-  
-  // Add nodes to graph first
-  NodePtr a1 = my_SBM.add_node("a1", 0);
-  NodePtr a2 = my_SBM.add_node("a2", 0);
-  NodePtr a3 = my_SBM.add_node("a3", 0);
-  NodePtr a4 = my_SBM.add_node("a4", 0);
-  NodePtr b1 = my_SBM.add_node("b1", 1);
-  NodePtr b2 = my_SBM.add_node("b2", 1);
-  NodePtr b3 = my_SBM.add_node("b3", 1);
-  NodePtr b4 = my_SBM.add_node("b4", 1);
-  
-  // Add connections
-  my_SBM.add_connection(a1, b1);
-  my_SBM.add_connection(a1, b2);
-  my_SBM.add_connection(a2, b1);
-  my_SBM.add_connection(a2, b2);
-  my_SBM.add_connection(a3, b1);
-  my_SBM.add_connection(a3, b2);
-  my_SBM.add_connection(a3, b4);
-  my_SBM.add_connection(a4, b3);
-  
-  // Make 2 type 0/a groups
-  NodePtr a11 = my_SBM.add_node("a11", 0, 1);
-  NodePtr a12 = my_SBM.add_node("a12", 0, 1);
-  NodePtr a13 = my_SBM.add_node("a13", 0, 1);
-  NodePtr b11 = my_SBM.add_node("b11", 1, 1);
-  NodePtr b12 = my_SBM.add_node("b12", 1, 1);
-  NodePtr b13 = my_SBM.add_node("b13", 1, 1);
-  
-  // Assign nodes to their groups
-  a1->set_parent(a11);
-  a2->set_parent(a12);
-  a3->set_parent(a12);
-  a4->set_parent(a13);
-  b1->set_parent(b11);
-  b2->set_parent(b11);
-  b3->set_parent(b12);
-  b4->set_parent(b13);
-  
-  if (add_hierarchy) 
-  {
-    // Assign nodes to their groups
-    a1->set_parent(a11);
-    a2->set_parent(a12);
-    a3->set_parent(a12);
-    a4->set_parent(a13);
-    
-    b1->set_parent(b11);
-    b2->set_parent(b11);
-    b3->set_parent(b12);
-    b4->set_parent(b13);
-  }
-  
-  return my_SBM;
-}
-
-SBM build_simple_SBM(){
-  return build_simple_SBM(false);
-}
-
-
 TEST(testSBM, node_move_attempts){
   double tol = 0.01;
-  SBM my_SBM = build_simple_SBM();
+  SBM my_SBM = build_simple_SBM(false);
 
   NodePtr a1 = my_SBM.get_node_by_id("a1");
   
@@ -742,8 +710,8 @@ TEST(testSBM, node_move_sweeps){
   // Run a node sweep on the same SBM model a bunch of times
   for (int i = 0; i < n_trials; i++)
   {
-    // Setup simple SBM model
-    SBM my_SBM = build_simple_SBM();
+    // Setup simple SBM model w/ no hierarchy
+    SBM my_SBM = build_simple_SBM(false);
     
     // Run a single sweep at the node-level
     int nodes_moved = my_SBM.run_move_sweep(0);
@@ -759,7 +727,7 @@ TEST(testSBM, node_move_sweeps){
   // sweeps will be more stable because of convergence
   
   // Setup simple SBM model
-  SBM my_SBM = build_simple_SBM();
+  SBM my_SBM = build_simple_SBM(false);
   int n_sweeps = 100;
   vector<int> n_moved_first_third;
   vector<int> n_moved_last_third;
@@ -793,16 +761,11 @@ TEST(testSBM, node_move_sweeps){
   
 };
 
-float avg_last_n(vector<int> vec, int n){
-  return std::accumulate(vec.end() - n, 
-                         vec.end(), 
-                         0.0 ) / float(n);
-}
 
 TEST(testSBM, mcmc_chain_initialization){
  
   // Setup simple SBM model
-  SBM my_SBM = build_simple_SBM();
+  SBM my_SBM = build_simple_SBM(false);
   
   // Start with every node in its own group
   my_SBM.give_every_node_a_group_at_level(0);
@@ -845,6 +808,7 @@ TEST(testSBM, mcmc_chain_initialization){
   
 };
 
+
 TEST(testSBM, entropy_calculation){
   
   // Setup simple SBM model
@@ -878,10 +842,6 @@ TEST(testSBM, entropy_calculation){
   NodePtr from_group = node_to_move->parent;
   NodePtr to_group = my_SBM.get_node_by_id("a12", 1);
 
-  // Now calculate the actual entropy delta by fully calculating entropy before and after move
-  double original_entropy = my_SBM.compute_entropy(0);
-  double original_edge_entropy = my_SBM.compute_edge_entropy(l1_edges);
-  
   
   // Calculate the entropy delta
   double entropy_delta = my_SBM.compute_entropy_delta(
@@ -892,16 +852,16 @@ TEST(testSBM, entropy_calculation){
     to_group
   );
 
+  // Now we will actually move the desired node and test to see if entropy has changed
+  
   // Move node
   node_to_move->set_parent(to_group);
  
   // Recalculate entropy
   double new_entropy = my_SBM.compute_entropy(0);
-  EdgeCounts new_l1_edges = my_SBM.gather_edge_counts(1);
-  double new_edge_entropy = my_SBM.compute_edge_entropy(new_l1_edges);
-  
-  // double real_entropy_delta = original_edge_entropy - new_edge_entropy;
-  double real_entropy_delta = original_entropy - new_entropy;
+ 
+  // Get difference from original
+  double real_entropy_delta = model_entropy - new_entropy;
   
   EXPECT_NEAR(
     entropy_delta,
