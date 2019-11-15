@@ -123,16 +123,6 @@ NodePtr SBM::create_group_node(int type, int level) {
 
 
 // =============================================================================
-// Validates that a given level has nodes and throws error if it doesn't
-// =============================================================================
-void SBM::check_level_has_nodes(const LevelPtr level_to_check){
-  if (level_to_check->size() == 0) {
-    throw "Requested level is empty.";
-  }
-};    
-
-
-// =============================================================================
 // Return nodes of a desired type from level. If match_type = true then the
 // nodes returned are of the same type as specified, otherwise the nodes
 // returned are _not_ of the same type.
@@ -149,8 +139,8 @@ list<NodePtr> SBM::get_nodes_from_level(
   LevelPtr node_level = nodes.at(level);
   
   // Make sure level has nodes before looping through it
-  check_level_has_nodes(node_level);
-  
+  if (node_level->size() == 0) throw "Requested level is empty.";
+
   // Loop through every node belonging to the desired level
   for (auto node_it  = node_level->begin(); 
             node_it != node_level->end(); 
@@ -223,7 +213,8 @@ void SBM::give_every_node_a_group_at_level(int level) {
   LevelPtr node_level = nodes.at(level);
   
   // Make sure level has nodes before looping through it
-  check_level_has_nodes(node_level);
+  if (node_level->size() == 0) throw "Requested level is empty.";
+  
   
   // Loop through each of the nodes,
   for (auto node_it  = node_level->begin(); 
@@ -689,17 +680,22 @@ NodePtr SBM::propose_move_for_node(NodePtr node, Sampler& sampler)
 // =============================================================================
 int SBM::mcmc_sweep(int level, bool variable_num_groups) {
   double eps = 0.01;
+  double beta = 1.5;
+  
   int num_changes = 0;
   int group_level = level + 1;
   
   // Grab level map
   LevelPtr node_map = get_level(level);
   
+  // Calculate edge counts
+  EdgeCounts level_edges = gather_edge_counts(level);
+  
+  
   // Get all the nodes at the given level in a shuffleable vector format
   // Initialize vector to hold nodes
   vector<NodePtr> node_vec;
   node_vec.reserve(node_map->size());
-  
   // Fill in vector with map elements
   for (auto node_it = node_map->begin(); node_it != node_map->end(); ++node_it)
   {
@@ -717,6 +713,34 @@ int SBM::mcmc_sweep(int level, bool variable_num_groups) {
   {
     NodePtr curr_node = *node_it;
     
+    // Get a move proposal
+    NodePtr proposed_new_group = propose_move_for_node(curr_node, sampler);
+    
+    // Calculate acceptance probability based on posterior changes
+    Proposal_Res proposal_results = compute_acceptance_prob(
+      level_edges,
+      curr_node,
+      proposed_new_group,
+      beta
+    );
+    
+    bool move_accepted = sampler.draw_unif() < proposal_results.prob_of_accept;
+    
+    if (move_accepted) 
+    {
+      // Update edge counts 
+      update_edge_counts(level_edges, 
+                         level, 
+                         curr_node, 
+                         curr_node->parent, 
+                         proposed_new_group);
+     
+      // Move the node
+      curr_node->set_parent(proposed_new_group);
+      
+      num_changes++;
+    }
+    
     // Check if we're running sweep with variable group numbers. If we are, we
     // need to remove empty groups and add a new group as a potential for the
     // node to enter
@@ -727,37 +751,6 @@ int SBM::mcmc_sweep(int level, bool variable_num_groups) {
       
       // Add a new group node for the current node type
       create_group_node(curr_node->type, group_level);
-    }
-
-    // Grab a list of all the groups that the node could join
-    list<NodePtr> potential_groups = get_nodes_of_type_at_level(
-      curr_node->type,
-      group_level);
- 
-    // Sample a random neighbor of the current node
-    NodePtr rand_neighbor = sampler.sample(
-      curr_node->get_connections_to_level(level)
-    );
-    
-    // Get number total number connections for neighbor's group
-    int neighbor_group_degree = rand_neighbor->parent->degree;
-    
-    // Decide if we are going to choose a random group for our node
-    double ergo_amnt = eps*potential_groups.size();
-    double prob_of_random_group = ergo_amnt/(neighbor_group_degree + ergo_amnt);
-
-    // Setup new group for node to join by choosing between a fully random group
-    // or a group sampled from the edges of the random neighbor
-    NodePtr new_group = sampler.draw_unif() < prob_of_random_group ? 
-      sampler.sample(potential_groups) :
-      sampler.sample(rand_neighbor->get_connections_to_level(group_level));
-    
-    // Check if we actually moved the node
-    if (curr_node->parent->id != new_group->id) 
-    {
-      // Update node with this new group
-      curr_node->set_parent(new_group);
-      num_changes++;
     }
   } // End loop over all nodes
   
