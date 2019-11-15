@@ -77,7 +77,6 @@ class SBM {
     NodePtr       propose_move_for_node(NodePtr, Sampler&);             // Propose a potential group move for a node.
     Proposal_Res  compute_acceptance_prob(EdgeCounts&, NodePtr, NodePtr, double);    // Compute probability of accepting a node group swap
     
-    static double  compute_edge_entropy(EdgeCounts&);                                // Compute change in entropy caused by swapping a node's group
     static void    update_edge_counts(EdgeCounts&, int, NodePtr, NodePtr, NodePtr);  // Update an EdgeCount map after moving a node around to avoid rescanning
     static string  build_group_id(int, int, int);                                    // Builds a group id from a scaffold for generated new groups
 };

@@ -840,16 +840,8 @@ TEST(testSBM, entropy_calculation){
   // Setup simple SBM model
   SBM my_SBM = build_simple_SBM();
   
-  // Compute just the edge-related entropy for first level
-  // Should be (2*log(2/12) + 4*log(4/30) + 1*log(1/5) + 1*log(1) ) = -13.25257
   EdgeCounts l1_edges = my_SBM.gather_edge_counts(1);
-  double edge_entropy = my_SBM.compute_edge_entropy(l1_edges);
-  ASSERT_NEAR(
-    edge_entropy,
-    -13.25257,
-    0.1
-  );
-  
+
   // Compute full entropy at first level of nodes
   double model_entropy = my_SBM.compute_entropy(0);
  
@@ -868,7 +860,6 @@ TEST(testSBM, entropy_calculation){
   NodePtr from_group = node_to_move->parent;
   NodePtr to_group = my_SBM.get_node_by_id("a12", 1);
 
-  
   // Calculate the entropy delta along with acceptance prob
   Proposal_Res proposal_results = my_SBM.compute_acceptance_prob(
     l1_edges,
@@ -882,7 +873,6 @@ TEST(testSBM, entropy_calculation){
   // std::cout << "Moving a1 from a11->a12: prob = " << proposal_results.prob_of_accept << std::endl;
 
   // Now we will actually move the desired node and test to see if entropy has changed
-  
   // Move node
   node_to_move->set_parent(to_group);
  
