@@ -1,4 +1,4 @@
-#include<gtest/gtest.h>
+#include <gtest/gtest.h>
 #include <iostream>
 #include "../helpers.h"
 #include "../SBM.h"
@@ -877,6 +877,12 @@ TEST(testSBM, entropy_calculation){
     from_group,
     to_group
   );
+  
+  double entropy_delta_new = my_SBM.compute_entropy_delta_new(
+    l1_edges,
+    node_to_move,
+    to_group
+  );
 
   // Now we will actually move the desired node and test to see if entropy has changed
   
@@ -893,6 +899,11 @@ TEST(testSBM, entropy_calculation){
     entropy_delta,
     real_entropy_delta,
     0.1
+  );
+  
+  EXPECT_EQ(
+    entropy_delta,
+    entropy_delta_new
   );
   
 };

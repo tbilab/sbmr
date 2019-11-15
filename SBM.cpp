@@ -938,6 +938,91 @@ double SBM::compute_entropy_delta(
 }
 
 
+double SBM::compute_entropy_delta_new(EdgeCounts& level_counts, 
+                                      NodePtr     node_to_update, 
+                                      NodePtr     new_group)
+{
+  int group_level = node_to_update->level + 1;
+  
+  // Get reference to old group that would be swapped for new_group
+  NodePtr old_group = node_to_update->parent;
+  
+  // Figure out how much the group node's degrees will change.
+  double node_degree = node_to_update->degree;
+  double old_group_degree_pre = old_group->degree;
+  double new_group_degree_pre = new_group->degree;
+  double old_group_degree_post = old_group_degree_pre - node_degree;
+  double new_group_degree_post = new_group_degree_pre + node_degree;
+  
+  // Initialize the partial edge entropy sum holders
+  double entropy_pre = 0;
+  double entropy_post = 0;
+  
+  // Gather connection maps for the node and its moved groups as these will have
+  // changes in their entropy contribution
+  std::map<NodePtr, int> node_connections = node_to_update->
+    gather_connections_to_level(group_level);
+  
+  std::map<NodePtr, int> new_group_connections = new_group->
+    gather_connections_to_level(group_level);
+  
+  std::map<NodePtr, int> old_group_connections = old_group->
+    gather_connections_to_level(group_level);
+  
+  // Lambda function to process a pair of groups contribution to edge entropy.
+  // Needs to know what group is contributing the pair with moved_is_old_group. 
+  auto process_group_pair = [&]
+                            (bool moved_is_old_group, 
+                             NodePtr connected_group, 
+                             double edge_count_pre)
+  {
+    // Find out how many edges the node being moved contributed to total
+    // connections between old group and connected group
+    double edges_from_node = node_connections[connected_group];
+    
+    // Now calculate the old and new edge counts we need to compute entropy
+    double edge_count_post = edge_count_pre + 
+      (moved_is_old_group ? -1: 1) * edges_from_node;
+    
+    double moved_degree_pre = moved_is_old_group ? old_group_degree_pre: new_group_degree_pre;
+    double moved_degree_post = moved_is_old_group ? old_group_degree_post: new_group_degree_post;
+    
+    double connected_degree = connected_group->degree;
+    
+    // Calculate entropy contribution pre move 
+    entropy_pre += edge_count_pre > 0 ?
+      edge_count_pre* 
+      log(edge_count_pre / (moved_degree_pre*connected_degree)):
+      0; 
+    
+    // Calculate entropy contribution post move 
+    entropy_post += edge_count_post > 0 ?
+      edge_count_post * 
+      log(edge_count_post / (moved_degree_post*connected_degree)):
+      0;
+  };
+  
+ 
+  // Loop through and calculate the new entropy contribution for each old group connection
+  for(auto con_group_it = old_group_connections.begin(); 
+           con_group_it != old_group_connections.end(); 
+           con_group_it++)
+  {
+    process_group_pair(true, con_group_it->first, con_group_it->second);
+  }
+  
+  // And again loop over new group connections
+  for(auto con_group_it = new_group_connections.begin(); 
+           con_group_it != new_group_connections.end(); 
+           con_group_it++)
+  {
+    process_group_pair(false, con_group_it->first, con_group_it->second);
+  }
+  
+  return entropy_post - entropy_pre;
+}
+
+
 // =============================================================================
 // Calculates acceptance probability of a given move. Calculates entropy delta
 // along with partial probability sums to build entire prob.
@@ -945,121 +1030,194 @@ double SBM::compute_entropy_delta(
 // (P(old->new | group)) )/(Sum_{groups} (frac of node edges group) *
 // (P(new->old | group)) )}
 // =============================================================================
-double SBM::compute_acceptance_prob(EdgeCounts&  level_counts, 
-                                    int          level, 
-                                    NodePtr      updated_node, 
-                                    NodePtr      old_group_orig, 
-                                    NodePtr      new_group_orig)
-{
-  
-  // Default inverse temperature. Will be set in future
-  double beta = 1.5;
-  
-  // Get ids of groups moved, at the level of the move
-  NodePtr old_group = old_group_orig->get_parent_at_level(level);
-  NodePtr new_group = new_group_orig->get_parent_at_level(level);
-  
-  // Find how many possible groups the node could join
-  int num_possible_groups = get_nodes_of_type_at_level(
-    updated_node->type,
-    level).size();
-  
-  // Gather all connections from the moved node to the level of the groups we're
-  // working with by getting a map of group -> num connections for updated node
-  std::map<NodePtr, int> moved_connections_counts = updated_node->
-    gather_connections_to_level(level);
-  
-  // Setup a new edge count maps to keep track of changes
-  EdgeCounts old_edge_counts;
-  EdgeCounts new_edge_counts;
-  
-  // Loop through all the edge counts and extract only the ones that belong to 
-  // the groups that have changes in them.
-  for(auto group_edges_it = level_counts.begin();
-      group_edges_it != level_counts.end();
-      ++group_edges_it)
-  {
-    NodePtr group_r = (group_edges_it->first).first;
-    NodePtr group_s = (group_edges_it->first).second;
-    const int old_edge_count = group_edges_it->second;
-    
-    // Check if we should care about this edge combo. We only care about combos
-    // that contain one or more of the groups that were swapped
-    bool node_left_r = group_r == old_group;
-    bool node_left_s = group_s == old_group;
-    bool node_joined_r = group_r == new_group;
-    bool node_joined_s = group_s == new_group;
-    bool has_changed = node_left_r | node_joined_r | 
-      node_left_s | node_joined_s;
-    
-    if (has_changed)
-    {
-      
-      int new_edge_count = old_edge_count;
-      
-      // If group r or s was the node that the node moved in or out of, we need
-      // to modify the edge connections for the other group. This is because the
-      // non-moved group will be loosing however many connections the node had
-      // to it from moved group when the node leaves it
-      if (node_left_r) new_edge_count -= moved_connections_counts[group_s];
-      if (node_left_s) new_edge_count -= moved_connections_counts[group_r];
-      
-      // The same logic applies in reverse. We will need to add the connections
-      // between the moved group and any groups the node was connected to
-      if (node_joined_r) new_edge_count += moved_connections_counts[group_s];
-      if (node_joined_s) new_edge_count += moved_connections_counts[group_r];
-      
-      // Now update the changed edge count maps with counts. These could stay
-      // the same if the node had no connections to them. In that case we still
-      // need to include them in the delta calculation because the demonimator
-      // includes the raw counts in and out of each group
-      auto edge_pair_key = find_edges(group_r, group_s);
-      old_edge_counts[edge_pair_key] = old_edge_count;
-      new_edge_counts[edge_pair_key] = new_edge_count;
-    }
-    
-  }
-  
-  // Now we can calculate the accept reject scalar using the edge counts we have
-  // updated. When we are moving node i from group r to group s the forumla is
-  // Sum_{all group t} (frac of node edges to t) * (P(s->r | t)) / 
-  // Sum_{all group t} (frac of node edges to t) * (P(r->s | t)).
-  // Loop over all groups node is connected to
-  double P_old_to_new_sum = 0.0;
-  double P_new_to_old_sum = 0.0;
-  for (auto group_it  = moved_connections_counts.begin(); 
-       group_it != moved_connections_counts.end(); 
-       ++group_it)
-  {
-    double frac_cons_to_group = group_it->second / updated_node->degree;
-    double e_t_new = old_edge_counts[find_edges(group_it->first, new_group)];
-    double e_t_old = new_edge_counts[find_edges(group_it->first, old_group)];
-    double e_t = group_it->first->degree;
-    
-    P_old_to_new_sum += frac_cons_to_group * (e_t_new + eps)/
-                                             (e_t + eps*num_possible_groups);
-    P_new_to_old_sum += frac_cons_to_group * (e_t_old + eps)/
-                                             (e_t + eps*num_possible_groups);
-  }
-  
-  // Now calculate partial edge entropy from new counts.
-  double old_entropy_part = compute_edge_entropy(old_edge_counts);
-  
-  // Temporarily swap node parent
-  updated_node->set_parent(new_group);
-  
-  // Calculate the edge entropy of this new arrangement and find difference
-  double entropy_delta = compute_edge_entropy(new_edge_counts) - old_entropy_part;
-  
-  // Return parent
-  updated_node->set_parent(old_group);
-  
-  // Combine calculated terms together
-  double a_calc = exp(-beta*entropy_delta) * (P_old_to_new_sum/P_new_to_old_sum);
-  
-  // Return the min of calculated value and 1 to ensure a valid probability
-  return a_calc < 1 ? a_calc : 1;
-}
+// double SBM::compute_acceptance_prob(EdgeCounts& level_counts, 
+//                                     NodePtr     node_to_update, 
+//                                     NodePtr     new_group)
+// {
+//   
+//   // Default inverse temperature. Will be set in future
+//   double beta = 1.5;
+//   
+//   int group_level = node_to_update->level;
+//   
+//   // Get reference to old group that would be swapped for new_group
+//   NodePtr old_group = node_to_update->parent;
+//   
+//   // Figure out how much the group node's degrees will change.
+//   int node_degree = node_to_update->degree;
+//   int old_group_degree_pre = old_group->degree;
+//   int new_group_degree_pre = new_group->degree;
+//   
+//   int old_group_degree_post = old_group_degree_pre - node_degree;
+//   int new_group_degree_post = new_group_degree_pre + node_degree;
+//   
+//   
+//   // Initialize the partial edge entropy sum holders
+//   double entropy_pre = 0;
+//   double entropy_post = 0;
+//   
+//   std::map<NodePtr, int> node_connections = node_to_update->
+//     gather_connections_to_level(group_level);
+//   
+//   // Gather all connections for the old group as these will have changes in
+//   // their entropy contribution
+//   std::map<NodePtr, int> old_group_connections = old_group->
+//     gather_connections_to_level(group_level);
+//   
+//   // Loop through these and calculate the new entropy contribution for each
+//   for(auto con_group_it = old_group_connections.begin(); 
+//            con_group_it != old_group_connections.end(); 
+//            ++con_group_it)
+//   {
+//     NodePtr connected_group = con_group_it->first;
+//    
+//     
+//     // Find out how many edges the node being moved contributed to total
+//     // connections between old group and connected group
+//     int edges_from_node = node_connections[connected_group];
+//     
+//     // Now calculate the old and new edge counts we need to compute entropy
+//     int edge_count_pre = con_group_it->second;
+//     int edge_count_post = edge_count_pre - edges_from_node;
+//     
+//     int connected_degree_pre = connected_group->degree;
+//     int connected_degree_post = connected_degree_pre - edges_from_node;
+//     
+//     // Calculate entropy contribution pre move 
+//     entropy_pre += edge_count_pre * 
+//                    log(edge_count_pre /
+//                        old_group_degree_pre*connected_degree_pre); 
+//     
+//     // Calculate entropy contribution post move 
+//     entropy_post += edge_count_post * 
+//                     log(edge_count_post /
+//                         old_group_degree_post*connected_degree_post); 
+//   }
+//   
+//   // Now gather connection for the new group...
+//   std::map<NodePtr, int> new_group_connections = new_group->
+//     gather_connections_to_level(group_level);
+//   
+//   // And again loop over them to calculate the new entropy contribution for each
+//   for(auto con_group_it = new_group_connections.begin(); 
+//            con_group_it != new_group_connections.end(); 
+//            ++con_group_it)
+//   {
+//     NodePtr connected_group = con_group_it->first;
+//     
+//     // Find out how many edges the node being moved contributed to total
+//     // connections between old group and connected group
+//     int edges_from_node = node_connections[connected_group];
+//     
+//     // Now calculate the old and new edge counts we need to compute entropy
+//     int edge_count_pre = con_group_it->second;
+//     int edge_count_post = edge_count_pre - edges_from_node;
+//     int connected_degree_pre = connected_group->degree;
+//     int connected_degree_post = connected_degree_pre - edges_from_node;
+//     
+//     // Calculate entropy contribution pre move 
+//     entropy_pre += edge_count_pre * 
+//                    log(edge_count_pre /
+//                        new_group_degree_pre*connected_degree_pre); 
+//                 
+//     // Calculate entropy contribution post move 
+//     entropy_post += edge_count_post * 
+//                     log(edge_count_post /
+//                         new_group_degree_post*connected_degree_post); 
+//   }
+//   
+// 
+//   // Setup a new edge count maps to keep track of changes
+//   EdgeCounts old_edge_counts;
+//   EdgeCounts new_edge_counts;
+//   
+//   // Loop through all the edge counts and extract only the ones that belong to 
+//   // the groups that have changes in them.
+//   for(auto group_edges_it = level_counts.begin();
+//       group_edges_it != level_counts.end();
+//       ++group_edges_it)
+//   {
+//     NodePtr group_r = (group_edges_it->first).first;
+//     NodePtr group_s = (group_edges_it->first).second;
+//     const int old_edge_count = group_edges_it->second;
+//     
+//     // Check if we should care about this edge combo. We only care about combos
+//     // that contain one or more of the groups that were swapped
+//     bool node_left_r = group_r == old_group;
+//     bool node_left_s = group_s == old_group;
+//     bool node_joined_r = group_r == new_group;
+//     bool node_joined_s = group_s == new_group;
+//     bool has_changed = node_left_r | node_joined_r | 
+//       node_left_s | node_joined_s;
+//     
+//     if (has_changed)
+//     {
+//       
+//       int new_edge_count = old_edge_count;
+//       
+//       // If group r or s was the node that the node moved in or out of, we need
+//       // to modify the edge connections for the other group. This is because the
+//       // non-moved group will be loosing however many connections the node had
+//       // to it from moved group when the node leaves it
+//       if (node_left_r) new_edge_count -= moved_connections_counts[group_s];
+//       if (node_left_s) new_edge_count -= moved_connections_counts[group_r];
+//       
+//       // The same logic applies in reverse. We will need to add the connections
+//       // between the moved group and any groups the node was connected to
+//       if (node_joined_r) new_edge_count += moved_connections_counts[group_s];
+//       if (node_joined_s) new_edge_count += moved_connections_counts[group_r];
+//       
+//       // Now update the changed edge count maps with counts. These could stay
+//       // the same if the node had no connections to them. In that case we still
+//       // need to include them in the delta calculation because the demonimator
+//       // includes the raw counts in and out of each group
+//       auto edge_pair_key = find_edges(group_r, group_s);
+//       old_edge_counts[edge_pair_key] = old_edge_count;
+//       new_edge_counts[edge_pair_key] = new_edge_count;
+//     }
+//     
+//   }
+//   
+//   // Now we can calculate the accept reject scalar using the edge counts we have
+//   // updated. When we are moving node i from group r to group s the forumla is
+//   // Sum_{all group t} (frac of node edges to t) * (P(s->r | t)) / 
+//   // Sum_{all group t} (frac of node edges to t) * (P(r->s | t)).
+//   // Loop over all groups node is connected to
+//   double P_old_to_new_sum = 0.0;
+//   double P_new_to_old_sum = 0.0;
+//   for (auto group_it  = moved_connections_counts.begin(); 
+//        group_it != moved_connections_counts.end(); 
+//        ++group_it)
+//   {
+//     double frac_cons_to_group = group_it->second / node_to_update->degree;
+//     double e_t_new = old_edge_counts[find_edges(group_it->first, new_group)];
+//     double e_t_old = new_edge_counts[find_edges(group_it->first, old_group)];
+//     double e_t = group_it->first->degree;
+//     
+//     P_old_to_new_sum += frac_cons_to_group * (e_t_new + eps)/
+//                                              (e_t + eps*num_possible_groups);
+//     P_new_to_old_sum += frac_cons_to_group * (e_t_old + eps)/
+//                                              (e_t + eps*num_possible_groups);
+//   }
+//   
+//   // Now calculate partial edge entropy from new counts.
+//   double old_entropy_part = compute_edge_entropy(old_edge_counts);
+//   
+//   // Temporarily swap node parent
+//   node_to_update->set_parent(new_group);
+//   
+//   // Calculate the edge entropy of this new arrangement and find difference
+//   double entropy_delta = compute_edge_entropy(new_edge_counts) - old_entropy_part;
+//   
+//   // Return parent
+//   node_to_update->set_parent(old_group);
+//   
+//   // Combine calculated terms together
+//   double a_calc = exp(-beta*entropy_delta) * (P_old_to_new_sum/P_new_to_old_sum);
+//   
+//   // Return the min of calculated value and 1 to ensure a valid probability
+//   return a_calc < 1 ? a_calc : 1;
+// }
 
 
 // =============================================================================
