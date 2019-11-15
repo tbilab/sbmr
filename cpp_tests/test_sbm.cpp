@@ -872,14 +872,6 @@ TEST(testSBM, entropy_calculation){
   // Calculate the entropy delta
   double entropy_delta = my_SBM.compute_entropy_delta(
     l1_edges,
-    1,
-    node_to_move,
-    from_group,
-    to_group
-  );
-  
-  double entropy_delta_new = my_SBM.compute_entropy_delta_new(
-    l1_edges,
     node_to_move,
     to_group
   );
@@ -900,11 +892,7 @@ TEST(testSBM, entropy_calculation){
     real_entropy_delta,
     0.1
   );
-  
-  EXPECT_EQ(
-    entropy_delta,
-    entropy_delta_new
-  );
+
   
 };
 
