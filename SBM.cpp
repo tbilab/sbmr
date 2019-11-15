@@ -826,17 +826,23 @@ double SBM::compute_entropy(int level)
 
 
 // =============================================================================
-// Calculates the delta in entropy for whole model caused by swapping the group
-// membership of a given node
+// Calculates acceptance probability of a given move. Calculates entropy delta
+// along with partial probability sums to build entire prob.
 // =============================================================================
-double SBM::compute_entropy_delta(EdgeCounts& level_counts, 
-                                  NodePtr     node_to_update, 
-                                  NodePtr     new_group)
+Proposal_Res SBM::compute_acceptance_prob(EdgeCounts& level_counts,
+                                          NodePtr     node_to_update,
+                                          NodePtr     new_group,
+                                          double      beta)
 {
   int group_level = node_to_update->level + 1;
   
   // Get reference to old group that would be swapped for new_group
   NodePtr old_group = node_to_update->parent;
+  
+  // Grab all groups that could belong to connections
+  double n_possible_groups = get_nodes_of_type_at_level(
+    node_to_update->type,
+    group_level).size();
   
   // Figure out how much the group node's degrees will change.
   double node_degree = node_to_update->degree;
@@ -860,12 +866,15 @@ double SBM::compute_entropy_delta(EdgeCounts& level_counts,
   std::map<NodePtr, int> old_group_connections = old_group->
     gather_connections_to_level(group_level);
   
+  // Initialize edge counts to hold new and old group counts to connected groups
+  EdgeCounts post_move_level_counts;
+
   // Lambda function to process a pair of groups contribution to edge entropy.
   // Needs to know what group is contributing the pair with moved_is_old_group. 
   auto process_group_pair = [&]
-                            (bool moved_is_old_group, 
-                             NodePtr connected_group, 
-                             double edge_count_pre)
+  (bool moved_is_old_group, 
+   NodePtr connected_group, 
+   double edge_count_pre)
   {
     // Find out how many edges the node being moved contributed to total
     // connections between old group and connected group
@@ -880,6 +889,12 @@ double SBM::compute_entropy_delta(EdgeCounts& level_counts,
     
     double connected_degree = connected_group->degree;
     
+    // Record edge counts for after move
+    post_move_level_counts.emplace(
+      find_edges(moved_is_old_group ? old_group: new_group, connected_group),
+      edge_count_post
+    );
+    
     // Calculate entropy contribution pre move 
     entropy_pre += edge_count_pre > 0 ?
       edge_count_pre* 
@@ -893,34 +908,59 @@ double SBM::compute_entropy_delta(EdgeCounts& level_counts,
       0;
   };
   
- 
   // Loop through and calculate the new entropy contribution for each old group connection
   for(auto con_group_it = old_group_connections.begin(); 
-           con_group_it != old_group_connections.end(); 
-           con_group_it++)
+      con_group_it != old_group_connections.end(); 
+      con_group_it++)
   {
     process_group_pair(true, con_group_it->first, con_group_it->second);
   }
   
   // And again loop over new group connections
   for(auto con_group_it = new_group_connections.begin(); 
-           con_group_it != new_group_connections.end(); 
-           con_group_it++)
+      con_group_it != new_group_connections.end(); 
+      con_group_it++)
   {
     process_group_pair(false, con_group_it->first, con_group_it->second);
   }
   
-  return entropy_post - entropy_pre;
+  double pre_move_prob = 0.0;
+  double post_move_prob = 0.0;
+  
+  // And again loop over new group connections
+  for(auto con_group_it = node_connections.begin(); 
+           con_group_it != node_connections.end(); 
+           con_group_it++)
+  {
+    NodePtr group_t = con_group_it->first;
+    
+    double e_it = con_group_it->second;
+    
+    double e_new_t_pre = level_counts[
+      find_edges(old_group, group_t)
+    ];
+    
+    double e_old_t_post = post_move_level_counts[
+      find_edges(new_group, group_t)
+    ];
+    
+    double denom = group_t->degree + eps*n_possible_groups;
+    
+    pre_move_prob  += e_it * (e_new_t_pre + eps) / denom;
+    post_move_prob += e_it * (e_old_t_post + eps) / denom;
+  }
+
+  double entropy_delta = entropy_post - entropy_pre;
+  
+  double acceptance_prob = exp(beta*entropy_delta) * (pre_move_prob/post_move_prob);
+  
+  return Proposal_Res(
+    entropy_delta,
+    acceptance_prob > 1 ? 1: acceptance_prob
+  );
 }
 
 
-// =============================================================================
-// Calculates acceptance probability of a given move. Calculates entropy delta
-// along with partial probability sums to build entire prob.
-// Formula is exp^{-beta*entopy_delta*(Sum_{groups} (frac of node edges group) *
-// (P(old->new | group)) )/(Sum_{groups} (frac of node edges group) *
-// (P(new->old | group)) )}
-// =============================================================================
 // double SBM::compute_acceptance_prob(EdgeCounts& level_counts, 
 //                                     NodePtr     node_to_update, 
 //                                     NodePtr     new_group)

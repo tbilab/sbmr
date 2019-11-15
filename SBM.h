@@ -20,6 +20,7 @@
 class SBM;
 struct Trans_Probs;
 struct State_Dump;
+struct Proposal_Res;
 
 // Some type definitions for cleaning up ugly syntax
 typedef std::shared_ptr<Node>                    NodePtr;
@@ -73,10 +74,8 @@ class SBM {
     State_Dump    get_sbm_state();                                      // Export current state of nodes in model
     int           mcmc_sweep(int, bool);                                // Runs efficient MCMC sweep algorithm on desired node level
     double        compute_entropy(int);                                 // Compute microcononical entropy of current model state at a level
-    double        compute_entropy_delta(EdgeCounts&, NodePtr, NodePtr); // Compute change in entropy caused by swapping a node's group
     NodePtr       propose_move_for_node(NodePtr, Sampler&);             // Propose a potential group move for a node.
-   
-    double  compute_acceptance_prob(EdgeCounts&, NodePtr, NodePtr);    // Compute probability of accepting a node group swap
+    Proposal_Res  compute_acceptance_prob(EdgeCounts&, NodePtr, NodePtr, double);    // Compute probability of accepting a node group swap
     
     static double  compute_edge_entropy(EdgeCounts&);                                // Compute change in entropy caused by swapping a node's group
     static void    update_edge_counts(EdgeCounts&, int, NodePtr, NodePtr, NodePtr);  // Update an EdgeCount map after moving a node around to avoid rescanning
@@ -99,6 +98,14 @@ struct State_Dump {
   vector<string> parent;
   vector<int>    level;
   vector<int>    type;
+};
+
+struct Proposal_Res {
+  double entropy_delta;
+  double prob_of_accept; 
+  Proposal_Res(double e, double p):
+    entropy_delta(e),
+    prob_of_accept(p){};
 };
 
 
