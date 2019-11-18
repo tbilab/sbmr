@@ -402,7 +402,7 @@ TEST(testSBM, calculating_transition_probs){
   EXPECT_EQ("a2, a3", print_node_ids(a1_2->children));
  
   // Calculate move probabilities for node a1
-  Trans_Probs a1_move_probs = my_SBM.get_transition_probs_for_groups(a1);
+  Trans_Probs a1_move_probs = my_SBM.get_transition_probs_for_groups(a1, false);
   EXPECT_EQ("0-1_0, 0-1_1, 0-1_2", print_node_ids(a1_move_probs.group));
   EXPECT_EQ("0-1_0, 0-1_1, 0-1_2", print_node_ids(a1_move_probs.group));
 
@@ -914,7 +914,6 @@ TEST(testSBM, mcmc_sweep){
 
   State_Dump pre_sweep = my_SBM.get_sbm_state();
 
-
   // Run a few rounds of sweeps of the MCMC algorithm on network 
   int num_sweeps = 1000;
 
@@ -940,6 +939,25 @@ TEST(testSBM, mcmc_sweep){
 
   // Make sure that we have a more move-prone model when we have a high epsilon value...
   ASSERT_TRUE(avg_num_moves.at(0) < avg_num_moves.at(epsilons.size() - 1));
+};
+
+
+TEST(testSBM, agglomerative_merging){
+  
+  // Setup simple SBM model
+  SBM my_SBM = build_simple_SBM();
+  
+  int num_initial_groups = my_SBM.get_level(1)->size();
+
+  // Run greedy aglomerative merge
+  my_SBM.agglomerative_merge(1);
+
+  // Make sure that we now have one less group than before
+  EXPECT_EQ(
+    num_initial_groups - my_SBM.get_level(1)->size(),
+    1
+  );
+
 
 };
 

@@ -247,7 +247,8 @@ NodePtr SBM::get_node_from_level(int level) {
 // =============================================================================
 Trans_Probs SBM::get_transition_probs_for_groups(
     NodePtr    node_to_move, 
-    EdgeCounts group_edge_counts
+    EdgeCounts group_edge_counts,
+    bool       ignore_own_group
 ) 
 {
   // Ergodicity tuning parameter
@@ -290,6 +291,10 @@ Trans_Probs SBM::get_transition_probs_for_groups(
        ++potential_group_it)
   {
     NodePtr potential_group = *potential_group_it;
+
+    // If we're ignoring probabilities for the nodes own group, skip calculating for
+    // the node that matches the node to moves current group.
+    if((potential_group->id == node_to_move->parent->id) & ignore_own_group) continue;
     
     // Send currently investigated group to groups vector
     groups.push_back(potential_group);
@@ -338,12 +343,15 @@ Trans_Probs SBM::get_transition_probs_for_groups(
 }
 
 // Calculates its own edge counts if they arent provided
-Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
+Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move,     
+                                                 bool ignore_own_group
+) 
+{
 
   // Gather all the group connection counts at the group level
   EdgeCounts level_counts = gather_edge_counts(node_to_move->level + 1);
   
-  return get_transition_probs_for_groups(node_to_move, level_counts);
+  return get_transition_probs_for_groups(node_to_move, level_counts, ignore_own_group);
 }
 
 
@@ -351,7 +359,8 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move) {
 // Scan through entire SBM and remove all group nodes that have no children. 
 // Returns the number removed
 // =============================================================================
-int SBM::clean_empty_groups(){
+int SBM::clean_empty_groups()
+{
   
   int num_levels = nodes.size();
   int total_deleted = 0;
@@ -502,7 +511,8 @@ NodePtr SBM::attempt_move(
 
   // Calculate the transition probabilities for all possible groups node could join
   Trans_Probs move_probs = get_transition_probs_for_groups(node_to_move, 
-                                                           group_edge_counts);
+                                                           group_edge_counts, 
+                                                           false);
 
   // Initialize a sampler to choose group
   Sampler my_sampler;
@@ -1129,4 +1139,90 @@ Proposal_Res SBM::compute_acceptance_prob(EdgeCounts& level_counts,
     entropy_delta,
     acceptance_prob > 1 ? 1: acceptance_prob
   );
+}
+
+// =============================================================================
+// Merge two groups, placing all nodes that were under group_b under group_a and 
+// deleting group_a from model.
+// =============================================================================
+void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
+{
+
+  std::cout << "Merging " << group_b->id << " into " << group_a->id << std::endl;
+  // Place all the members of group b under group a
+  for (NodePtr member_node : group_b->children)
+  {
+    member_node->set_parent(group_a);
+  }
+
+  // Delete the now empty group_b from the model
+  nodes.at(group_a->level)->erase(group_b->id);
+}  
+
+// =============================================================================
+// Merge two groups at a given level based on the best probability of doing so
+// =============================================================================
+double SBM::agglomerative_merge(int level)
+{
+  // Build a single group for each node at desired level
+  give_every_node_a_group_at_level(level);
+
+  // Grab all the groups we're looking to merge
+  LevelPtr all_groups = get_level(level);
+
+  // Build vectors for recording merges
+  vector<NodePtr> from_group;
+  vector<NodePtr> to_group;
+  vector<double>  move_prob;
+
+  int n_groups = all_groups->size();
+
+  if (n_groups <= 2) throw "To few groups to perform merge.";
+
+  // Reserve proper size for vectors
+  from_group.reserve(n_groups);
+  to_group.reserve(n_groups);
+  move_prob.reserve(n_groups);
+
+  std::cout << "Finding best merge options ==============================" << std::endl;
+
+  // Loop over each new meta-group and find best merge option
+  for (auto group_it = all_groups->begin(); 
+            group_it != all_groups->end();
+            group_it++)
+  {
+    NodePtr curr_group = group_it->second;
+    
+    // Calculate transition probabilities for the current group
+    Trans_Probs moves = get_transition_probs_for_groups(curr_group, true);
+
+    // Find index of best prob of moving
+    int best_move_index = std::distance(moves.probability.begin(), 
+                                        std::max_element(moves.probability.begin(), 
+                                                        moves.probability.end()));
+    
+    // Get the group that belongs to the most likely meta-group to merge into
+    NodePtr group_to_enter = *((moves.group[best_move_index]->children).begin());
+
+    // Record this move's stats
+    from_group.push_back(curr_group);
+    to_group.push_back(group_to_enter);
+    move_prob.push_back(moves.probability[best_move_index]);
+
+    std::cout << curr_group->id << " -> " << group_to_enter->id << ": p = " << moves.probability[best_move_index] << std::endl;
+  }
+
+  // Find best proposed move of the options and merge those two groups
+  int best_move_index = std::distance(move_prob.begin(), 
+                                      std::max_element(move_prob.begin(), 
+                                                       move_prob.end()));
+
+  // Merge the best group pair
+  merge_groups(to_group[best_move_index], from_group[best_move_index]);
+
+  // Erase the meta-group level
+  nodes.erase(level + 1);
+
+                                                
+  return 5.5;
 }

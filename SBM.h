@@ -11,6 +11,7 @@
 #include <memory>
 #include <numeric>
 #include <utility> 
+#include <iostream>
 
 
 // =============================================================================
@@ -63,15 +64,15 @@ class SBM {
     void add_connection(string, string);                               // Adds a connection between two nodes based on their ids
     void add_connection(NodePtr, NodePtr);                             // Adds a connection between two nodes based on their pointers
     void give_every_node_a_group_at_level(int);                        // Builds and assigns a group node for every node in a given level
-    Trans_Probs get_transition_probs_for_groups(NodePtr);              // Calculates probabilities for joining a given new group based on current SBM state
-    Trans_Probs get_transition_probs_for_groups(NodePtr, EdgeCounts);  // Calculates probabilities for joining a given new group based on current SBM state
+    Trans_Probs get_transition_probs_for_groups(NodePtr, bool);              // Calculates probabilities for joining a given new group based on current SBM state
+    Trans_Probs get_transition_probs_for_groups(NodePtr, EdgeCounts, bool);  // Calculates probabilities for joining a given new group based on current SBM state
     int clean_empty_groups();                                          // Scan through levels and remove all group nodes that have no children. Returns # removed
     EdgeCounts gather_edge_counts(int);                                // Builds a id-id paired map of edge counts between nodes of the same level
     NodePtr attempt_move(NodePtr, EdgeCounts &, Sampler &);            // Attempts to move a node to new group, returns true if node moved, false if it stays.
     int run_move_sweep(int);                                           // Run through all nodes in a given level and attempt a group move on each one in turn.
     State_Dump get_sbm_state();                                        // Export current state of nodes in model
     double compute_entropy(int);                                       // Compute microcononical entropy of current model state at a level
-    
+    void merge_groups(NodePtr group_a, NodePtr group_b);               // Merge two groups, placing all nodes that were under group_b under group_a and deleting from model.
     
     // Methods related to the efficient MCMC samping of network
     NodePtr propose_move(NodePtr, double);                 // Propose a potential group move for a node.
@@ -80,6 +81,8 @@ class SBM {
                    bool variable_num_groups, 
                    double eps, 
                    double beta);
+
+    double agglomerative_merge(int level); // Merge two groups at a given level based on the best probability of doing so
 
     Proposal_Res compute_acceptance_prob(EdgeCounts &, NodePtr, NodePtr, double); // Compute probability of accepting a node group swap
     static void update_edge_counts(EdgeCounts &, int, NodePtr, NodePtr, NodePtr); // Update an EdgeCount map after moving a node around to avoid rescanning
