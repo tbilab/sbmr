@@ -914,17 +914,32 @@ TEST(testSBM, mcmc_sweep){
 
   State_Dump pre_sweep = my_SBM.get_sbm_state();
 
+
   // Run a few rounds of sweeps of the MCMC algorithm on network 
-  int num_sweeps = 100;
-  for (int i = 0; i < num_sweeps; i++)
+  int num_sweeps = 1000;
+
+  // Loop over a few different epsilon values
+  vector<double> epsilons = {0.01, 0.9};
+  vector<double> avg_num_moves;
+
+  for (double eps : epsilons)
   {
-    my_SBM.mcmc_sweep(0, true, 0.01, 1.5);
+    int total_num_changes = 0;
+
+    for (int i = 0; i < num_sweeps; i++)
+    {
+      int n_changes = my_SBM.mcmc_sweep(0, false, eps, 1.0);
+      total_num_changes += n_changes;
+    }
+
+    double avg_num_changes = double(total_num_changes)/double(num_sweeps);
+
+    avg_num_moves.push_back(avg_num_changes);
+   // std::cout << std::setw (5) << eps << " -- Avg number of changes = " << avg_num_changes << std::endl; 
   }
 
-  State_Dump post_sweep = my_SBM.get_sbm_state();
-
-  print_state_dump(post_sweep);
-
+  // Make sure that we have a more move-prone model when we have a high epsilon value...
+  ASSERT_TRUE(avg_num_moves.at(0) < avg_num_moves.at(epsilons.size() - 1));
 
 };
 
