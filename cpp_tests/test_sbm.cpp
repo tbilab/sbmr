@@ -950,14 +950,13 @@ TEST(testSBM, agglomerative_merging){
   int num_initial_groups = my_SBM.get_level(1)->size();
 
   // Run greedy aglomerative merge
-  my_SBM.agglomerative_merge(1);
+  my_SBM.agglomerative_merge(1, true, 5, 0.01);
 
   // Make sure that we now have one less group than before
   EXPECT_EQ(
     num_initial_groups - my_SBM.get_level(1)->size(),
     1
   );
-
 
 };
 

@@ -1162,8 +1162,14 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 // =============================================================================
 // Merge two groups at a given level based on the best probability of doing so
 // =============================================================================
-double SBM::agglomerative_merge(int level)
+double SBM::agglomerative_merge(
+  int level, 
+  bool greedy, 
+  int n_checks_per_group,
+  double eps)
 {
+  int meta_level = level + 1;
+
   // Build a single group for each node at desired level
   give_every_node_a_group_at_level(level);
 
@@ -1173,56 +1179,81 @@ double SBM::agglomerative_merge(int level)
   // Build vectors for recording merges
   vector<NodePtr> from_group;
   vector<NodePtr> to_group;
-  vector<double>  move_prob;
+  vector<double>  move_delta;
 
-  int n_groups = all_groups->size();
-
-  if (n_groups <= 2) throw "To few groups to perform merge.";
-
-  // Reserve proper size for vectors
-  from_group.reserve(n_groups);
-  to_group.reserve(n_groups);
-  move_prob.reserve(n_groups);
+  // Make sure doing a merge makes sense
+  if (all_groups->size() <= 2) throw "To few groups to perform merge.";
 
   std::cout << "Finding best merge options ==============================" << std::endl;
 
-  // Loop over each new meta-group and find best merge option
+  // Gather edge-counts for metagroups
+  EdgeCounts metagroup_edges = gather_edge_counts(meta_level);
+
+  // Loop over each group and find best merge option
   for (auto group_it = all_groups->begin(); 
             group_it != all_groups->end();
             group_it++)
   {
     NodePtr curr_group = group_it->second;
-    
-    // Calculate transition probabilities for the current group
-    Trans_Probs moves = get_transition_probs_for_groups(curr_group, true);
 
-    // Find index of best prob of moving
-    int best_move_index = std::distance(moves.probability.begin(), 
-                                        std::max_element(moves.probability.begin(), 
-                                                        moves.probability.end()));
-    
-    // Get the group that belongs to the most likely meta-group to merge into
-    NodePtr group_to_enter = *((moves.group[best_move_index]->children).begin());
+    list<NodePtr> metagroups_to_search;
 
-    // Record this move's stats
-    from_group.push_back(curr_group);
-    to_group.push_back(group_to_enter);
-    move_prob.push_back(moves.probability[best_move_index]);
+    // If we're running algorithm in greedy mode we should just
+    // add every possible group to the groups-to-search list
+    if (greedy) 
+    {
+      // Get a list of all the potential merges for group
+      metagroups_to_search = get_nodes_of_type_at_level(
+        curr_group->type, 
+        meta_level 
+      );
+    } 
+    else  
+    {
+      // Otherwise, we should sample a given number of groups to check
+      for (int i = 0; i < n_checks_per_group; i++)
+      {
+        // Sample a group from potential groups
+        metagroups_to_search.push_back(propose_move(curr_group, eps));
+      }
+    }
 
-    std::cout << curr_group->id << " -> " << group_to_enter->id << ": p = " << moves.probability[best_move_index] << std::endl;
+    // Now that we have gathered all the merges to check, we can loop
+    // through them and check entropy changes
+    for (NodePtr metagroup : metagroups_to_search) 
+    {
+      // Get group that the metagroup belongs to
+      NodePtr merge_group = *((metagroup->children).begin());
+
+      // Skip group if it is the current group for this node
+      if (merge_group->id == curr_group->id) continue;
+
+      // Calculate entropy delta for move
+      double entropy_delta = make_proposal_decision(
+        metagroup_edges,
+        curr_group,
+        metagroup,
+        eps,
+        1.0 
+      ).entropy_delta;
+      
+      from_group.push_back(curr_group);
+      to_group.push_back(merge_group);
+      move_delta.push_back(entropy_delta);
+    } 
   }
 
   // Find best proposed move of the options and merge those two groups
-  int best_move_index = std::distance(move_prob.begin(), 
-                                      std::max_element(move_prob.begin(), 
-                                                       move_prob.end()));
+  int best_move_index = std::distance(move_delta.begin(), 
+                                      std::min_element(move_delta.begin(), 
+                                                       move_delta.end()));
 
   // Merge the best group pair
   merge_groups(to_group[best_move_index], from_group[best_move_index]);
 
   // Erase the meta-group level
-  nodes.erase(level + 1);
+  clean_empty_groups();
 
-                                                
-  return 5.5;
+  // Return the move delta for the chosen move             
+  return move_delta[best_move_index];
 }

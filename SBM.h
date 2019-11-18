@@ -76,14 +76,24 @@ class SBM {
     
     // Methods related to the efficient MCMC samping of network
     NodePtr propose_move(NodePtr, double);                 // Propose a potential group move for a node.
-    Proposal_Res make_proposal_decision(EdgeCounts &, NodePtr, NodePtr, double, double); // Make a decision on the proposed new group for node
+    
+    Proposal_Res make_proposal_decision(
+      EdgeCounts &edge_counts,
+      NodePtr node,
+      NodePtr new_group,
+      double eps,
+      double beta); // Make a decision on the proposed new group for node
+    
     int mcmc_sweep(int level,                    // Runs efficient MCMC sweep algorithm on desired node level
                    bool variable_num_groups, 
                    double eps, 
                    double beta);
 
-    double agglomerative_merge(int level); // Merge two groups at a given level based on the best probability of doing so
-
+    double agglomerative_merge(
+      int level, 
+      bool greedy, 
+      int n_checks_per_group,
+      double eps);  // Merge two groups at a given level based on the best probability of doing so
     Proposal_Res compute_acceptance_prob(EdgeCounts &, NodePtr, NodePtr, double); // Compute probability of accepting a node group swap
     static void update_edge_counts(EdgeCounts &, int, NodePtr, NodePtr, NodePtr); // Update an EdgeCount map after moving a node around to avoid rescanning
     static string build_group_id(int, int, int);                                  // Builds a group id from a scaffold for generated new groups
