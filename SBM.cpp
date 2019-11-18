@@ -648,7 +648,7 @@ State_Dump SBM::get_sbm_state(){
 // =============================================================================
 // Propose a potential group move for a node.
 // =============================================================================
-NodePtr SBM::propose_move(NodePtr node)
+NodePtr SBM::propose_move(NodePtr node, double eps)
 {
   int group_level = node->level + 1;
   
@@ -682,6 +682,7 @@ Proposal_Res SBM::make_proposal_decision(
     EdgeCounts &edge_counts,
     NodePtr node,
     NodePtr new_group,
+    double eps,
     double beta)
 {
   // The level that this proposal is taking place on
@@ -845,7 +846,7 @@ int SBM::mcmc_sweep(int level, bool variable_num_groups)
   // Calculate edge counts
   EdgeCounts level_edges = gather_edge_counts(level);
   
-  
+
   // Get all the nodes at the given level in a shuffleable vector format
   // Initialize vector to hold nodes
   vector<NodePtr> node_vec;
@@ -858,9 +859,7 @@ int SBM::mcmc_sweep(int level, bool variable_num_groups)
   
   // Shuffle node order
   std::random_shuffle(node_vec.begin(), node_vec.end());
-  
-  // Setup sampler
-  Sampler sampler;
+
   
   // Loop through each node
   for (auto node_it = node_vec.begin(); node_it != node_vec.end(); ++node_it)
@@ -868,13 +867,14 @@ int SBM::mcmc_sweep(int level, bool variable_num_groups)
     NodePtr curr_node = *node_it;
     
     // Get a move proposal
-    NodePtr proposed_new_group = propose_move(curr_node);
+    NodePtr proposed_new_group = propose_move(curr_node, eps);
     
     // Calculate acceptance probability based on posterior changes
-    Proposal_Res proposal_results = compute_acceptance_prob(
+    Proposal_Res proposal_results = make_proposal_decision(
       level_edges,
       curr_node,
       proposed_new_group,
+      eps,
       beta
     );
     

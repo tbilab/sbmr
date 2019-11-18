@@ -649,6 +649,7 @@ TEST(testSBM, edge_count_map){
 
 TEST(testSBM, node_move_proposals){
   double tol = 0.01;
+  double eps = 0.01;
   SBM my_SBM = build_simple_SBM();
 
   NodePtr a1 = my_SBM.get_node_by_id("a1");
@@ -664,7 +665,7 @@ TEST(testSBM, node_move_proposals){
   for (int i = 0; i < num_trials; ++i)
   {
     // Do move attempt (dry run)
-    NodePtr new_group = my_SBM.propose_move(a1);
+    NodePtr new_group = my_SBM.propose_move(a1, eps);
 
     if (new_group->id == old_group->id) num_times_no_move++;
   }
@@ -676,7 +677,6 @@ TEST(testSBM, node_move_proposals){
   double two = 2;
   double six = 6;
   double four = 4;
-  double eps = 0.01;
   
   ASSERT_NEAR(
     (two + eps)/(six + four*eps),

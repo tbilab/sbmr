@@ -76,8 +76,8 @@ class SBM {
     
     
     // Methods related to the efficient MCMC samping of network
-    NodePtr propose_move(NodePtr);                 // Propose a potential group move for a node.
-    Proposal_Res make_proposal_decision(EdgeCounts &, NodePtr, NodePtr, double); // Make a decision on the proposed new group for node
+    NodePtr propose_move(NodePtr, double);                 // Propose a potential group move for a node.
+    Proposal_Res make_proposal_decision(EdgeCounts &, NodePtr, NodePtr, double, double); // Make a decision on the proposed new group for node
 
     Proposal_Res compute_acceptance_prob(EdgeCounts &, NodePtr, NodePtr, double); // Compute probability of accepting a node group swap
     static void update_edge_counts(EdgeCounts &, int, NodePtr, NodePtr, NodePtr); // Update an EdgeCount map after moving a node around to avoid rescanning
