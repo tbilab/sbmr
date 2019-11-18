@@ -80,6 +80,19 @@ inline float avg_last_n(vector<int> vec, int n){
                          0.0 ) / float(n);
 }
 
+// Print a state dump for debugging purposes
+inline void print_state_dump(State_Dump state)
+{
+  int n = state.id.size();
+
+  for (int i = 0; i < n; i++)
+  {
+    std::cout << std::setw (7) << state.id[i] << ", " 
+              << std::setw (7) << state.parent[i] << ", " 
+              << std::setw (2) << state.level[i] << ", " << std::endl;
+  }
+}
+
 
 TEST(testSBM, basic){
   SBM my_SBM;
@@ -892,6 +905,27 @@ TEST(testSBM, entropy_calculation){
     proposal_results.entropy_delta,
     entropy_delta
   );
+};
+
+TEST(testSBM, mcmc_sweep){
+  
+  // Setup simple SBM model
+  SBM my_SBM = build_simple_SBM();
+
+  State_Dump pre_sweep = my_SBM.get_sbm_state();
+
+  // Run a few rounds of sweeps of the MCMC algorithm on network 
+  int num_sweeps = 100;
+  for (int i = 0; i < num_sweeps; i++)
+  {
+    my_SBM.mcmc_sweep(0, true, 0.01, 1.5);
+  }
+
+  State_Dump post_sweep = my_SBM.get_sbm_state();
+
+  print_state_dump(post_sweep);
+
+
 };
 
 int main(int argc, char* argv[]){

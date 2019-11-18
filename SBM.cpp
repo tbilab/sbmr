@@ -596,7 +596,8 @@ int SBM::run_move_sweep(int level)
 // =============================================================================
 // Export current state of nodes in model
 // =============================================================================
-State_Dump SBM::get_sbm_state(){
+State_Dump SBM::get_sbm_state()
+{
   // Initialize the return struct
   State_Dump state; 
   
@@ -832,10 +833,11 @@ Proposal_Res SBM::make_proposal_decision(
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-int SBM::mcmc_sweep(int level, bool variable_num_groups) 
+int SBM::mcmc_sweep(int level, 
+                    bool variable_num_groups, 
+                    double eps, 
+                    double beta) 
 {
-  double eps = 0.01;
-  double beta = 1.5;
   
   int num_changes = 0;
   int group_level = level + 1;
@@ -846,13 +848,14 @@ int SBM::mcmc_sweep(int level, bool variable_num_groups)
   // Calculate edge counts
   EdgeCounts level_edges = gather_edge_counts(level);
   
-
   // Get all the nodes at the given level in a shuffleable vector format
   // Initialize vector to hold nodes
   vector<NodePtr> node_vec;
   node_vec.reserve(node_map->size());
   // Fill in vector with map elements
-  for (auto node_it = node_map->begin(); node_it != node_map->end(); ++node_it)
+  for (auto node_it = node_map->begin(); 
+            node_it != node_map->end(); 
+            node_it++)
   {
     node_vec.push_back(node_it->second);
   }
@@ -860,7 +863,6 @@ int SBM::mcmc_sweep(int level, bool variable_num_groups)
   // Shuffle node order
   std::random_shuffle(node_vec.begin(), node_vec.end());
 
-  
   // Loop through each node
   for (auto node_it = node_vec.begin(); node_it != node_vec.end(); ++node_it)
   {
@@ -868,6 +870,10 @@ int SBM::mcmc_sweep(int level, bool variable_num_groups)
     
     // Get a move proposal
     NodePtr proposed_new_group = propose_move(curr_node, eps);
+
+    // If the propsosed group is the nodes current group, we don't need to waste
+    // time checking because decision will always result in same state.
+    if(curr_node->parent->id == proposed_new_group->id) continue;
     
     // Calculate acceptance probability based on posterior changes
     Proposal_Res proposal_results = make_proposal_decision(
@@ -879,12 +885,12 @@ int SBM::mcmc_sweep(int level, bool variable_num_groups)
     );
     
     bool move_accepted = sampler.draw_unif() < proposal_results.prob_of_accept;
-    
+
     if (move_accepted) 
     {
       // Update edge counts 
       update_edge_counts(level_edges, 
-                         level, 
+                         group_level, 
                          curr_node, 
                          curr_node->parent, 
                          proposed_new_group);
