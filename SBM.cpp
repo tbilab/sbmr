@@ -675,6 +675,158 @@ NodePtr SBM::propose_move(NodePtr node)
     sampler.sample(rand_neighbor->get_connections_to_level(group_level));
 }
 
+// =============================================================================
+// Make a decision on the proposed new group for node
+// =============================================================================
+Proposal_Res SBM::make_proposal_decision(
+    EdgeCounts &edge_counts,
+    NodePtr node,
+    NodePtr new_group,
+    double beta)
+{
+  // The level that this proposal is taking place on
+  int group_level = node->level + 1;
+
+  // Reference to old group that would be swapped for new_group
+  NodePtr old_group = node->parent;
+  
+  // Grab number of groups that could belong to connections of node
+  double n_possible_groups = get_nodes_of_type_at_level(node->type, group_level)
+    .size();
+
+  // Grab degree of the node to move
+  double node_degree = node->degree;
+
+  // Get degrees of the two groups pre-move
+  double old_group_degree_pre = old_group->degree;
+  double new_group_degree_pre = new_group->degree;
+
+  // Get degrees of the two groups post-move
+  double old_group_degree_post = old_group_degree_pre - node_degree;
+  double new_group_degree_post = new_group_degree_pre + node_degree;
+ 
+  // Initialize the partial edge entropy sum holders
+  double entropy_pre = 0;
+  double entropy_post = 0;
+
+  // Gather connection maps for the node and its moved groups as these will have
+  // changes in their entropy contribution
+  std::map<NodePtr, int> node_edges = node->
+    gather_connections_to_level(group_level);
+
+  std::map<NodePtr, int> new_group_edges = new_group->
+    gather_connections_to_level(group_level);
+
+  std::map<NodePtr, int> old_group_edges = old_group->
+    gather_connections_to_level(group_level);
+ 
+  // Initialize edge counts to hold new and old group counts to connected groups
+  EdgeCounts post_move_edge_counts;
+
+  // Lambda function to process a pair of groups contribution to edge entropy.
+  // Needs to know what group is contributing the pair with moved_is_old_group.
+  auto process_group_pair = [&](bool old_group_pair,
+                                NodePtr neighbor_group,
+                                double edge_count_pre) 
+  {
+    // How many edges does the node being moved contributed to total
+    // edges between group node and neighbor group?
+    double edges_from_node = node_edges[neighbor_group];
+
+    // The old and new edge counts we need to compute entropy
+    // If we're looking at the neighbor groups for the old group we need to 
+    // subtract the edges the node contributed, otherwise we need to add.
+    double edge_count_post = edge_count_pre + 
+      (old_group_pair ? -1: 1) * edges_from_node;
+    
+    // Grab the degree of the group node for pre and post depending on which pair we're
+    // looking at.
+    double moved_degree_pre = old_group_pair ? old_group_degree_pre: new_group_degree_pre;
+    double moved_degree_post = old_group_pair ? old_group_degree_post: new_group_degree_post;
+    
+    // Neighbor node degree
+    double neighbor_degree = neighbor_group->degree;
+    
+    // Record edge counts for after move for pair
+    post_move_edge_counts.emplace(
+      find_edges(old_group_pair ? old_group: new_group, neighbor_group),
+      edge_count_post
+    );
+    
+    // Calculate entropy contribution pre move 
+    entropy_pre += edge_count_pre > 0 ?
+      edge_count_pre* 
+      log(edge_count_pre / (moved_degree_pre*neighbor_degree)):
+      0; 
+    
+    // Calculate entropy contribution post move 
+    entropy_post += edge_count_post > 0 ?
+      edge_count_post * 
+      log(edge_count_post / (moved_degree_post*neighbor_degree)):
+      0;
+  };
+
+  // Loop through and calculate the ntropy contribution for each pair of 
+  // old group - neighbor
+  for(auto con_group_it = old_group_edges.begin(); 
+           con_group_it != old_group_edges.end(); 
+           con_group_it++)
+  {
+    process_group_pair(true, con_group_it->first, con_group_it->second);
+  }
+  
+  // Do the same for the new group - neighbor
+  for(auto con_group_it = new_group_edges.begin(); 
+           con_group_it != new_group_edges.end(); 
+           con_group_it++)
+  {
+    process_group_pair(false, con_group_it->first, con_group_it->second);
+  }
+
+  // Now we move on to calculating the probability ratios for the node moving 
+  // from old->new and then new->old assuming node was already in new.  
+  double pre_move_prob = 0.0;
+  double post_move_prob = 0.0;
+  
+  // Loop over all the node's connections to neighbor groups
+  for(auto con_group_it = node_edges.begin(); 
+           con_group_it != node_edges.end(); 
+           con_group_it++)
+  {
+    NodePtr group_t = con_group_it->first;
+    
+    // Edges from node to group t
+    double e_it = con_group_it->second;
+    
+    // Edges from new group to t pre move...
+    double e_new_t_pre = edge_counts[
+      find_edges(old_group, group_t)
+    ];
+    
+    // Edges from old group to t post move...
+    double e_old_t_post = post_move_edge_counts[
+      find_edges(new_group, group_t)
+    ];
+    
+    // Denominator of both probability fractions
+    double denom = group_t->degree + eps*n_possible_groups;
+    
+    // Add new components to both the pre and post move probabilities. 
+    pre_move_prob  += e_it * (e_new_t_pre + eps) / denom;
+    post_move_prob += e_it * (e_old_t_post + eps) / denom;
+  }
+
+  // Now we can clean up all the calculations into to entropy delta and the probability
+  // ratio for the moves and use those to calculate the acceptance probability for 
+  // the proposed move.
+  double entropy_delta = entropy_post - entropy_pre;
+  double acceptance_prob = exp(beta*entropy_delta) * (pre_move_prob/post_move_prob);
+  
+  return Proposal_Res(
+    entropy_delta,
+    acceptance_prob > 1 ? 1: acceptance_prob
+  );
+}
 
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
