@@ -46,6 +46,7 @@ class SBM {
     LevelMap nodes;                  // A map keyed by level integer of each level of nodes
     std::set<int> unique_node_types; // Vector storing all the unique types of nodes seen. Used to make sure the correct move proposals are made
     double eps;                      // Parameter used to inforce ergodicity in MCMC sampling. Defaults to 0.01.
+    Sampler sampler;                 // A random sampler generation class. 
 
     // ==========================================
     // Methods
@@ -72,7 +73,10 @@ class SBM {
     State_Dump get_sbm_state();                                        // Export current state of nodes in model
     int mcmc_sweep(int, bool);                                         // Runs efficient MCMC sweep algorithm on desired node level
     double compute_entropy(int);                                       // Compute microcononical entropy of current model state at a level
-    NodePtr propose_move_for_node(NodePtr, Sampler &);                 // Propose a potential group move for a node.
+    
+    
+    // Methods related to the efficient MCMC samping of network
+    NodePtr propose_move(NodePtr);                 // Propose a potential group move for a node.
     Proposal_Res compute_acceptance_prob(EdgeCounts &, NodePtr, NodePtr, double); // Compute probability of accepting a node group swap
     static void update_edge_counts(EdgeCounts &, int, NodePtr, NodePtr, NodePtr); // Update an EdgeCount map after moving a node around to avoid rescanning
     static string build_group_id(int, int, int);                                  // Builds a group id from a scaffold for generated new groups

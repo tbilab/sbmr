@@ -4,7 +4,8 @@
 // Constructor. Just sets default epsilon value right now.
 // =============================================================================
 SBM::SBM():
-  eps(0.01){}
+  eps(0.01),
+  sampler(42){}
 
 
 // =============================================================================
@@ -647,7 +648,7 @@ State_Dump SBM::get_sbm_state(){
 // =============================================================================
 // Propose a potential group move for a node.
 // =============================================================================
-NodePtr SBM::propose_move_for_node(NodePtr node, Sampler& sampler)
+NodePtr SBM::propose_move(NodePtr node)
 {
   int group_level = node->level + 1;
   
@@ -678,7 +679,8 @@ NodePtr SBM::propose_move_for_node(NodePtr node, Sampler& sampler)
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-int SBM::mcmc_sweep(int level, bool variable_num_groups) {
+int SBM::mcmc_sweep(int level, bool variable_num_groups) 
+{
   double eps = 0.01;
   double beta = 1.5;
   
@@ -714,7 +716,7 @@ int SBM::mcmc_sweep(int level, bool variable_num_groups) {
     NodePtr curr_node = *node_it;
     
     // Get a move proposal
-    NodePtr proposed_new_group = propose_move_for_node(curr_node, sampler);
+    NodePtr proposed_new_group = propose_move(curr_node);
     
     // Calculate acceptance probability based on posterior changes
     Proposal_Res proposal_results = compute_acceptance_prob(
