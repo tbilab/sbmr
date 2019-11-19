@@ -9,7 +9,12 @@ echo "==========================================================================
 
 g++ -std=c++11 -c Node.cpp SBM.cpp helpers.cpp Sampler.cpp
 
-g++ -std=c++11 cpp_tests/tests-main.o Node.o helpers.o Sampler.o cpp_tests/tests-node.cpp cpp_tests/tests-sampler.cpp -o cpp_tests/run_tests.o 
+g++ -std=c++11 cpp_tests/tests-main.o \
+  Node.o SBM.o helpers.o Sampler.o \
+  cpp_tests/tests-node.cpp \
+  cpp_tests/tests-sampler.cpp \
+  cpp_tests/tests-sbm.cpp \
+  -o cpp_tests/run_tests.o 
 
 ./cpp_tests/run_tests.o
 
