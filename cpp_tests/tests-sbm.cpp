@@ -5,6 +5,7 @@
 #include "../helpers.h"
 #include "../SBM.h"
 
+
 // Loads a simple bipartite sbm model with optional hierarchy added
 SBM build_simple_SBM()
 {
@@ -574,41 +575,41 @@ TEST_CASE("Basic MCMC sweeps", "[SBM]")
 }
 
 
-// TEST_CASE("Agglomerative merge steps", "[SBM]")
-// {
-//     // Setup simple SBM model
-//     SBM my_SBM = build_simple_SBM();
+TEST_CASE("Agglomerative merge steps", "[SBM]")
+{
+    // Setup simple SBM model
+    SBM my_SBM = build_simple_SBM();
 
-//     int num_initial_groups = my_SBM.get_level(1)->size();
-//     double initial_entropy = my_SBM.compute_entropy(0);
+    int num_initial_groups = my_SBM.get_level(1)->size();
+    double initial_entropy = my_SBM.compute_entropy(0);
 
-//     // Run greedy aglomerative merge with best single merge done
-//     Merge_Res single_merge = my_SBM.agglomerative_merge(1, true, 5, 1, 0.01);
+    // Run greedy aglomerative merge with best single merge done
+    Merge_Res single_merge = my_SBM.agglomerative_merge(1, true, 5, 1, 0.01);
 
-//     // Make sure that we now have one less group than before
-//     REQUIRE(
-//         1 == 
-//         (num_initial_groups - my_SBM.get_level(1)->size())
-//     );
+    // Make sure that we now have one less group than before
+    REQUIRE(
+        1 == 
+        (num_initial_groups - my_SBM.get_level(1)->size())
+    );
 
-//     // Make sure entropy has gone down as we would expect
-//     REQUIRE(initial_entropy > single_merge.entropy);
+    // Make sure entropy has gone down as we would expect
+    REQUIRE(initial_entropy > single_merge.entropy);
 
-//     // Run again but this time merging the best 2
-//     SBM new_SBM = build_simple_SBM();
+    // Run again but this time merging the best 2
+    SBM new_SBM = build_simple_SBM();
 
-//     // Run greedy aglomerative merge with best single merge done
-//     Merge_Res double_merge = new_SBM.agglomerative_merge(1, true, 5, 2, 0.01);
+    // Run greedy aglomerative merge with best single merge done
+    Merge_Res double_merge = new_SBM.agglomerative_merge(1, true, 5, 2, 0.01);
 
-//     // Make sure that we now have one less group than before
-//     REQUIRE(
-//         2 == 
-//         num_initial_groups - new_SBM.get_level(1)->size()
-//     );
+    // Make sure that we now have one less group than before
+    REQUIRE(
+        2 == 
+        num_initial_groups - new_SBM.get_level(1)->size()
+    );
 
-//     // Entropy should go down even more with two merges
-//     REQUIRE(single_merge.entropy > double_merge.entropy);
-// }
+    // Entropy should go down even more with two merges
+    REQUIRE(single_merge.entropy > double_merge.entropy);
+}
 
 
 // Currently not working due to bugs in agglomerative merging 

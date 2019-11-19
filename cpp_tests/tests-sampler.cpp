@@ -5,6 +5,7 @@
 #include "../Sampler.h"
 #include "../helpers.h"
 
+
 TEST_CASE("Vector Normalization", "[Sampler]")
 {
   double tol = 0.01;

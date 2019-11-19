@@ -1,14 +1,19 @@
 echo $PWD
 
-echo "=============================================================================\nCompiling files..."
+echo "=============================================================================\nCompiling Classes..."
 echo "=============================================================================\n"
-# # Compile files so we can link
-# g++ -std=c++11 -c Node.cpp SBM.cpp helpers.cpp Sampler.cpp
 
-# g++ -std=c++11 cpp_tests/tests-main.cpp -c -o cpp_tests/tests-main.o
-
+# Compile the main classes
 g++ -std=c++11 -c Node.cpp SBM.cpp helpers.cpp Sampler.cpp
 
+
+
+echo "=============================================================================\nCompiling Tests..."
+echo "=============================================================================\n"
+# Compile the entryway to the tests. This only needs to happen once
+# g++ -std=c++11 cpp_tests/tests-main.cpp -c -o cpp_tests/tests-main.o
+
+# Compile all the tests
 g++ -std=c++11 cpp_tests/tests-main.o \
   Node.o SBM.o helpers.o Sampler.o \
   cpp_tests/tests-node.cpp \
@@ -16,43 +21,18 @@ g++ -std=c++11 cpp_tests/tests-main.o \
   cpp_tests/tests-sbm.cpp \
   -o cpp_tests/run_tests.o 
 
+
+
+echo "=============================================================================\nRunning Tests..."
+echo "=============================================================================\n"
+
+# Run tests
 ./cpp_tests/run_tests.o
 
+
+
+echo "=============================================================================\nCleaning Up..."
+echo "=============================================================================\n"
 # Cleanup the compiled classes so RCpp doesn't get mad
 rm *.o
 
-# echo "=============================================================================\nTesting Sampler.cpp"
-# echo "=============================================================================\n"
-# g++ -std=c++11 \
-#   -isystem ${ISYSTEM} \
-#   -pthread cpp_tests/test_sampler.cpp Sampler.o helpers.o Node.o\
-#   ${LIBGTEST} -o my_googletest
-# ./my_googletest
-
-
-# echo "=============================================================================\nTesting Node.cpp"
-# echo "=============================================================================\n"
-# g++ -std=c++11 \
-#   -isystem ${ISYSTEM} \
-#   -pthread cpp_tests/test_node.cpp Node.o helpers.o\
-#   ${LIBGTEST} -o my_googletest
-# ./my_googletest
-
-
-# echo "=============================================================================\nTesting SBM.cpp"
-# echo "=============================================================================\n"
-# g++ -std=c++11 \
-#   -isystem ${ISYSTEM} \
-#   -pthread cpp_tests/test_sbm.cpp Node.o SBM.o helpers.o Sampler.o\
-#   ${LIBGTEST} -o my_googletest
-# ./my_googletest
-
-
-# g++ -std=c++11 \
-#   -isystem ${ISYSTEM} \
-#   -pthread cpp_tests/test_sbm.cpp Node.o SBM.o helpers.o Sampler.o\
-#   ${LIBGTEST} -o my_googletest
-
-# Cleanup the compiled files so RCpp doesn't get mad
-# rm *.o
-# rm my_googletest
