@@ -1,12 +1,12 @@
-#include<gtest/gtest.h>
+#include "catch.hpp"
+
 #include <iostream>
-#include <vector>
-#include <memory>
 
 #include "../Sampler.h"
 #include "../helpers.h"
 
-TEST(testSampler, vector_normalization){
+TEST_CASE("Vector Normalization", "[Sampler]")
+{
   double tol = 0.01;
   // Setup generator
   Sampler my_sampler;
@@ -17,34 +17,26 @@ TEST(testSampler, vector_normalization){
   // Normalize vector
   std::vector<double> vec_norm = normalize_vector(vec_raw);
   
-  EXPECT_EQ(vec_norm.size(), vec_raw.size());
-  ASSERT_NEAR(vec_norm[0], 0.1, tol);
-  ASSERT_NEAR(vec_norm[1], 0.2, tol);
-  ASSERT_NEAR(vec_norm[2], 0.3, tol);
-  ASSERT_NEAR(vec_norm[3], 0.4, tol);
+  REQUIRE(vec_norm.size() == vec_raw.size());
+
+  REQUIRE(vec_norm[0] == Approx(0.1).epsilon(tol));
+  REQUIRE(vec_norm[1] == Approx(0.2).epsilon(tol));
+  REQUIRE(vec_norm[2] == Approx(0.3).epsilon(tol));
+  REQUIRE(vec_norm[3] == Approx(0.4).epsilon(tol));
 }
 
-TEST(testSampler, basic){
-  // Setup generator
-  Sampler my_sampler;
-
-  double drawn_value = my_sampler.draw_unif();
-
-  EXPECT_TRUE((drawn_value < 1.0) & (drawn_value > 0.0));
-}
-
-TEST(testSampler, set_seeds){
-  
+TEST_CASE("Setting Seeds", "[Sampler]")
+{  
   // Setup multuple generators with same seed
   Sampler sampler_1(42);
   Sampler sampler_2(42);
   
   // The two samplers should give back the same result
-  EXPECT_TRUE(sampler_1.draw_unif() == sampler_2.draw_unif());
+  REQUIRE(sampler_1.draw_unif() == sampler_2.draw_unif());
 }
 
-TEST(testSampler, lots_of_samples){
-  
+TEST_CASE("Lots of Samples", "[Sampler]")
+{
   Sampler my_sampler;
   
   int num_samples = 1000;
@@ -60,12 +52,12 @@ TEST(testSampler, lots_of_samples){
     if (current_draw > max_draw) max_draw = current_draw;
   }
   
-  EXPECT_TRUE(min_draw > 0.0);
-  EXPECT_TRUE(max_draw < 1.0);
+  REQUIRE(min_draw > 0.0);
+  REQUIRE(max_draw < 1.0);
 }
 
-TEST(testSampler, drawing_from_weights){
-
+TEST_CASE("Drawing from weighted vector", "[Sampler]")
+{
   Sampler my_sampler;
 
   // Setup some weights
@@ -74,7 +66,8 @@ TEST(testSampler, drawing_from_weights){
   int chosen_index = my_sampler.sample(weights);
 
   // Hopefully chosen index is within range...
-  EXPECT_TRUE(chosen_index < 4 & chosen_index > 0);
+  REQUIRE(chosen_index < 4);
+  REQUIRE(chosen_index > 0);
 
   int num_samples = 10000;
   int times_el_3_chosen = 0;
@@ -89,16 +82,14 @@ TEST(testSampler, drawing_from_weights){
 
   // Make sure that the element was chosen roughly as much as it should have
   // been
-  ASSERT_NEAR(
-    prop_of_el_3,
-    weights[2],
-    0.01
+  REQUIRE(
+    Approx(prop_of_el_3).epsilon(0.05) ==
+    weights[2]
   );
 }
 
-
-TEST(testSampler, uniform_integer_sampling){
-  
+TEST_CASE("Uniform integer sampling", "[Sampler]")
+{  
   Sampler my_sampler;
   
   int num_samples = 1000;
@@ -116,12 +107,12 @@ TEST(testSampler, uniform_integer_sampling){
     if (current_draw > max_draw) max_draw = current_draw;
   }
   
-  EXPECT_TRUE(min_draw == 0);
-  EXPECT_TRUE(max_draw == max_val);
+  REQUIRE(min_draw == 0);
+  REQUIRE(max_draw == max_val);
 }
 
-
-TEST(testSampler, node_list_and_vec_sampling){
+TEST_CASE("Node list and vector sampling", "[Sampler]")
+{
   
   Sampler my_sampler;
   
@@ -143,7 +134,7 @@ TEST(testSampler, node_list_and_vec_sampling){
   nodes_vec.push_back(n3);
   
   // Run a bunch of samples and makes sure we grab a given element rougly 1/3rd of the time
-  int num_samples = 1000;
+  int num_samples = 10000;
   int times_n2_sampled_list = 0;
   int times_n2_sampled_vec = 0;
   
@@ -154,23 +145,14 @@ TEST(testSampler, node_list_and_vec_sampling){
   }
   
   // Make sure list sampled a given correct amount
-  ASSERT_NEAR(
-    double(times_n2_sampled_list)/double(num_samples),
-    0.333333,
-    0.03
+  REQUIRE(
+    double(times_n2_sampled_list)/double(num_samples) == 
+    Approx(0.333333).epsilon(0.03)
   );
   
   // Make sure vector sampled a given correct amount
-  ASSERT_NEAR(
-    double(times_n2_sampled_vec)/double(num_samples),
-    0.333333,
-    0.03
+  REQUIRE(
+    double(times_n2_sampled_vec)/double(num_samples) == 
+    Approx(0.333333).epsilon(0.03)
   );
-}
-
-
-
-int main(int argc, char* argv[]){
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

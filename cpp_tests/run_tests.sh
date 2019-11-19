@@ -6,9 +6,10 @@ echo "==========================================================================
 # g++ -std=c++11 -c Node.cpp SBM.cpp helpers.cpp Sampler.cpp
 
 # g++ -std=c++11 cpp_tests/tests-main.cpp -c 
+
 g++ -std=c++11 -c Node.cpp SBM.cpp helpers.cpp Sampler.cpp
 
-g++ -std=c++11 tests-main.o Node.o helpers.o cpp_tests/tests-node.cpp -o my_tests.o 
+g++ -std=c++11 tests-main.o Node.o helpers.o Sampler.o cpp_tests/tests-node.cpp cpp_tests/tests-sampler.cpp -o my_tests.o 
 
 ./my_tests.o
 
