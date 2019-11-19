@@ -948,9 +948,10 @@ TEST(testSBM, agglomerative_merging){
   SBM my_SBM = build_simple_SBM();
   
   int num_initial_groups = my_SBM.get_level(1)->size();
+  double initial_entropy = my_SBM.compute_entropy(0);
 
-  // Run greedy aglomerative merge
-  my_SBM.agglomerative_merge(1, true, 5, 0.01);
+  // Run greedy aglomerative merge with best single merge done
+  Merge_Res single_merge = my_SBM.agglomerative_merge(1, true, 5, 1, 0.01);
 
   // Make sure that we now have one less group than before
   EXPECT_EQ(
@@ -958,6 +959,23 @@ TEST(testSBM, agglomerative_merging){
     1
   );
 
+  // Make sure entropy has gone down as we would expect
+  ASSERT_TRUE(initial_entropy > single_merge.entropy);
+
+  // Run again but this time merging the best 2
+  SBM new_SBM = build_simple_SBM();
+  
+  // Run greedy aglomerative merge with best single merge done
+  Merge_Res double_merge = new_SBM.agglomerative_merge(1, true, 5, 2, 0.01);
+
+  // Make sure that we now have one less group than before
+  EXPECT_EQ(
+    num_initial_groups - new_SBM.get_level(1)->size(),
+    2
+  );
+
+  // Entropy should go down even more with two merges
+  ASSERT_TRUE(single_merge.entropy > double_merge.entropy);
 };
 
 int main(int argc, char* argv[]){

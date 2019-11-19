@@ -21,6 +21,7 @@ class SBM;
 struct Trans_Probs;
 struct State_Dump;
 struct Proposal_Res;
+struct Merge_Res;
 
 // Some type definitions for cleaning up ugly syntax
 typedef std::shared_ptr<Node>                      NodePtr;
@@ -89,10 +90,11 @@ class SBM {
                    double eps, 
                    double beta);
 
-    double agglomerative_merge(
+    Merge_Res agglomerative_merge(
       int level, 
       bool greedy, 
       int n_checks_per_group,
+      int n_merges,
       double eps);  // Merge two groups at a given level based on the best probability of doing so
     Proposal_Res compute_acceptance_prob(EdgeCounts &, NodePtr, NodePtr, double); // Compute probability of accepting a node group swap
     static void update_edge_counts(EdgeCounts &, int, NodePtr, NodePtr, NodePtr); // Update an EdgeCount map after moving a node around to avoid rescanning
@@ -123,6 +125,13 @@ struct Proposal_Res
   double prob_of_accept;
   Proposal_Res(double e, double p) : entropy_delta(e),
                                      prob_of_accept(p){};
+};
+
+struct Merge_Res
+{
+  double entropy;
+  vector<NodePtr> from_node;
+  vector<NodePtr> to_node;
 };
 
 #endif

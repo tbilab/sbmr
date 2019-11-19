@@ -1148,7 +1148,7 @@ Proposal_Res SBM::compute_acceptance_prob(EdgeCounts& level_counts,
 void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 {
 
-  std::cout << "Merging " << group_b->id << " into " << group_a->id << std::endl;
+  // std::cout << "Merging " << group_b->id << " into " << group_a->id << std::endl;
   // Place all the members of group b under group a
   for (NodePtr member_node : group_b->children)
   {
@@ -1162,10 +1162,11 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 // =============================================================================
 // Merge two groups at a given level based on the best probability of doing so
 // =============================================================================
-double SBM::agglomerative_merge(
+Merge_Res SBM::agglomerative_merge(
   int level, 
   bool greedy, 
   int n_checks_per_group,
+  int n_merges,
   double eps)
 {
   int meta_level = level + 1;
@@ -1183,8 +1184,6 @@ double SBM::agglomerative_merge(
 
   // Make sure doing a merge makes sense
   if (all_groups->size() <= 2) throw "To few groups to perform merge.";
-
-  std::cout << "Finding best merge options ==============================" << std::endl;
 
   // Gather edge-counts for metagroups
   EdgeCounts metagroup_edges = gather_edge_counts(meta_level);
@@ -1243,17 +1242,37 @@ double SBM::agglomerative_merge(
     } 
   }
 
-  // Find best proposed move of the options and merge those two groups
-  int best_move_index = std::distance(move_delta.begin(), 
-                                      std::min_element(move_delta.begin(), 
-                                                       move_delta.end()));
+  // Now we find the top merges
 
-  // Merge the best group pair
-  merge_groups(to_group[best_move_index], from_group[best_move_index]);
+  // Initialize a merge result holder struct
+  Merge_Res results; 
 
-  // Erase the meta-group level
+  // Push all results into a priority queue
+  std::priority_queue<std::pair<double, int>> q;
+  for (int i = 0; i < move_delta.size(); ++i) {
+    q.push(std::pair<double, int>(move_delta[i], i));
+  }
+
+  // Pop off the top n_merges to perform the best merges. 
+  for (int i = 0; i < n_merges; ++i) {
+    int merge_index = q.top().second;
+    
+    // Merge the best group pair
+    merge_groups(to_group[merge_index], from_group[merge_index]);
+    
+    // Record pair for results
+    results.from_node.push_back(from_group[merge_index]);
+    results.to_node.push_back(to_group[merge_index]);
+
+    // Remove the last index from our queue and go again
+    q.pop();
+  }
+
+  // Erase the empty groups 
   clean_empty_groups();
 
-  // Return the move delta for the chosen move             
-  return move_delta[best_move_index];
+  // Return the entropy for new model and merges done 
+  results.entropy = compute_entropy(level - 1);
+  
+  return results;
 }
