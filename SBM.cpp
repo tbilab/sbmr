@@ -208,7 +208,8 @@ void SBM::add_connection(NodePtr node1, NodePtr node2) {
 // =============================================================================
 // Builds and assigns a group node for every node in a given level
 // =============================================================================
-void SBM::give_every_node_a_group_at_level(int level) {
+void SBM::give_every_node_a_group_at_level(int level) 
+{
 
   // Grab all the nodes for the desired level
   LevelPtr node_level = nodes.at(level);
@@ -1148,7 +1149,7 @@ Proposal_Res SBM::compute_acceptance_prob(EdgeCounts& level_counts,
 void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 {
 
-  // std::cout << "Merging " << group_b->id << " into " << group_a->id << std::endl;
+  std::cout << "Merging " << group_b->id << " into " << group_a->id << std::endl;
   // Place all the members of group b under group a
   for (NodePtr member_node : group_b->children)
   {
@@ -1275,4 +1276,62 @@ Merge_Res SBM::agglomerative_merge(
   results.entropy = compute_entropy(level - 1);
   
   return results;
+}
+
+// =============================================================================
+// Run agglomerative merging until a desired number of groups is reached. 
+// Returns vector of results for each merge step
+// =============================================================================
+vector<Merge_Res> SBM::agglomerative_run(
+  int level, 
+  bool greedy,
+  int n_checks_per_group,
+  int desired_num_groups,
+  double sigma,
+  double eps
+) 
+{
+  // Start by giving every node at the desired level its own group
+  give_every_node_a_group_at_level(level);
+
+  // Now clean up the empty groups 
+  // (if there were previously group nodes for the level)
+  clean_empty_groups();
+
+  // Get the current number of groups we have 
+  int group_level = level + 1;
+  int curr_num_groups = get_level(group_level)->size();
+
+  // Setup vector to hold all merge step results
+  vector<Merge_Res> step_results;
+
+  // Perform merge steps until we have the proper number of groups
+  while (curr_num_groups > desired_num_groups) 
+  {
+    // Calculate how many merges we should do for this step
+    // (Converting to integer rounds down.)
+    int num_merges = curr_num_groups - curr_num_groups/sigma;
+
+    // Make sure we don't overstep the goal number of groups
+    if ((curr_num_groups - num_merges) < desired_num_groups) 
+    {
+      num_merges = curr_num_groups - desired_num_groups;
+    }
+
+    std::cout << "Performing " << num_merges << " merges. Current size: " << curr_num_groups << std::endl;
+
+    // Perform merge and record results
+    step_results.push_back(
+      agglomerative_merge(group_level, 
+                          greedy, 
+                          n_checks_per_group, 
+                          num_merges, 
+                          eps )
+    );
+
+    // Calculate the new number of groups
+    curr_num_groups = get_level(group_level)->size();
+  }
+
+  return step_results;
 }

@@ -90,12 +90,25 @@ class SBM {
                    double eps, 
                    double beta);
 
+    // Merge two groups at a given level based on the best probability of doing so
     Merge_Res agglomerative_merge(
       int level, 
       bool greedy, 
       int n_checks_per_group,
       int n_merges,
-      double eps);  // Merge two groups at a given level based on the best probability of doing so
+      double eps);  
+    
+    // Run agglomerative merging until a desired number of groups is reached. 
+    // Returns vector of results for each merge step
+    vector<Merge_Res> agglomerative_run(
+      int level, 
+      bool greedy,
+      int n_checks_per_group,
+      int desired_num_groups,
+      double sigma,
+      double eps
+    );
+    
     Proposal_Res compute_acceptance_prob(EdgeCounts &, NodePtr, NodePtr, double); // Compute probability of accepting a node group swap
     static void update_edge_counts(EdgeCounts &, int, NodePtr, NodePtr, NodePtr); // Update an EdgeCount map after moving a node around to avoid rescanning
     static string build_group_id(int, int, int);                                  // Builds a group id from a scaffold for generated new groups
