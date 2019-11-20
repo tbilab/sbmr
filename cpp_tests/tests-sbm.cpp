@@ -214,7 +214,7 @@ TEST_CASE("Initializing a group for every node", "[SBM]")
     REQUIRE(0 == my_SBM.get_level(1)->size());
 
     // Now assignin every node their own parent group
-    my_SBM.give_every_node_a_group_at_level(0);
+    my_SBM.give_every_node_at_level_own_group(0);
 
     // There should now be a total of 18 nodes at level 1
     REQUIRE(18 == my_SBM.get_level(1)->size());
@@ -583,13 +583,14 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
     int num_initial_groups = my_SBM.get_level(1)->size();
     double initial_entropy = my_SBM.compute_entropy(0);
 
+    std::cout << "Attempting single merge " << std::endl;
     // Run greedy aglomerative merge with best single merge done
     Merge_Res single_merge = my_SBM.agglomerative_merge(1, true, 5, 1, 0.01);
 
-    // Make sure that we now have one less group than before
+    // Make sure that we now have one less group than before for each type
     int new_group_num = my_SBM.get_level(1)->size();
     int change_in_groups = num_initial_groups - new_group_num;
-    REQUIRE( change_in_groups == 1 );
+    REQUIRE( change_in_groups == 2 );
 
     // Make sure entropy has gone down as we would expect
     REQUIRE(initial_entropy < single_merge.entropy);
@@ -597,12 +598,13 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
     // Run again but this time merging the best 2
     SBM new_SBM = build_simple_SBM();
 
+    std::cout << "Attempting double merge " << std::endl;
     // Run greedy aglomerative merge with best single merge done
     Merge_Res double_merge = new_SBM.agglomerative_merge(1, true, 5, 2, 0.01);
 
-    // Make sure that we now have one less group than before
+    // Make sure that we now have two fewer groups per type than before
     REQUIRE(
-        2 == 
+        4 == 
         num_initial_groups - new_SBM.get_level(1)->size()
     );
 
@@ -612,38 +614,23 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
 
 
 // Currently not working due to bugs in agglomerative merging 
-// TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
-// {
-      
-//     // Setup simple SBM model
-//     SBM my_SBM = build_simple_SBM();
+TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
+{
+  // Setup simple SBM model
+  SBM my_SBM = build_simple_SBM();
 
-//     int level = 0;
+  int num_initial_groups = my_SBM.get_level(1)->size();
+  double initial_entropy = my_SBM.compute_entropy(0);
 
-//     std::cout << "Start..." << std::endl;
-//     print_state_dump(my_SBM.get_sbm_state());
+  // Run full agglomerative merging algorithm till we have just 3 groups left
+  my_SBM.agglomerative_run(1,true,5,3,2,0.01);
 
-//     my_SBM.give_every_node_a_group_at_level(level);
-//     my_SBM.clean_empty_groups();
+  // std::cout << "Post-Merging..." << std::endl;
+  // print_state_dump(my_SBM.get_sbm_state());
 
-//     std::cout << "Pre-Merging..." << std::endl;
-//     print_state_dump(my_SBM.get_sbm_state());
-
-//     Merge_Res double_merge = my_SBM.agglomerative_merge(1, true, 5, 2, 0.01);
-
-//     // int num_initial_groups = my_SBM.get_level(1)->size();
-//     // double initial_entropy = my_SBM.compute_entropy(0);
-
-//     // // Run full agglomerative merging algorithm till we have just 3 groups left
-//     // my_SBM.agglomerative_run(1,false,5,3,2,0.01);
-
-
-//     std::cout << "Post-Merging..." << std::endl;
-//     print_state_dump(my_SBM.get_sbm_state());
-
-//     // // Make sure that we now have one less group than before
-//     // REQUIRE(
-//     //   my_SBM.get_level(1)->size() == 
-//     //   3
-//     // );
-// }
+  // // Make sure that we now have one less group than before
+  // REQUIRE(
+  //   my_SBM.get_level(1)->size() == 
+  //   3
+  // );
+}
