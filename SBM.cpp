@@ -386,7 +386,7 @@ int SBM::clean_empty_groups()
       if (current_group->children.size() == 0) 
       {
         // Remove group from children of its parent (if it has one)
-        if (level < num_levels - 1) 
+        if (current_group->parent) 
         {
           current_group->parent->remove_child(current_group);
         }
@@ -1151,13 +1151,15 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 
   std::cout << "Merging " << group_b->id << " into " << group_a->id << std::endl;
   // Place all the members of group b under group a
-  for (NodePtr member_node : group_b->children)
+  auto children_to_move = group_b->children;
+
+  for (NodePtr member_node : children_to_move)
   {
     member_node->set_parent(group_a);
   }
 
   // Delete the now empty group_b from the model
-  nodes.at(group_a->level)->erase(group_b->id);
+  // nodes.at(group_a->level)->erase(group_b->id);
 }  
 
 // =============================================================================
