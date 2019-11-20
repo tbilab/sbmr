@@ -4,5 +4,6 @@
 .Ruserdata
 *.o
 my_googletest
-.vscode/
 .DS_Store
+.vscode/settings.json
+*.out*
