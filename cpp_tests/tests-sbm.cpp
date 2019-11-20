@@ -587,10 +587,9 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
     Merge_Res single_merge = my_SBM.agglomerative_merge(1, true, 5, 1, 0.01);
 
     // Make sure that we now have one less group than before
-    REQUIRE(
-        1 == 
-        (num_initial_groups - my_SBM.get_level(1)->size())
-    );
+    int new_group_num = my_SBM.get_level(1)->size();
+    int change_in_groups = num_initial_groups - new_group_num;
+    REQUIRE( change_in_groups == 1 );
 
     // Make sure entropy has gone down as we would expect
     REQUIRE(initial_entropy > single_merge.entropy);
