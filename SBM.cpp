@@ -208,7 +208,7 @@ void SBM::add_connection(NodePtr node1, NodePtr node2) {
 // =============================================================================
 // Builds and assigns a group node for every node in a given level
 // =============================================================================
-void SBM::give_every_node_a_group_at_level(int level) 
+void SBM::give_every_node_at_level_own_group(int level) 
 {
 
   // Grab all the nodes for the desired level
@@ -1162,6 +1162,9 @@ Proposal_Res SBM::compute_acceptance_prob(EdgeCounts& level_counts,
 // =============================================================================
 void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 {
+  std::cout << "Merging " << group_b->id << " into " 
+            << group_a->id << std::endl;
+
   // Place all the members of group b under group a
   auto children_to_move = group_b->children;
 
@@ -1183,11 +1186,20 @@ Merge_Res SBM::agglomerative_merge(
 {
   int meta_level = level + 1;
 
-  // Build a single group for each node at desired level
-  give_every_node_a_group_at_level(level);
+  // Build a single meta-group for each node at desired level
+  give_every_node_at_level_own_group(level);
 
   // Grab all the groups we're looking to merge
   LevelPtr all_groups = get_level(level);
+
+  // Gather how many groups of each type we have
+  std::map<int, int> n_groups_of_type;
+  for (auto group_it = all_groups->begin();
+            group_it != all_groups->end();
+            group_it++)
+  {
+    n_groups_of_type[group_it->second->type]++;
+  }
 
   // Build vectors for recording merges
   vector<NodePtr> from_group;
@@ -1259,28 +1271,76 @@ Merge_Res SBM::agglomerative_merge(
   // Initialize a merge result holder struct
   Merge_Res results; 
 
-  // Push all results into a priority queue
-  std::priority_queue<std::pair<double, int>> q;
+  // Push all results into type keyed map of priority queues
+  std::map<int, std::priority_queue<std::pair<double, int>>> type_q;
   for (int i = 0; i < move_delta.size(); ++i) {
-    q.push(std::pair<double, int>(move_delta[i], i));
+    // Get type of the move being added to queue
+    int move_type = to_group[i]->type;  
+    
+    // Place this move's results in the proper queue location
+    type_q[move_type].push(
+      std::pair<double, int>(move_delta[i], i)
+    );
   }
 
-  // Pop off the top n_merges to perform the best merges. 
-  for (int i = 0; i < n_merges; ++i) {
-    int merge_index = q.top().second;
+  // Pop off the top n_merges best merges from each type to perform.
+  for (auto type_moves_it = type_q.begin();
+            type_moves_it != type_q.end();
+            type_moves_it++ )
+  { 
+    // Get how many groups we actualy have for this type
+    int num_available_groups = n_groups_of_type[type_moves_it->first];
     
-    // Merge the best group pair
-    merge_groups(to_group[merge_index], from_group[merge_index]);
+    // Make sure we dont try to overextract moves for a type
+    int num_merges_to_make = num_available_groups < n_merges ?
+      num_available_groups : 
+      n_merges;
+  
+    std::cout << "Merging " << num_merges_to_make << " groups of type " 
+              << type_moves_it->first << std::endl;
     
-    // Record pair for results
-    results.from_node.push_back(from_group[merge_index]);
-    results.to_node.push_back(to_group[merge_index]);
+    // A set of the unique merges we've made
+    std::set<string> merges_made;
 
-    // Remove the last index from our queue and go again
-    q.pop();
-  }
+    // While we still have merges to make and we haven't exhausted the queue
+    // Keep poping off merges from queue.
+    while ((merges_made.size() < num_merges_to_make) &
+           (type_moves_it->second.size() != 0)) 
+    {
+      // Extract index of best remaining merge
+      int merge_index = type_moves_it->second.top().second;
 
-  // Erase the empty groups 
+      // Get groups that are being merged (culled)
+      NodePtr culled_group = from_group[merge_index];
+      NodePtr absorbing_group = to_group[merge_index];
+
+      // Make sure we haven't already merged the culled group
+      bool culled_still_exists = merges_made.find(culled_group->id) == 
+                                 merges_made.end();
+
+      // Also make sure that we haven't culled the group we're trying to
+      // merge into
+      bool absorbing_still_exists = merges_made.find(absorbing_group->id) == 
+                                    merges_made.end();
+                                  
+      if (culled_still_exists & absorbing_still_exists) 
+      {
+        // Insert new culled group into set
+        merges_made.insert(culled_group->id);
+
+        // Merge the best group pair
+        merge_groups(absorbing_group, culled_group);
+
+        // Record pair for results
+        results.from_node.push_back(culled_group);
+        results.to_node.push_back(absorbing_group);
+      }
+      // Remove the last index from our queue and go again
+      type_moves_it->second.pop();
+    }
+  } 
+
+  // Erase the empty groups and metagroups
   clean_empty_groups();
 
   // Return the entropy for new model and merges done 
@@ -1303,7 +1363,7 @@ vector<Merge_Res> SBM::agglomerative_run(
 ) 
 {
   // Start by giving every node at the desired level its own group
-  give_every_node_a_group_at_level(level);
+  give_every_node_at_level_own_group(level);
 
   // Now clean up the empty groups 
   // (if there were previously group nodes for the level)

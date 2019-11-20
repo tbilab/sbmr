@@ -64,7 +64,7 @@ class SBM {
     list<NodePtr> get_nodes_not_of_type_at_level(int, int);            // Return nodes node of a specified type from level
     void add_connection(string, string);                               // Adds a connection between two nodes based on their ids
     void add_connection(NodePtr, NodePtr);                             // Adds a connection between two nodes based on their pointers
-    void give_every_node_a_group_at_level(int);                        // Builds and assigns a group node for every node in a given level
+    void give_every_node_at_level_own_group(int);                        // Builds and assigns a group node for every node in a given level
     Trans_Probs get_transition_probs_for_groups(NodePtr, bool);              // Calculates probabilities for joining a given new group based on current SBM state
     Trans_Probs get_transition_probs_for_groups(NodePtr, EdgeCounts, bool);  // Calculates probabilities for joining a given new group based on current SBM state
     int clean_empty_groups();                                          // Scan through levels and remove all group nodes that have no children. Returns # removed
