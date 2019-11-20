@@ -205,7 +205,8 @@ vector<NodePtr> Node::get_connections_to_level(int desired_level) {
 
 
 // =============================================================================
-// Collapse a nodes connection to a given level into a map of connected group id->count
+// Collapse a nodes connection to a given level into a map of 
+// connected group id->count
 // =============================================================================
 std::map<NodePtr, int> Node::gather_connections_to_level(int level) 
 {
