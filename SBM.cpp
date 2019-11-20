@@ -293,9 +293,12 @@ Trans_Probs SBM::get_transition_probs_for_groups(
   {
     NodePtr potential_group = *potential_group_it;
 
-    // If we're ignoring probabilities for the nodes own group, skip calculating for
-    // the node that matches the node to moves current group.
-    if((potential_group->id == node_to_move->parent->id) & ignore_own_group) continue;
+    // If we're ignoring probabilities for the nodes own group, skip calculating
+    // for the node that matches the node to moves current group.
+    if((potential_group->id == node_to_move->parent->id) & ignore_own_group)
+    {
+      continue;
+    } 
     
     // Send currently investigated group to groups vector
     groups.push_back(potential_group);
@@ -315,7 +318,8 @@ Trans_Probs SBM::get_transition_probs_for_groups(
       
       // How many connections there are between our neighbor group and the
       // potential group
-      double e_sr = group_edge_counts[find_edges(potential_group, neighbor_group)];
+      double e_sr = group_edge_counts[find_edges(potential_group, 
+                                                 neighbor_group)];
       
       // How many total connections the neighbor node has
       double e_s = neighbor_group->degree;
@@ -352,7 +356,9 @@ Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move,
   // Gather all the group connection counts at the group level
   EdgeCounts level_counts = gather_edge_counts(node_to_move->level + 1);
   
-  return get_transition_probs_for_groups(node_to_move, level_counts, ignore_own_group);
+  return get_transition_probs_for_groups(node_to_move, 
+                                         level_counts, 
+                                         ignore_own_group);
 }
 
 
@@ -487,13 +493,13 @@ void SBM::update_edge_counts(
            ++changed_group_it )
   {
     NodePtr changed_group = changed_group_it->first;
-    int amount_changed = changed_group_it->second;
+    int amnt_change = changed_group_it->second;
     
     // Subtract from old group...
-    level_counts[find_edges(changed_group, old_group_for_level)] -= amount_changed;
+    level_counts[find_edges(changed_group, old_group_for_level)] -= amnt_change;
     
     // ...Add to new group
-    level_counts[find_edges(changed_group, new_group_for_level)] += amount_changed;
+    level_counts[find_edges(changed_group, new_group_for_level)] += amnt_change;
   }
 
 }
@@ -510,7 +516,7 @@ NodePtr SBM::attempt_move(
 {
   int level_of_move = node_to_move->level + 1;
 
-  // Calculate the transition probabilities for all possible groups node could join
+  // Calculate transition probabilities for all possible groups node could join
   Trans_Probs move_probs = get_transition_probs_for_groups(node_to_move, 
                                                            group_edge_counts, 
                                                            false);
@@ -752,10 +758,13 @@ Proposal_Res SBM::make_proposal_decision(
     double edge_count_post = edge_count_pre + 
       (old_group_pair ? -1: 1) * edges_from_node;
     
-    // Grab the degree of the group node for pre and post depending on which pair we're
-    // looking at.
-    double moved_degree_pre = old_group_pair ? old_group_degree_pre: new_group_degree_pre;
-    double moved_degree_post = old_group_pair ? old_group_degree_post: new_group_degree_post;
+    // Grab the degree of the group node for pre and post depending on which 
+    // pair we're looking at.
+    double moved_degree_pre = old_group_pair ? old_group_degree_pre: 
+                                               new_group_degree_pre;
+
+    double moved_degree_post = old_group_pair ? old_group_degree_post: 
+                                                new_group_degree_post;
     
     // Neighbor node degree
     double neighbor_degree = neighbor_group->degree;
@@ -829,11 +838,12 @@ Proposal_Res SBM::make_proposal_decision(
     post_move_prob += e_it * (e_old_t_post + eps) / denom;
   }
 
-  // Now we can clean up all the calculations into to entropy delta and the probability
-  // ratio for the moves and use those to calculate the acceptance probability for 
-  // the proposed move.
+  // Now we can clean up all the calculations into to entropy delta and the 
+  // probability ratio for the moves and use those to calculate the acceptance 
+  // probability for the proposed move.
   double entropy_delta = entropy_post - entropy_pre;
-  double acceptance_prob = exp(beta*entropy_delta) * (pre_move_prob/post_move_prob);
+  double acceptance_prob = exp(beta*entropy_delta) * 
+                          (pre_move_prob/post_move_prob);
   
   return Proposal_Res(
     entropy_delta,
@@ -1066,8 +1076,11 @@ Proposal_Res SBM::compute_acceptance_prob(EdgeCounts& level_counts,
     double edge_count_post = edge_count_pre + 
       (moved_is_old_group ? -1: 1) * edges_from_node;
     
-    double moved_degree_pre = moved_is_old_group ? old_group_degree_pre: new_group_degree_pre;
-    double moved_degree_post = moved_is_old_group ? old_group_degree_post: new_group_degree_post;
+    double moved_degree_pre = moved_is_old_group ? old_group_degree_pre: 
+                                                   new_group_degree_pre;
+
+    double moved_degree_post = moved_is_old_group ? old_group_degree_post: 
+                                                    new_group_degree_post;
     
     double connected_degree = connected_group->degree;
     
@@ -1090,7 +1103,7 @@ Proposal_Res SBM::compute_acceptance_prob(EdgeCounts& level_counts,
       0;
   };
   
-  // Loop through and calculate the new entropy contribution for each old group connection
+  // Calculate the new entropy contribution for each old group connection
   for(auto con_group_it = old_group_connections.begin(); 
       con_group_it != old_group_connections.end(); 
       con_group_it++)
@@ -1134,7 +1147,8 @@ Proposal_Res SBM::compute_acceptance_prob(EdgeCounts& level_counts,
 
   double entropy_delta = entropy_post - entropy_pre;
   
-  double acceptance_prob = exp(beta*entropy_delta) * (pre_move_prob/post_move_prob);
+  double acceptance_prob = exp(beta*entropy_delta) * 
+                           (pre_move_prob/post_move_prob);
   
   return Proposal_Res(
     entropy_delta,
@@ -1148,8 +1162,6 @@ Proposal_Res SBM::compute_acceptance_prob(EdgeCounts& level_counts,
 // =============================================================================
 void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 {
-
-  std::cout << "Merging " << group_b->id << " into " << group_a->id << std::endl;
   // Place all the members of group b under group a
   auto children_to_move = group_b->children;
 
@@ -1157,9 +1169,6 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
   {
     member_node->set_parent(group_a);
   }
-
-  // Delete the now empty group_b from the model
-  // nodes.at(group_a->level)->erase(group_b->id);
 }  
 
 // =============================================================================
@@ -1320,7 +1329,8 @@ vector<Merge_Res> SBM::agglomerative_run(
       num_merges = curr_num_groups - desired_num_groups;
     }
 
-    std::cout << "Performing " << num_merges << " merges. Current size: " << curr_num_groups << std::endl;
+    // std::cout << "Performing " << num_merges << " merges. Current size: " 
+    //           << curr_num_groups << std::endl;
 
     // Perform merge and record results
     step_results.push_back(
