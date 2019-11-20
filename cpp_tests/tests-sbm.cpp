@@ -591,8 +591,8 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
     int change_in_groups = num_initial_groups - new_group_num;
     REQUIRE( change_in_groups == 1 );
 
-    // // Make sure entropy has gone down as we would expect
-    // REQUIRE(initial_entropy > single_merge.entropy);
+    // Make sure entropy has gone down as we would expect
+    REQUIRE(initial_entropy < single_merge.entropy);
 
     // Run again but this time merging the best 2
     SBM new_SBM = build_simple_SBM();
@@ -607,7 +607,7 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
     );
 
     // Entropy should go down even more with two merges
-    // REQUIRE(single_merge.entropy > double_merge.entropy);
+    REQUIRE(single_merge.entropy < double_merge.entropy);
 }
 
 
