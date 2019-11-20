@@ -1,0 +1,25 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Build debug w/ g++",
+        "type": "shell",
+        "command": "g++",
+        "args": [
+          "-std=c++11",
+          "-g",
+          "debugging/debug.cpp",
+          "Node.cpp",
+          "SBM.cpp",
+          "helpers.cpp",
+          "Sampler.cpp",
+          "-o",
+          "debugging/debug.out"
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      }
+    ]
+  }
