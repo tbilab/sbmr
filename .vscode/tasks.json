@@ -15,10 +15,19 @@
           "Sampler.cpp",
           "-o",
           "debugging/debug.out"
-        ],
+        ]
+      },
+      {
+        "label": "Run tests",
+        "type": "shell",
+        "command": "./cpp_tests/run_tests.sh",
         "group": {
           "kind": "build",
           "isDefault": true
+        },
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
         }
       }
     ]
