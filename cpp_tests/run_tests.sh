@@ -9,8 +9,13 @@ g++ -std=c++11 -c Node.cpp SBM.cpp helpers.cpp Sampler.cpp
 
 echo "=============================================================================\nCompiling Tests..."
 echo "=============================================================================\n"
+
 # Compile the entryway to the tests. This only needs to happen once
-# g++ -std=c++11 cpp_tests/tests-main.cpp -c -o cpp_tests/tests-main.o
+if [ ! -f cpp_tests/tests-main.o ]; then
+  echo "Building test entryway..."
+  g++ -std=c++11 cpp_tests/tests-main.cpp -c -o cpp_tests/tests-main.o
+fi
+
 
 # Compile all the tests
 g++ -std=c++11 cpp_tests/tests-main.o \
