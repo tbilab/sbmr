@@ -1,238 +1,5 @@
 #include "SBM.h" 
 
-// =============================================================================
-// Constructor. Just sets default epsilon value right now.
-// =============================================================================
-SBM::SBM():
-  eps(0.01),
-  sampler(42){}
-
-
-// =============================================================================
-// Calculates probabilities for joining all possible new groups based on current
-// SBM state
-// =============================================================================
-Trans_Probs SBM::get_transition_probs_for_groups(
-    NodePtr    node_to_move, 
-    EdgeCounts group_edge_counts,
-    bool       ignore_own_group
-) 
-{
-  // Ergodicity tuning parameter
-  double epsilon = 0.01;
-  
-  int group_level = node_to_move->level + 1;
-  
-  // If we have a polypartite network we want to avoid that type when finding
-  // neighbor nodes to look at. Otherwise we want to get all types, which we do
-  // by supplying the 'null' type of -1.
-  int type_to_ignore = unique_node_types.size() > 1 ? node_to_move->type : -1;
-  
-  // Grab all groups that could belong to connections
-  list<NodePtr> neighboring_groups = get_nodes_not_of_type_at_level(
-    type_to_ignore,
-    group_level);
-  
-  map<NodePtr, int> node_outward_connections = node_to_move->
-    gather_connections_to_level(group_level);
-
-  // Now loop through all the groups that the node could join
-  list<NodePtr> potential_groups = get_nodes_of_type_at_level(
-    type_to_ignore,
-    node_to_move->level + 1);
-  
-  // Number of potential groups
-  int B = potential_groups.size();
-  
-  // Initialize holder of transition probabilities
-  vector<double> probabilities;
-  probabilities.reserve(B);
-  
-  // Initialize holder of groups to match transition probs
-  vector<NodePtr> groups;
-  groups.reserve(B);
-  
-  // Start main loop over all the potential groups that the node could join
-  for (auto potential_group_it  = potential_groups.begin();
-       potential_group_it != potential_groups.end();
-       ++potential_group_it)
-  {
-    NodePtr potential_group = *potential_group_it;
-
-    // If we're ignoring probabilities for the nodes own group, skip calculating
-    // for the node that matches the node to moves current group.
-    if((potential_group->id == node_to_move->parent->id) & ignore_own_group)
-    {
-      continue;
-    } 
-    
-    // Send currently investigated group to groups vector
-    groups.push_back(potential_group);
-    
-    // Start out sum at 0.
-    double cummulative_prob = 0;
-    
-    // Loop over the neighbor groups again
-    for (auto neighbor_group_it  = neighboring_groups.begin();
-         neighbor_group_it != neighboring_groups.end();
-         ++neighbor_group_it)
-    {
-      NodePtr neighbor_group = *neighbor_group_it;
-      
-      // How many connections does this node have to group of interest? 
-      double e_si = node_outward_connections[neighbor_group];
-      
-      // How many connections there are between our neighbor group and the
-      // potential group
-      double e_sr = group_edge_counts[find_edges(potential_group, 
-                                                 neighbor_group)];
-      
-      // How many total connections the neighbor node has
-      double e_s = neighbor_group->degree;
-      
-      // Finally calculate partial probability and add to cummulative sum
-      cummulative_prob += e_si * ( (e_sr + epsilon) / (e_s + epsilon*(B + 1)) );
-    }
-    
-    // Add the final cumulative probabiltiy sum to potential group's element in
-    // probability vector
-    probabilities.push_back(cummulative_prob);
-  }
-  
-  // Our sampling algorithm just needs unormalized weights so we don't actually
-  // have to normalize. Normalize vector to sum to 1
-  double total_of_probs = std::accumulate(
-    probabilities.begin(), 
-    probabilities.end(), 
-    double(0));
-  for (auto prob = probabilities.begin(); prob != probabilities.end(); ++prob)
-  {
-    *prob = *prob/total_of_probs;
-  }
-  
-  return Trans_Probs(probabilities, groups);
-}
-
-// Calculates its own edge counts if they arent provided
-Trans_Probs SBM::get_transition_probs_for_groups(NodePtr node_to_move,     
-                                                 bool ignore_own_group
-) 
-{
-
-  // Gather all the group connection counts at the group level
-  EdgeCounts level_counts = gather_edge_counts(node_to_move->level + 1);
-  
-  return get_transition_probs_for_groups(node_to_move, 
-                                         level_counts, 
-                                         ignore_own_group);
-}
-
-
-// =============================================================================
-// Attempts to move a node to new group. 
-// Returns true if node moved, false if it stays.
-// =============================================================================
-NodePtr SBM::attempt_move(
-    NodePtr            node_to_move, 
-    EdgeCounts &       group_edge_counts, 
-    Sampler &          sampler) 
-{
-  int level_of_move = node_to_move->level + 1;
-
-  // Calculate transition probabilities for all possible groups node could join
-  Trans_Probs move_probs = get_transition_probs_for_groups(node_to_move, 
-                                                           group_edge_counts, 
-                                                           false);
-
-  // Initialize a sampler to choose group
-  Sampler my_sampler;
-
-  // Sample probabilies to choose index of new group
-  int chosen_group_index = sampler.sample(move_probs.probability);
-
-  // Extract new group
-  NodePtr new_group = move_probs.group[chosen_group_index];
-  
-  return new_group;
-}; 
-
-
-// =============================================================================
-// Run through all nodes in a given level and attempt a group move on each one
-// in turn.
-// =============================================================================
-int SBM::run_move_sweep(int level) 
-{
-  // Grab level map
-  LevelPtr node_map = get_level(level);
-  
-  // Get all the nodes at the given level in a shuffleable vector format
-  // Initialize vector to hold nodes
-  vector<NodePtr> node_vec;
-  node_vec.reserve(node_map->size());
-  
-  // Fill in vector with map elements
-  for (auto node_it = node_map->begin(); 
-            node_it != node_map->end(); 
-            ++node_it)
-  {
-    node_vec.push_back(node_it->second);
-  }
-  
-  // Shuffle node order
-  std::random_shuffle(node_vec.begin(), node_vec.end());
-  
-  // Build starting edge counts
-  int group_level = level + 1;
-  EdgeCounts group_edges = gather_edge_counts(group_level);
-  
-  // Setup random sampler
-  Sampler my_sampler;
-  
-  // Keep track of how many moves were made
-  int num_moves_made = 0;
-  
-  // Loop through randomly ordered nodes
-  for (auto node_it = node_vec.begin(); 
-            node_it != node_vec.end(); 
-            ++node_it)
-  {
-    // Get direct pointer to current node
-    NodePtr node_to_move = *node_it;
-    
-    // Note the current group of the node
-    NodePtr old_group = node_to_move->parent;
-    
-    // Attempt group move
-    NodePtr new_group = attempt_move(node_to_move, group_edges, my_sampler);
-    
-    // Check if chosen group is different than the current group for the node.
-    // If group has changed, Update the node's parent and update counts map
-    if (new_group->id != old_group->id)
-    {
-      // Swap parent for newly chosen group
-      node_to_move->set_parent(new_group);
-
-      // Update edge counts with this move
-      update_edge_counts(group_edges,
-                         group_level,
-                         node_to_move,
-                         old_group,
-                         new_group);
-      
-      // Add to moves made counter
-      num_moves_made++;
-    }
-  } // Ends current sweep loop
-  
-  // Cleanup any now empty groups
-  clean_empty_groups();
-  
-  // Return number of nodes that were moved
-  return num_moves_made;
-}  
-
-
 
 // =============================================================================
 // Propose a potential group move for a node.
@@ -242,7 +9,7 @@ NodePtr SBM::propose_move(NodePtr node, double eps)
   int group_level = node->level + 1;
   
   // Grab a list of all the groups that the node could join
-  list<NodePtr> potential_groups = get_nodes_of_type_at_level(
+  std::list<NodePtr> potential_groups = get_nodes_of_type_at_level(
     node->type,
     group_level);
 
@@ -442,7 +209,7 @@ int SBM::mcmc_sweep(int level,
   
   // Get all the nodes at the given level in a shuffleable vector format
   // Initialize vector to hold nodes
-  vector<NodePtr> node_vec;
+  std::vector<NodePtr> node_vec;
   node_vec.reserve(node_map->size());
   // Fill in vector with map elements
   for (auto node_it = node_map->begin(); 
@@ -521,7 +288,7 @@ double SBM::compute_entropy(int level)
   // First, calc the number of total edges and build a degree->num nodes map
   
   // Build map of number of nodes with given degree
-  map<int, int> n_nodes_w_degree;
+  std::map<int, int> n_nodes_w_degree;
 
   // Keep track of total number of edges as well
   int sum_of_degrees = 0;
@@ -595,6 +362,7 @@ double SBM::compute_entropy(int level)
 Proposal_Res SBM::compute_acceptance_prob(EdgeCounts& level_counts,
                                           NodePtr     node_to_update,
                                           NodePtr     new_group,
+                                          double      eps,
                                           double      beta)
 {
   int group_level = node_to_update->level + 1;
@@ -774,9 +542,9 @@ Merge_Res SBM::agglomerative_merge(
   }
 
   // Build vectors for recording merges
-  vector<NodePtr> from_groups;
-  vector<NodePtr> to_groups;
-  vector<double>  move_delta;
+  std::vector<NodePtr> from_groups;
+  std::vector<NodePtr> to_groups;
+  std::vector<double>  move_delta;
 
   // Make sure doing a merge makes sense by checking we have enough groups
   // of every type
@@ -797,7 +565,7 @@ Merge_Res SBM::agglomerative_merge(
   {
     NodePtr curr_group = group_it->second;
 
-    list<NodePtr> metagroups_to_search;
+    std::list<NodePtr> metagroups_to_search;
 
     // If we're running algorithm in greedy mode we should just
     // add every possible group to the groups-to-search list
@@ -916,7 +684,7 @@ Merge_Res SBM::agglomerative_merge(
 // Run agglomerative merging until a desired number of groups is reached. 
 // Returns vector of results for each merge step
 // =============================================================================
-vector<Merge_Res> SBM::agglomerative_run(
+std::vector<Merge_Res> SBM::agglomerative_run(
   int level, 
   bool greedy,
   int n_checks_per_group,
@@ -937,7 +705,7 @@ vector<Merge_Res> SBM::agglomerative_run(
   int curr_num_groups = get_level(group_level)->size();
 
   // Setup vector to hold all merge step results
-  vector<Merge_Res> step_results;
+  std::vector<Merge_Res> step_results;
 
   // Perform merge steps until we have the proper number of groups
   while (curr_num_groups > desired_num_groups) 
