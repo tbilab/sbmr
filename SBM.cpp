@@ -220,7 +220,7 @@ int SBM::mcmc_sweep(int level,
   }
   
   // Shuffle node order
-  std::random_shuffle(node_vec.begin(), node_vec.end());
+  std::shuffle(node_vec.begin(), node_vec.end(), sampler.int_gen);
 
   // Loop through each node
   for (auto node_it = node_vec.begin(); node_it != node_vec.end(); ++node_it)
@@ -719,9 +719,6 @@ std::vector<Merge_Res> SBM::agglomerative_run(
     {
       num_merges = curr_num_groups - desired_num_groups;
     }
-
-    // std::cout << "Performing " << num_merges << " merges. Current size: " 
-    //           << curr_num_groups << std::endl;
 
     // Perform merge and record results
     step_results.push_back(
