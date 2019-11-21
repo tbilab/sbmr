@@ -78,7 +78,7 @@ SBM build_simple_SBM()
 }
 
 // Gets average of the last n elements for a paseed vector of integers
-inline float avg_last_n(vector<int> vec, int n)
+inline float avg_last_n(std::vector<int> vec, int n)
 {
   return std::accumulate(vec.end() - n, 
                          vec.end(), 
@@ -166,6 +166,7 @@ TEST_CASE("Calculate Model entropy", "[SBM]")
         l1_edges,
         node_to_move,
         to_group,
+        0.1,
         0.1
     );
 
@@ -206,8 +207,8 @@ TEST_CASE("Basic MCMC sweeps", "[SBM]")
     int num_sweeps = 1000;
 
     // Loop over a few different epsilon values
-    vector<double> epsilons = {0.01, 0.9};
-    vector<double> avg_num_moves;
+    std::vector<double> epsilons = {0.01, 0.9};
+    std::vector<double> avg_num_moves;
 
     for (double eps : epsilons)
     {
