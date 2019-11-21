@@ -590,7 +590,7 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
     // Make sure that we now have one less group than before for each type
     int new_group_num = my_SBM.get_level(1)->size();
     int change_in_groups = num_initial_groups - new_group_num;
-    REQUIRE( change_in_groups == 2 );
+    REQUIRE( change_in_groups == 1 );
 
     // Make sure entropy has gone down as we would expect
     REQUIRE(initial_entropy < single_merge.entropy);
@@ -600,11 +600,11 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
 
     std::cout << "Attempting double merge " << std::endl;
     // Run greedy aglomerative merge with best single merge done
-    Merge_Res double_merge = new_SBM.agglomerative_merge(1, true, 5, 2, 0.01);
+    Merge_Res double_merge = new_SBM.agglomerative_merge(1, 2, true, 5, 0.01);
 
     // Make sure that we now have two fewer groups per type than before
     REQUIRE(
-        4 == 
+        2 == 
         num_initial_groups - new_SBM.get_level(1)->size()
     );
 

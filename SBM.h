@@ -92,10 +92,10 @@ class SBM {
 
     // Merge two groups at a given level based on the best probability of doing so
     Merge_Res agglomerative_merge(
-      int level, 
-      bool greedy, 
-      int n_checks_per_group,
-      int n_merges,
+      int    level_of_groups, 
+      int    n_merges,
+      bool   check_all_moves, 
+      int    n_checks_per_group,
       double eps);  
     
     // Run agglomerative merging until a desired number of groups is reached. 

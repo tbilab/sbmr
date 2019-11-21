@@ -1175,22 +1175,23 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 }  
 
 // =============================================================================
-// Merge two groups at a given level based on the best probability of doing so
+// Merge groups at a given level based on the best probability of doing so
 // =============================================================================
 Merge_Res SBM::agglomerative_merge(
-  int level, 
-  bool greedy, 
-  int n_checks_per_group,
-  int n_merges,
+  int    group_level, 
+  int    num_merges_to_make,
+  bool   check_all_moves, 
+  int    n_checks_per_group,
   double eps)
-{
-  int meta_level = level + 1;
+{ 
+  // Level that the group metagroups will sit at
+  int meta_level = group_level + 1;
 
   // Build a single meta-group for each node at desired level
-  give_every_node_at_level_own_group(level);
+  give_every_node_at_level_own_group(group_level);
 
   // Grab all the groups we're looking to merge
-  LevelPtr all_groups = get_level(level);
+  LevelPtr all_groups = get_level(group_level);
 
   // Gather how many groups of each type we have
   std::map<int, int> n_groups_of_type;
@@ -1202,12 +1203,18 @@ Merge_Res SBM::agglomerative_merge(
   }
 
   // Build vectors for recording merges
-  vector<NodePtr> from_group;
-  vector<NodePtr> to_group;
+  vector<NodePtr> from_groups;
+  vector<NodePtr> to_groups;
   vector<double>  move_delta;
 
-  // Make sure doing a merge makes sense
-  if (all_groups->size() <= 2) throw "To few groups to perform merge.";
+  // Make sure doing a merge makes sense by checking we have enough groups
+  // of every type
+  for (auto node_type_it = n_groups_of_type.begin();
+            node_type_it != n_groups_of_type.end();
+            node_type_it++)
+  {
+    if (node_type_it->second < 2) throw "To few groups to perform merge.";
+  }
 
   // Gather edge-counts for metagroups
   EdgeCounts metagroup_edges = gather_edge_counts(meta_level);
@@ -1223,7 +1230,7 @@ Merge_Res SBM::agglomerative_merge(
 
     // If we're running algorithm in greedy mode we should just
     // add every possible group to the groups-to-search list
-    if (greedy) 
+    if (check_all_moves) 
     {
       // Get a list of all the potential merges for group
       metagroups_to_search = get_nodes_of_type_at_level(
@@ -1260,91 +1267,76 @@ Merge_Res SBM::agglomerative_merge(
         1.0 
       ).entropy_delta;
       
-      from_group.push_back(curr_group);
-      to_group.push_back(merge_group);
+      from_groups.push_back(curr_group);
+      to_groups.push_back(merge_group);
       move_delta.push_back(entropy_delta);
     } 
   }
 
   // Now we find the top merges
-
   // Initialize a merge result holder struct
   Merge_Res results; 
 
-  // Push all results into type keyed map of priority queues
-  std::map<int, std::priority_queue<std::pair<double, int>>> type_q;
-  for (int i = 0; i < move_delta.size(); ++i) {
-    // Get type of the move being added to queue
-    int move_type = to_group[i]->type;  
-    
-    // Place this move's results in the proper queue location
-    type_q[move_type].push(
-      std::pair<double, int>(move_delta[i], i)
-    );
+  // Priority queue to find best moves
+  std::priority_queue<std::pair<double, int>> best_moves;
+
+ for (int i = 0; i < move_delta.size(); ++i) {
+    // Place this move's results in the queue
+    best_moves.push(std::pair<double, int>(move_delta[i], i));
   }
 
-  // Pop off the top n_merges best merges from each type to perform.
-  for (auto type_moves_it = type_q.begin();
-            type_moves_it != type_q.end();
-            type_moves_it++ )
-  { 
-    // Get how many groups we actualy have for this type
-    int num_available_groups = n_groups_of_type[type_moves_it->first];
-    
-    // Make sure we dont try to overextract moves for a type
-    int num_merges_to_make = num_available_groups < n_merges ?
-      num_available_groups : 
-      n_merges;
+  // A set of the unique merges we've made
+  std::set<string> merges_made;
+
+  // Start working our way through the queue of best moves and making merges
+  // if they are appropriate...
+  bool more_merges_needed = true;
+  bool queue_not_empty = true;
   
-    std::cout << "Merging " << num_merges_to_make << " groups of type " 
-              << type_moves_it->first << std::endl;
+  while (more_merges_needed & queue_not_empty)
+  {
+    // Extract index of best remaining merge
+    int merge_index = best_moves.top().second;
+
+    // Get groups that are being merged (culled)
+    NodePtr from_group = from_groups[merge_index];
+    NodePtr to_group = to_groups[merge_index];
+
+    // Make sure we haven't already merged the culled group
+    bool from_still_exists = merges_made.find(from_group->id) == 
+                             merges_made.end();
+
+    // Also make sure that we haven't removed the group we're trying to
+    // merge into
+    bool to_still_exists = merges_made.find(to_group->id) ==  
+                           merges_made.end();
     
-    // A set of the unique merges we've made
-    std::set<string> merges_made;
-
-    // While we still have merges to make and we haven't exhausted the queue
-    // Keep poping off merges from queue.
-    while ((merges_made.size() < num_merges_to_make) &
-           (type_moves_it->second.size() != 0)) 
+    if (from_still_exists & to_still_exists) 
     {
-      // Extract index of best remaining merge
-      int merge_index = type_moves_it->second.top().second;
+      // Insert new culled group into set
+      merges_made.insert(from_group->id);
 
-      // Get groups that are being merged (culled)
-      NodePtr culled_group = from_group[merge_index];
-      NodePtr absorbing_group = to_group[merge_index];
+      // Merge the best group pair
+      merge_groups(to_group, from_group);
 
-      // Make sure we haven't already merged the culled group
-      bool culled_still_exists = merges_made.find(culled_group->id) == 
-                                 merges_made.end();
-
-      // Also make sure that we haven't culled the group we're trying to
-      // merge into
-      bool absorbing_still_exists = merges_made.find(absorbing_group->id) == 
-                                    merges_made.end();
-                                  
-      if (culled_still_exists & absorbing_still_exists) 
-      {
-        // Insert new culled group into set
-        merges_made.insert(culled_group->id);
-
-        // Merge the best group pair
-        merge_groups(absorbing_group, culled_group);
-
-        // Record pair for results
-        results.from_node.push_back(culled_group);
-        results.to_node.push_back(absorbing_group);
-      }
-      // Remove the last index from our queue and go again
-      type_moves_it->second.pop();
+      // Record pair for results
+      results.from_node.push_back(from_group);
+      results.to_node.push_back(to_group);
     }
-  } 
+
+    // Remove the last index from our queue and go again
+    best_moves.pop();
+
+    // Update termination checking conditions
+    more_merges_needed = merges_made.size() < num_merges_to_make;
+    queue_not_empty = best_moves.size() != 0;
+  }
 
   // Erase the empty groups and metagroups
   clean_empty_groups();
 
   // Return the entropy for new model and merges done 
-  results.entropy = compute_entropy(level - 1);
+  results.entropy = compute_entropy(group_level - 1);
   
   return results;
 }
@@ -1395,9 +1387,9 @@ vector<Merge_Res> SBM::agglomerative_run(
     // Perform merge and record results
     step_results.push_back(
       agglomerative_merge(group_level, 
+                          num_merges, 
                           greedy, 
                           n_checks_per_group, 
-                          num_merges, 
                           eps )
     );
 
