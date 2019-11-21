@@ -128,13 +128,13 @@ NodePtr Network::create_group_node(int type, int level)
 // nodes returned are of the same type as specified, otherwise the nodes
 // returned are _not_ of the same type.
 // =============================================================================
-list<NodePtr> Network::get_nodes_from_level(
+std::list<NodePtr> Network::get_nodes_from_level(
     int type, 
     int level, 
     bool match_type) 
 {
   // Where we will store all the nodes found from level
-  list<NodePtr> nodes_to_return;
+  std::list<NodePtr> nodes_to_return;
 
   // Grab desired level reference
   LevelPtr node_level = nodes.at(level);
@@ -166,7 +166,7 @@ list<NodePtr> Network::get_nodes_from_level(
 // =============================================================================
 // Return nodes of a desired type from level. 
 // =============================================================================
-list<NodePtr> Network::get_nodes_of_type_at_level(int type, int level) 
+std::list<NodePtr> Network::get_nodes_of_type_at_level(int type, int level) 
 {
   return get_nodes_from_level(type, level, true);
 }   
@@ -175,7 +175,7 @@ list<NodePtr> Network::get_nodes_of_type_at_level(int type, int level)
 // =============================================================================
 // Return nodes _not_ of a specified type from level
 // =============================================================================
-list<NodePtr> Network::get_nodes_not_of_type_at_level(int type, int level) 
+std::list<NodePtr> Network::get_nodes_not_of_type_at_level(int type, int level) 
 {
   return get_nodes_from_level(type, level, false);
 }   
@@ -265,7 +265,7 @@ int Network::clean_empty_groups()
     LevelPtr group_level = nodes.at(level);
     
     // Create a vector to store group ids that we want to delete
-    vector<string> groups_to_delete;
+    std::vector<string> groups_to_delete;
     
     // Loop through every node at level
     for (auto group_it = group_level->begin(); 
@@ -322,7 +322,8 @@ EdgeCounts Network::gather_edge_counts(int level)
     NodePtr group_r = group_it->second;
 
     // Get all the edges for group r to its level
-    vector<NodePtr> group_r_cons = group_r->get_connections_to_level(level);
+    std::vector<NodePtr> group_r_cons = group_r->
+      get_connections_to_level(level);
     
     // Loop over all edges
     for (auto group_s = group_r_cons.begin(); 

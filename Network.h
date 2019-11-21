@@ -3,13 +3,8 @@
 
 #include "Node.h" 
 #include "helpers.h" 
-#include <math.h>   
 
-#include <map>
 #include <set>
-#include <memory>
-#include <numeric>
-#include <utility> 
 #include <iostream>
 
 
@@ -26,17 +21,13 @@ typedef std::shared_ptr<NodeLevel>                 LevelPtr;
 typedef std::map<int, LevelPtr>                    LevelMap;
 typedef std::map<std::pair<NodePtr, NodePtr>, int> EdgeCounts;
 
-using std::map;
 using std::string;
-using std::vector;
 
 // =============================================================================
 // Main node class declaration
 // =============================================================================
 class Network {
   public:
-    // Constructor
-    // Network();
 
     // Attributes
     // =========================================================================
@@ -75,15 +66,15 @@ class Network {
 
     // Return nodes of a desired type from level can be switched
     // Either matching or not matching the specified type
-    list<NodePtr> get_nodes_from_level(int type, 
+    std::list<NodePtr> get_nodes_from_level(int type, 
                                        int level, 
                                        bool match_type);
 
     // Return nodes of a desired type from level matching type
-    list<NodePtr> get_nodes_of_type_at_level(int type, int level);
+    std::list<NodePtr> get_nodes_of_type_at_level(int type, int level);
 
     // Return all nodes not of a specified type from level
-    list<NodePtr> get_nodes_not_of_type_at_level(int type, int level);   
+    std::list<NodePtr> get_nodes_not_of_type_at_level(int type, int level);   
 
     // Adds a connection between two nodes based on their references                         
     void add_connection(NodePtr node_a, NodePtr node_b);                             
@@ -114,10 +105,10 @@ class Network {
 
 struct State_Dump
 {
-  vector<string> id;
-  vector<string> parent;
-  vector<int> level;
-  vector<int> type;
+  std::vector<string> id;
+  std::vector<string> parent;
+  std::vector<int> level;
+  std::vector<int> type;
 };
 
 
