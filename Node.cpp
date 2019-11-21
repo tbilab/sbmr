@@ -1,24 +1,6 @@
 #include "Node.h" 
 
 
-// ============================================================================
-// Constructor that takes the nodes id and level. Assumes default 0 type. 
-// ============================================================================
-Node::Node(string node_id, int level):
-  id(node_id),
-  level(level),
-  type(0),
-  degree(0){}
-
-// ============================================================================
-// Constructor that takes the node's id, level, and type. 
-// ============================================================================
-Node::Node(string node_id, int level, int type):
-  id(node_id),
-  level(level),
-  type(type),
-  degree(0){}
-
 // =============================================================================
 // Replace 'this' with a shared smart pointer
 // =============================================================================
@@ -168,9 +150,9 @@ NodePtr Node::get_parent_at_level(int level_of_parent) {
 // We return a vector because we need random access to elements in this array
 // and that isn't provided to us with the list format.
 // =============================================================================
-vector<NodePtr> Node::get_connections_to_level(int desired_level) {
+std::vector<NodePtr> Node::get_connections_to_level(int desired_level) {
   // Vector to return containing parents at desired level for connections
-  vector<NodePtr> connected_nodes; 
+  std::vector<NodePtr> connected_nodes; 
 
   // Start by getting all of the level zero children of this node
   ChildSet leaf_children = get_children_at_level(0);
@@ -212,7 +194,7 @@ std::map<NodePtr, int> Node::gather_connections_to_level(int level)
 {
   // Gather all connections from the moved node to the level of the groups we're
   // working with
-  vector<NodePtr> all_connections = get_connections_to_level(level);
+  std::vector<NodePtr> all_connections = get_connections_to_level(level);
   
   // Setup an edge count map for node
   std::map<NodePtr, int> connections_counts;
@@ -227,32 +209,6 @@ std::map<NodePtr, int> Node::gather_connections_to_level(int level)
   
   return connections_counts;
 }
-
-
-// =============================================================================
-// Find what proportions of a nodes edges go to another node
-// =============================================================================
-double Node::frac_of_connections_to_group(NodePtr target_node) {
-  // Gather all connections from the moved node to the level of the node we're
-  // targeting
-  vector<NodePtr> all_connections = get_connections_to_level(target_node->level);
-  
-  int connections_to_target = 0;
-  
-  // Parse through all connections
-  for(auto curr_connection  = all_connections.begin(); 
-           curr_connection != all_connections.end();
-           ++curr_connection )
-  {
-    if ((*curr_connection)->id == target_node->id) 
-    {
-      connections_to_target++;
-    }
-  }
-  
-  return double(connections_to_target)/double(all_connections.size());
-}
-
 
 // =============================================================================
 // Static method to connect two nodes to each other with edge
