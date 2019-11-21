@@ -140,28 +140,6 @@ TEST_CASE("Gathering edge counts to a level", "[Node]")
     5
   );
   
-  double tol = 0.01;
-
-  // Also make sure fraction of connections to a given node works as well. 
-  REQUIRE(
-    a1->frac_of_connections_to_group(b11) == 
-    Approx(1.0).epsilon(tol)
-  );
-  
-  REQUIRE(
-    a1->frac_of_connections_to_group(b12) == 
-    Approx(0.0).epsilon(tol)
-  );
-  
-  REQUIRE(
-    a3->frac_of_connections_to_group(b11) == 
-    Approx(0.5).epsilon(tol)
-  );
-  
-  REQUIRE(
-    a3->frac_of_connections_to_group(a11) == 
-    Approx(0.0).epsilon(tol)
-  );
   
 }
 
