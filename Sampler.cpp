@@ -1,20 +1,7 @@
 #include "Sampler.h" 
 
 
-// =============================================================================
-// Constructor 
-// =============================================================================
-Sampler::Sampler()
-{
-   // Setup with the default random seed
-  initialize_seed(-1);
-}
 
-// When seed is provided, pass onto initialize seed
-Sampler::Sampler(int random_seed)
-{
-  initialize_seed(random_seed);
-}
 
 
 // =============================================================================
@@ -66,7 +53,7 @@ int Sampler::sample(int max_val)
 // =============================================================================
 // Sample a random element from a list of node pointers
 // =============================================================================
-NodePtr Sampler::sample(list<NodePtr> node_list)
+NodePtr Sampler::sample(std::list<NodePtr> node_list)
 {
   // Select a random index to grab
   int random_index = sample(node_list.size()-1);
@@ -91,7 +78,7 @@ NodePtr Sampler::sample(list<NodePtr> node_list)
 // Sample random node from vector of nodes
 // Easier than list because we can just index to a spot
 // =============================================================================
-NodePtr Sampler::sample(vector<NodePtr> node_vec)
+NodePtr Sampler::sample(std::vector<NodePtr> node_vec)
 {
   // Select a random index to grab
   int random_index = sample(node_vec.size() - 1);
