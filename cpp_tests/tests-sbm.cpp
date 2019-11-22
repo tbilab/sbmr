@@ -348,7 +348,7 @@ TEST_CASE("Greedy agglomerative merging on larger network", "[SBM]")
       true, // Run greedy?
       5,    // If not greedy we run 5 checks per group
       desired_num_groups,
-      2,     // Beta inverse temp for entropy calculation
+      2,     // sigma for rate of collapsing
       0.01); // epsilon for ergodicity amount in move proposals/entropy
 
   // Make sure that we have lumped together at least some groups
@@ -366,6 +366,30 @@ TEST_CASE("Greedy agglomerative merging on larger network", "[SBM]")
         Approx(run_results.end()->entropy).epsilon(0.5) ==
         first_merge_entropy);
   }
+}
+
+TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]")
+{
+  // Setup simple SBM model
+  SBM my_SBM = build_simulated_SBM();
+
+  int desired_num_groups = 4;
+
+  // Run full agglomerative merging algorithm till we have just 3 groups left
+  auto run_results = my_SBM.agglomerative_run(
+      0,    // Level
+      true, // Run greedy?
+      5,    // If not greedy we run 5 checks per group
+      desired_num_groups,
+      0.5,   // Setting sigma below one will trigger min number of moves aka 1
+      0.01); // epsilon for ergodicity amount in move proposals/entropy
+
+  int num_groups_removed = my_SBM.get_level(0)->size() - my_SBM.get_level(1)->size();
+
+  // Make sure we have a single step for each group removed.
+  REQUIRE(
+      num_groups_removed == run_results.size());
+
 }
 
 TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]")
