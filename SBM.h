@@ -84,10 +84,6 @@ public:
       int level_of_nodes_to_group,
       int desired_num_groups,
       Merge_Params params = Merge_Params()
-      // double sigma,
-      // double eps,
-      // bool greedy,
-      // int n_checks_per_group // If we don't look for all moves, how many?
   );
 
   // Compute probability of accepting a node group swap
