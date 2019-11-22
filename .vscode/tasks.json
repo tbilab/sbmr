@@ -10,6 +10,7 @@
           "-g",
           "debugging/debug.cpp",
           "Node.cpp",
+          "Network.cpp",
           "SBM.cpp",
           "helpers.cpp",
           "Sampler.cpp",
