@@ -13,6 +13,16 @@ struct Trans_Probs;
 struct Proposal_Res;
 struct Merge_Res;
 
+
+struct Merge_Params
+{
+  double eps = 0.1;
+  double sigma = 2;
+  bool greedy = true;
+  int n_checks_per_group = 5;
+  Merge_Params(){};
+};
+
 // =============================================================================
 // Main node class declaration
 // =============================================================================
@@ -71,12 +81,13 @@ public:
   // Run agglomerative merging until a desired number of groups is reached.
   // Returns vector of results for each merge step
   std::vector<Merge_Res> agglomerative_run(
-      int level_of_nodes_to_group, // What level the nodes we're merging are at
-      bool greedy,                 // Do we look for all possible moves?
-      int n_checks_per_group,      // If we don't look for all moves, how many?
-      int desired_num_groups,      // How many groups should we aim for having?
-      double sigma,                // Speed parameter: bigger == smaller jumps
-      double eps                   // How random are our proposals?
+      int level_of_nodes_to_group,
+      int desired_num_groups,
+      Merge_Params params = Merge_Params()
+      // double sigma,
+      // double eps,
+      // bool greedy,
+      // int n_checks_per_group // If we don't look for all moves, how many?
   );
 
   // Compute probability of accepting a node group swap
@@ -112,5 +123,7 @@ struct Merge_Res
   std::vector<NodePtr> from_node;
   std::vector<NodePtr> to_node;
 };
+
+
 
 #endif

@@ -672,11 +672,8 @@ Merge_Res SBM::agglomerative_merge(int group_level, int num_merges_to_make,
 // =============================================================================
 std::vector<Merge_Res>
 SBM::agglomerative_run(int level_of_nodes_to_group,
-                       bool greedy,
-                       int n_checks_per_group,
                        int desired_num_groups,
-                       double sigma,
-                       double eps)
+                       Merge_Params params)
 {
   // Start by giving every node at the desired level its own group
   give_every_node_at_level_own_group(level_of_nodes_to_group);
@@ -697,7 +694,7 @@ SBM::agglomerative_run(int level_of_nodes_to_group,
     // Calculate how many merges we should do for this step
     // (Converting to integer rounds down.)
     int num_merges =
-      std::max(int(curr_num_groups - curr_num_groups / sigma), 1);
+      std::max(int(curr_num_groups - curr_num_groups / params.sigma), 1);
 
     // Make sure we don't overstep the goal number of groups
     if ((curr_num_groups - num_merges) < desired_num_groups) {
@@ -708,7 +705,7 @@ SBM::agglomerative_run(int level_of_nodes_to_group,
     try {
       // Perform merge and record results
       step_results.push_back(agglomerative_merge(
-        group_level, num_merges, greedy, n_checks_per_group, eps));
+        group_level, num_merges, params.greedy, params.n_checks_per_group, params.eps));
     } catch (...) {
       // We reached the collapsibility limit of our network so we break early
       break;
