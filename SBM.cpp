@@ -516,7 +516,8 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 // =============================================================================
 Merge_Res SBM::agglomerative_merge(int group_level, int num_merges_to_make,
                                    bool check_all_moves, int n_checks_per_group,
-                                   double eps) {
+                                   double eps)
+{
   // Quick check to make sure reasonable request
   if (num_merges_to_make == 0)
     throw "Zero merges requested.";
@@ -536,7 +537,8 @@ Merge_Res SBM::agglomerative_merge(int group_level, int num_merges_to_make,
   // Gather how many groups of each type we have
   std::map<int, int> n_groups_of_type;
   for (auto group_it = all_groups->begin(); group_it != all_groups->end();
-       group_it++) {
+       group_it++)
+  {
     n_groups_of_type[group_it->second->type]++;
   }
 
@@ -548,8 +550,10 @@ Merge_Res SBM::agglomerative_merge(int group_level, int num_merges_to_make,
   // Make sure doing a merge makes sense by checking we have enough groups
   // of every type
   for (auto node_type_it = n_groups_of_type.begin();
-       node_type_it != n_groups_of_type.end(); node_type_it++) {
-    if (node_type_it->second < 2) {
+       node_type_it != n_groups_of_type.end(); node_type_it++)
+  {
+    if (node_type_it->second < 2)
+    {
       throw "To few groups to perform merge.";
     }
   }
@@ -559,20 +563,25 @@ Merge_Res SBM::agglomerative_merge(int group_level, int num_merges_to_make,
 
   // Loop over each group and find best merge option
   for (auto group_it = all_groups->begin(); group_it != all_groups->end();
-       group_it++) {
+       group_it++)
+  {
     NodePtr curr_group = group_it->second;
 
     std::list<NodePtr> metagroups_to_search;
 
     // If we're running algorithm in greedy mode we should just
     // add every possible group to the groups-to-search list
-    if (check_all_moves) {
+    if (check_all_moves)
+    {
       // Get a list of all the potential merges for group
       metagroups_to_search =
           get_nodes_of_type_at_level(curr_group->type, meta_level);
-    } else {
+    }
+    else
+    {
       // Otherwise, we should sample a given number of groups to check
-      for (int i = 0; i < n_checks_per_group; i++) {
+      for (int i = 0; i < n_checks_per_group; i++)
+      {
         // Sample a group from potential groups
         metagroups_to_search.push_back(propose_move(curr_group, eps));
       }
@@ -580,7 +589,8 @@ Merge_Res SBM::agglomerative_merge(int group_level, int num_merges_to_make,
 
     // Now that we have gathered all the merges to check, we can loop
     // through them and check entropy changes
-    for (NodePtr metagroup : metagroups_to_search) {
+    for (NodePtr metagroup : metagroups_to_search)
+    {
       // Get group that the metagroup belongs to
       NodePtr merge_group = *((metagroup->children).begin());
 
@@ -606,7 +616,8 @@ Merge_Res SBM::agglomerative_merge(int group_level, int num_merges_to_make,
   // Priority queue to find best moves
   std::priority_queue<std::pair<double, int>> best_moves;
 
-  for (int i = 0; i < move_delta.size(); ++i) {
+  for (int i = 0; i < move_delta.size(); ++i)
+  {
     // Place this move's results in the queue
     best_moves.push(std::pair<double, int>(move_delta[i], i));
   }
@@ -619,7 +630,8 @@ Merge_Res SBM::agglomerative_merge(int group_level, int num_merges_to_make,
   bool more_merges_needed = true;
   bool queue_not_empty = true;
 
-  while (more_merges_needed & queue_not_empty) {
+  while (more_merges_needed & queue_not_empty)
+  {
     // Extract index of best remaining merge
     int merge_index = best_moves.top().second;
 
@@ -635,7 +647,8 @@ Merge_Res SBM::agglomerative_merge(int group_level, int num_merges_to_make,
     // merge into
     bool to_still_exists = merges_made.find(to_group->id) == merges_made.end();
 
-    if (from_still_exists & to_still_exists) {
+    if (from_still_exists & to_still_exists)
+    {
       // Insert new culled group into set
       merges_made.insert(from_group->id);
 
