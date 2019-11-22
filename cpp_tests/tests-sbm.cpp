@@ -281,14 +281,14 @@ TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
   double initial_entropy = my_SBM.compute_entropy(0);
 
   // Run full agglomerative merging algorithm till we have just 3 groups left
-  my_SBM.agglomerative_run(1,true,5,3,2,0.01);
+  auto run_results = my_SBM.agglomerative_run(0,true,5,3,2,0.01);
 
-  // std::cout << "Post-Merging..." << std::endl;
-  // print_state_dump(my_SBM.get_state());
+  std::cout << "Post-Merging..." << std::endl;
+  print_state_dump(my_SBM.get_state());
 
-  // // Make sure that we now have one less group than before
-  // REQUIRE(
-  //   my_SBM.get_level(1)->size() == 
-  //   3
-  // );
+  // Make sure that we now have just 3 groups left
+  REQUIRE(
+    my_SBM.get_level(1)->size() == 
+    3
+  );
 }
