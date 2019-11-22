@@ -310,7 +310,8 @@ double SBM::compute_entropy(int level)
   
   // Compute total number of edges and convert to double
   double n_total_edges = double(sum_of_degrees)/2.0;
-  
+
+
   // Calculate first component (sum of node degree counts portion)
   double degree_summation = 0.0;
   for (auto degree_count =  n_nodes_w_degree.begin(); 
@@ -319,7 +320,7 @@ double SBM::compute_entropy(int level)
   {
     int k = degree_count->first;
     int num_nodes = degree_count->second;
-    degree_summation += num_nodes * log(factorial(k));
+    degree_summation += num_nodes * log_factorial(k);
   }
   
   //============================================================================
@@ -501,9 +502,6 @@ Proposal_Res SBM::compute_acceptance_prob(EdgeCounts& level_counts,
 // =============================================================================
 void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 {
-  std::cout << "Merging " << group_b->id << " into " 
-            << group_a->id << std::endl;
-
   // Place all the members of group b under group a
   auto children_to_move = group_b->children;
 
