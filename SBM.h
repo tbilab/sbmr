@@ -76,12 +76,12 @@ class SBM : public Network {
     // Run agglomerative merging until a desired number of groups is reached. 
     // Returns vector of results for each merge step
     std::vector<Merge_Res> agglomerative_run(
-      int level_of_nodes_to_group, 
-      bool greedy,
-      int n_checks_per_group,
-      int desired_num_groups,
-      double sigma,
-      double eps
+      int level_of_nodes_to_group,  // What level the nodes we're merging are at
+      bool greedy,                  // Do we look for all possible moves?
+      int n_checks_per_group,       // If we don't look for all moves, how many?
+      int desired_num_groups,       // How many groups should we aim for having?
+      double sigma,                 // Speed parameter: bigger == smaller jumps
+      double eps                    // How random are our proposals?
     );
     
 
