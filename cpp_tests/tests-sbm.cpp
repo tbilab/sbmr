@@ -154,7 +154,6 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
   int num_initial_groups = my_SBM.get_level(1)->size();
   double initial_entropy = my_SBM.compute_entropy(0);
 
-  std::cout << "Attempting single merge " << std::endl;
   // Run greedy aglomerative merge with best single merge done
   Merge_Res single_merge = my_SBM.agglomerative_merge(1, true, 5, 1, 0.01);
 
@@ -169,7 +168,6 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
   // Run again but this time merging the best 2
   SBM new_SBM = build_simple_SBM();
 
-  std::cout << "Attempting double merge " << std::endl;
   // Run greedy aglomerative merge with best single merge done
   Merge_Res double_merge = new_SBM.agglomerative_merge(1, 2, true, 5, 0.01);
 
@@ -197,9 +195,6 @@ TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
     3,  // Reduce to 3 total groups
     params);
 
-  std::cout << "Post-Merging..." << std::endl;
-  print_state_dump(my_SBM.get_state());
-
   // Make sure that we now have just 3 groups left
   REQUIRE(my_SBM.get_level(1)->size() == 3);
 }
@@ -221,7 +216,7 @@ TEST_CASE("Greedy agglomerative merging on larger network", "[SBM]")
 
   // Greedy merging should also always return the same results...
   double first_merge_entropy = run_results.end()->entropy;
-  for (int i = 0; i < 15; i++)
+  for (int i = 0; i < 5; i++)
   {
     SBM new_SBM = build_simulated_SBM();
     auto new_results =
@@ -240,12 +235,13 @@ TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]"
   // Setup simple SBM model
   SBM my_SBM = build_simulated_SBM();
 
-  int desired_num_groups = 4;
-
+  int desired_num_groups = 6;
 
   Merge_Params params;
   params.sigma = 0.5;
-  // Run full agglomerative merging algorithm till we have just 3 groups left
+  params.eps = 2;
+
+  // Run full agglomerative merging algorithm 
   auto run_results = my_SBM.agglomerative_run(
       0, // Level
       desired_num_groups,
@@ -257,6 +253,15 @@ TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]"
   REQUIRE(
       num_groups_removed == run_results.size());
 
+  // for (auto step_it = run_results.begin();
+  //           step_it != run_results.end();
+  //           step_it++)
+  // {
+  //   std::cout << (step_it->from_node)[0]->id <<  " -> " 
+  //             << (step_it->to_node)[0]->id   << ": " 
+  //             << step_it->entropy 
+  //             << std::endl;
+  // }
 }
 
 TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]")
