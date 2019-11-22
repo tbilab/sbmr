@@ -1,10 +1,9 @@
 #ifndef __SBM_INCLUDED__
 #define __SBM_INCLUDED__
 
-#include "Network.h" 
+#include "Network.h"
 #include "Sampler.h"
-#include <math.h>   
-
+#include <math.h>
 
 // =============================================================================
 // What this file declares
@@ -14,85 +13,79 @@ struct Trans_Probs;
 struct Proposal_Res;
 struct Merge_Res;
 
-
 // =============================================================================
 // Main node class declaration
 // =============================================================================
-class SBM : public Network {
-  public:
-    // Constructors
-    // =========================================================================            
-    // Just sets default epsilon value to computer derived seed
-    SBM(){}
-    
-    // Sets default seed to specified value
-    SBM(int sampler_seed):
-      sampler(sampler_seed){}
+class SBM : public Network
+{
+public:
+  // Constructors
+  // =========================================================================
+  // Just sets default epsilon value to computer derived seed
+  SBM() {}
 
-    // Attributes
-    // =========================================================================            
-    // A random sampler generation sclass. 
-    Sampler sampler;                 
+  // Sets default seed to specified value
+  SBM(int sampler_seed) : sampler(sampler_seed) {}
 
-    // Methods
-    // =========================================================================
- 
-    // Compute microcononical entropy of current model state at a level               
-    double compute_entropy(int level);      
+  // Attributes
+  // =========================================================================
+  // A random sampler generation sclass.
+  Sampler sampler;
 
-    // Merge two groups, placing all nodes that were under group_b under 
-    // group_a and deleting from model.
-    void merge_groups(NodePtr group_a, NodePtr group_b);               
-    
-    // Use model state to propose a potential group move for a node. 
-    NodePtr propose_move(NodePtr node, double eps);                 
-    
-    // Make a decision on the proposed new group for node
-    Proposal_Res make_proposal_decision(
+  // Methods
+  // =========================================================================
+
+  // Compute microcononical entropy of current model state at a level
+  double compute_entropy(int level);
+
+  // Merge two groups, placing all nodes that were under group_b under
+  // group_a and deleting from model.
+  void merge_groups(NodePtr group_a, NodePtr group_b);
+
+  // Use model state to propose a potential group move for a node.
+  NodePtr propose_move(NodePtr node, double eps);
+
+  // Make a decision on the proposed new group for node
+  Proposal_Res make_proposal_decision(
       EdgeCounts &edge_counts,
       NodePtr node,
       NodePtr new_group,
       double eps,
-      double beta
-    ); 
-    
-    // Runs efficient MCMC sweep algorithm on desired node level
-    int mcmc_sweep(
-      int level,                    
-      bool variable_num_groups, 
-      double eps, 
-      double beta
-    );
+      double beta);
 
-    // Merge two groups at a given level based on the probability of doing so
-    Merge_Res agglomerative_merge(
-      int    level_of_groups, 
-      int    n_merges,
-      bool   check_all_moves, 
-      int    n_checks_per_group,
-      double eps
-    );  
-    
-    // Run agglomerative merging until a desired number of groups is reached. 
-    // Returns vector of results for each merge step
-    std::vector<Merge_Res> agglomerative_run(
-      int level_of_nodes_to_group,  // What level the nodes we're merging are at
-      bool greedy,                  // Do we look for all possible moves?
-      int n_checks_per_group,       // If we don't look for all moves, how many?
-      int desired_num_groups,       // How many groups should we aim for having?
-      double sigma,                 // Speed parameter: bigger == smaller jumps
-      double eps                    // How random are our proposals?
-    );
-    
+  // Runs efficient MCMC sweep algorithm on desired node level
+  int mcmc_sweep(
+      int level,
+      bool variable_num_groups,
+      double eps,
+      double beta);
 
-    // Compute probability of accepting a node group swap
-    Proposal_Res compute_acceptance_prob(
-      EdgeCounts& level_counts,
-      NodePtr     node_to_update,
-      NodePtr     new_group,
-      double      eps,
-      double      beta 
-    ); 
+  // Merge two groups at a given level based on the probability of doing so
+  Merge_Res agglomerative_merge(
+      int level_of_groups,
+      int n_merges,
+      bool check_all_moves,
+      int n_checks_per_group,
+      double eps);
+
+  // Run agglomerative merging until a desired number of groups is reached.
+  // Returns vector of results for each merge step
+  std::vector<Merge_Res> agglomerative_run(
+      int level_of_nodes_to_group, // What level the nodes we're merging are at
+      bool greedy,                 // Do we look for all possible moves?
+      int n_checks_per_group,      // If we don't look for all moves, how many?
+      int desired_num_groups,      // How many groups should we aim for having?
+      double sigma,                // Speed parameter: bigger == smaller jumps
+      double eps                   // How random are our proposals?
+  );
+
+  // Compute probability of accepting a node group swap
+  Proposal_Res compute_acceptance_prob(
+      EdgeCounts &level_counts,
+      NodePtr node_to_update,
+      NodePtr new_group,
+      double eps,
+      double beta);
 };
 
 // Two equal-sized vectors, one containing probabilities of a node joining a
@@ -102,7 +95,7 @@ struct Trans_Probs
   std::vector<double> probability;
   std::vector<NodePtr> group;
   Trans_Probs(std::vector<double> p, std::vector<NodePtr> g) : probability(p),
-                                                     group(g){};
+                                                               group(g){};
 };
 
 struct Proposal_Res

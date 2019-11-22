@@ -5,11 +5,10 @@
 #include "../helpers.h"
 #include "../SBM.h"
 
-
 // Loads a simple bipartite sbm model with optional hierarchy added
 SBM build_simple_SBM()
 {
-  
+
   // This function builds a network with the following structure
   /*
    +----+               +----+
@@ -32,9 +31,9 @@ SBM build_simple_SBM()
    |    |   | a4 |------/  \-----| b4 |---|    |
    +----+   |    |               |    |   +----+
    +----+               +----+
-   */   
+   */
   SBM my_SBM;
-  
+
   // Add nodes to graph first
   NodePtr a1 = my_SBM.add_node("a1", 0);
   NodePtr a2 = my_SBM.add_node("a2", 0);
@@ -44,7 +43,7 @@ SBM build_simple_SBM()
   NodePtr b2 = my_SBM.add_node("b2", 1);
   NodePtr b3 = my_SBM.add_node("b3", 1);
   NodePtr b4 = my_SBM.add_node("b4", 1);
-  
+
   // Add connections
   my_SBM.add_connection(a1, b1);
   my_SBM.add_connection(a1, b2);
@@ -54,7 +53,7 @@ SBM build_simple_SBM()
   my_SBM.add_connection(a3, b2);
   my_SBM.add_connection(a3, b4);
   my_SBM.add_connection(a4, b3);
-  
+
   // Make 2 type 0/a groups
   NodePtr a11 = my_SBM.add_node("a11", 0, 1);
   NodePtr a12 = my_SBM.add_node("a12", 0, 1);
@@ -62,7 +61,7 @@ SBM build_simple_SBM()
   NodePtr b11 = my_SBM.add_node("b11", 1, 1);
   NodePtr b12 = my_SBM.add_node("b12", 1, 1);
   NodePtr b13 = my_SBM.add_node("b13", 1, 1);
-  
+
   // Assign nodes to their groups
   a1->set_parent(a11);
   a2->set_parent(a12);
@@ -72,8 +71,7 @@ SBM build_simple_SBM()
   b2->set_parent(b11);
   b3->set_parent(b12);
   b4->set_parent(b13);
-  
-  
+
   return my_SBM;
 }
 
@@ -139,9 +137,10 @@ SBM build_simulated_SBM()
 // Gets average of the last n elements for a paseed vector of integers
 inline float avg_last_n(std::vector<int> vec, int n)
 {
-  return std::accumulate(vec.end() - n, 
-                         vec.end(), 
-                         0.0 ) / float(n);
+  return std::accumulate(vec.end() - n,
+                         vec.end(),
+                         0.0) /
+         float(n);
 }
 
 // Print a state dump for debugging purposes
@@ -151,182 +150,171 @@ inline void print_state_dump(State_Dump state)
 
   for (int i = 0; i < n; i++)
   {
-    std::cout << std::setw (7) << state.id[i] << ", " 
-              << std::setw (7) << state.parent[i] << ", " 
-              << std::setw (2) << state.level[i] << ", " << std::endl;
+    std::cout << std::setw(7) << state.id[i] << ", "
+              << std::setw(7) << state.parent[i] << ", "
+              << std::setw(2) << state.level[i] << ", " << std::endl;
   }
 }
 
-
 TEST_CASE("Generate Node move proposals", "[SBM]")
 {
-    double tol = 0.01;
-    double eps = 0.01;
-    SBM my_SBM = build_simple_SBM();
+  double tol = 0.01;
+  double eps = 0.01;
+  SBM my_SBM = build_simple_SBM();
 
-    NodePtr a1 = my_SBM.get_node_by_id("a1");
+  NodePtr a1 = my_SBM.get_node_by_id("a1");
 
-    // Initialize a sampler to choose group
-    Sampler my_sampler;
+  // Initialize a sampler to choose group
+  Sampler my_sampler;
 
-    int num_trials = 5000;
-    int num_times_no_move = 0;
-    NodePtr old_group = a1->parent;
+  int num_trials = 5000;
+  int num_times_no_move = 0;
+  NodePtr old_group = a1->parent;
 
-    // Run multiple trials and of move and see how often a given node is moved
-    for (int i = 0; i < num_trials; ++i)
-    {
-        // Do move attempt (dry run)
-        NodePtr new_group = my_SBM.propose_move(a1, eps);
+  // Run multiple trials and of move and see how often a given node is moved
+  for (int i = 0; i < num_trials; ++i)
+  {
+    // Do move attempt (dry run)
+    NodePtr new_group = my_SBM.propose_move(a1, eps);
 
-        if (new_group->id == old_group->id) num_times_no_move++;
-    }
+    if (new_group->id == old_group->id)
+      num_times_no_move++;
+  }
 
-    double frac_of_time_no_change = double(num_times_no_move)/double(num_trials);
+  double frac_of_time_no_change = double(num_times_no_move) / double(num_trials);
 
-    // Prob of a1 staying in a1_1 should be approximately (2 + eps)/(6 + 4*eps)
-    // Make sure model's decisions to move a1 reflects this.
-    double two = 2;
-    double six = 6;
-    double four = 4;
+  // Prob of a1 staying in a1_1 should be approximately (2 + eps)/(6 + 4*eps)
+  // Make sure model's decisions to move a1 reflects this.
+  double two = 2;
+  double six = 6;
+  double four = 4;
 
-    REQUIRE(
-        Approx((two + eps)/(six + four*eps)).epsilon(tol) == 
-        frac_of_time_no_change
-    );
+  REQUIRE(
+      Approx((two + eps) / (six + four * eps)).epsilon(tol) ==
+      frac_of_time_no_change);
 }
-
 
 TEST_CASE("Calculate Model entropy", "[SBM]")
 {
-    // Setup simple SBM model
-    SBM my_SBM = build_simple_SBM();
+  // Setup simple SBM model
+  SBM my_SBM = build_simple_SBM();
 
-    EdgeCounts l1_edges = my_SBM.gather_edge_counts(1);
+  EdgeCounts l1_edges = my_SBM.gather_edge_counts(1);
 
-    // Compute full entropy at first level of nodes
-    double model_entropy = my_SBM.compute_entropy(0);
+  // Compute full entropy at first level of nodes
+  double model_entropy = my_SBM.compute_entropy(0);
 
-    // Test entropy is near a hand-calculated value
-    // Should be -8 - ( 2*log(2) + 3*log(6) ) - ( 2*log(2/12) + 4*log(4/30) + 1*log(1/5) + 1*log(1) ) = -1.509004
-    REQUIRE(
-        model_entropy == 
-        Approx(-1.509004).epsilon(0.1)
-    );
+  // Test entropy is near a hand-calculated value
+  // Should be -8 - ( 2*log(2) + 3*log(6) ) - ( 2*log(2/12) + 4*log(4/30) + 1*log(1/5) + 1*log(1) ) = -1.509004
+  REQUIRE(
+      model_entropy ==
+      Approx(-1.509004).epsilon(0.1));
 
+  // Calculate entropy delta caused by moving a node
+  NodePtr node_to_move = my_SBM.get_node_by_id("a1");
+  NodePtr from_group = node_to_move->parent;
+  NodePtr to_group = my_SBM.get_node_by_id("a12", 1);
 
-    // Calculate entropy delta caused by moving a node
-    NodePtr node_to_move = my_SBM.get_node_by_id("a1");
-    NodePtr from_group = node_to_move->parent;
-    NodePtr to_group = my_SBM.get_node_by_id("a12", 1);
+  // Calculate the entropy delta along with acceptance prob
+  Proposal_Res proposal_results = my_SBM.compute_acceptance_prob(
+      l1_edges,
+      node_to_move,
+      to_group,
+      0.1,
+      0.1);
 
-    // Calculate the entropy delta along with acceptance prob
-    Proposal_Res proposal_results = my_SBM.compute_acceptance_prob(
-        l1_edges,
-        node_to_move,
-        to_group,
-        0.1,
-        0.1
-    );
+  double entropy_delta = proposal_results.entropy_delta;
 
-    double entropy_delta = proposal_results.entropy_delta;
+  // std::cout << "Moving a1 from a11->a12: prob = " << proposal_results.prob_of_accept << std::endl;
 
-    // std::cout << "Moving a1 from a11->a12: prob = " << proposal_results.prob_of_accept << std::endl;
+  // Now we will actually move the desired node and test to see if entropy has changed
+  // Move node
+  node_to_move->set_parent(to_group);
 
-    // Now we will actually move the desired node and test to see if entropy has changed
-    // Move node
-    node_to_move->set_parent(to_group);
+  // Recalculate entropy
+  double new_entropy = my_SBM.compute_entropy(0);
 
-    // Recalculate entropy
-    double new_entropy = my_SBM.compute_entropy(0);
+  // Get difference from original
+  double real_entropy_delta = model_entropy - new_entropy;
 
-    // Get difference from original
-    double real_entropy_delta = model_entropy - new_entropy;
+  REQUIRE(
+      real_entropy_delta ==
+      Approx(entropy_delta).epsilon(0.1));
 
-    REQUIRE(
-        real_entropy_delta ==
-        Approx(entropy_delta).epsilon(0.1) 
-    );
-
-    REQUIRE(
-        proposal_results.entropy_delta == 
-        entropy_delta
-    );
+  REQUIRE(
+      proposal_results.entropy_delta ==
+      entropy_delta);
 }
-
 
 TEST_CASE("Basic MCMC sweeps", "[SBM]")
 {
-    // Setup simple SBM model
-    SBM my_SBM = build_simple_SBM();
+  // Setup simple SBM model
+  SBM my_SBM = build_simple_SBM();
 
-    State_Dump pre_sweep = my_SBM.get_state();
+  State_Dump pre_sweep = my_SBM.get_state();
 
-    // Run a few rounds of sweeps of the MCMC algorithm on network 
-    int num_sweeps = 1000;
+  // Run a few rounds of sweeps of the MCMC algorithm on network
+  int num_sweeps = 1000;
 
-    // Loop over a few different epsilon values
-    std::vector<double> epsilons = {0.01, 0.9};
-    std::vector<double> avg_num_moves;
+  // Loop over a few different epsilon values
+  std::vector<double> epsilons = {0.01, 0.9};
+  std::vector<double> avg_num_moves;
 
-    for (double eps : epsilons)
+  for (double eps : epsilons)
+  {
+    int total_num_changes = 0;
+
+    for (int i = 0; i < num_sweeps; i++)
     {
-        int total_num_changes = 0;
-
-        for (int i = 0; i < num_sweeps; i++)
-        {
-            int n_changes = my_SBM.mcmc_sweep(0, false, eps, 1.0);
-            total_num_changes += n_changes;
-        }
-
-        double avg_num_changes = double(total_num_changes)/double(num_sweeps);
-
-        avg_num_moves.push_back(avg_num_changes);
-        // std::cout << std::setw (5) << eps << " -- Avg number of changes = " << avg_num_changes << std::endl; 
+      int n_changes = my_SBM.mcmc_sweep(0, false, eps, 1.0);
+      total_num_changes += n_changes;
     }
 
-    // Make sure that we have a more move-prone model when we have a high epsilon value...
-    REQUIRE(
-        avg_num_moves.at(0) < avg_num_moves.at(epsilons.size() - 1)
-    );
-}
+    double avg_num_changes = double(total_num_changes) / double(num_sweeps);
 
+    avg_num_moves.push_back(avg_num_changes);
+    // std::cout << std::setw (5) << eps << " -- Avg number of changes = " << avg_num_changes << std::endl;
+  }
+
+  // Make sure that we have a more move-prone model when we have a high epsilon value...
+  REQUIRE(
+      avg_num_moves.at(0) < avg_num_moves.at(epsilons.size() - 1));
+}
 
 TEST_CASE("Agglomerative merge steps", "[SBM]")
 {
-    // Setup simple SBM model
-    SBM my_SBM = build_simple_SBM();
+  // Setup simple SBM model
+  SBM my_SBM = build_simple_SBM();
 
-    int num_initial_groups = my_SBM.get_level(1)->size();
-    double initial_entropy = my_SBM.compute_entropy(0);
+  int num_initial_groups = my_SBM.get_level(1)->size();
+  double initial_entropy = my_SBM.compute_entropy(0);
 
-    std::cout << "Attempting single merge " << std::endl;
-    // Run greedy aglomerative merge with best single merge done
-    Merge_Res single_merge = my_SBM.agglomerative_merge(1, true, 5, 1, 0.01);
+  std::cout << "Attempting single merge " << std::endl;
+  // Run greedy aglomerative merge with best single merge done
+  Merge_Res single_merge = my_SBM.agglomerative_merge(1, true, 5, 1, 0.01);
 
-    // Make sure that we now have one less group than before for each type
-    int new_group_num = my_SBM.get_level(1)->size();
-    int change_in_groups = num_initial_groups - new_group_num;
-    REQUIRE( change_in_groups == 1 );
+  // Make sure that we now have one less group than before for each type
+  int new_group_num = my_SBM.get_level(1)->size();
+  int change_in_groups = num_initial_groups - new_group_num;
+  REQUIRE(change_in_groups == 1);
 
-    // Make sure entropy has gone down as we would expect
-    REQUIRE(initial_entropy < single_merge.entropy);
+  // Make sure entropy has gone down as we would expect
+  REQUIRE(initial_entropy < single_merge.entropy);
 
-    // Run again but this time merging the best 2
-    SBM new_SBM = build_simple_SBM();
+  // Run again but this time merging the best 2
+  SBM new_SBM = build_simple_SBM();
 
-    std::cout << "Attempting double merge " << std::endl;
-    // Run greedy aglomerative merge with best single merge done
-    Merge_Res double_merge = new_SBM.agglomerative_merge(1, 2, true, 5, 0.01);
+  std::cout << "Attempting double merge " << std::endl;
+  // Run greedy aglomerative merge with best single merge done
+  Merge_Res double_merge = new_SBM.agglomerative_merge(1, 2, true, 5, 0.01);
 
-    // Make sure that we now have two fewer groups per type than before
-    REQUIRE(
-        2 == 
-        num_initial_groups - new_SBM.get_level(1)->size()
-    );
+  // Make sure that we now have two fewer groups per type than before
+  REQUIRE(
+      2 ==
+      num_initial_groups - new_SBM.get_level(1)->size());
 
-    // Entropy should go down even more with two merges
-    REQUIRE(single_merge.entropy < double_merge.entropy);
+  // Entropy should go down even more with two merges
+  REQUIRE(single_merge.entropy < double_merge.entropy);
 }
 
 TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
@@ -356,30 +344,32 @@ TEST_CASE("Greedy agglomerative merging on larger network", "[SBM]")
 
   // Run full agglomerative merging algorithm till we have just 3 groups left
   auto run_results = my_SBM.agglomerative_run(
-    0,    // Level
-    true, // Run greedy?
-    5,    // If not greedy we run 5 checks per group
-    desired_num_groups,
-    2,     // Beta inverse temp for entropy calculation
-    0.01); // epsilon for ergodicity amount in move proposals/entropy
+      0,    // Level
+      true, // Run greedy?
+      5,    // If not greedy we run 5 checks per group
+      desired_num_groups,
+      2,     // Beta inverse temp for entropy calculation
+      0.01); // epsilon for ergodicity amount in move proposals/entropy
 
   // Make sure that we have lumped together at least some groups
   REQUIRE(my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size());
 
   // Greedy merging should also always return the same results...
   double first_merge_entropy = run_results.end()->entropy;
-  for (int i = 0; i < 15; i++) {
+  for (int i = 0; i < 15; i++)
+  {
     SBM new_SBM = build_simulated_SBM();
     auto new_results =
         my_SBM.agglomerative_run(0, true, 5, desired_num_groups, 2, 0.01);
 
     REQUIRE(
-      Approx(run_results.end()->entropy).epsilon(0.5) ==
-      first_merge_entropy);
+        Approx(run_results.end()->entropy).epsilon(0.5) ==
+        first_merge_entropy);
   }
 }
 
-TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]") {
+TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]")
+{
   // Setup simple SBM model
   SBM my_SBM = build_simulated_SBM();
 
