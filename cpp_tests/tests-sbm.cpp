@@ -77,6 +77,65 @@ SBM build_simple_SBM()
   return my_SBM;
 }
 
+SBM build_simulated_SBM()
+{
+  // This function implements a network built using the bisbmsim package
+  // produced for the TBI lab and is built using the R script at
+  // /tools/simulate_test_network.R
+  SBM my_SBM;
+
+  my_SBM.add_node("a1", 1);
+  my_SBM.add_node("a2", 1);
+  my_SBM.add_node("a3", 1);
+  my_SBM.add_node("a4", 1);
+  my_SBM.add_node("a5", 1);
+  my_SBM.add_node("a10", 1);
+  my_SBM.add_node("a11", 1);
+  my_SBM.add_node("a12", 1);
+  my_SBM.add_node("a13", 1);
+  my_SBM.add_node("a14", 1);
+  my_SBM.add_node("a6", 1);
+  my_SBM.add_node("a7", 1);
+  my_SBM.add_node("a8", 1);
+  my_SBM.add_node("a9", 1);
+  my_SBM.add_node("b1", 0);
+  my_SBM.add_node("b2", 0);
+  my_SBM.add_node("b3", 0);
+  my_SBM.add_node("b4", 0);
+
+  my_SBM.add_connection("a1", "b1");
+  my_SBM.add_connection("a2", "b1");
+  my_SBM.add_connection("a3", "b1");
+  my_SBM.add_connection("a4", "b1");
+  my_SBM.add_connection("a5", "b1");
+  my_SBM.add_connection("a1", "b2");
+  my_SBM.add_connection("a2", "b2");
+  my_SBM.add_connection("a3", "b2");
+  my_SBM.add_connection("a4", "b2");
+  my_SBM.add_connection("a5", "b2");
+  my_SBM.add_connection("a10", "b2");
+  my_SBM.add_connection("a11", "b2");
+  my_SBM.add_connection("a12", "b2");
+  my_SBM.add_connection("a13", "b2");
+  my_SBM.add_connection("a14", "b2");
+  my_SBM.add_connection("a6", "b3");
+  my_SBM.add_connection("a7", "b3");
+  my_SBM.add_connection("a8", "b3");
+  my_SBM.add_connection("a9", "b3");
+  my_SBM.add_connection("a10", "b3");
+  my_SBM.add_connection("a11", "b3");
+  my_SBM.add_connection("a12", "b3");
+  my_SBM.add_connection("a13", "b3");
+  my_SBM.add_connection("a14", "b3");
+  my_SBM.add_connection("a10", "b4");
+  my_SBM.add_connection("a11", "b4");
+  my_SBM.add_connection("a12", "b4");
+  my_SBM.add_connection("a13", "b4");
+  my_SBM.add_connection("a14", "b4");
+
+  return my_SBM;
+}
+
 // Gets average of the last n elements for a paseed vector of integers
 inline float avg_last_n(std::vector<int> vec, int n)
 {
@@ -270,8 +329,6 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
     REQUIRE(single_merge.entropy < double_merge.entropy);
 }
 
-
-// Currently not working due to bugs in agglomerative merging 
 TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
 {
   // Setup simple SBM model
@@ -281,14 +338,62 @@ TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
   double initial_entropy = my_SBM.compute_entropy(0);
 
   // Run full agglomerative merging algorithm till we have just 3 groups left
-  auto run_results = my_SBM.agglomerative_run(0,true,5,3,2,0.01);
+  auto run_results = my_SBM.agglomerative_run(0, true, 5, 3, 2, 0.01);
 
   std::cout << "Post-Merging..." << std::endl;
   print_state_dump(my_SBM.get_state());
 
   // Make sure that we now have just 3 groups left
-  REQUIRE(
-    my_SBM.get_level(1)->size() == 
-    3
-  );
+  REQUIRE(my_SBM.get_level(1)->size() == 3);
+}
+
+TEST_CASE("Greedy agglomerative merging on larger network", "[SBM]")
+{
+  // Setup simple SBM model
+  SBM my_SBM = build_simulated_SBM();
+
+  int desired_num_groups = 4;
+
+  // Run full agglomerative merging algorithm till we have just 3 groups left
+  auto run_results = my_SBM.agglomerative_run(
+    0,    // Level
+    true, // Run greedy?
+    5,    // If not greedy we run 5 checks per group
+    desired_num_groups,
+    2,     // Beta inverse temp for entropy calculation
+    0.01); // epsilon for ergodicity amount in move proposals/entropy
+
+  // Make sure that we have lumped together at least some groups
+  REQUIRE(my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size());
+
+  // Greedy merging should also always return the same results...
+  double first_merge_entropy = run_results.end()->entropy;
+  for (int i = 0; i < 15; i++) {
+    SBM new_SBM = build_simulated_SBM();
+    auto new_results =
+        my_SBM.agglomerative_run(0, true, 5, desired_num_groups, 2, 0.01);
+
+    REQUIRE(
+      Approx(run_results.end()->entropy).epsilon(0.5) ==
+      first_merge_entropy);
+  }
+}
+
+TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]") {
+  // Setup simple SBM model
+  SBM my_SBM = build_simulated_SBM();
+
+  int desired_num_groups = 4;
+
+  // Run full agglomerative merging algorithm till we have just 3 groups left
+  auto run_results = my_SBM.agglomerative_run(
+      0,     // Level
+      false, // Run greedy?
+      5,     // If not greedy we run 5 checks per group
+      desired_num_groups,
+      2,     // Beta inverse temp for entropy calculation
+      0.01); // epsilon for ergodicity amount in move proposals/entropy
+
+  // Make sure that we have lumped together at least some groups
+  REQUIRE(my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size());
 }
