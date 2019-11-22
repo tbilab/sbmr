@@ -92,7 +92,7 @@ NodePtr Network::add_node(string id, int type, int level)
   // Create node
   NodePtr new_node = std::make_shared<Node>(node_id, level, type);
   
-  node_level->emplace(node_id, new_node);
+  (*node_level)[node_id] = new_node;
  
   // Update node types set with new node's type
   unique_node_types.insert(type);
@@ -221,6 +221,7 @@ void Network::give_every_node_at_level_own_group(int level)
   // Make sure level has nodes before looping through it
   if (node_level->size() == 0) throw "Requested level is empty.";
   
+
   
   // Loop through each of the nodes,
   for (auto node_it  = node_level->begin(); 
