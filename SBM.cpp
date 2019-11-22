@@ -516,22 +516,19 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 // =============================================================================
 // Merge groups at a given level based on the best probability of doing so
 // =============================================================================
-Merge_Res SBM::agglomerative_merge(
-  int    group_level, 
-  int    num_merges_to_make,
-  bool   check_all_moves, 
-  int    n_checks_per_group,
-  double eps)
-{ 
+Merge_Res SBM::agglomerative_merge(int group_level, int num_merges_to_make,
+                                   bool check_all_moves, int n_checks_per_group,
+                                   double eps) {
   // Quick check to make sure reasonable request
-  if (num_merges_to_make == 0) throw "Zero merges requested.";
+  if (num_merges_to_make == 0)
+    throw "Zero merges requested.";
 
   // Level that the group metagroups will sit at
   int meta_level = group_level + 1;
 
   // Build a single meta-group for each node at desired level
   give_every_node_at_level_own_group(group_level);
-  
+
   // Clean up old groups
   clean_empty_groups();
 
@@ -540,57 +537,44 @@ Merge_Res SBM::agglomerative_merge(
 
   // Gather how many groups of each type we have
   std::map<int, int> n_groups_of_type;
-  for (auto group_it = all_groups->begin();
-            group_it != all_groups->end();
-            group_it++)
-  {
+  for (auto group_it = all_groups->begin(); group_it != all_groups->end();
+       group_it++) {
     n_groups_of_type[group_it->second->type]++;
   }
 
   // Build vectors for recording merges
   std::vector<NodePtr> from_groups;
   std::vector<NodePtr> to_groups;
-  std::vector<double>  move_delta;
+  std::vector<double> move_delta;
 
   // Make sure doing a merge makes sense by checking we have enough groups
   // of every type
   for (auto node_type_it = n_groups_of_type.begin();
-            node_type_it != n_groups_of_type.end();
-            node_type_it++)
-  {
-    if (node_type_it->second < 2)
-    {
+       node_type_it != n_groups_of_type.end(); node_type_it++) {
+    if (node_type_it->second < 2) {
       throw "To few groups to perform merge.";
-    } 
+    }
   }
 
   // Gather edge-counts for metagroups
   EdgeCounts metagroup_edges = gather_edge_counts(meta_level);
 
   // Loop over each group and find best merge option
-  for (auto group_it = all_groups->begin(); 
-            group_it != all_groups->end();
-            group_it++)
-  {
+  for (auto group_it = all_groups->begin(); group_it != all_groups->end();
+       group_it++) {
     NodePtr curr_group = group_it->second;
 
     std::list<NodePtr> metagroups_to_search;
 
     // If we're running algorithm in greedy mode we should just
     // add every possible group to the groups-to-search list
-    if (check_all_moves) 
-    {
+    if (check_all_moves) {
       // Get a list of all the potential merges for group
-      metagroups_to_search = get_nodes_of_type_at_level(
-        curr_group->type, 
-        meta_level 
-      );
-    } 
-    else  
-    {
+      metagroups_to_search =
+          get_nodes_of_type_at_level(curr_group->type, meta_level);
+    } else {
       // Otherwise, we should sample a given number of groups to check
-      for (int i = 0; i < n_checks_per_group; i++)
-      {
+      for (int i = 0; i < n_checks_per_group; i++) {
         // Sample a group from potential groups
         metagroups_to_search.push_back(propose_move(curr_group, eps));
       }
@@ -598,32 +582,28 @@ Merge_Res SBM::agglomerative_merge(
 
     // Now that we have gathered all the merges to check, we can loop
     // through them and check entropy changes
-    for (NodePtr metagroup : metagroups_to_search) 
-    {
+    for (NodePtr metagroup : metagroups_to_search) {
       // Get group that the metagroup belongs to
       NodePtr merge_group = *((metagroup->children).begin());
 
       // Skip group if it is the current group for this node
-      if (merge_group->id == curr_group->id) continue;
+      if (merge_group->id == curr_group->id)
+        continue;
 
       // Calculate entropy delta for move
-      double entropy_delta = make_proposal_decision(
-        metagroup_edges,
-        curr_group,
-        metagroup,
-        eps,
-        1.0 
-      ).entropy_delta;
-      
+      double entropy_delta = make_proposal_decision(metagroup_edges, curr_group,
+                                                    metagroup, eps, 1.0)
+                                 .entropy_delta;
+
       from_groups.push_back(curr_group);
       to_groups.push_back(merge_group);
       move_delta.push_back(entropy_delta);
-    } 
+    }
   }
 
   // Now we find the top merges
   // Initialize a merge result holder struct
-  Merge_Res results; 
+  Merge_Res results;
 
   // Priority queue to find best moves
   std::priority_queue<std::pair<double, int>> best_moves;
@@ -640,9 +620,8 @@ Merge_Res SBM::agglomerative_merge(
   // if they are appropriate...
   bool more_merges_needed = true;
   bool queue_not_empty = true;
-  
-  while (more_merges_needed & queue_not_empty)
-  {
+
+  while (more_merges_needed & queue_not_empty) {
     // Extract index of best remaining merge
     int merge_index = best_moves.top().second;
 
@@ -651,16 +630,14 @@ Merge_Res SBM::agglomerative_merge(
     NodePtr to_group = to_groups[merge_index];
 
     // Make sure we haven't already merged the culled group
-    bool from_still_exists = merges_made.find(from_group->id) == 
-                             merges_made.end();
+    bool from_still_exists =
+        merges_made.find(from_group->id) == merges_made.end();
 
     // Also make sure that we haven't removed the group we're trying to
     // merge into
-    bool to_still_exists = merges_made.find(to_group->id) ==  
-                           merges_made.end();
-    
-    if (from_still_exists & to_still_exists) 
-    {
+    bool to_still_exists = merges_made.find(to_group->id) == merges_made.end();
+
+    if (from_still_exists & to_still_exists) {
       // Insert new culled group into set
       merges_made.insert(from_group->id);
 
@@ -683,9 +660,9 @@ Merge_Res SBM::agglomerative_merge(
   // Erase the empty groups and metagroups
   clean_empty_groups();
 
-  // Return the entropy for new model and merges done 
+  // Return the entropy for new model and merges done
   results.entropy = compute_entropy(group_level - 1);
-  
+
   return results;
 }
 
@@ -693,23 +670,22 @@ Merge_Res SBM::agglomerative_merge(
 // Run agglomerative merging until a desired number of groups is reached. 
 // Returns vector of results for each merge step
 // =============================================================================
-std::vector<Merge_Res> SBM::agglomerative_run(
-  int level_of_nodes_to_group, 
-  bool greedy,
-  int n_checks_per_group,
-  int desired_num_groups,
-  double sigma,
-  double eps
-) 
+std::vector<Merge_Res>
+SBM::agglomerative_run(int level_of_nodes_to_group,
+                       bool greedy,
+                       int n_checks_per_group,
+                       int desired_num_groups,
+                       double sigma,
+                       double eps)
 {
   // Start by giving every node at the desired level its own group
   give_every_node_at_level_own_group(level_of_nodes_to_group);
 
-  // Now clean up the empty groups 
+  // Now clean up the empty groups
   // (if there were previously group nodes for the level)
   clean_empty_groups();
 
-  // Get the current number of groups we have 
+  // Get the current number of groups we have
   int group_level = level_of_nodes_to_group + 1;
   int curr_num_groups = get_level(group_level)->size();
 
@@ -717,32 +693,23 @@ std::vector<Merge_Res> SBM::agglomerative_run(
   std::vector<Merge_Res> step_results;
 
   // Perform merge steps until we have the proper number of groups
-  while (curr_num_groups > desired_num_groups) 
-  {
+  while (curr_num_groups > desired_num_groups) {
     // Calculate how many merges we should do for this step
     // (Converting to integer rounds down.)
-    int num_merges = std::max(int(curr_num_groups - curr_num_groups/sigma), 1);
+    int num_merges =
+      std::max(int(curr_num_groups - curr_num_groups / sigma), 1);
 
     // Make sure we don't overstep the goal number of groups
-    if ((curr_num_groups - num_merges) < desired_num_groups) 
-    {
+    if ((curr_num_groups - num_merges) < desired_num_groups) {
       num_merges = curr_num_groups - desired_num_groups;
     }
 
     // Attempt another merge step
-    try 
-    {
+    try {
       // Perform merge and record results
-      step_results.push_back(
-        agglomerative_merge(group_level, 
-                            num_merges, 
-                            greedy, 
-                            n_checks_per_group, 
-                            eps )
-      );
-    } 
-    catch (...)
-    {
+      step_results.push_back(agglomerative_merge(
+        group_level, num_merges, greedy, n_checks_per_group, eps));
+    } catch (...) {
       // We reached the collapsibility limit of our network so we break early
       break;
     }
