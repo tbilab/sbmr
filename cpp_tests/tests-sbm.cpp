@@ -225,7 +225,7 @@ TEST_CASE("Greedy agglomerative merging on larger network", "[SBM]")
   {
     SBM new_SBM = build_simulated_SBM();
     auto new_results =
-        my_SBM.agglomerative_run(
+        new_SBM.agglomerative_run(
             0,
             desired_num_groups);
 
@@ -275,5 +275,5 @@ TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]")
       params);
 
   // Make sure that we have lumped together at least some groups
-  // REQUIRE(my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size());
+  REQUIRE(my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size());
 }
