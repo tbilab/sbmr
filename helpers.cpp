@@ -168,6 +168,23 @@ int factorial(int n)
   return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
 }
 
+// Calculate ln(n!), uses stirling's approximation if n is big
+double log_factorial(int N)
+{
+  int cutoff_for_stirling = 8;
+
+  if (N < cutoff_for_stirling)
+  {
+    return log(factorial(N));
+  }
+  else
+  {
+    double n = N;
+    double half_log_2_pi = 0.9189385;
+
+    return ((n + 0.5) * log(n)) - n + half_log_2_pi;
+  }
+}
 
 // Gets average of the last n elements for a paseed vector of integers
 inline float avg_last_n(std::vector<int> vec, int n)
