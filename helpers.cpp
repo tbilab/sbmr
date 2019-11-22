@@ -167,3 +167,13 @@ int factorial(int n)
 {
   return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
 }
+
+
+// Gets average of the last n elements for a paseed vector of integers
+inline float avg_last_n(std::vector<int> vec, int n)
+{
+  return std::accumulate(vec.end() - n,
+                         vec.end(),
+                         0.0) /
+         float(n);
+}
