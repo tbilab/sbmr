@@ -12,6 +12,7 @@ class SBM;
 struct Trans_Probs;
 struct Proposal_Res;
 struct Merge_Res;
+struct Init_Step;
 
 
 struct Merge_Params
@@ -80,7 +81,7 @@ public:
 
   // Run mcmc chain initialization by finding best organization
   // of B' groups for all B from B = N to B = 1. 
-  std::vector<Merge_Res> initialize_mcmc(
+  std::vector<Init_Step> initialize_mcmc(
     int node_level,
     double beta,
     int num_mcmc_steps,
@@ -129,6 +130,12 @@ struct Merge_Res
   std::vector<NodePtr> to_node;
 };
 
-
+struct Init_Step
+{
+  double entropy;
+  State_Dump state;
+  Init_Step(double e, State_Dump s) : entropy(e),
+                                      state(s) {}
+};
 
 #endif

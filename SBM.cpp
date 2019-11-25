@@ -738,7 +738,7 @@ SBM::agglomerative_run(int level_of_nodes_to_group,
 // Run mcmc chain initialization by finding best organization
 // of B' groups for all B from B = N to B = 1.
 // =============================================================================
-std::vector<Merge_Res> SBM::initialize_mcmc(
+std::vector<Init_Step> SBM::initialize_mcmc(
     int node_level,
     double beta,
     int num_mcmc_steps,
@@ -757,7 +757,7 @@ std::vector<Merge_Res> SBM::initialize_mcmc(
   clean_empty_groups();
 
   // Setup vector to hold all merge step results
-  std::vector<Merge_Res> step_results;
+  std::vector<Init_Step> step_results;
 
   int i;
   for (i = 0; i < B_start - unique_node_types.size(); i++)
@@ -769,13 +769,12 @@ std::vector<Merge_Res> SBM::initialize_mcmc(
     try
     {
       // Perform next best merge and record results
-      step_results.push_back(
-          agglomerative_merge(
-              group_level,
-              1,
-              merge_params.greedy,
-              merge_params.n_checks_per_group,
-              merge_params.eps));
+      agglomerative_merge(
+          group_level,
+          1,
+          merge_params.greedy,
+          merge_params.n_checks_per_group,
+          merge_params.eps);
     }
     catch (...)
     {
@@ -795,6 +794,13 @@ std::vector<Merge_Res> SBM::initialize_mcmc(
           beta);
       std::cout << j << " ";
     }
+
+    // Gather info for return
+    step_results.push_back(
+        Init_Step(
+            compute_entropy(node_level),
+            get_state()));
+
     std::cout << std::endl;
   }
 

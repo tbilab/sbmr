@@ -293,7 +293,7 @@ TEST_CASE("Initialize MCMC chain with agglomerative merging", "[SBM]")
   auto results = my_SBM.initialize_mcmc(
     0,
     1.5,
-    10,
+    30,
     params
   );
 
