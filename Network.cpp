@@ -438,5 +438,39 @@ State_Dump Network::get_state()
   } // End level loop
   
   return state;
-}                          
+}
 
+void Network::load_from_state(State_Dump state, int level)
+{ 
+  int group_level = level + 1;
+
+  // First we need to make a list of all the required group nodes
+  std::set<std::pair<string, int>> unique_group_ids;
+
+  int n = state.parent.size();
+  LevelPtr all_groups = get_level(group_level);
+
+  for (int i = 0; i < n; i++)
+  {
+    string parent_id = state.parent[i];
+
+    // Attempt to find the parent node in the network
+    auto parent_loc = all_groups->find(parent_id);
+
+    // If it doesn't exist, build it
+    // If it does exist, just grab it
+    NodePtr parent_node = parent_loc == all_groups->end() 
+      ? add_node(parent_id, state.type[i], group_level) 
+      : parent_loc->second;
+
+    // Next grab the child node (this one should exist...)
+    NodePtr child_node = get_node_by_id(state.id[i], level);
+
+    // Assign the parent node to the child node
+    child_node->set_parent(parent_node);
+  }
+
+  // Now clean up any potentially childless nodes that got kicked
+  // out by this process
+  clean_empty_groups();
+}
