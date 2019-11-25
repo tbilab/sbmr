@@ -44,9 +44,48 @@ public:
   {
     return compute_entropy(level);
   }
+
+  int mcmc_sweep_rcpp(
+      int level,
+      bool variable_num_groups,
+      double eps,
+      double beta)
+  {
+    return mcmc_sweep(level, variable_num_groups, eps, beta);
+  }
+
+  DataFrame initialize_mcmc_rcpp(
+      int node_level,
+      int num_mcmc_steps,
+      bool greedy,
+      int n_checks_per_group,
+      double beta,
+      double epsilon)
+  {
+    auto init_results = initialize_mcmc(
+        node_level,
+        num_mcmc_steps,
+        greedy,
+        n_checks_per_group,
+        beta,
+        epsilon);
+
+    std::vector<double> entropy_results;
+    entropy_results.reserve(init_results.size());
+    
+    for (auto step = init_results.begin();
+              step != init_results.end();
+              step++)
+    {
+      entropy_results.push_back(step->entropy);
+    }
+
+    return DataFrame::create(
+        _("entropy") = entropy_results
+    );
+
+  }
 };
-
-
 
 RCPP_MODULE(sbm_module)
 {
@@ -59,6 +98,8 @@ RCPP_MODULE(sbm_module)
   .method("get_state_rcpp", &Rcpp_SBM::get_state_rcpp)
   .method("set_node_parent", &Rcpp_SBM::set_node_parent)
   .method("compute_entropy_rcpp", &Rcpp_SBM::compute_entropy_rcpp)
+  .method("mcmc_sweep_rcpp", &Rcpp_SBM::mcmc_sweep_rcpp)
+  .method("initialize_mcmc_rcpp", &Rcpp_SBM::initialize_mcmc_rcpp)
   ;
 }
 
@@ -94,6 +135,9 @@ sbm$set_node_parent("b3", "b12", 0)
 
 sbm$get_state_rcpp()
 
+sbm$compute_entropy_rcpp(0L)
+
+sbm$mcmc_sweep_rcpp(0,FALSE,0.1,1.5)
 sbm$compute_entropy_rcpp(0L)
 
 
