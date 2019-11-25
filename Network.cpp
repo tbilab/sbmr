@@ -57,12 +57,6 @@ NodePtr Network::get_node_by_id(string desired_id, int level)
   
 }
 
-// The default level to search is 0.
-NodePtr Network::get_node_by_id(string desired_id) 
-{
-  return get_node_by_id(desired_id, 0);
-}
-
 
 // =============================================================================
 // Builds a group id from a scaffold for generated new groups
@@ -100,11 +94,11 @@ NodePtr Network::add_node(string id, int type, int level)
   return new_node;
 }; 
 
-// Default is adding node to level 0
-NodePtr Network::add_node(string id, int type)
-{
-  return add_node(id, type, 0);
-}; 
+// // Default is adding node to level 0
+// NodePtr Network::add_node(string id, int type)
+// {
+//   return add_node(id, type, 0);
+// }; 
 
 
 // =============================================================================
