@@ -94,12 +94,6 @@ NodePtr Network::add_node(string id, int type, int level)
   return new_node;
 }; 
 
-// // Default is adding node to level 0
-// NodePtr Network::add_node(string id, int type)
-// {
-//   return add_node(id, type, 0);
-// }; 
-
 
 // =============================================================================
 // Creates a new group node and add it to its neccesary level
@@ -440,6 +434,10 @@ State_Dump Network::get_state()
   return state;
 }
 
+
+// =============================================================================
+// Load current state of nodes in model from state dump given Network::get_state() 
+// =============================================================================
 void Network::load_from_state(State_Dump state)
 { 
 
