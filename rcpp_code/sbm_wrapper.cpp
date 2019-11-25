@@ -39,6 +39,11 @@ public:
 
     child_node->set_parent(parent_node);
   }
+
+  double compute_entropy_rcpp(int level)
+  {
+    return compute_entropy(level);
+  }
 };
 
 
@@ -53,6 +58,7 @@ RCPP_MODULE(sbm_module)
   .method("add_connections_rcpp", &Rcpp_SBM::add_connections_rcpp)
   .method("get_state_rcpp", &Rcpp_SBM::get_state_rcpp)
   .method("set_node_parent", &Rcpp_SBM::set_node_parent)
+  .method("compute_entropy_rcpp", &Rcpp_SBM::compute_entropy_rcpp)
   ;
 }
 
@@ -87,5 +93,8 @@ sbm$set_node_parent("b3", "b12", 0)
 
 
 sbm$get_state_rcpp()
+
+sbm$compute_entropy_rcpp(0L)
+
 
 */
