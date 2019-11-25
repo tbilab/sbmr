@@ -282,3 +282,25 @@ TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]")
   // Make sure that we have lumped together at least some groups
   REQUIRE(my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size());
 }
+
+TEST_CASE("Initialize MCMC chain with agglomerative merging", "[SBM]")
+{
+  // Setup simple SBM model
+  SBM my_SBM = build_simulated_SBM();
+
+  Merge_Params params;
+
+  auto results = my_SBM.initialize_mcmc(
+    0,
+    1.5,
+    10,
+    params
+  );
+
+  for (auto step_it = results.begin();
+       step_it != results.end();
+       step_it++)
+  {
+    std::cout << step_it->entropy << std::endl;
+  }
+}

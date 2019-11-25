@@ -678,7 +678,7 @@ Merge_Res SBM::agglomerative_merge(int group_level, int num_merges_to_make,
 }
 
 // =============================================================================
-// Run agglomerative merging until a desired number of groups is reached. 
+// Run agglomerative merging until a desired number of groups is reached.
 // Returns vector of results for each merge step
 // =============================================================================
 std::vector<Merge_Res>
@@ -701,23 +701,28 @@ SBM::agglomerative_run(int level_of_nodes_to_group,
   std::vector<Merge_Res> step_results;
 
   // Perform merge steps until we have the proper number of groups
-  while (curr_num_groups > desired_num_groups) {
+  while (curr_num_groups > desired_num_groups)
+  {
     // Calculate how many merges we should do for this step
     // (Converting to integer rounds down.)
     int num_merges =
-      std::max(int(curr_num_groups - curr_num_groups / params.sigma), 1);
+        std::max(int(curr_num_groups - curr_num_groups / params.sigma), 1);
 
     // Make sure we don't overstep the goal number of groups
-    if ((curr_num_groups - num_merges) < desired_num_groups) {
+    if ((curr_num_groups - num_merges) < desired_num_groups)
+    {
       num_merges = curr_num_groups - desired_num_groups;
     }
 
     // Attempt another merge step
-    try {
+    try
+    {
       // Perform merge and record results
       step_results.push_back(agglomerative_merge(
-        group_level, num_merges, params.greedy, params.n_checks_per_group, params.eps));
-    } catch (...) {
+          group_level, num_merges, params.greedy, params.n_checks_per_group, params.eps));
+    }
+    catch (...)
+    {
       // We reached the collapsibility limit of our network so we break early
       break;
     }
@@ -725,6 +730,76 @@ SBM::agglomerative_run(int level_of_nodes_to_group,
     // Calculate the new number of groups
     curr_num_groups = get_level(group_level)->size();
   }
+
+  return step_results;
+}
+
+// =============================================================================
+// Run mcmc chain initialization by finding best organization
+// of B' groups for all B from B = N to B = 1.
+// =============================================================================
+std::vector<Merge_Res> SBM::initialize_mcmc(
+    int node_level,
+    double beta,
+    int num_mcmc_steps,
+    Merge_Params merge_params)
+{
+  int group_level = node_level + 1;
+
+  // Start by giving every node at the desired level its own group
+  give_every_node_at_level_own_group(node_level);
+
+  // Get starting number of clusters
+  int B_start = get_level(group_level)->size();
+
+  // Now clean up the empty groups
+  // (if there were previously group nodes for the level)
+  clean_empty_groups();
+
+  // Setup vector to hold all merge step results
+  std::vector<Merge_Res> step_results;
+
+  int i;
+  for (i = 0; i < B_start - unique_node_types.size(); i++)
+  {
+
+    std::cout << "Attempt group merge" << std::endl;
+
+    // Attempt merge step
+    try
+    {
+      // Perform next best merge and record results
+      step_results.push_back(
+          agglomerative_merge(
+              group_level,
+              1,
+              merge_params.greedy,
+              merge_params.n_checks_per_group,
+              merge_params.eps));
+    }
+    catch (...)
+    {
+      // We reached the collapsibility limit of our network so we break early
+      break;
+    }
+
+    std::cout << "Equlibriating model..." << std::endl;
+    std::cout << "MCMC sweep ";
+    // Let model equilibriate with new group layout...
+    for (int j = 0; j < num_mcmc_steps; j++)
+    {
+      mcmc_sweep(
+          node_level,
+          false,
+          merge_params.eps,
+          beta);
+      std::cout << j << " ";
+    }
+    std::cout << std::endl;
+  }
+
+  std::cout << "Model finished with " << get_level(group_level)->size()
+            << " nodes after " << i << " merges" << std::endl;
 
   return step_results;
 }

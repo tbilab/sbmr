@@ -78,6 +78,15 @@ public:
       int n_checks_per_group,
       double eps);
 
+  // Run mcmc chain initialization by finding best organization
+  // of B' groups for all B from B = N to B = 1. 
+  std::vector<Merge_Res> initialize_mcmc(
+    int node_level,
+    double beta,
+    int num_mcmc_steps,
+    Merge_Params merge_params
+  );
+
   // Run agglomerative merging until a desired number of groups is reached.
   // Returns vector of results for each merge step
   std::vector<Merge_Res> agglomerative_run(
