@@ -38,10 +38,6 @@ std::string print_node_ids(std::map<std::string, NodePtr>);
 // std::pair<string, string> find_edges(string, string);
 std::pair<NodePtr, NodePtr> find_edges(NodePtr, NodePtr);
 
-// Single values return a double pair. e.g. find_edges('a') -> ['a','a']
-// std::pair<string, string> find_edges(string);
-// std::pair<string, string> find_edges(NodePtr);
-
 
 // ============================================================================
 // Normalizes a vector of doubles so all elements sum to 1 
