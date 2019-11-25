@@ -52,7 +52,7 @@ public:
   State_Dump get_state();
 
   // Load a level grouping from a state dump
-  void load_from_state(State_Dump state, int level = 0);
+  void load_from_state(State_Dump state);
 
   // Setup a new Node level
   void add_level(int level_index);
