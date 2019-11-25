@@ -740,9 +740,11 @@ SBM::agglomerative_run(int level_of_nodes_to_group,
 // =============================================================================
 std::vector<Init_Step> SBM::initialize_mcmc(
     int node_level,
-    double beta,
     int num_mcmc_steps,
-    Merge_Params merge_params)
+    bool greedy,
+    int n_checks_per_group,
+    double beta,
+    double epsilon)
 {
   int group_level = node_level + 1;
 
@@ -772,9 +774,9 @@ std::vector<Init_Step> SBM::initialize_mcmc(
       agglomerative_merge(
           group_level,
           1,
-          merge_params.greedy,
-          merge_params.n_checks_per_group,
-          merge_params.eps);
+          greedy,
+          n_checks_per_group,
+          epsilon);
     }
     catch (...)
     {
@@ -790,7 +792,7 @@ std::vector<Init_Step> SBM::initialize_mcmc(
       mcmc_sweep(
           node_level,
           false,
-          merge_params.eps,
+          epsilon,
           beta);
       std::cout << j << " ";
     }

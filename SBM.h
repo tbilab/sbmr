@@ -83,9 +83,11 @@ public:
   // of B' groups for all B from B = N to B = 1. 
   std::vector<Init_Step> initialize_mcmc(
     int node_level,
-    double beta,
     int num_mcmc_steps,
-    Merge_Params merge_params
+    bool greedy,
+    int n_checks_per_group,
+    double beta,
+    double epsilon
   );
 
   // Run agglomerative merging until a desired number of groups is reached.
