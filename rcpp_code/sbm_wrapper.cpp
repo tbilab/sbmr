@@ -31,6 +31,14 @@ public:
         _("type") = state.type,
         _("level") = state.level);
   }
+
+  void set_node_parent(std::string child_id, std::string parent_id, int level = 0)
+  {
+    NodePtr child_node = get_node_by_id(child_id, level);
+    NodePtr parent_node = get_node_by_id(parent_id, level + 1);
+
+    child_node->set_parent(parent_node);
+  }
 };
 
 
@@ -44,6 +52,7 @@ RCPP_MODULE(sbm_module)
   .method("add_node_rcpp", &Rcpp_SBM::add_node_rcpp)
   .method("add_connections_rcpp", &Rcpp_SBM::add_connections_rcpp)
   .method("get_state_rcpp", &Rcpp_SBM::get_state_rcpp)
+  .method("set_node_parent", &Rcpp_SBM::set_node_parent)
   ;
 }
 
@@ -57,13 +66,24 @@ sbm$add_node_rcpp("b1", 1L, 0L)
 sbm$add_node_rcpp("b2", 1L, 0L)
 sbm$add_node_rcpp("b3", 1L, 0L)
 
+sbm$add_node_rcpp("a11", 0L, 1L)
+sbm$add_node_rcpp("a12", 0L, 1L)
+sbm$add_node_rcpp("b11", 1L, 1L)
+sbm$add_node_rcpp("b12", 1L, 1L)
+
+
 sbm$add_connections_rcpp("a1", "b1")
 sbm$add_connections_rcpp("a1", "b2")
 sbm$add_connections_rcpp("a1", "b3")
 sbm$add_connections_rcpp("a2", "b3")
 sbm$add_connections_rcpp("a3", "b2")
 
-
+sbm$set_node_parent("a1", "a11", 0)
+sbm$set_node_parent("a2", "a11", 0)
+sbm$set_node_parent("a3", "a12", 0)
+sbm$set_node_parent("b1", "b11", 0)
+sbm$set_node_parent("b2", "b11", 0)
+sbm$set_node_parent("b3", "b12", 0)
 
 
 sbm$get_state_rcpp()
