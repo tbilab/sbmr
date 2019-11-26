@@ -18,7 +18,8 @@ struct Init_Step;
 struct Merge_Params
 {
   double eps = 0.1;
-  double sigma = 2;
+  double sigma = 0.5;
+  double beta = 1.5;
   bool greedy = true;
   int n_checks_per_group = 5;
   Merge_Params(){};
@@ -75,20 +76,14 @@ public:
   Merge_Res agglomerative_merge(
       int level_of_groups,
       int n_merges,
-      bool check_all_moves,
-      int n_checks_per_group,
-      double eps);
+      Merge_Params params      );
 
   // Run mcmc chain initialization by finding best organization
   // of B' groups for all B from B = N to B = 1. 
   std::vector<Init_Step> initialize_mcmc(
     int node_level,
     int num_mcmc_steps,
-    bool greedy,
-    int n_checks_per_group,
-    double beta,
-    double epsilon
-  );
+    Merge_Params params);
 
   // Run agglomerative merging until a desired number of groups is reached.
   // Returns vector of results for each merge step

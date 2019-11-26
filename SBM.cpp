@@ -514,9 +514,10 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 // =============================================================================
 // Merge groups at a given level based on the best probability of doing so
 // =============================================================================
-Merge_Res SBM::agglomerative_merge(int group_level, int num_merges_to_make,
-                                   bool check_all_moves, int n_checks_per_group,
-                                   double eps)
+Merge_Res SBM::agglomerative_merge(
+    int group_level,
+    int num_merges_to_make,
+    Merge_Params params)
 {
   // Quick check to make sure reasonable request
   if (num_merges_to_make == 0)
@@ -571,7 +572,7 @@ Merge_Res SBM::agglomerative_merge(int group_level, int num_merges_to_make,
 
     // If we're running algorithm in greedy mode we should just
     // add every possible group to the groups-to-search list
-    if (check_all_moves)
+    if (params.greedy)
     {
       // Get a list of all the potential merges for group
       metagroups_to_search =
@@ -580,10 +581,10 @@ Merge_Res SBM::agglomerative_merge(int group_level, int num_merges_to_make,
     else
     {
       // Otherwise, we should sample a given number of groups to check
-      for (int i = 0; i < n_checks_per_group; i++)
+      for (int i = 0; i < params.n_checks_per_group; i++)
       {
         // Sample a group from potential groups
-        metagroups_to_search.push_back(propose_move(curr_group, eps));
+        metagroups_to_search.push_back(propose_move(curr_group, params.eps));
       }
     }
 
@@ -599,8 +600,12 @@ Merge_Res SBM::agglomerative_merge(int group_level, int num_merges_to_make,
         continue;
 
       // Calculate entropy delta for move
-      double entropy_delta = make_proposal_decision(metagroup_edges, curr_group,
-                                                    metagroup, eps, 1.0)
+      double entropy_delta = make_proposal_decision(
+                                 metagroup_edges,
+                                 curr_group,
+                                 metagroup,
+                                 params.eps,
+                                 1.0)
                                  .entropy_delta;
 
       from_groups.push_back(curr_group);
@@ -718,8 +723,8 @@ SBM::agglomerative_run(int level_of_nodes_to_group,
     try
     {
       // Perform merge and record results
-      step_results.push_back(agglomerative_merge(
-          group_level, num_merges, params.greedy, params.n_checks_per_group, params.eps));
+      step_results.push_back(
+        agglomerative_merge(group_level, num_merges, params));
     }
     catch (...)
     {
@@ -741,10 +746,8 @@ SBM::agglomerative_run(int level_of_nodes_to_group,
 std::vector<Init_Step> SBM::initialize_mcmc(
     int node_level,
     int num_mcmc_steps,
-    bool greedy,
-    int n_checks_per_group,
-    double beta,
-    double epsilon)
+    Merge_Params params
+)
 {
   int group_level = node_level + 1;
 
@@ -766,6 +769,14 @@ std::vector<Init_Step> SBM::initialize_mcmc(
   {
 
     std::cout << "Attempt group merge" << std::endl;
+    
+    // Get the current number of groups we have
+    int curr_num_groups = get_level(group_level)->size();
+
+    // Decide how many merges we should do. 
+    int num_merges = std::max(
+        int(curr_num_groups - (curr_num_groups / params.sigma)),
+        1);
 
     // Attempt merge step
     try
@@ -773,10 +784,8 @@ std::vector<Init_Step> SBM::initialize_mcmc(
       // Perform next best merge and record results
       agglomerative_merge(
           group_level,
-          1,
-          greedy,
-          n_checks_per_group,
-          epsilon);
+          num_merges,
+          params);
     }
     catch (...)
     {
@@ -787,14 +796,17 @@ std::vector<Init_Step> SBM::initialize_mcmc(
     std::cout << "Equlibriating model..." << std::endl;
     std::cout << "MCMC sweep ";
     // Let model equilibriate with new group layout...
-    for (int j = 0; j < num_mcmc_steps; j++)
+    if (num_mcmc_steps != 0) 
     {
-      mcmc_sweep(
-          node_level,
-          false,
-          epsilon,
-          beta);
-      std::cout << j << " ";
+      for (int j = 0; j < num_mcmc_steps; j++)
+      {
+        mcmc_sweep(
+            node_level,
+            false,
+            params.eps,
+            params.beta);
+        std::cout << j << " ";
+      }
     }
 
     // Gather info for return

@@ -154,8 +154,11 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
   int num_initial_groups = my_SBM.get_level(1)->size();
   double initial_entropy = my_SBM.compute_entropy(0);
 
+  // Setup default parameter values
+  Merge_Params params;
+
   // Run greedy aglomerative merge with best single merge done
-  Merge_Res single_merge = my_SBM.agglomerative_merge(1, true, 5, 1, 0.01);
+  Merge_Res single_merge = my_SBM.agglomerative_merge(1, 1, params);
 
   // Make sure that we now have one less group than before for each type
   int new_group_num = my_SBM.get_level(1)->size();
@@ -168,8 +171,9 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
   // Run again but this time merging the best 2
   SBM new_SBM = build_simple_SBM();
 
+  
   // Run greedy aglomerative merge with best single merge done
-  Merge_Res double_merge = new_SBM.agglomerative_merge(1, 2, true, 5, 0.01);
+  Merge_Res double_merge = new_SBM.agglomerative_merge(1, 2, params);
 
   // Make sure that we now have two fewer groups per type than before
   REQUIRE(
@@ -250,18 +254,8 @@ TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]"
   int num_groups_removed = my_SBM.get_level(0)->size() - my_SBM.get_level(1)->size();
 
   // Make sure we have a single step for each group removed.
-  REQUIRE(
-      num_groups_removed == run_results.size());
+  REQUIRE(num_groups_removed == run_results.size());
 
-  // for (auto step_it = run_results.begin();
-  //           step_it != run_results.end();
-  //           step_it++)
-  // {
-  //   std::cout << (step_it->from_node)[0]->id <<  " -> " 
-  //             << (step_it->to_node)[0]->id   << ": " 
-  //             << step_it->entropy 
-  //             << std::endl;
-  // }
 }
 
 TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]")
@@ -288,14 +282,11 @@ TEST_CASE("Initialize MCMC chain with agglomerative merging", "[SBM]")
   // Setup simple SBM model
   SBM my_SBM = build_simulated_SBM();
 
+  Merge_Params params;
   auto results = my_SBM.initialize_mcmc(
-    0,
-    30,
-    true,
-    10,
-    1.5,
-    0.1
-  );
+      0,
+      30,
+      params);
 
   for (auto step_it = results.begin();
        step_it != results.end();
