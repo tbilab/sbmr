@@ -79,7 +79,7 @@ public:
 
   // Run mcmc chain initialization by finding best organization
   // of B' groups for all B from B = N to B = 1. 
-  std::vector<Merge_Step> initialize_mcmc(
+  std::vector<Merge_Step> collapse_groups(
     int node_level,
     int num_mcmc_steps,
     Merge_Params params,

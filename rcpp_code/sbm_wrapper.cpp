@@ -62,7 +62,7 @@ public:
     return mcmc_sweep(level, variable_num_groups, eps, beta);
   }
 
-  List initialize_mcmc_rcpp(
+  List collapse_groups_rcpp(
       int node_level,
       int num_mcmc_steps,
       bool greedy,
@@ -70,7 +70,7 @@ public:
       double beta,
       double epsilon)
   {
-    auto init_results = initialize_mcmc(
+    auto init_results = collapse_groups(
         node_level,
         num_mcmc_steps,
         greedy,
@@ -120,7 +120,7 @@ RCPP_MODULE(sbm_module)
   .method("set_node_parent", &Rcpp_SBM::set_node_parent)
   .method("compute_entropy_rcpp", &Rcpp_SBM::compute_entropy_rcpp)
   .method("mcmc_sweep_rcpp", &Rcpp_SBM::mcmc_sweep_rcpp)
-  .method("initialize_mcmc_rcpp", &Rcpp_SBM::initialize_mcmc_rcpp)
+  .method("collapse_groups_rcpp", &Rcpp_SBM::collapse_groups_rcpp)
   ;
 }
 
@@ -158,7 +158,7 @@ sbm$get_state_rcpp()
 
 sbm$compute_entropy_rcpp(0L)
 
-init_results <- sbm$initialize_mcmc_rcpp(0, 15, TRUE, 5, 1.5, 0.1)
+init_results <- sbm$collapse_groups_rcpp(0, 15, TRUE, 5, 1.5, 0.1)
 
 desired_state <- init_results[[1]]$state
 sbm$load_from_state_rcpp(desired_state$id, desired_state$parent, desired_state$level, desired_state$type)

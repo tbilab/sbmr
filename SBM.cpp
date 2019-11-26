@@ -691,8 +691,8 @@ SBM::agglomerative_run(int level_of_nodes_to_group,
                        int desired_num_groups,
                        Merge_Params params)
 {
-  
-  return initialize_mcmc(
+
+  return collapse_groups(
     level_of_nodes_to_group,
     0,
     params,
@@ -705,7 +705,7 @@ SBM::agglomerative_run(int level_of_nodes_to_group,
 // Run mcmc chain initialization by finding best organization
 // of B' groups for all B from B = N to B = 1.
 // =============================================================================
-std::vector<Merge_Step> SBM::initialize_mcmc(
+std::vector<Merge_Step> SBM::collapse_groups(
     int node_level,
     int num_mcmc_steps,
     Merge_Params params,

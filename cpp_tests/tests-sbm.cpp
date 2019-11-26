@@ -286,7 +286,7 @@ TEST_CASE("Initialize MCMC chain with agglomerative merging", "[SBM]")
   SBM my_SBM = build_simulated_SBM();
 
   Merge_Params params;
-  auto results = my_SBM.initialize_mcmc(
+  auto results = my_SBM.collapse_groups(
       0,
       30,
       params);
