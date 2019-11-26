@@ -3,6 +3,17 @@
 
 using namespace Rcpp;
 
+
+inline DataFrame state_to_df(State_Dump state)
+{
+    // Create and return dump of state as dataframe
+    return DataFrame::create(
+        _("id") = state.id,
+        _("parent") = state.parent,
+        _("type") = state.type,
+        _("level") = state.level);
+}
+
 class Rcpp_SBM: public SBM {
 public:
   // Rcpp_SBM(int seed):sampler(seed) {};
@@ -14,7 +25,7 @@ public:
     add_node(id, type, level);
   }
   
-  void add_connections_rcpp(std::string node_a_id, std::string node_b_id)
+  void add_connection_rcpp(std::string node_a_id, std::string node_b_id)
   {
     add_connection(node_a_id, node_b_id);
   }
@@ -25,11 +36,7 @@ public:
     State_Dump state = get_state();
 
     // Create and return dump of state as dataframe
-    return DataFrame::create(
-        _("id") = state.id,
-        _("parent") = state.parent,
-        _("type") = state.type,
-        _("level") = state.level);
+    return state_to_df(state);
   }
 
   void set_node_parent(std::string child_id, std::string parent_id, int level = 0)
@@ -54,7 +61,7 @@ public:
     return mcmc_sweep(level, variable_num_groups, eps, beta);
   }
 
-  DataFrame initialize_mcmc_rcpp(
+  List initialize_mcmc_rcpp(
       int node_level,
       int num_mcmc_steps,
       bool greedy,
@@ -70,20 +77,21 @@ public:
         beta,
         epsilon);
 
-    std::vector<double> entropy_results;
-    entropy_results.reserve(init_results.size());
-    
+    List entropy_results;
+
     for (auto step = init_results.begin();
               step != init_results.end();
               step++)
     {
-      entropy_results.push_back(step->entropy);
+
+      entropy_results.push_back(
+        List::create(
+          _["entropy"] = step->entropy,
+          _["state"] = state_to_df(step->state)
+        ));
     }
 
-    return DataFrame::create(
-        _("entropy") = entropy_results
-    );
-
+    return entropy_results;
   }
 };
 
@@ -94,7 +102,7 @@ RCPP_MODULE(sbm_module)
   .constructor()
   
   .method("add_node_rcpp", &Rcpp_SBM::add_node_rcpp)
-  .method("add_connections_rcpp", &Rcpp_SBM::add_connections_rcpp)
+  .method("add_connection_rcpp", &Rcpp_SBM::add_connection_rcpp)
   .method("get_state_rcpp", &Rcpp_SBM::get_state_rcpp)
   .method("set_node_parent", &Rcpp_SBM::set_node_parent)
   .method("compute_entropy_rcpp", &Rcpp_SBM::compute_entropy_rcpp)
@@ -119,11 +127,11 @@ sbm$add_node_rcpp("b11", 1L, 1L)
 sbm$add_node_rcpp("b12", 1L, 1L)
 
 
-sbm$add_connections_rcpp("a1", "b1")
-sbm$add_connections_rcpp("a1", "b2")
-sbm$add_connections_rcpp("a1", "b3")
-sbm$add_connections_rcpp("a2", "b3")
-sbm$add_connections_rcpp("a3", "b2")
+sbm$add_connection_rcpp("a1", "b1")
+sbm$add_connection_rcpp("a1", "b2")
+sbm$add_connection_rcpp("a1", "b3")
+sbm$add_connection_rcpp("a2", "b3")
+sbm$add_connection_rcpp("a3", "b2")
 
 sbm$set_node_parent("a1", "a11", 0)
 sbm$set_node_parent("a2", "a11", 0)
@@ -137,8 +145,10 @@ sbm$get_state_rcpp()
 
 sbm$compute_entropy_rcpp(0L)
 
-sbm$mcmc_sweep_rcpp(0,FALSE,0.1,1.5)
-sbm$compute_entropy_rcpp(0L)
+sbm$initialize_mcmc_rcpp(0, 15, TRUE, 5, 1.5, 0.1)
+
+# sbm$mcmc_sweep_rcpp(0,FALSE,0.1,1.5)
+# sbm$compute_entropy_rcpp(0L)
 
 
 */
