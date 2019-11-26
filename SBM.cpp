@@ -514,7 +514,7 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 // =============================================================================
 // Merge groups at a given level based on the best probability of doing so
 // =============================================================================
-Merge_Res SBM::agglomerative_merge(
+Merge_Step SBM::agglomerative_merge(
     int group_level,
     int num_merges_to_make,
     Merge_Params params)
@@ -616,7 +616,7 @@ Merge_Res SBM::agglomerative_merge(
 
   // Now we find the top merges
   // Initialize a merge result holder struct
-  Merge_Res results;
+  Merge_Step results;
 
   // Priority queue to find best moves
   std::priority_queue<std::pair<double, int>> best_moves;
@@ -686,7 +686,7 @@ Merge_Res SBM::agglomerative_merge(
 // Run agglomerative merging until a desired number of groups is reached.
 // Returns vector of results for each merge step
 // =============================================================================
-std::vector<Merge_Res>
+std::vector<Merge_Step>
 SBM::agglomerative_run(int level_of_nodes_to_group,
                        int desired_num_groups,
                        Merge_Params params)
@@ -703,7 +703,7 @@ SBM::agglomerative_run(int level_of_nodes_to_group,
   int curr_num_groups = get_level(group_level)->size();
 
   // Setup vector to hold all merge step results
-  std::vector<Merge_Res> step_results;
+  std::vector<Merge_Step> step_results;
 
   // Perform merge steps until we have the proper number of groups
   while (curr_num_groups > desired_num_groups)
@@ -743,7 +743,7 @@ SBM::agglomerative_run(int level_of_nodes_to_group,
 // Run mcmc chain initialization by finding best organization
 // of B' groups for all B from B = N to B = 1.
 // =============================================================================
-std::vector<Init_Step> SBM::initialize_mcmc(
+std::vector<Merge_Step> SBM::initialize_mcmc(
     int node_level,
     int num_mcmc_steps,
     Merge_Params params
@@ -762,7 +762,7 @@ std::vector<Init_Step> SBM::initialize_mcmc(
   clean_empty_groups();
 
   // Setup vector to hold all merge step results
-  std::vector<Init_Step> step_results;
+  std::vector<Merge_Step> step_results;
 
   int i;
   for (i = 0; i < B_start - unique_node_types.size(); i++)
@@ -779,7 +779,7 @@ std::vector<Init_Step> SBM::initialize_mcmc(
         1);
         
 
-    Merge_Res merge;
+    Merge_Step merge;
 
     // Attempt merge step
     try
@@ -814,7 +814,7 @@ std::vector<Init_Step> SBM::initialize_mcmc(
 
     // Gather info for return
     step_results.push_back(
-        Init_Step(
+        Merge_Step(
             compute_entropy(node_level),
             get_state()));
 

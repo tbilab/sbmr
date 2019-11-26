@@ -11,8 +11,7 @@
 class SBM;
 struct Trans_Probs;
 struct Proposal_Res;
-struct Merge_Res;
-struct Init_Step;
+struct Merge_Step;
 
 
 struct Merge_Params
@@ -73,21 +72,21 @@ public:
       double beta);
 
   // Merge two groups at a given level based on the probability of doing so
-  Merge_Res agglomerative_merge(
+  Merge_Step agglomerative_merge(
       int level_of_groups,
       int n_merges,
       Merge_Params params      );
 
   // Run mcmc chain initialization by finding best organization
   // of B' groups for all B from B = N to B = 1. 
-  std::vector<Init_Step> initialize_mcmc(
+  std::vector<Merge_Step> initialize_mcmc(
     int node_level,
     int num_mcmc_steps,
     Merge_Params params);
 
   // Run agglomerative merging until a desired number of groups is reached.
   // Returns vector of results for each merge step
-  std::vector<Merge_Res> agglomerative_run(
+  std::vector<Merge_Step> agglomerative_run(
       int level_of_nodes_to_group,
       int desired_num_groups,
       Merge_Params params = Merge_Params()
@@ -120,20 +119,15 @@ struct Proposal_Res
                                      prob_of_accept(p){};
 };
 
-struct Merge_Res
-{
-  double entropy;
-  std::vector<string> from_node;
-  std::vector<string> to_node;
-};
 
-struct Init_Step
+struct Merge_Step
 {
   double entropy;
   State_Dump state;
   std::vector<string> from_node;
   std::vector<string> to_node;
-  Init_Step(double e, State_Dump s) : entropy(e),
+  Merge_Step(){}
+  Merge_Step(double e, State_Dump s) : entropy(e),
                                       state(s) {}
 };
 
