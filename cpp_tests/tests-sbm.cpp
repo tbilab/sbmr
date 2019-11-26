@@ -193,6 +193,9 @@ TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
   double initial_entropy = my_SBM.compute_entropy(0);
 
   Merge_Params params;
+  params.sigma = 2;
+  params.eps = 0.01;
+
   // Run full agglomerative merging algorithm till we have just 3 groups left
   auto run_results = my_SBM.agglomerative_run(
     0,  // Run on level 0

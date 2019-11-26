@@ -691,52 +691,14 @@ SBM::agglomerative_run(int level_of_nodes_to_group,
                        int desired_num_groups,
                        Merge_Params params)
 {
-  // Start by giving every node at the desired level its own group
-  give_every_node_at_level_own_group(level_of_nodes_to_group);
+  
+  return initialize_mcmc(
+    level_of_nodes_to_group,
+    0,
+    params,
+    desired_num_groups
+  );
 
-  // Now clean up the empty groups
-  // (if there were previously group nodes for the level)
-  clean_empty_groups();
-
-  // Get the current number of groups we have
-  int group_level = level_of_nodes_to_group + 1;
-  int curr_num_groups = get_level(group_level)->size();
-
-  // Setup vector to hold all merge step results
-  std::vector<Merge_Step> step_results;
-
-  // Perform merge steps until we have the proper number of groups
-  while (curr_num_groups > desired_num_groups)
-  {
-    // Calculate how many merges we should do for this step
-    // (Converting to integer rounds down.)
-    int num_merges =
-        std::max(int(curr_num_groups - curr_num_groups / params.sigma), 1);
-
-    // Make sure we don't overstep the goal number of groups
-    if ((curr_num_groups - num_merges) < desired_num_groups)
-    {
-      num_merges = curr_num_groups - desired_num_groups;
-    }
-
-    // Attempt another merge step
-    try
-    {
-      // Perform merge and record results
-      step_results.push_back(
-        agglomerative_merge(group_level, num_merges, params));
-    }
-    catch (...)
-    {
-      // We reached the collapsibility limit of our network so we break early
-      break;
-    }
-
-    // Calculate the new number of groups
-    curr_num_groups = get_level(group_level)->size();
-  }
-
-  return step_results;
 }
 
 // =============================================================================
@@ -746,7 +708,8 @@ SBM::agglomerative_run(int level_of_nodes_to_group,
 std::vector<Merge_Step> SBM::initialize_mcmc(
     int node_level,
     int num_mcmc_steps,
-    Merge_Params params
+    Merge_Params params,
+    int desired_num_groups
 )
 {
   int group_level = node_level + 1;
@@ -764,8 +727,12 @@ std::vector<Merge_Step> SBM::initialize_mcmc(
   // Setup vector to hold all merge step results
   std::vector<Merge_Step> step_results;
 
+  int num_steps = desired_num_groups == -1 
+    ? B_start - unique_node_types.size()
+    : desired_num_groups;
+
   int i;
-  for (i = 0; i < B_start - unique_node_types.size(); i++)
+  for (i = 0; i < num_steps; i++)
   {
 
     std::cout << "Attempt group merge" << std::endl;
@@ -777,15 +744,20 @@ std::vector<Merge_Step> SBM::initialize_mcmc(
     int num_merges = std::max(
         int(curr_num_groups - (curr_num_groups / params.sigma)),
         1);
-        
 
-    Merge_Step merge;
+    // Make sure we don't overstep the goal number of groups
+    if ((curr_num_groups - num_merges) < desired_num_groups)
+    {
+      num_merges = curr_num_groups - desired_num_groups;
+    }
+
+    Merge_Step merge_results;
 
     // Attempt merge step
     try
     {
       // Perform next best merge and record results
-      merge = agglomerative_merge(
+      merge_results = agglomerative_merge(
           group_level,
           num_merges,
           params);
@@ -796,11 +768,11 @@ std::vector<Merge_Step> SBM::initialize_mcmc(
       break;
     }
 
-    std::cout << "Equlibriating model..." << std::endl;
-    std::cout << "MCMC sweep ";
-    // Let model equilibriate with new group layout...
-    if (num_mcmc_steps != 0) 
+    if (num_mcmc_steps != 0)
     {
+      std::cout << "Equlibriating model..." << std::endl;
+      std::cout << "MCMC sweep ";
+      // Let model equilibriate with new group layout...
       for (int j = 0; j < num_mcmc_steps; j++)
       {
         mcmc_sweep(
@@ -810,13 +782,16 @@ std::vector<Merge_Step> SBM::initialize_mcmc(
             params.beta);
         std::cout << j << " ";
       }
+
+      // Update the step entropy results with new equilibriated model
+      merge_results.entropy = compute_entropy(node_level);
     }
 
+    // Dump state into step results
+    merge_results.state = get_state();
+
     // Gather info for return
-    step_results.push_back(
-        Merge_Step(
-            compute_entropy(node_level),
-            get_state()));
+    step_results.push_back(merge_results);
 
     std::cout << std::endl;
   }

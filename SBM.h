@@ -82,7 +82,8 @@ public:
   std::vector<Merge_Step> initialize_mcmc(
     int node_level,
     int num_mcmc_steps,
-    Merge_Params params);
+    Merge_Params params,
+    int desired_num_groups = -1); // Default value which lets model drop to 1 group per type.
 
   // Run agglomerative merging until a desired number of groups is reached.
   // Returns vector of results for each merge step
