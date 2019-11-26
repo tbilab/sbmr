@@ -262,94 +262,90 @@ TEST_CASE("Building an edge count map", "[Network]")
     REQUIRE(3 == my_net.nodes.at(2)->size());
 
     // Build the network connection map for first level
-    EdgeCounts l1_edges = my_net.gather_edge_counts(1);
+    auto l1_edges = my_net.get_edge_counts(1);
 
     // The edge count map should have 6 non-empty entries 
-    REQUIRE(6 == l1_edges.size());
+    REQUIRE(6 == l1_edges->size());
 
     // Check num edges between groups
-    REQUIRE(l1_edges[find_edges(a11, b11)] == 2);
-    REQUIRE(l1_edges[find_edges(a11, b12)] == 0);
-    REQUIRE(l1_edges[find_edges(a11, b13)] == 0);
-    REQUIRE(l1_edges[find_edges(a12, b11)] == 4);
-    REQUIRE(l1_edges[find_edges(a12, b12)] == 2);
-    REQUIRE(l1_edges[find_edges(a12, b13)] == 1);
-    REQUIRE(l1_edges[find_edges(a13, b11)] == 1);
-    REQUIRE(l1_edges[find_edges(a13, b12)] == 1);
-    REQUIRE(l1_edges[find_edges(a13, b13)] == 0);
+    REQUIRE((*l1_edges)[find_edges(a11, b11)] == 2);
+    REQUIRE((*l1_edges)[find_edges(a11, b12)] == 0);
+    REQUIRE((*l1_edges)[find_edges(a11, b13)] == 0);
+    REQUIRE((*l1_edges)[find_edges(a12, b11)] == 4);
+    REQUIRE((*l1_edges)[find_edges(a12, b12)] == 2);
+    REQUIRE((*l1_edges)[find_edges(a12, b13)] == 1);
+    REQUIRE((*l1_edges)[find_edges(a13, b11)] == 1);
+    REQUIRE((*l1_edges)[find_edges(a13, b12)] == 1);
+    REQUIRE((*l1_edges)[find_edges(a13, b13)] == 0);
 
     // Direction shouldn't matter
     REQUIRE(
-        l1_edges[find_edges(a11, b11)] == 
-        l1_edges[find_edges(b11, a11)]);
+        (*l1_edges)[find_edges(a11, b11)] == 
+        (*l1_edges)[find_edges(b11, a11)]);
 
     REQUIRE(
-        l1_edges[find_edges(a11, b12)] ==
-        l1_edges[find_edges(b12, a11)]);
+        (*l1_edges)[find_edges(a11, b12)] ==
+        (*l1_edges)[find_edges(b12, a11)]);
 
     REQUIRE(
-        l1_edges[find_edges(a11, b13)] ==
-        l1_edges[find_edges(b13, a11)]);
+        (*l1_edges)[find_edges(a11, b13)] ==
+        (*l1_edges)[find_edges(b13, a11)]);
 
     REQUIRE(
-        l1_edges[find_edges(a12, b11)] ==
-        l1_edges[find_edges(b11, a12)]);
+        (*l1_edges)[find_edges(a12, b11)] ==
+        (*l1_edges)[find_edges(b11, a12)]);
 
     REQUIRE(
-        l1_edges[find_edges(a12, b12)] ==
-        l1_edges[find_edges(b12, a12)]);
+        (*l1_edges)[find_edges(a12, b12)] ==
+        (*l1_edges)[find_edges(b12, a12)]);
 
     REQUIRE(
-        l1_edges[find_edges(a12, b13)] ==
-        l1_edges[find_edges(b13, a12)]);
+        (*l1_edges)[find_edges(a12, b13)] ==
+        (*l1_edges)[find_edges(b13, a12)]);
 
     REQUIRE(
-        l1_edges[find_edges(a13, b11)] ==
-        l1_edges[find_edges(b11, a13)]);
+        (*l1_edges)[find_edges(a13, b11)] ==
+        (*l1_edges)[find_edges(b11, a13)]);
 
     REQUIRE(
-        l1_edges[find_edges(a13, b12)] ==
-        l1_edges[find_edges(b12, a13)]);
+        (*l1_edges)[find_edges(a13, b12)] ==
+        (*l1_edges)[find_edges(b12, a13)]);
 
     REQUIRE(
-        l1_edges[find_edges(a13, b13)] ==
-        l1_edges[find_edges(b13, a13)]);
+        (*l1_edges)[find_edges(a13, b13)] ==
+        (*l1_edges)[find_edges(b13, a13)]);
 
     // Repeat for level 2
-    EdgeCounts l2_edges = my_net.gather_edge_counts(2);
+    auto l2_edges = my_net.get_edge_counts(2);
 
     // Check num edges between groups
-    REQUIRE(l2_edges[find_edges(a22, b21)] == 9);
+    REQUIRE((*l2_edges)[find_edges(a22, b21)] == 9);
 
 
     // Now we will change the group for a node and make sure the changes are
     // updated properly with the update_edge_counts() function
 
     // Change a3's parent from a12 to a13.
-    a3->set_parent(a13);
 
     // Update the level 1 edge counts
-    Network::update_edge_counts(l1_edges, 1, a3, a12, a13);
+    my_net.update_edge_counts(a3, a13);
+    a3->set_parent(a13);
 
     // Make sure that the needed change were made to a12's connections:
-    REQUIRE(l1_edges[find_edges(a12, b11)] == 2);
-    REQUIRE(l1_edges[find_edges(a12, b12)] == 1);
-    REQUIRE(l1_edges[find_edges(a12, b13)] == 1);
+    REQUIRE((*l1_edges)[find_edges(a12, b11)] == 2);
+    REQUIRE((*l1_edges)[find_edges(a12, b12)] == 1);
+    REQUIRE((*l1_edges)[find_edges(a12, b13)] == 1);
 
     // And to a13's as well...
-    REQUIRE(l1_edges[find_edges(a13, b11)] == 3);
-    REQUIRE(l1_edges[find_edges(a13, b12)] == 2);
-    REQUIRE(l1_edges[find_edges(a13, b13)] == 0);
+    REQUIRE((*l1_edges)[find_edges(a13, b11)] == 3);
+    REQUIRE((*l1_edges)[find_edges(a13, b12)] == 2);
+    REQUIRE((*l1_edges)[find_edges(a13, b13)] == 0);
 
 
     // Nothing should have changed for the level 2 connections
-
-    // Update the level 2 edge counts
-    Network::update_edge_counts(l2_edges, 2, a3, a12, a13);
-
     // Check num edges between groups
-    REQUIRE(l2_edges[find_edges(a21, b21)] == 2);
-    REQUIRE(l2_edges[find_edges(a22, b21)] == 9);
+    REQUIRE((*l2_edges)[find_edges(a21, b21)] == 2);
+    REQUIRE((*l2_edges)[find_edges(a22, b21)] == 9);
 }
 
 

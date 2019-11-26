@@ -58,7 +58,6 @@ public:
 
   // Make a decision on the proposed new group for node
   Proposal_Res make_proposal_decision(
-      EdgeCounts &edge_counts,
       NodePtr node,
       NodePtr new_group,
       double eps,

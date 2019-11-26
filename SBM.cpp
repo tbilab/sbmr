@@ -35,7 +35,6 @@ NodePtr SBM::propose_move(NodePtr node, double eps)
 // Make a decision on the proposed new group for node
 // =============================================================================
 Proposal_Res SBM::make_proposal_decision(
-    EdgeCounts &edge_counts,
     NodePtr node,
     NodePtr new_group,
     double eps,
@@ -148,6 +147,8 @@ Proposal_Res SBM::make_proposal_decision(
   double pre_move_prob = 0.0;
   double post_move_prob = 0.0;
   
+  auto edge_counts = get_edge_counts(new_group->level);
+
   // Loop over all the node's connections to neighbor groups
   for(auto con_group_it = node_edges.begin(); 
            con_group_it != node_edges.end(); 
@@ -159,7 +160,7 @@ Proposal_Res SBM::make_proposal_decision(
     double e_it = con_group_it->second;
     
     // Edges from new group to t pre move...
-    double e_new_t_pre = edge_counts[
+    double e_new_t_pre = (*edge_counts)[
       find_edges(old_group, group_t)
     ];
     
@@ -204,8 +205,9 @@ int SBM::mcmc_sweep(int level,
   // Grab level map
   LevelPtr node_map = get_level(level);
   
-  // Calculate edge counts
-  EdgeCounts level_edges = gather_edge_counts(level);
+  // Calculate edge counts g
+  // EdgeCounts level_edges = gather_edge_counts(level);
+  auto level_edges = get_edge_counts(level);
   
   // Get all the nodes at the given level in a shuffleable vector format
   // Initialize vector to hold nodes
@@ -236,7 +238,6 @@ int SBM::mcmc_sweep(int level,
     
     // Calculate acceptance probability based on posterior changes
     Proposal_Res proposal_results = make_proposal_decision(
-      level_edges,
       curr_node,
       proposed_new_group,
       eps,
@@ -246,15 +247,9 @@ int SBM::mcmc_sweep(int level,
     bool move_accepted = sampler.draw_unif() < proposal_results.prob_of_accept;
 
     if (move_accepted) 
-    {
-      // Update edge counts 
-      update_edge_counts(level_edges, 
-                         group_level, 
-                         curr_node, 
-                         curr_node->parent, 
-                         proposed_new_group);
-     
+    {   
       // Move the node
+      update_edge_counts(curr_node, proposed_new_group);
       curr_node->set_parent(proposed_new_group);
       
       num_changes++;
@@ -560,7 +555,7 @@ Merge_Step SBM::agglomerative_merge(
   }
 
   // Gather edge-counts for metagroups
-  EdgeCounts metagroup_edges = gather_edge_counts(meta_level);
+  auto metagroup_edges = get_edge_counts(meta_level);
 
   // Loop over each group and find best merge option
   for (auto group_it = all_groups->begin(); group_it != all_groups->end();
@@ -601,7 +596,6 @@ Merge_Step SBM::agglomerative_merge(
 
       // Calculate entropy delta for move
       double entropy_delta = make_proposal_decision(
-                                 metagroup_edges,
                                  curr_group,
                                  metagroup,
                                  params.eps,

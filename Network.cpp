@@ -359,46 +359,73 @@ EdgeCounts Network::gather_edge_counts(int level)
   }
   
   return e_rs;
-}   
+}
 
+EdgeCounts* Network::get_edge_counts(int level)
+{
+  // First try and find the edge counts for level
+
+  // If they dont exist, build them
+  if (edge_counts.find(level) == edge_counts.end())
+  {
+    // Build an edge count for this level and then we're done...
+    edge_counts[level] = gather_edge_counts(level);
+  }
+  return &edge_counts.at(level);
+}
 
 // =============================================================================
-// Updates supplied id-id paired map of edge counts between nodes 
+// Updates internal id-id paired map of edge counts between nodes 
 // =============================================================================
 void Network::update_edge_counts(
-    EdgeCounts& level_counts, 
-    int         level, 
-    NodePtr     updated_node, 
-    NodePtr     old_group, 
-    NodePtr     new_group) 
+    NodePtr updated_node,
+    NodePtr new_group)
 {
-  
-  // Get map of group -> num connections for updated node
-  std::map<NodePtr, int> moved_connections_counts = updated_node->
-    gather_connections_to_level(level);
-  
-  // Get ids of groups moved, at the level of the move
-  NodePtr old_group_for_level = old_group->get_parent_at_level(level);
-  NodePtr new_group_for_level = new_group->get_parent_at_level(level);
- 
-  // Now we can loop through all the groups that the moved node was connected to
-  // and subtract their counts from the from-group's edges and add their counts
-  // to the to-group's
-  // Fill out edge count map
-  for(auto changed_group_it  = moved_connections_counts.begin(); 
-           changed_group_it != moved_connections_counts.end();
-           ++changed_group_it )
-  {
-    NodePtr changed_group = changed_group_it->first;
-    int amnt_change = changed_group_it->second;
-    
-    // Subtract from old group...
-    level_counts[find_edges(changed_group, old_group_for_level)] -= amnt_change;
-    
-    // ...Add to new group
-    level_counts[find_edges(changed_group, new_group_for_level)] += amnt_change;
-  }
+  NodePtr old_group = updated_node->parent;
+  int group_level = new_group->level;
 
+  // Go over every level present from the current group level on up
+  for (int level = group_level;
+       level < nodes.size();
+       level++)
+  {
+
+    // Check if no counts exist for this level yet...
+    bool counts_dont_exist_yet = edge_counts.find(level) == edge_counts.end();
+    
+     // Grab reference to level so we're modifying the right thing
+    auto level_edges = get_edge_counts(level);
+
+    // If count didn't exist before request then no need to update
+    if (counts_dont_exist_yet) continue;
+   
+    // Get map of group -> num connections for updated node
+    auto changed_connections = updated_node->gather_connections_to_level(level);
+
+    // Get ids of groups moved, at desired level
+    NodePtr old_group_for_level = old_group->get_parent_at_level(level);
+    NodePtr new_group_for_level = new_group->get_parent_at_level(level);
+
+    // Now we can loop through all the groups that the moved node was connected to
+    // and subtract their counts from the from-group's edges and add their counts
+    // to the to-group's
+    // Fill out edge count map
+    for (auto changed_group_it = changed_connections.begin();
+         changed_group_it != changed_connections.end();
+         ++changed_group_it)
+    {
+      NodePtr changed_group = changed_group_it->first;
+      int amnt_change = changed_group_it->second;
+
+      // Subtract from old group...
+      auto changed_to_old = find_edges(changed_group, old_group_for_level);
+      (*level_edges)[changed_to_old] -= amnt_change;
+
+      // ...Add to new group
+      auto changed_to_new = find_edges(changed_group, new_group_for_level);
+      (*level_edges)[changed_to_new] += amnt_change;
+    } // end loop over connections
+  }   // end loop over successive levels
 }
 
 

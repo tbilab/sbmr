@@ -19,6 +19,7 @@ typedef std::map<string, NodePtr> NodeLevel;
 typedef std::shared_ptr<NodeLevel> LevelPtr;
 typedef std::map<int, LevelPtr> LevelMap;
 typedef std::map<std::pair<NodePtr, NodePtr>, int> EdgeCounts;
+typedef std::map<int, EdgeCounts> EdgeMap;
 
 using std::string;
 
@@ -41,6 +42,10 @@ public:
   // =========================================================================
   // A map keyed by level integer of each level of nodes
   LevelMap nodes;
+
+  // A map keyed by level with the node to node edge counts for that level
+  EdgeMap edge_counts;
+
 
   // Vector storing all the unique types of nodes seen.
   // Used to make sure the correct move proposals are made
@@ -80,6 +85,7 @@ public:
       string id,
       int level = 0);
 
+
   // Attempts to find node in network. If node doesn't exist, it will add it.
   NodePtr find_or_add_node(
     string id,
@@ -96,6 +102,7 @@ public:
   std::list<NodePtr> get_nodes_of_type_at_level(
       int type,
       int level);
+
 
   // Return all nodes not of a specified type from level
   std::list<NodePtr> get_nodes_not_of_type_at_level(
@@ -124,12 +131,13 @@ public:
   EdgeCounts gather_edge_counts(int level);
 
 
-  // Update an EdgeCount map after moving a node around to avoid rescanning
-  static void update_edge_counts(
-      EdgeCounts &level_counts,
-      int level,
+
+  EdgeCounts* get_edge_counts(int level);
+
+
+  // Update network's internal edge counts map after structure change
+  void update_edge_counts(
       NodePtr updated_node,
-      NodePtr old_group,
       NodePtr new_group);
 
 
