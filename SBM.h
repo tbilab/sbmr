@@ -84,14 +84,6 @@ public:
     Merge_Params params,
     int desired_num_groups = -1); // Default value which lets model drop to 1 group per type.
 
-
-  // Compute probability of accepting a node group swap
-  Proposal_Res compute_acceptance_prob(
-      EdgeCounts &level_counts,
-      NodePtr node_to_update,
-      NodePtr new_group,
-      double eps,
-      double beta);
 };
 
 // Two equal-sized vectors, one containing probabilities of a node joining a

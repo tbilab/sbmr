@@ -81,16 +81,13 @@ TEST_CASE("Calculate Model entropy", "[SBM]")
   NodePtr to_group = my_SBM.get_node_by_id("a12", 1);
 
   // Calculate the entropy delta along with acceptance prob
-  Proposal_Res proposal_results = my_SBM.compute_acceptance_prob(
-      l1_edges,
+  Proposal_Res proposal_results = my_SBM.make_proposal_decision(
       node_to_move,
       to_group,
       0.1,
       0.1);
 
   double entropy_delta = proposal_results.entropy_delta;
-
-  // std::cout << "Moving a1 from a11->a12: prob = " << proposal_results.prob_of_accept << std::endl;
 
   // Now we will actually move the desired node and test to see if entropy has changed
   // Move node

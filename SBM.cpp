@@ -206,7 +206,6 @@ int SBM::mcmc_sweep(int level,
   LevelPtr node_map = get_level(level);
   
   // Calculate edge counts g
-  // EdgeCounts level_edges = gather_edge_counts(level);
   auto level_edges = get_edge_counts(level);
   
   // Get all the nodes at the given level in a shuffleable vector format
@@ -325,6 +324,7 @@ double SBM::compute_entropy(int level)
   // we already accounted for repeats of edges by building a unique-pairs-only
   // map of edges between groups
   EdgeCounts level_edges = gather_edge_counts(level + 1);
+
   double edge_entropy = 0.0;
   
   for (auto edge_it  = level_edges.begin(); 
@@ -350,146 +350,6 @@ double SBM::compute_entropy(int level)
   return -1 * (n_total_edges + degree_summation + edge_entropy);
 }
 
-
-// =============================================================================
-// Calculates acceptance probability of a given move. Calculates entropy delta
-// along with partial probability sums to build entire prob.
-// =============================================================================
-Proposal_Res SBM::compute_acceptance_prob(EdgeCounts& level_counts,
-                                          NodePtr     node_to_update,
-                                          NodePtr     new_group,
-                                          double      eps,
-                                          double      beta)
-{
-  int group_level = node_to_update->level + 1;
-  
-  // Get reference to old group that would be swapped for new_group
-  NodePtr old_group = node_to_update->parent;
-  
-  // Grab all groups that could belong to connections
-  double n_possible_groups = get_nodes_of_type_at_level(
-    node_to_update->type,
-    group_level).size();
-  
-  // Figure out how much the group node's degrees will change.
-  double node_degree = node_to_update->degree;
-  double old_group_degree_pre = old_group->degree;
-  double new_group_degree_pre = new_group->degree;
-  double old_group_degree_post = old_group_degree_pre - node_degree;
-  double new_group_degree_post = new_group_degree_pre + node_degree;
-  
-  // Initialize the partial edge entropy sum holders
-  double entropy_pre = 0;
-  double entropy_post = 0;
-  
-  // Gather connection maps for the node and its moved groups as these will have
-  // changes in their entropy contribution
-  std::map<NodePtr, int> node_connections = node_to_update->
-    gather_connections_to_level(group_level);
-  
-  std::map<NodePtr, int> new_group_connections = new_group->
-    gather_connections_to_level(group_level);
-  
-  std::map<NodePtr, int> old_group_connections = old_group->
-    gather_connections_to_level(group_level);
-  
-  // Initialize edge counts to hold new and old group counts to connected groups
-  EdgeCounts post_move_level_counts;
-
-  // Lambda function to process a pair of groups contribution to edge entropy.
-  // Needs to know what group is contributing the pair with moved_is_old_group. 
-  auto process_group_pair = [&]
-  (bool moved_is_old_group, 
-   NodePtr connected_group, 
-   double edge_count_pre)
-  {
-    // Find out how many edges the node being moved contributed to total
-    // connections between old group and connected group
-    double edges_from_node = node_connections[connected_group];
-    
-    // Now calculate the old and new edge counts we need to compute entropy
-    double edge_count_post = edge_count_pre + 
-      (moved_is_old_group ? -1: 1) * edges_from_node;
-    
-    double moved_degree_pre = moved_is_old_group ? old_group_degree_pre: 
-                                                   new_group_degree_pre;
-
-    double moved_degree_post = moved_is_old_group ? old_group_degree_post: 
-                                                    new_group_degree_post;
-    
-    double connected_degree = connected_group->degree;
-    
-    // Record edge counts for after move
-    post_move_level_counts.emplace(
-      find_edges(moved_is_old_group ? old_group: new_group, connected_group),
-      edge_count_post
-    );
-    
-    // Calculate entropy contribution pre move 
-    entropy_pre += edge_count_pre > 0 ?
-      edge_count_pre* 
-      log(edge_count_pre / (moved_degree_pre*connected_degree)):
-      0; 
-    
-    // Calculate entropy contribution post move 
-    entropy_post += edge_count_post > 0 ?
-      edge_count_post * 
-      log(edge_count_post / (moved_degree_post*connected_degree)):
-      0;
-  };
-  
-  // Calculate the new entropy contribution for each old group connection
-  for(auto con_group_it = old_group_connections.begin(); 
-      con_group_it != old_group_connections.end(); 
-      con_group_it++)
-  {
-    process_group_pair(true, con_group_it->first, con_group_it->second);
-  }
-  
-  // And again loop over new group connections
-  for(auto con_group_it = new_group_connections.begin(); 
-      con_group_it != new_group_connections.end(); 
-      con_group_it++)
-  {
-    process_group_pair(false, con_group_it->first, con_group_it->second);
-  }
-  
-  double pre_move_prob = 0.0;
-  double post_move_prob = 0.0;
-  
-  // And again loop over new group connections
-  for(auto con_group_it = node_connections.begin(); 
-           con_group_it != node_connections.end(); 
-           con_group_it++)
-  {
-    NodePtr group_t = con_group_it->first;
-    
-    double e_it = con_group_it->second;
-    
-    double e_new_t_pre = level_counts[
-      find_edges(old_group, group_t)
-    ];
-    
-    double e_old_t_post = post_move_level_counts[
-      find_edges(new_group, group_t)
-    ];
-    
-    double denom = group_t->degree + eps*n_possible_groups;
-    
-    pre_move_prob  += e_it * (e_new_t_pre + eps) / denom;
-    post_move_prob += e_it * (e_old_t_post + eps) / denom;
-  }
-
-  double entropy_delta = entropy_post - entropy_pre;
-  
-  double acceptance_prob = exp(beta*entropy_delta) * 
-                           (pre_move_prob/post_move_prob);
-  
-  return Proposal_Res(
-    entropy_delta,
-    acceptance_prob > 1 ? 1: acceptance_prob
-  );
-}
 
 // =============================================================================
 // Merge two groups, placing all nodes that were under group_b under group_a and 
