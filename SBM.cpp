@@ -661,8 +661,8 @@ Merge_Res SBM::agglomerative_merge(
       merge_groups(to_group, from_group);
 
       // Record pair for results
-      results.from_node.push_back(from_group);
-      results.to_node.push_back(to_group);
+      results.from_node.push_back(from_group->id);
+      results.to_node.push_back(to_group->id);
     }
 
     // Remove the last index from our queue and go again
@@ -777,12 +777,15 @@ std::vector<Init_Step> SBM::initialize_mcmc(
     int num_merges = std::max(
         int(curr_num_groups - (curr_num_groups / params.sigma)),
         1);
+        
+
+    Merge_Res merge;
 
     // Attempt merge step
     try
     {
       // Perform next best merge and record results
-      agglomerative_merge(
+      merge = agglomerative_merge(
           group_level,
           num_merges,
           params);

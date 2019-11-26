@@ -123,14 +123,16 @@ struct Proposal_Res
 struct Merge_Res
 {
   double entropy;
-  std::vector<NodePtr> from_node;
-  std::vector<NodePtr> to_node;
+  std::vector<string> from_node;
+  std::vector<string> to_node;
 };
 
 struct Init_Step
 {
   double entropy;
   State_Dump state;
+  std::vector<string> from_node;
+  std::vector<string> to_node;
   Init_Step(double e, State_Dump s) : entropy(e),
                                       state(s) {}
 };
