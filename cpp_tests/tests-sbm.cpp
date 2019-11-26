@@ -208,39 +208,6 @@ TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
   REQUIRE(my_SBM.get_level(1)->size() == 3);
 }
 
-TEST_CASE("Greedy agglomerative merging on larger network", "[SBM]")
-{
-  // Setup simple SBM model
-  SBM my_SBM = build_simulated_SBM();
-
-  int desired_num_groups = 4;
-
-  // Run full agglomerative merging algorithm till we have just 3 groups left
-  auto run_results = my_SBM.collapse_groups(
-      0,
-      0,
-      Merge_Params(),
-      desired_num_groups);
-
-  // Make sure that we have lumped together at least some groups
-  REQUIRE(my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size());
-
-  // Greedy merging should also always return the same results...
-  double first_merge_entropy = run_results.end()->entropy;
-  for (int i = 0; i < 5; i++)
-  {
-    SBM new_SBM = build_simulated_SBM();
-    auto new_results = new_SBM.collapse_groups(
-        0,
-        0,
-        Merge_Params(),
-        desired_num_groups);
-
-    REQUIRE(
-        Approx(run_results.end()->entropy).epsilon(0.5) ==
-        first_merge_entropy);
-  }
-}
 
 TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]")
 {
