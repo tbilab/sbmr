@@ -8,10 +8,11 @@ inline DataFrame state_to_df(State_Dump state)
 {
     // Create and return dump of state as dataframe
     return DataFrame::create(
-        _("id") = state.id,
-        _("parent") = state.parent,
-        _("type") = state.type,
-        _("level") = state.level);
+        _["id"] = state.id,
+        _["parent"] = state.parent,
+        _["type"] = state.type,
+        _["level"] = state.level,
+        _["stringsAsFactors"] = false);
 }
 
 class Rcpp_SBM: public SBM {
@@ -93,6 +94,17 @@ public:
 
     return entropy_results;
   }
+
+  void load_from_state_rcpp(
+      std::vector<string> id,
+      std::vector<string> parent,
+      std::vector<int> level,
+      std::vector<int> type)
+  {
+    // Construct a state dump from vectors and
+    // pass the constructed state to load_state function
+    load_from_state(State_Dump(id, parent, level, type));
+  }
 };
 
 RCPP_MODULE(sbm_module)
@@ -104,6 +116,7 @@ RCPP_MODULE(sbm_module)
   .method("add_node_rcpp", &Rcpp_SBM::add_node_rcpp)
   .method("add_connection_rcpp", &Rcpp_SBM::add_connection_rcpp)
   .method("get_state_rcpp", &Rcpp_SBM::get_state_rcpp)
+  .method("load_from_state_rcpp", &Rcpp_SBM::load_from_state_rcpp)
   .method("set_node_parent", &Rcpp_SBM::set_node_parent)
   .method("compute_entropy_rcpp", &Rcpp_SBM::compute_entropy_rcpp)
   .method("mcmc_sweep_rcpp", &Rcpp_SBM::mcmc_sweep_rcpp)
@@ -145,7 +158,12 @@ sbm$get_state_rcpp()
 
 sbm$compute_entropy_rcpp(0L)
 
-sbm$initialize_mcmc_rcpp(0, 15, TRUE, 5, 1.5, 0.1)
+init_results <- sbm$initialize_mcmc_rcpp(0, 15, TRUE, 5, 1.5, 0.1)
+
+desired_state <- init_results[[1]]$state
+sbm$load_from_state_rcpp(desired_state$id, desired_state$parent, desired_state$level, desired_state$type)
+
+
 
 # sbm$mcmc_sweep_rcpp(0,FALSE,0.1,1.5)
 # sbm$compute_entropy_rcpp(0L)
