@@ -80,6 +80,13 @@ public:
       string id,
       int level = 0);
 
+  // Attempts to find node in network. If node doesn't exist, it will add it.
+  NodePtr find_or_add_node(
+    string id,
+    int level,
+    int type
+  );
+
 
   // Grabs the first node found at a given level, used in testing.
   NodePtr get_node_from_level(int level);
@@ -139,6 +146,12 @@ struct State_Dump
   std::vector<string> parent;
   std::vector<int> level;
   std::vector<int> type;
+  State_Dump(){};
+  State_Dump(
+      std::vector<string> i,
+      std::vector<string> p,
+      std::vector<int> l,
+      std::vector<int> t) : id(i), parent(p), level(l), type(t) {}
 };
 
 #endif
