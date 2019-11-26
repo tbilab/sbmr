@@ -85,13 +85,6 @@ public:
     Merge_Params params,
     int desired_num_groups = -1); // Default value which lets model drop to 1 group per type.
 
-  // Run agglomerative merging until a desired number of groups is reached.
-  // Returns vector of results for each merge step
-  std::vector<Merge_Step> agglomerative_run(
-      int level_of_nodes_to_group,
-      int desired_num_groups,
-      Merge_Params params = Merge_Params()
-  );
 
   // Compute probability of accepting a node group swap
   Proposal_Res compute_acceptance_prob(

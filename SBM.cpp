@@ -682,24 +682,7 @@ Merge_Step SBM::agglomerative_merge(
   return results;
 }
 
-// =============================================================================
-// Run agglomerative merging until a desired number of groups is reached.
-// Returns vector of results for each merge step
-// =============================================================================
-std::vector<Merge_Step>
-SBM::agglomerative_run(int level_of_nodes_to_group,
-                       int desired_num_groups,
-                       Merge_Params params)
-{
 
-  return collapse_groups(
-    level_of_nodes_to_group,
-    0,
-    params,
-    desired_num_groups
-  );
-
-}
 
 // =============================================================================
 // Run mcmc chain initialization by finding best organization
@@ -782,7 +765,6 @@ std::vector<Merge_Step> SBM::collapse_groups(
             params.beta);
         std::cout << j << " ";
       }
-
       // Update the step entropy results with new equilibriated model
       merge_results.entropy = compute_entropy(node_level);
     }
