@@ -4,7 +4,7 @@
 // =============================================================================
 // Propose a potential group move for a node.
 // =============================================================================
-NodePtr SBM::propose_move(NodePtr node, double eps)
+NodePtr SBM::propose_move(NodePtr node)
 {
   int group_level = node->level + 1;
   
@@ -22,7 +22,7 @@ NodePtr SBM::propose_move(NodePtr node, double eps)
   int neighbor_group_degree = rand_neighbor->parent->degree;
   
   // Decide if we are going to choose a random group for our node
-  double ergo_amnt = eps*potential_groups.size();
+  double ergo_amnt = Params.eps*potential_groups.size();
   double prob_of_random_group = ergo_amnt/(neighbor_group_degree + ergo_amnt);
   
   // Decide where we will get new group from and draw from potential candidates
@@ -221,7 +221,7 @@ int SBM::mcmc_sweep(int level, bool variable_num_groups)
     NodePtr curr_node = *node_it;
     
     // Get a move proposal
-    NodePtr proposed_new_group = propose_move(curr_node, Params.eps);
+    NodePtr proposed_new_group = propose_move(curr_node);
 
     // If the propsosed group is the nodes current group, we don't need to waste
     // time checking because decision will always result in same state.
@@ -425,7 +425,7 @@ Merge_Step SBM::agglomerative_merge(
       for (int i = 0; i < Params.n_checks_per_group; i++)
       {
         // Sample a group from potential groups
-        metagroups_to_search.push_back(propose_move(curr_group, Params.eps));
+        metagroups_to_search.push_back(propose_move(curr_group));
       }
     }
 

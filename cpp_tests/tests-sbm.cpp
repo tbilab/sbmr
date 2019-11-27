@@ -27,7 +27,7 @@ TEST_CASE("Generate Node move proposals", "[SBM]")
   for (int i = 0; i < num_trials; ++i)
   {
     // Do move attempt (dry run)
-    NodePtr new_group = my_SBM.propose_move(a1, eps);
+    NodePtr new_group = my_SBM.propose_move(a1);
 
     if (new_group->id == old_group->id)
       num_times_no_move++;

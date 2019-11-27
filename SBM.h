@@ -58,7 +58,7 @@ public:
   void merge_groups(NodePtr group_a, NodePtr group_b);
 
   // Use model state to propose a potential group move for a node.
-  NodePtr propose_move(NodePtr node, double eps);
+  NodePtr propose_move(NodePtr node);
 
   // Make a decision on the proposed new group for node
   Proposal_Res make_proposal_decision(
