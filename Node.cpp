@@ -23,6 +23,9 @@ void Node::add_connection(NodePtr node)
   }
 }
 
+// =============================================================================
+// Add or remove connections from nodes connection list
+// =============================================================================
 void Node::update_connections_from_node(NodePtr node, bool remove)
 {
   auto connections_to_remove = node->connections;
