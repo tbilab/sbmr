@@ -49,24 +49,19 @@ public:
   // =========================================================================
   // Unique integer id for node
   string id;
-
   // Nodes that are connected to this node
   std::list<NodePtr> connections;
-
   // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
   int level;
-
   // What node contains this node (aka its cluster)
   NodePtr parent;
-
   // Nodes that are contained within node (if node is cluster)
   ChildSet children;
-
   // What type of node is this?
   int type;
-
   // How many connections/ edges does this node have?
   int degree;
+
 
   // Methods
   // =========================================================================
