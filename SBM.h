@@ -80,7 +80,6 @@ public:
   std::vector<Merge_Step> collapse_groups(
     int node_level,
     int num_mcmc_steps,
-    Merge_Params params,
     int desired_num_groups = -1); // Default value which lets model drop to 1 group per type.
 
 };

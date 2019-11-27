@@ -529,7 +529,6 @@ Merge_Step SBM::agglomerative_merge(
 std::vector<Merge_Step> SBM::collapse_groups(
     int node_level,
     int num_mcmc_steps,
-    Merge_Params params,
     int desired_num_groups
 )
 {
@@ -561,7 +560,7 @@ std::vector<Merge_Step> SBM::collapse_groups(
 
     // Decide how many merges we should do. 
     int num_merges = std::max(
-        int(curr_num_groups - (curr_num_groups / params.sigma)),
+        int(curr_num_groups - (curr_num_groups / Params.sigma)),
         1);
 
     // Make sure we don't overstep the goal number of groups
