@@ -63,9 +63,7 @@ public:
   // Make a decision on the proposed new group for node
   Proposal_Res make_proposal_decision(
       NodePtr node,
-      NodePtr new_group,
-      double eps,
-      double beta);
+      NodePtr new_group);
 
   // Runs efficient MCMC sweep algorithm on desired node level
   int mcmc_sweep(

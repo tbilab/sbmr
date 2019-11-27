@@ -36,9 +36,7 @@ NodePtr SBM::propose_move(NodePtr node, double eps)
 // =============================================================================
 Proposal_Res SBM::make_proposal_decision(
     NodePtr node,
-    NodePtr new_group,
-    double eps,
-    double beta)
+    NodePtr new_group)
 {
   // The level that this proposal is taking place on
   int group_level = node->level + 1;
@@ -170,18 +168,18 @@ Proposal_Res SBM::make_proposal_decision(
     ];
     
     // Denominator of both probability fractions
-    double denom = group_t->degree + eps*n_possible_groups;
+    double denom = group_t->degree + Params.eps*n_possible_groups;
     
     // Add new components to both the pre and post move probabilities. 
-    pre_move_prob  += e_it * (e_new_t_pre + eps) / denom;
-    post_move_prob += e_it * (e_old_t_post + eps) / denom;
+    pre_move_prob  += e_it * (e_new_t_pre + Params.eps) / denom;
+    post_move_prob += e_it * (e_old_t_post + Params.eps) / denom;
   }
 
   // Now we can clean up all the calculations into to entropy delta and the 
   // probability ratio for the moves and use those to calculate the acceptance 
   // probability for the proposed move.
   double entropy_delta = entropy_post - entropy_pre;
-  double acceptance_prob = exp(beta*entropy_delta) * 
+  double acceptance_prob = exp(Params.beta*entropy_delta) * 
                           (pre_move_prob/post_move_prob);
   
   return Proposal_Res(
@@ -193,8 +191,7 @@ Proposal_Res SBM::make_proposal_decision(
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-int SBM::mcmc_sweep(int level, 
-                    bool variable_num_groups) 
+int SBM::mcmc_sweep(int level, bool variable_num_groups) 
 {
   
   int num_changes = 0;
@@ -233,9 +230,7 @@ int SBM::mcmc_sweep(int level,
     // Calculate acceptance probability based on posterior changes
     Proposal_Res proposal_results = make_proposal_decision(
       curr_node,
-      proposed_new_group,
-      Params.eps,
-      Params.beta
+      proposed_new_group
     );
     
     bool move_accepted = sampler.draw_unif() < proposal_results.prob_of_accept;
@@ -449,9 +444,7 @@ Merge_Step SBM::agglomerative_merge(
       // Calculate entropy delta for move
       double entropy_delta = make_proposal_decision(
                                  curr_group,
-                                 metagroup,
-                                 params.eps,
-                                 1.0)
+                                 metagroup)
                                  .entropy_delta;
 
       from_groups.push_back(curr_group);

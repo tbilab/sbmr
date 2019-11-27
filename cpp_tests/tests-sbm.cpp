@@ -67,12 +67,12 @@ TEST_CASE("Calculate Model entropy", "[SBM]")
   NodePtr from_group = node_to_move->parent;
   NodePtr to_group = my_SBM.get_node_by_id("a12", 1);
 
+
+  my_SBM.Params.beta = 0.1;
   // Calculate the entropy delta along with acceptance prob
   Proposal_Res proposal_results = my_SBM.make_proposal_decision(
       node_to_move,
-      to_group,
-      0.1,
-      0.1);
+      to_group);
 
   double entropy_delta = proposal_results.entropy_delta;
 
