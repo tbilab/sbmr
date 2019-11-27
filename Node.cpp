@@ -11,29 +11,61 @@ NodePtr Node::this_ptr()
 // =============================================================================
 // Add connection to another node
 // =============================================================================
-void Node::add_connection(NodePtr node_ptr)
+void Node::add_connection(NodePtr node)
 {
-  // Add element to connections list
-  connections.push_back(node_ptr);
+  // propigate new connection upwards to all parents
+  NodePtr current_node = this_ptr();
+  while (current_node)
+  {
+    (current_node->connections).push_back(node); 
+    current_node->degree++;
+    current_node = current_node->parent;
+  }
 
-  // propigate increase in degree upwards through hieararchy
-  update_degree(1);
 }
 
-// =============================================================================
-// Update node's and all its parents degree
-// =============================================================================
-void Node::update_degree(int change_amnt)
+void Node::update_connections_from_node(NodePtr node, bool remove)
 {
-  // propigate increase in degree upwards through hieararchy
-  NodePtr current_node = this_ptr();
+  auto connections_to_remove = node->connections;
+
+  // Starting with this node
+  auto current_node = this_ptr();
 
   while (current_node)
   {
-    current_node->degree += change_amnt;
+    for (auto connected_node : connections_to_remove)
+    {
+      if (remove)
+      {
+        // Scan through this nodes connections untill we find the first instance
+        // of the connected node we want to remove
+        for (auto con_it = connections.begin();
+             con_it != connections.end();
+             con_it++)
+        {
+          if (*con_it == connected_node)
+          {
+            connections.erase(con_it);
+            break;
+          }
+        }
+      }
+      else
+      {
+        // Just add this connection to nodes connections
+        (current_node->connections).push_back(connected_node);
+      }
+    }
+
+    // Update degree of current node
+    current_node->degree += (remove ? -1 : 1)*connections_to_remove.size();
+
+    // Update current node to nodes parent
     current_node = current_node->parent;
   }
 }
+
+
 
 // =============================================================================
 // Set current node parent/cluster
@@ -43,8 +75,8 @@ void Node::set_parent(NodePtr parent_node_ptr)
   // Remove self from previous parents children list (if it existed)
   if (parent)
   {
-    // Remove this node's edges contribution from parent's degree count
-    parent->update_degree(-degree);
+    // Remove this node's edges contribution from parent's 
+    parent->update_connections_from_node(this_ptr(), true);
 
     // Remove self from previous children
     parent->remove_child(this_ptr());
@@ -54,7 +86,8 @@ void Node::set_parent(NodePtr parent_node_ptr)
   parent = parent_node_ptr;
 
   // Add this node's edges to parent's degree count
-  parent->update_degree(degree);
+  parent->update_connections_from_node(this_ptr(), false);
+
 
   // Add this node to new parent's children list
   parent_node_ptr->add_child(this_ptr());

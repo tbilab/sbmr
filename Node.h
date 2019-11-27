@@ -85,9 +85,9 @@ public:
   // Add connection to another node
   void add_connection(NodePtr node);
 
-  // Update degree of node by specified amount, propigating to all parents
-  void update_degree(int change_in_degree);
-
+  // Remove connection from nodes connection list
+  void update_connections_from_node(NodePtr node, bool remove);
+ 
   // Get all member nodes of current node at a given level
   ChildSet get_children_at_level(int level);
 

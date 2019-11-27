@@ -190,18 +190,27 @@ TEST_CASE("Tracking node degrees", "[Node]")
   REQUIRE(a2->degree == 2);
   REQUIRE(a3->degree == 2);
   
+  REQUIRE(a1->degree == (a1->connections).size());
+  REQUIRE(a2->degree == (a2->connections).size());
+  REQUIRE(a3->degree == (a3->connections).size());
+  
   REQUIRE(b1->degree == 2);
   REQUIRE(b2->degree == 3);
   REQUIRE(b3->degree == 1);
   
   REQUIRE(a11->degree == 2);
   REQUIRE(a12->degree == 4);
-  
   REQUIRE(b11->degree == 5);
   REQUIRE(b12->degree == 1);
-  
   REQUIRE(a21->degree == 6);
   REQUIRE(b21->degree == 6);
+
+  REQUIRE(a11->degree == (a11->connections).size());
+  REQUIRE(a12->degree == (a12->connections).size());
+  REQUIRE(b11->degree == (b11->connections).size());
+  REQUIRE(b12->degree == (b12->connections).size());
+  REQUIRE(a21->degree == (a21->connections).size());
+  REQUIRE(b21->degree == (b21->connections).size());
   
   
   // Swap parents of a2 and b2 nodes
@@ -219,10 +228,15 @@ TEST_CASE("Tracking node degrees", "[Node]")
   
   REQUIRE(a11->degree == 4);
   REQUIRE(a12->degree == 2);
-  
   REQUIRE(b11->degree == 2);
   REQUIRE(b12->degree == 4);
-  
   REQUIRE(a21->degree == 6);
   REQUIRE(b21->degree == 6);
+
+  REQUIRE(a11->degree == (a11->connections).size());
+  REQUIRE(a12->degree == (a12->connections).size());
+  REQUIRE(b11->degree == (b11->connections).size());
+  REQUIRE(b12->degree == (b12->connections).size());
+  REQUIRE(a21->degree == (a21->connections).size());
+  REQUIRE(b21->degree == (b21->connections).size());
 }
