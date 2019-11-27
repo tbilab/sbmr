@@ -17,11 +17,10 @@ void Node::add_connection(NodePtr node)
   NodePtr current_node = this_ptr();
   while (current_node)
   {
-    (current_node->connections).push_back(node); 
+    (current_node->connections).push_back(node);
     current_node->degree++;
     current_node = current_node->parent;
   }
-
 }
 
 void Node::update_connections_from_node(NodePtr node, bool remove)
@@ -58,13 +57,12 @@ void Node::update_connections_from_node(NodePtr node, bool remove)
     }
 
     // Update degree of current node
-    current_node->degree += (remove ? -1 : 1)*connections_to_remove.size();
+    current_node->degree += (remove ? -1 : 1) * connections_to_remove.size();
 
     // Update current node to nodes parent
     current_node = current_node->parent;
   }
 }
-
 
 // =============================================================================
 // Set current node parent/cluster
@@ -74,7 +72,7 @@ void Node::set_parent(NodePtr parent_node_ptr)
   // Remove self from previous parents children list (if it existed)
   if (parent)
   {
-    // Remove this node's edges contribution from parent's 
+    // Remove this node's edges contribution from parent's
     parent->update_connections_from_node(this_ptr(), true);
 
     // Remove self from previous children
@@ -86,7 +84,6 @@ void Node::set_parent(NodePtr parent_node_ptr)
 
   // Add this node's edges to parent's degree count
   parent->update_connections_from_node(this_ptr(), false);
-
 
   // Add this node to new parent's children list
   parent_node_ptr->add_child(this_ptr());
@@ -196,12 +193,12 @@ std::vector<NodePtr> Node::get_connections_to_level(int desired_level)
   std::vector<NodePtr> level_cons;
   level_cons.reserve(connections.size());
 
-  // Go through every child node's connections list, find parent at 
+  // Go through every child node's connections list, find parent at
   // desired level and place in connected nodes vector
   for (auto connection : connections)
   {
     level_cons.push_back(connection->get_parent_at_level(desired_level));
-  } 
+  }
 
   return level_cons;
 }
