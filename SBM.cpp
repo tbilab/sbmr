@@ -361,8 +361,7 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 // =============================================================================
 Merge_Step SBM::agglomerative_merge(
     int group_level,
-    int num_merges_to_make,
-    Merge_Params params)
+    int num_merges_to_make)
 {
   // Quick check to make sure reasonable request
   if (num_merges_to_make == 0)
@@ -414,7 +413,7 @@ Merge_Step SBM::agglomerative_merge(
 
     // If we're running algorithm in greedy mode we should just
     // add every possible group to the groups-to-search list
-    if (params.greedy)
+    if (Params.greedy)
     {
       // Get a list of all the potential merges for group
       metagroups_to_search =
@@ -423,10 +422,10 @@ Merge_Step SBM::agglomerative_merge(
     else
     {
       // Otherwise, we should sample a given number of groups to check
-      for (int i = 0; i < params.n_checks_per_group; i++)
+      for (int i = 0; i < Params.n_checks_per_group; i++)
       {
         // Sample a group from potential groups
-        metagroups_to_search.push_back(propose_move(curr_group, params.eps));
+        metagroups_to_search.push_back(propose_move(curr_group, Params.eps));
       }
     }
 
@@ -579,8 +578,7 @@ std::vector<Merge_Step> SBM::collapse_groups(
       // Perform next best merge and record results
       merge_results = agglomerative_merge(
           group_level,
-          num_merges,
-          params);
+          num_merges);
     }
     catch (...)
     {

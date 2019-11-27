@@ -138,11 +138,9 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
   int num_initial_groups = my_SBM.get_level(1)->size();
   double initial_entropy = my_SBM.compute_entropy(0);
 
-  // Setup default parameter values
-  Merge_Params params;
 
   // Run greedy aglomerative merge with best single merge done
-  Merge_Step single_merge = my_SBM.agglomerative_merge(1, 1, params);
+  Merge_Step single_merge = my_SBM.agglomerative_merge(1, 1);
 
   // Make sure that we now have one less group than before for each type
   int new_group_num = my_SBM.get_level(1)->size();
@@ -157,7 +155,7 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
 
   
   // Run greedy aglomerative merge with best single merge done
-  Merge_Step double_merge = new_SBM.agglomerative_merge(1, 2, params);
+  Merge_Step double_merge = new_SBM.agglomerative_merge(1, 2);
 
   // Make sure that we now have two fewer groups per type than before
   REQUIRE(

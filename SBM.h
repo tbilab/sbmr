@@ -73,8 +73,7 @@ public:
   // Merge two groups at a given level based on the probability of doing so
   Merge_Step agglomerative_merge(
       int level_of_groups,
-      int n_merges,
-      Merge_Params params      );
+      int n_merges);
 
   // Run mcmc chain initialization by finding best organization
   // of B' groups for all B from B = N to B = 1. 
