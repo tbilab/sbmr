@@ -66,7 +66,6 @@ void Node::update_connections_from_node(NodePtr node, bool remove)
 }
 
 
-
 // =============================================================================
 // Set current node parent/cluster
 // =============================================================================
@@ -194,38 +193,17 @@ NodePtr Node::get_parent_at_level(int level_of_parent)
 std::vector<NodePtr> Node::get_connections_to_level(int desired_level)
 {
   // Vector to return containing parents at desired level for connections
-  std::vector<NodePtr> connected_nodes;
+  std::vector<NodePtr> level_cons;
+  level_cons.reserve(connections.size());
 
-  // Start by getting all of the level zero children of this node
-  ChildSet leaf_children = get_children_at_level(0);
-
-  // Go through every child
-  for (auto child_it = leaf_children.begin();
-       child_it != leaf_children.end();
-       ++child_it)
+  // Go through every child node's connections list, find parent at 
+  // desired level and place in connected nodes vector
+  for (auto connection : connections)
   {
-    // Go through every child node's connections list
-    for (auto connection_it = (*child_it)->connections.begin();
-         connection_it != (*child_it)->connections.end();
-         ++connection_it)
-    {
-      // For each connection of current child, find parent at desired level and
-      // place in connected nodes vector
-      try
-      {
-        connected_nodes.push_back(
-            (*connection_it)->get_parent_at_level(desired_level));
-      }
-      catch (...)
-      {
-        // A node doesn't have a parent at desired level
-        throw "A connected node doesn't have a parent at the desired level.";
-      }
+    level_cons.push_back(connection->get_parent_at_level(desired_level));
+  } 
 
-    } // End child connection loop
-  }   // End child loop
-
-  return connected_nodes;
+  return level_cons;
 }
 
 // =============================================================================
