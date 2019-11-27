@@ -8,19 +8,6 @@
 #include "network_builders.cpp"
 
 
-// Print a state dump for debugging purposes
-inline void print_state_dump(State_Dump state)
-{
-  int n = state.id.size();
-
-  for (int i = 0; i < n; i++)
-  {
-    std::cout << std::setw(7) << state.id[i] << ", "
-              << std::setw(7) << state.parent[i] << ", "
-              << std::setw(2) << state.level[i] << ", " << std::endl;
-  }
-}
-
 TEST_CASE("Generate Node move proposals", "[SBM]")
 {
   double tol = 0.01;
@@ -135,7 +122,6 @@ TEST_CASE("Basic MCMC sweeps", "[SBM]")
     double avg_num_changes = double(total_num_changes) / double(num_sweeps);
 
     avg_num_moves.push_back(avg_num_changes);
-    // std::cout << std::setw (5) << eps << " -- Avg number of changes = " << avg_num_changes << std::endl;
   }
 
   // Make sure that we have a more move-prone model when we have a high epsilon value...
@@ -264,10 +250,4 @@ TEST_CASE("Initialize MCMC chain with agglomerative merging", "[SBM]")
       30,
       params);
 
-  for (auto step_it = results.begin();
-       step_it != results.end();
-       step_it++)
-  {
-    std::cout << step_it->entropy << std::endl;
-  }
 }

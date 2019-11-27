@@ -565,8 +565,6 @@ std::vector<Merge_Step> SBM::collapse_groups(
   int i;
   for (i = 0; i < num_steps; i++)
   {
-
-    std::cout << "Attempt group merge" << std::endl;
     
     // Get the current number of groups we have
     int curr_num_groups = get_level(group_level)->size();
@@ -601,8 +599,6 @@ std::vector<Merge_Step> SBM::collapse_groups(
 
     if (num_mcmc_steps != 0)
     {
-      std::cout << "Equlibriating model..." << std::endl;
-      std::cout << "MCMC sweep ";
       // Let model equilibriate with new group layout...
       for (int j = 0; j < num_mcmc_steps; j++)
       {
@@ -611,7 +607,6 @@ std::vector<Merge_Step> SBM::collapse_groups(
             false,
             params.eps,
             params.beta);
-        std::cout << j << " ";
       }
       // Update the step entropy results with new equilibriated model
       merge_results.entropy = compute_entropy(node_level);
@@ -622,12 +617,7 @@ std::vector<Merge_Step> SBM::collapse_groups(
 
     // Gather info for return
     step_results.push_back(merge_results);
-
-    std::cout << std::endl;
   }
-
-  std::cout << "Model finished with " << get_level(group_level)->size()
-            << " nodes after " << i << " merges" << std::endl;
 
   return step_results;
 }

@@ -489,16 +489,11 @@ void Network::load_from_state(State_Dump state)
 { 
 
   int n = state.parent.size();
-  std::cout << "Reading state with " << n << " nodes to model..." << std::endl;
+
   for (int i = 0; i < n; i++)
   {
     int node_level = state.level[i];
     string parent_id = state.parent[i];
-
-    std::cout << i <<  " - Node: " << state.id[i]
-              << "  Parent: " << state.parent[i]
-              << "  level: " << state.level[i]
-              << "  type: " << state.type[i] << std::endl;
 
     // "none" indicates the highest level has been reached
     if (parent_id == "none") continue;
