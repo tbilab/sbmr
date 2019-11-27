@@ -70,13 +70,17 @@ public:
       double beta,
       double epsilon)
   {
+
+    Merge_Params params;
+    params.greedy = greedy;
+    params.n_checks_per_group = n_checks_per_group;
+    params.beta = beta;
+    params.eps = epsilon;
+
     auto init_results = collapse_groups(
         node_level,
         num_mcmc_steps,
-        greedy,
-        n_checks_per_group,
-        beta,
-        epsilon);
+        params);
 
     List entropy_results;
 
