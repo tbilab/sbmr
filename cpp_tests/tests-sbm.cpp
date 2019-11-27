@@ -115,7 +115,8 @@ TEST_CASE("Basic MCMC sweeps", "[SBM]")
 
     for (int i = 0; i < num_sweeps; i++)
     {
-      int n_changes = my_SBM.mcmc_sweep(0, false, eps, 1.0);
+      my_SBM.Params.eps = eps;
+      int n_changes = my_SBM.mcmc_sweep(0, false);
       total_num_changes += n_changes;
     }
 

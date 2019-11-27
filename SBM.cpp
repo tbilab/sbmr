@@ -194,9 +194,7 @@ Proposal_Res SBM::make_proposal_decision(
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
 int SBM::mcmc_sweep(int level, 
-                    bool variable_num_groups, 
-                    double eps, 
-                    double beta) 
+                    bool variable_num_groups) 
 {
   
   int num_changes = 0;
@@ -226,7 +224,7 @@ int SBM::mcmc_sweep(int level,
     NodePtr curr_node = *node_it;
     
     // Get a move proposal
-    NodePtr proposed_new_group = propose_move(curr_node, eps);
+    NodePtr proposed_new_group = propose_move(curr_node, Params.eps);
 
     // If the propsosed group is the nodes current group, we don't need to waste
     // time checking because decision will always result in same state.
@@ -236,8 +234,8 @@ int SBM::mcmc_sweep(int level,
     Proposal_Res proposal_results = make_proposal_decision(
       curr_node,
       proposed_new_group,
-      eps,
-      beta
+      Params.eps,
+      Params.beta
     );
     
     bool move_accepted = sampler.draw_unif() < proposal_results.prob_of_accept;
@@ -604,9 +602,7 @@ std::vector<Merge_Step> SBM::collapse_groups(
       {
         mcmc_sweep(
             node_level,
-            false,
-            params.eps,
-            params.beta);
+            false);
       }
       // Update the step entropy results with new equilibriated model
       merge_results.entropy = compute_entropy(node_level);

@@ -43,6 +43,10 @@ public:
   // A random sampler generation sclass.
   Sampler sampler;
 
+  // Parameters that control the mcmc and merging stuffs
+  Merge_Params Params;
+
+
   // Methods
   // =========================================================================
 
@@ -66,9 +70,7 @@ public:
   // Runs efficient MCMC sweep algorithm on desired node level
   int mcmc_sweep(
       int level,
-      bool variable_num_groups,
-      double eps,
-      double beta);
+      bool variable_num_groups);
 
   // Merge two groups at a given level based on the probability of doing so
   Merge_Step agglomerative_merge(
