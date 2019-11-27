@@ -204,10 +204,7 @@ int SBM::mcmc_sweep(int level,
   
   // Grab level map
   LevelPtr node_map = get_level(level);
-  
-  // Calculate edge counts g
-  auto level_edges = get_edge_counts(level);
-  
+    
   // Get all the nodes at the given level in a shuffleable vector format
   // Initialize vector to hold nodes
   std::vector<NodePtr> node_vec;
@@ -413,9 +410,6 @@ Merge_Step SBM::agglomerative_merge(
       throw "To few groups to perform merge.";
     }
   }
-
-  // Gather edge-counts for metagroups
-  auto metagroup_edges = get_edge_counts(meta_level);
 
   // Loop over each group and find best merge option
   for (auto group_it = all_groups->begin(); group_it != all_groups->end();
