@@ -131,7 +131,6 @@ public:
   EdgeCounts gather_edge_counts(int level);
 
 
-
   EdgeCounts* get_edge_counts(int level);
 
 
