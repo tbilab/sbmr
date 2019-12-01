@@ -80,7 +80,7 @@ public:
   // Add connection to another node
   void add_connection(NodePtr node);
 
-  // Remove connection from nodes connection list
+  // Add or remove connections from nodes connection list
   void update_connections_from_node(NodePtr node, bool remove);
  
   // Get all member nodes of current node at a given level

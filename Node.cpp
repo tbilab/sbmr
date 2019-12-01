@@ -26,7 +26,7 @@ void Node::add_connection(NodePtr node)
 // =============================================================================
 // Add or remove connections from nodes connection list
 // =============================================================================
-void Node::update_connections_from_node(NodePtr node, bool remove)
+void Node::update_connections_from_node(const NodePtr node, const bool remove)
 {
   auto connections_to_remove = node->connections;
 
@@ -35,14 +35,15 @@ void Node::update_connections_from_node(NodePtr node, bool remove)
 
   while (current_node)
   {
-    for (auto connected_node : connections_to_remove)
+    for (auto & connected_node : connections_to_remove)
     {
       if (remove)
       {
         // Scan through this nodes connections untill we find the first instance
         // of the connected node we want to remove
+        auto last_place = connections.end();
         for (auto con_it = connections.begin();
-             con_it != connections.end();
+             con_it != last_place;
              con_it++)
         {
           if (*con_it == connected_node)
