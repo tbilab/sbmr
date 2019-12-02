@@ -8,3 +8,4 @@ my_googletest
 .vscode/settings.json
 *.out*
 *.json
+*.h.gch
