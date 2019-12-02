@@ -7,3 +7,4 @@ my_googletest
 .DS_Store
 .vscode/settings.json
 *.out*
+*.json
