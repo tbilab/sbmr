@@ -4,12 +4,12 @@
 // =============================================================================
 // Propose a potential group move for a node.
 // =============================================================================
-NodePtr SBM::propose_move(NodePtr node)
+NodePtr SBM::propose_move(const NodePtr node)
 {
   int group_level = node->level + 1;
   
   // Grab a list of all the groups that the node could join
-  std::list<NodePtr> potential_groups = get_nodes_of_type_at_level(
+  std::vector<NodePtr> potential_groups = get_nodes_of_type_at_level(
     node->type,
     group_level);
 
@@ -34,9 +34,8 @@ NodePtr SBM::propose_move(NodePtr node)
 // =============================================================================
 // Make a decision on the proposed new group for node
 // =============================================================================
-Proposal_Res SBM::make_proposal_decision(
-    NodePtr node,
-    NodePtr new_group)
+Proposal_Res SBM::make_proposal_decision(const NodePtr node,
+                                         const NodePtr new_group)
 {
   // The level that this proposal is taking place on
   int group_level = node->level + 1;
@@ -191,7 +190,7 @@ Proposal_Res SBM::make_proposal_decision(
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-int SBM::mcmc_sweep(int level, bool variable_num_groups) 
+int SBM::mcmc_sweep(const int level, const bool variable_num_groups) 
 {
   
   int num_changes = 0;
@@ -359,9 +358,8 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 // =============================================================================
 // Merge groups at a given level based on the best probability of doing so
 // =============================================================================
-Merge_Step SBM::agglomerative_merge(
-    int group_level,
-    int num_merges_to_make)
+Merge_Step SBM::agglomerative_merge(const int group_level,
+                                    const int num_merges_to_make)
 {
   // Quick check to make sure reasonable request
   if (num_merges_to_make == 0)
@@ -392,6 +390,11 @@ Merge_Step SBM::agglomerative_merge(
   std::vector<NodePtr> to_groups;
   std::vector<double> move_delta;
 
+  const int size_to_return = Params.n_checks_per_group * all_groups->size();
+  from_groups.reserve(size_to_return);
+  to_groups.reserve(size_to_return);
+  move_delta.reserve(size_to_return);
+
   // Make sure doing a merge makes sense by checking we have enough groups
   // of every type
   for (auto node_type_it = n_groups_of_type.begin();
@@ -409,7 +412,7 @@ Merge_Step SBM::agglomerative_merge(
   {
     NodePtr curr_group = group_it->second;
 
-    std::list<NodePtr> metagroups_to_search;
+    std::vector<NodePtr> metagroups_to_search;
 
     // If we're running algorithm in greedy mode we should just
     // add every possible group to the groups-to-search list
@@ -421,6 +424,7 @@ Merge_Step SBM::agglomerative_merge(
     }
     else
     {
+      metagroups_to_search.reserve(Params.n_checks_per_group);
       // Otherwise, we should sample a given number of groups to check
       for (int i = 0; i < Params.n_checks_per_group; i++)
       {
@@ -466,7 +470,7 @@ Merge_Step SBM::agglomerative_merge(
   }
 
   // A set of the unique merges we've made
-  std::set<string> merges_made;
+  std::unordered_set<string> merges_made;
 
   // Start working our way through the queue of best moves and making merges
   // if they are appropriate...
@@ -524,11 +528,9 @@ Merge_Step SBM::agglomerative_merge(
 // Run mcmc chain initialization by finding best organization
 // of B' groups for all B from B = N to B = 1.
 // =============================================================================
-std::vector<Merge_Step> SBM::collapse_groups(
-    int node_level,
-    int num_mcmc_steps,
-    int desired_num_groups
-)
+std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
+                                             const int num_mcmc_steps,
+                                             const int desired_num_groups)
 {
   int group_level = node_level + 1;
 
@@ -542,12 +544,13 @@ std::vector<Merge_Step> SBM::collapse_groups(
   // (if there were previously group nodes for the level)
   clean_empty_groups();
 
-  // Setup vector to hold all merge step results
-  std::vector<Merge_Step> step_results;
-
   int num_steps = desired_num_groups == -1 
     ? B_start - unique_node_types.size()
     : desired_num_groups;
+
+  // Setup vector to hold all merge step results
+  std::vector<Merge_Step> step_results;
+  step_results.reserve(num_steps);
 
   int i;
   for (i = 0; i < num_steps; i++)
