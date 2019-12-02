@@ -4,8 +4,8 @@
 #include "Node.h"
 #include "helpers.h"
 
-#include <set>
 #include <iostream>
+#include <unordered_map>
 
 // =============================================================================
 // What this file declares
@@ -32,7 +32,6 @@ typedef std::map<string, NodePtr> NodeLevel;
 typedef std::shared_ptr<NodeLevel> LevelPtr;
 typedef std::map<int, LevelPtr> LevelMap;
 typedef std::map<std::pair<NodePtr, NodePtr>, int> EdgeCounts;
-typedef std::map<int, EdgeCounts> EdgeMap;
 
 using std::string;
 
@@ -45,7 +44,7 @@ class Network
 private:
   // Return nodes of a desired type from level can be switched
   // Either matching or not matching the specified type
-  std::list<NodePtr> get_nodes_from_level(int type, int level, bool match_type);
+  std::vector<NodePtr> get_nodes_from_level(int type, int level, bool match_type);
 
 public:
   // Attributes
@@ -54,11 +53,11 @@ public:
   LevelMap nodes;
 
   // A map keyed by level with the node to node edge counts for that level
-  EdgeMap edge_counts;
+  std::map<int, EdgeCounts> edge_counts;
 
   // Vector storing all the unique types of nodes seen.
   // Used to make sure the correct move proposals are made
-  std::set<int> unique_node_types;
+  std::unordered_set<int> unique_node_types;
 
   // Methods
   // =========================================================================
@@ -90,10 +89,10 @@ public:
   NodePtr get_node_from_level(int level);
 
   // Return nodes of a desired type from level matching type
-  std::list<NodePtr> get_nodes_of_type_at_level(int type, int level);
+  std::vector<NodePtr> get_nodes_of_type_at_level(int type, int level);
 
   // Return all nodes not of a specified type from level
-  std::list<NodePtr> get_nodes_not_of_type_at_level(int type, int level);
+  std::vector<NodePtr> get_nodes_not_of_type_at_level(int type, int level);
 
   // Adds a connection between two nodes based on their references
   void add_connection(NodePtr node_a, NodePtr node_b);

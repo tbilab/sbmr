@@ -138,15 +138,17 @@ NodePtr Network::create_group_node(const int type, const int level)
 // nodes returned are of the same type as specified, otherwise the nodes
 // returned are _not_ of the same type.
 // =============================================================================
-std::list<NodePtr> Network::get_nodes_from_level(const int type,
-                                                 const int level,
-                                                 const bool match_type)
+std::vector<NodePtr> Network::get_nodes_from_level(const int type,
+                                                   const int level,
+                                                   const bool match_type)
 {
-  // Where we will store all the nodes found from level
-  std::list<NodePtr> nodes_to_return;
 
   // Grab desired level reference
   LevelPtr node_level = nodes.at(level);
+  
+  // Where we will store all the nodes found from level
+  std::vector<NodePtr> nodes_to_return;
+  nodes_to_return.reserve(node_level->size());
   
   // Make sure level has nodes before looping through it
   if (node_level->size() == 0) throw "Requested level is empty.";
@@ -175,7 +177,7 @@ std::list<NodePtr> Network::get_nodes_from_level(const int type,
 // =============================================================================
 // Return nodes of a desired type from level. 
 // =============================================================================
-std::list<NodePtr> Network::get_nodes_of_type_at_level(const int type, const int level) 
+std::vector<NodePtr> Network::get_nodes_of_type_at_level(const int type, const int level) 
 {
   return get_nodes_from_level(type, level, true);
 }   
@@ -184,7 +186,7 @@ std::list<NodePtr> Network::get_nodes_of_type_at_level(const int type, const int
 // =============================================================================
 // Return nodes _not_ of a specified type from level
 // =============================================================================
-std::list<NodePtr> Network::get_nodes_not_of_type_at_level(const int type, const int level) 
+std::vector<NodePtr> Network::get_nodes_not_of_type_at_level(const int type, const int level) 
 {
   return get_nodes_from_level(type, level, false);
 }   
@@ -275,7 +277,7 @@ int Network::clean_empty_groups()
     LevelPtr group_level = nodes.at(level);
     
     // Create a vector to store group ids that we want to delete
-    std::vector<string> groups_to_delete;
+    std::queue<string> groups_to_delete;
     
     // Loop through every node at level
     for (auto group_it = group_level->begin(); 
@@ -294,18 +296,21 @@ int Network::clean_empty_groups()
         }
         
         // Add current group to the removal list
-        groups_to_delete.push_back(current_group->id);
+        groups_to_delete.push(current_group->id);
       }
     }
-    
+
     // Remove all the groups in the removal list
-    for (auto group_id : groups_to_delete)
+    while (!groups_to_delete.empty())
     {
-      group_level->erase(group_id);
+      group_level->erase(groups_to_delete.front());
+      // Remove reference from queue
+      groups_to_delete.pop();
+      
+      // Increment total groups deleted counter
+      total_deleted++;
     }
-    
-    // Increment total groups deleted counter
-    total_deleted += groups_to_delete.size();
+
   }
   
   return total_deleted;
