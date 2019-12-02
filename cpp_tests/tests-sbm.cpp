@@ -27,7 +27,7 @@ TEST_CASE("Generate Node move proposals", "[SBM]")
   for (int i = 0; i < num_trials; ++i)
   {
     // Do move attempt (dry run)
-    NodePtr new_group = my_SBM.propose_move(a1, eps);
+    NodePtr new_group = my_SBM.propose_move(a1);
 
     if (new_group->id == old_group->id)
       num_times_no_move++;
@@ -67,12 +67,12 @@ TEST_CASE("Calculate Model entropy", "[SBM]")
   NodePtr from_group = node_to_move->parent;
   NodePtr to_group = my_SBM.get_node_by_id("a12", 1);
 
+
+  my_SBM.Params.beta = 0.1;
   // Calculate the entropy delta along with acceptance prob
   Proposal_Res proposal_results = my_SBM.make_proposal_decision(
       node_to_move,
-      to_group,
-      0.1,
-      0.1);
+      to_group);
 
   double entropy_delta = proposal_results.entropy_delta;
 
@@ -115,7 +115,8 @@ TEST_CASE("Basic MCMC sweeps", "[SBM]")
 
     for (int i = 0; i < num_sweeps; i++)
     {
-      int n_changes = my_SBM.mcmc_sweep(0, false, eps, 1.0);
+      my_SBM.Params.eps = eps;
+      int n_changes = my_SBM.mcmc_sweep(0, false);
       total_num_changes += n_changes;
     }
 
@@ -137,11 +138,9 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
   int num_initial_groups = my_SBM.get_level(1)->size();
   double initial_entropy = my_SBM.compute_entropy(0);
 
-  // Setup default parameter values
-  Merge_Params params;
 
   // Run greedy aglomerative merge with best single merge done
-  Merge_Step single_merge = my_SBM.agglomerative_merge(1, 1, params);
+  Merge_Step single_merge = my_SBM.agglomerative_merge(1, 1);
 
   // Make sure that we now have one less group than before for each type
   int new_group_num = my_SBM.get_level(1)->size();
@@ -156,7 +155,7 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
 
   
   // Run greedy aglomerative merge with best single merge done
-  Merge_Step double_merge = new_SBM.agglomerative_merge(1, 2, params);
+  Merge_Step double_merge = new_SBM.agglomerative_merge(1, 2);
 
   // Make sure that we now have two fewer groups per type than before
   REQUIRE(
@@ -175,15 +174,13 @@ TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
   int num_initial_groups = my_SBM.get_level(1)->size();
   double initial_entropy = my_SBM.compute_entropy(0);
 
-  Merge_Params params;
-  params.sigma = 2;
-  params.eps = 0.01;
+  my_SBM.Params.sigma = 2;
+  // my_SBM.Params.eps = 0.01;
 
   // Run full agglomerative merging algorithm till we have just 3 groups left
   auto run_results = my_SBM.collapse_groups(
     0,
     0,
-    params,
     3
   );
 
@@ -199,15 +196,13 @@ TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]"
 
   int desired_num_groups = 6;
 
-  Merge_Params params;
-  params.sigma = 0.5;
-  params.eps = 2;
+  my_SBM.Params.sigma = 0.5;
+  my_SBM.Params.eps = 2;
 
   // Run full agglomerative merging algorithm 
   auto run_results = my_SBM.collapse_groups(
     0,
     0,
-    params,
     desired_num_groups
   );
 
@@ -225,13 +220,11 @@ TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]")
 
   int desired_num_groups = 4;
 
-  Merge_Params params;
-  params.greedy = false;
+  my_SBM.Params.greedy = false;
   // Run full agglomerative merging algorithm till we have just 3 groups left
   auto run_results = my_SBM.collapse_groups(
     0,
     0,
-    params,
     desired_num_groups
   );
 
@@ -244,10 +237,8 @@ TEST_CASE("Initialize MCMC chain with agglomerative merging", "[SBM]")
   // Setup simple SBM model
   SBM my_SBM = build_simulated_SBM();
 
-  Merge_Params params;
   auto results = my_SBM.collapse_groups(
       0,
-      30,
-      params);
+      30);
 
 }

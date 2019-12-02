@@ -317,31 +317,26 @@ int Network::clean_empty_groups()
 // =============================================================================
 EdgeCounts Network::gather_edge_counts(const int level)
 {
-  
   // Setup our edge count map: 
   EdgeCounts e_rs;
   
   // Grab current level
   LevelPtr node_level = nodes.at(level);
-  
+
   // Loop through all groups (r)
-  for (auto group_it = node_level->begin(); 
-            group_it != node_level->end(); 
-            ++group_it) 
+  for (auto group_it : *node_level)
   {
-    NodePtr group_r = group_it->second;
+    NodePtr group_r = group_it.second;
 
     // Get all the edges for group r to its level
     std::vector<NodePtr> group_r_cons = group_r->
       get_connections_to_level(level);
     
     // Loop over all edges
-    for (auto group_s = group_r_cons.begin(); 
-              group_s != group_r_cons.end(); 
-              ++group_s) 
+    for (auto group_s : group_r_cons)
     {
       // Add connection counts to the map
-      e_rs[find_edges(group_r, *group_s)]++;
+      e_rs[find_edges(group_r, group_s)]++;
     }
     
   } // end group r loop
@@ -352,7 +347,7 @@ EdgeCounts Network::gather_edge_counts(const int level)
             node_pair != e_rs.end(); 
             ++node_pair)
   {
-    // Make sure we're not on a diagonal
+    // Make sure wde're not on a diagonal
     if (node_pair->first.first != node_pair->first.second)
     {
       node_pair->second /= 2;

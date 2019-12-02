@@ -13,24 +13,57 @@ NodePtr Node::this_ptr()
 // =============================================================================
 void Node::add_connection(const NodePtr node_ptr)
 {
-  // Add element to connections list
-  connections.push_back(node_ptr);
-
-  // propigate increase in degree upwards through hieararchy
-  update_degree(1);
+  // propigate new connection upwards to all parents
+  NodePtr current_node = this_ptr();
+  while (current_node)
+  {
+    (current_node->connections).push_back(node);
+    current_node->degree++;
+    current_node = current_node->parent;
+  }
 }
 
 // =============================================================================
-// Update node's and all its parents degree
+// Add or remove connections from nodes connection list
 // =============================================================================
-void Node::update_degree(const int change_amnt)
+void Node::update_connections_from_node(const NodePtr node, const bool remove)
 {
-  // propigate increase in degree upwards through hieararchy
-  NodePtr current_node = this_ptr();
+  auto connections_to_remove = node->connections;
+
+  // Starting with this node
+  auto current_node = this_ptr();
 
   while (current_node)
   {
-    current_node->degree += change_amnt;
+    for (auto & connected_node : connections_to_remove)
+    {
+      if (remove)
+      {
+        // Scan through this nodes connections untill we find the first instance
+        // of the connected node we want to remove
+        auto last_place = connections.end();
+        for (auto con_it = connections.begin();
+             con_it != last_place;
+             con_it++)
+        {
+          if (*con_it == connected_node)
+          {
+            connections.erase(con_it);
+            break;
+          }
+        }
+      }
+      else
+      {
+        // Just add this connection to nodes connections
+        (current_node->connections).push_back(connected_node);
+      }
+    }
+
+    // Update degree of current node
+    current_node->degree += (remove ? -1 : 1) * connections_to_remove.size();
+
+    // Update current node to nodes parent
     current_node = current_node->parent;
   }
 }
@@ -43,8 +76,8 @@ void Node::set_parent(NodePtr parent_node_ptr)
   // Remove self from previous parents children list (if it existed)
   if (parent)
   {
-    // Remove this node's edges contribution from parent's degree count
-    parent->update_degree(-degree);
+    // Remove this node's edges contribution from parent's
+    parent->update_connections_from_node(this_ptr(), true);
 
     // Remove self from previous children
     parent->remove_child(this_ptr());
@@ -54,7 +87,7 @@ void Node::set_parent(NodePtr parent_node_ptr)
   parent = parent_node_ptr;
 
   // Add this node's edges to parent's degree count
-  parent->update_degree(degree);
+  parent->update_connections_from_node(this_ptr(), false);
 
   // Add this node to new parent's children list
   parent_node_ptr->add_child(this_ptr());
@@ -161,38 +194,17 @@ NodePtr Node::get_parent_at_level(const int level_of_parent)
 std::vector<NodePtr> Node::get_connections_to_level(const int desired_level)
 {
   // Vector to return containing parents at desired level for connections
-  std::vector<NodePtr> connected_nodes;
+  std::vector<NodePtr> level_cons;
+  level_cons.reserve(connections.size());
 
-  // Start by getting all of the level zero children of this node
-  ChildSet leaf_children = get_children_at_level(0);
-
-  // Go through every child
-  for (auto child_it = leaf_children.begin();
-       child_it != leaf_children.end();
-       ++child_it)
+  // Go through every child node's connections list, find parent at
+  // desired level and place in connected nodes vector
+  for (auto connection : connections)
   {
-    // Go through every child node's connections list
-    for (auto connection_it = (*child_it)->connections.begin();
-         connection_it != (*child_it)->connections.end();
-         ++connection_it)
-    {
-      // For each connection of current child, find parent at desired level and
-      // place in connected nodes vector
-      try
-      {
-        connected_nodes.push_back(
-            (*connection_it)->get_parent_at_level(desired_level));
-      }
-      catch (...)
-      {
-        // A node doesn't have a parent at desired level
-        throw "A connected node doesn't have a parent at the desired level.";
-      }
+    level_cons.push_back(connection->get_parent_at_level(desired_level));
+  }
 
-    } // End child connection loop
-  }   // End child loop
-
-  return connected_nodes;
+  return level_cons;
 }
 
 // =============================================================================

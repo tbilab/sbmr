@@ -4,7 +4,7 @@
 // =============================================================================
 // Propose a potential group move for a node.
 // =============================================================================
-NodePtr SBM::propose_move(const NodePtr node, const double eps)
+NodePtr SBM::propose_move(NodePtr node)
 {
   int group_level = node->level + 1;
   
@@ -22,7 +22,7 @@ NodePtr SBM::propose_move(const NodePtr node, const double eps)
   int neighbor_group_degree = rand_neighbor->parent->degree;
   
   // Decide if we are going to choose a random group for our node
-  double ergo_amnt = eps*potential_groups.size();
+  double ergo_amnt = Params.eps*potential_groups.size();
   double prob_of_random_group = ergo_amnt/(neighbor_group_degree + ergo_amnt);
   
   // Decide where we will get new group from and draw from potential candidates
@@ -34,10 +34,9 @@ NodePtr SBM::propose_move(const NodePtr node, const double eps)
 // =============================================================================
 // Make a decision on the proposed new group for node
 // =============================================================================
-Proposal_Res SBM::make_proposal_decision(const NodePtr node,
-                                         const NodePtr new_group,
-                                         const double eps,
-                                         const double beta)
+Proposal_Res SBM::make_proposal_decision(
+    NodePtr node,
+    NodePtr new_group)
 {
   // The level that this proposal is taking place on
   int group_level = node->level + 1;
@@ -169,18 +168,18 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     ];
     
     // Denominator of both probability fractions
-    double denom = group_t->degree + eps*n_possible_groups;
+    double denom = group_t->degree + Params.eps*n_possible_groups;
     
     // Add new components to both the pre and post move probabilities. 
-    pre_move_prob  += e_it * (e_new_t_pre + eps) / denom;
-    post_move_prob += e_it * (e_old_t_post + eps) / denom;
+    pre_move_prob  += e_it * (e_new_t_pre + Params.eps) / denom;
+    post_move_prob += e_it * (e_old_t_post + Params.eps) / denom;
   }
 
   // Now we can clean up all the calculations into to entropy delta and the 
   // probability ratio for the moves and use those to calculate the acceptance 
   // probability for the proposed move.
   double entropy_delta = entropy_post - entropy_pre;
-  double acceptance_prob = exp(beta*entropy_delta) * 
+  double acceptance_prob = exp(Params.beta*entropy_delta) * 
                           (pre_move_prob/post_move_prob);
   
   return Proposal_Res(
@@ -192,10 +191,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-int SBM::mcmc_sweep(const int level, 
-                    const bool variable_num_groups, 
-                    const double eps, 
-                    const double beta) 
+int SBM::mcmc_sweep(int level, bool variable_num_groups) 
 {
   
   int num_changes = 0;
@@ -225,7 +221,7 @@ int SBM::mcmc_sweep(const int level,
     NodePtr curr_node = *node_it;
     
     // Get a move proposal
-    NodePtr proposed_new_group = propose_move(curr_node, eps);
+    NodePtr proposed_new_group = propose_move(curr_node);
 
     // If the propsosed group is the nodes current group, we don't need to waste
     // time checking because decision will always result in same state.
@@ -234,9 +230,7 @@ int SBM::mcmc_sweep(const int level,
     // Calculate acceptance probability based on posterior changes
     Proposal_Res proposal_results = make_proposal_decision(
       curr_node,
-      proposed_new_group,
-      eps,
-      beta
+      proposed_new_group
     );
     
     bool move_accepted = sampler.draw_unif() < proposal_results.prob_of_accept;
@@ -365,9 +359,9 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 // =============================================================================
 // Merge groups at a given level based on the best probability of doing so
 // =============================================================================
-Merge_Step SBM::agglomerative_merge(const int group_level,
-                                    const int num_merges_to_make,
-                                    const Merge_Params params)
+Merge_Step SBM::agglomerative_merge(
+    int group_level,
+    int num_merges_to_make)
 {
   // Quick check to make sure reasonable request
   if (num_merges_to_make == 0)
@@ -419,7 +413,7 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
 
     // If we're running algorithm in greedy mode we should just
     // add every possible group to the groups-to-search list
-    if (params.greedy)
+    if (Params.greedy)
     {
       // Get a list of all the potential merges for group
       metagroups_to_search =
@@ -428,10 +422,10 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
     else
     {
       // Otherwise, we should sample a given number of groups to check
-      for (int i = 0; i < params.n_checks_per_group; i++)
+      for (int i = 0; i < Params.n_checks_per_group; i++)
       {
         // Sample a group from potential groups
-        metagroups_to_search.push_back(propose_move(curr_group, params.eps));
+        metagroups_to_search.push_back(propose_move(curr_group));
       }
     }
 
@@ -449,9 +443,7 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
       // Calculate entropy delta for move
       double entropy_delta = make_proposal_decision(
                                  curr_group,
-                                 metagroup,
-                                 params.eps,
-                                 1.0)
+                                 metagroup)
                                  .entropy_delta;
 
       from_groups.push_back(curr_group);
@@ -532,10 +524,11 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
 // Run mcmc chain initialization by finding best organization
 // of B' groups for all B from B = N to B = 1.
 // =============================================================================
-std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
-                                             const int num_mcmc_steps,
-                                             const Merge_Params params,
-                                             const int desired_num_groups)
+std::vector<Merge_Step> SBM::collapse_groups(
+    int node_level,
+    int num_mcmc_steps,
+    int desired_num_groups
+)
 {
   int group_level = node_level + 1;
 
@@ -565,7 +558,7 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
 
     // Decide how many merges we should do. 
     int num_merges = std::max(
-        int(curr_num_groups - (curr_num_groups / params.sigma)),
+        int(curr_num_groups - (curr_num_groups / Params.sigma)),
         1);
 
     // Make sure we don't overstep the goal number of groups
@@ -582,8 +575,7 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
       // Perform next best merge and record results
       merge_results = agglomerative_merge(
           group_level,
-          num_merges,
-          params);
+          num_merges);
     }
     catch (...)
     {
@@ -598,9 +590,7 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
       {
         mcmc_sweep(
             node_level,
-            false,
-            params.eps,
-            params.beta);
+            false);
       }
       // Update the step entropy results with new equilibriated model
       merge_results.entropy = compute_entropy(node_level);
