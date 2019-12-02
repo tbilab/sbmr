@@ -11,7 +11,7 @@ NodePtr Node::this_ptr()
 // =============================================================================
 // Add connection to another node
 // =============================================================================
-void Node::add_connection(const NodePtr node_ptr)
+void Node::add_connection(const NodePtr node)
 {
   // propigate new connection upwards to all parents
   NodePtr current_node = this_ptr();
@@ -28,27 +28,35 @@ void Node::add_connection(const NodePtr node_ptr)
 // =============================================================================
 void Node::update_connections_from_node(const NodePtr node, const bool remove)
 {
-  auto connections_to_remove = node->connections;
 
-  // Starting with this node
-  auto current_node = this_ptr();
+  // Grab list of nodes from node being removed or added we are updating
+  auto connections_being_updated = node->connections;
 
-  while (current_node)
+  // Keep track of which node in the hierarchy is being updated. 
+  // Starts with this node
+  auto node_being_updated = this_ptr();
+
+  // While we still have a node to continue to in the hierarchy...
+  while (node_being_updated)
   {
-    for (auto & connected_node : connections_to_remove)
+    // Loop through all the connections that are being updated...
+    for (auto & connection_to_update : connections_being_updated)
     {
+      // Grab reference to the current nodes connections list
+      std::list<NodePtr>& curr_connections = node_being_updated->connections;
+
       if (remove)
       {
         // Scan through this nodes connections untill we find the first instance
         // of the connected node we want to remove
-        auto last_place = connections.end();
-        for (auto con_it = connections.begin();
+        auto last_place = curr_connections.end();
+        for (auto con_it = curr_connections.begin();
              con_it != last_place;
              con_it++)
         {
-          if (*con_it == connected_node)
+          if (*con_it == connection_to_update)
           {
-            connections.erase(con_it);
+            curr_connections.erase(con_it);
             break;
           }
         }
@@ -56,15 +64,15 @@ void Node::update_connections_from_node(const NodePtr node, const bool remove)
       else
       {
         // Just add this connection to nodes connections
-        (current_node->connections).push_back(connected_node);
+        curr_connections.push_back(connection_to_update);
       }
     }
 
     // Update degree of current node
-    current_node->degree += (remove ? -1 : 1) * connections_to_remove.size();
+    node_being_updated->degree = node_being_updated->connections.size();
 
     // Update current node to nodes parent
-    current_node = current_node->parent;
+    node_being_updated = node_being_updated->parent;
   }
 }
 
