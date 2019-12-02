@@ -37,9 +37,7 @@ TEST_CASE("Basic Initialization", "[Node]")
   // Get basic info out of the nodes
   REQUIRE(n1->id == "n1");
   REQUIRE(n1->get_parent_at_level(1)->id == n1->parent->id);
-  REQUIRE(2 == c1->get_children_at_level(0).size());
-  REQUIRE(1 == d1->get_children_at_level(0).size());
-
+ 
   // Make sure the connection propigate properly.
   REQUIRE(
     "m1, m3" == print_node_ids(n1->get_connections_to_level(0))

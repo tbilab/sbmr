@@ -5,7 +5,7 @@
 // =============================================================================
 void Network::add_level(const int level) 
 {
-  
+  PROFILE_FUNCTION();
   // First, make sure level doesn't already exist
   if (nodes.find(level) != nodes.end()) {
     throw "Requested level to create already exists.";
@@ -22,7 +22,7 @@ void Network::add_level(const int level)
 // =============================================================================
 LevelPtr Network::get_level(const int level) 
 {
-  
+  PROFILE_FUNCTION();
   // Grab level for group node
   LevelMap::iterator group_level = nodes.find(level);
 
@@ -46,7 +46,7 @@ LevelPtr Network::get_level(const int level)
 // =============================================================================
 NodePtr Network::get_node_by_id(const string desired_id, const int level) 
 {
-  
+  PROFILE_FUNCTION();
   try {
     // Attempt to find node on the 'node level' of the Network
     return nodes.at(level)->at(desired_id);
@@ -64,6 +64,7 @@ NodePtr Network::find_or_add_node(const string id,
                                   const int level,
                                   const int type)
 {
+  PROFILE_FUNCTION();
   LevelPtr node_level = get_level(level);
 
   // Attempt to find the node in the network
@@ -83,6 +84,7 @@ string Network::build_group_id(const int type,
                                const int level,
                                const int index)
 {
+  PROFILE_FUNCTION();
   return std::to_string(type)  + "-" +
     std::to_string(level) + "_" +
     std::to_string(index);
@@ -96,7 +98,7 @@ NodePtr Network::add_node(const string id,
                           const int type,
                           const int level)
 {
-
+  PROFILE_FUNCTION();
   // Grab level
   LevelPtr node_level = get_level(level);
 
@@ -122,6 +124,7 @@ NodePtr Network::add_node(const string id,
 // =============================================================================
 NodePtr Network::create_group_node(const int type, const int level) 
 {
+  PROFILE_FUNCTION();
 
   // Make sure requested level is not 0
   if(level == 0) {
@@ -142,7 +145,7 @@ std::vector<NodePtr> Network::get_nodes_from_level(const int type,
                                                    const int level,
                                                    const bool match_type)
 {
-
+  PROFILE_FUNCTION();
   // Grab desired level reference
   LevelPtr node_level = nodes.at(level);
   
@@ -179,6 +182,7 @@ std::vector<NodePtr> Network::get_nodes_from_level(const int type,
 // =============================================================================
 std::vector<NodePtr> Network::get_nodes_of_type_at_level(const int type, const int level) 
 {
+  PROFILE_FUNCTION();
   return get_nodes_from_level(type, level, true);
 }   
 
@@ -188,6 +192,7 @@ std::vector<NodePtr> Network::get_nodes_of_type_at_level(const int type, const i
 // =============================================================================
 std::vector<NodePtr> Network::get_nodes_not_of_type_at_level(const int type, const int level) 
 {
+  PROFILE_FUNCTION();
   return get_nodes_from_level(type, level, false);
 }   
 
@@ -197,6 +202,7 @@ std::vector<NodePtr> Network::get_nodes_not_of_type_at_level(const int type, con
 // =============================================================================
 void Network::add_connection(const string node1_id, const string node2_id) 
 {
+  PROFILE_FUNCTION();
   
   Node::connect_nodes(
     get_node_by_id(node1_id), 
@@ -211,7 +217,7 @@ void Network::add_connection(const string node1_id, const string node2_id)
 // =============================================================================
 void Network::add_connection(const NodePtr node1, const NodePtr node2) 
 {
-  
+  PROFILE_FUNCTION();
   Node::connect_nodes(
     node1, 
     node2
@@ -225,7 +231,7 @@ void Network::add_connection(const NodePtr node1, const NodePtr node2)
 // =============================================================================
 void Network::give_every_node_at_level_own_group(const int level) 
 {
-
+  PROFILE_FUNCTION();
   // Grab all the nodes for the desired level
   LevelPtr node_level = nodes.at(level);
   
@@ -255,6 +261,7 @@ void Network::give_every_node_at_level_own_group(const int level)
 // =============================================================================
 NodePtr Network::get_node_from_level(const int level) 
 {
+  PROFILE_FUNCTION();
   return nodes.at(level)->begin()->second;
 }
 
@@ -266,7 +273,7 @@ NodePtr Network::get_node_from_level(const int level)
 // =============================================================================
 int Network::clean_empty_groups()
 {
-  
+  PROFILE_FUNCTION();
   int num_levels = nodes.size();
   int total_deleted = 0;
   
@@ -322,6 +329,7 @@ int Network::clean_empty_groups()
 // =============================================================================
 EdgeCounts Network::gather_edge_counts(const int level)
 {
+  PROFILE_FUNCTION();
   // Setup our edge count map: 
   EdgeCounts e_rs;
   
@@ -364,6 +372,7 @@ EdgeCounts Network::gather_edge_counts(const int level)
 
 EdgeCounts* Network::get_edge_counts(const int level)
 {
+  PROFILE_FUNCTION();
   // First try and find the edge counts for level
 
   // If they dont exist, build them
@@ -381,6 +390,7 @@ EdgeCounts* Network::get_edge_counts(const int level)
 void Network::update_edge_counts(const NodePtr updated_node,
                                  const NodePtr new_group)
 {
+  PROFILE_FUNCTION();
   NodePtr old_group = updated_node->parent;
   int group_level = new_group->level;
 
@@ -434,6 +444,7 @@ void Network::update_edge_counts(const NodePtr updated_node,
 // =============================================================================
 State_Dump Network::get_state()
 {
+  PROFILE_FUNCTION();
   // Initialize the return struct
   State_Dump state; 
   
@@ -487,6 +498,7 @@ State_Dump Network::get_state()
 // =============================================================================
 void Network::load_from_state(const State_Dump state)
 { 
+  PROFILE_FUNCTION();
 
   int n = state.parent.size();
 

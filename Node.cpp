@@ -1,5 +1,6 @@
 #include "Node.h"
 
+
 // =============================================================================
 // Replace 'this' with a shared smart pointer
 // =============================================================================
@@ -13,6 +14,8 @@ NodePtr Node::this_ptr()
 // =============================================================================
 void Node::add_connection(const NodePtr node)
 {
+  //PROFILE_FUNCTION();
+
   // propigate new connection upwards to all parents
   NodePtr current_node = this_ptr();
   while (current_node)
@@ -28,6 +31,7 @@ void Node::add_connection(const NodePtr node)
 // =============================================================================
 void Node::update_connections_from_node(const NodePtr node, const bool remove)
 {
+  // PROFILE_FUNCTION();
 
   // Grab list of nodes from node being removed or added we are updating
   auto connections_being_updated = node->connections;
@@ -81,6 +85,8 @@ void Node::update_connections_from_node(const NodePtr node, const bool remove)
 // =============================================================================
 void Node::set_parent(NodePtr parent_node_ptr)
 {
+  //PROFILE_FUNCTION();
+
   // Remove self from previous parents children list (if it existed)
   if (parent)
   {
@@ -106,6 +112,7 @@ void Node::set_parent(NodePtr parent_node_ptr)
 // =============================================================================
 void Node::add_child(const NodePtr new_child_node)
 {
+  //PROFILE_FUNCTION();
   // Add new child node to the set of children. An unordered set is used because
   // repeat children can't happen.
   (this_ptr()->children).insert(new_child_node);
@@ -116,53 +123,8 @@ void Node::add_child(const NodePtr new_child_node)
 // =============================================================================
 void Node::remove_child(const NodePtr child_node)
 {
+  //PROFILE_FUNCTION();
   children.erase(children.find(child_node));
-}
-
-// =============================================================================
-// Get all member nodes of current node at a given level
-// =============================================================================
-ChildSet Node::get_children_at_level(const int desired_level)
-{
-  // Set to hold all the nodes that are found as children
-  ChildSet children_nodes;
-
-  // Start by placing the current node into children queue
-  std::queue<NodePtr> children_queue;
-  children_queue.push(this_ptr());
-
-  // While the member queue is not empty, pop off a node reference
-  while (!children_queue.empty())
-  {
-    // Grab top reference
-    NodePtr current_node = children_queue.front();
-
-    // Remove reference from queue
-    children_queue.pop();
-
-    // check if that node is at desired level
-    bool at_desired_level = current_node->level == desired_level;
-
-    // if node is at desired level, add it to the return vector
-    if (at_desired_level)
-    {
-      children_nodes.insert(current_node);
-    }
-    else
-    {
-      // Otherwise, add each of the member nodes to queue
-      for (auto child_it = (current_node->children).begin();
-           child_it != (current_node->children).end();
-           ++child_it)
-      {
-        children_queue.push(*child_it);
-      }
-    }
-
-  } // End queue processing loop
-
-  // Return the vector of member nodes
-  return children_nodes;
 }
 
 // =============================================================================
@@ -170,7 +132,7 @@ ChildSet Node::get_children_at_level(const int desired_level)
 // =============================================================================
 NodePtr Node::get_parent_at_level(const int level_of_parent)
 {
-
+  //PROFILE_FUNCTION();
   // First we need to make sure that the requested level is not less than that
   // of the current node.
   if (level_of_parent < level)
@@ -201,6 +163,7 @@ NodePtr Node::get_parent_at_level(const int level_of_parent)
 // =============================================================================
 std::vector<NodePtr> Node::get_connections_to_level(const int desired_level)
 {
+  //PROFILE_FUNCTION();
   // Vector to return containing parents at desired level for connections
   std::vector<NodePtr> level_cons;
   level_cons.reserve(connections.size());
@@ -221,6 +184,7 @@ std::vector<NodePtr> Node::get_connections_to_level(const int desired_level)
 // =============================================================================
 std::map<NodePtr, int> Node::gather_connections_to_level(const int level)
 {
+  //PROFILE_FUNCTION();
   // Gather all connections from the moved node to the level of the groups we're
   // working with
   std::vector<NodePtr> all_connections = get_connections_to_level(level);
@@ -244,6 +208,7 @@ std::map<NodePtr, int> Node::gather_connections_to_level(const int level)
 // =============================================================================
 void Node::connect_nodes(NodePtr node1_ptr, NodePtr node2_ptr)
 {
+  //PROFILE_FUNCTION();
   // Add node2 to connections of node1
   node1_ptr->add_connection(node2_ptr);
   // Do the same for node2

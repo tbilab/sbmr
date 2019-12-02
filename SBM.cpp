@@ -6,6 +6,7 @@
 // =============================================================================
 NodePtr SBM::propose_move(const NodePtr node)
 {
+  PROFILE_FUNCTION();
   int group_level = node->level + 1;
   
   // Grab a list of all the groups that the node could join
@@ -37,6 +38,7 @@ NodePtr SBM::propose_move(const NodePtr node)
 Proposal_Res SBM::make_proposal_decision(const NodePtr node,
                                          const NodePtr new_group)
 {
+  PROFILE_FUNCTION();
   // The level that this proposal is taking place on
   int group_level = node->level + 1;
 
@@ -192,7 +194,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 // =============================================================================
 int SBM::mcmc_sweep(const int level, const bool variable_num_groups) 
 {
-  
+  PROFILE_FUNCTION();
   int num_changes = 0;
   int group_level = level + 1;
   
@@ -266,7 +268,7 @@ int SBM::mcmc_sweep(const int level, const bool variable_num_groups)
 // =============================================================================
 double SBM::compute_entropy(const int level)
 {
-  
+  PROFILE_FUNCTION();
   //============================================================================
   // First, calc the number of total edges and build a degree->num nodes map
   
@@ -346,6 +348,7 @@ double SBM::compute_entropy(const int level)
 // =============================================================================
 void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 {
+  PROFILE_FUNCTION();
   // Place all the members of group b under group a
   auto children_to_move = group_b->children;
 
@@ -361,6 +364,7 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 Merge_Step SBM::agglomerative_merge(const int group_level,
                                     const int num_merges_to_make)
 {
+  PROFILE_FUNCTION();
   // Quick check to make sure reasonable request
   if (num_merges_to_make == 0)
     throw "Zero merges requested.";
@@ -532,6 +536,7 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
                                              const int num_mcmc_steps,
                                              const int desired_num_groups)
 {
+  PROFILE_FUNCTION();
   int group_level = node_level + 1;
 
   // Start by giving every node at the desired level its own group

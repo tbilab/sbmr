@@ -13,6 +13,8 @@
 #include <map>
 #include <memory>
 
+#include "profiling/Instrument.h"
+
 using std::string;
 
 // =============================================================================
@@ -83,9 +85,6 @@ public:
   // Add or remove connections from nodes connection list
   void update_connections_from_node(NodePtr node, bool remove);
  
-  // Get all member nodes of current node at a given level
-  ChildSet get_children_at_level(int level);
-
   // Get parent of node at a given level
   NodePtr get_parent_at_level(int level);
 
