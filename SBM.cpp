@@ -4,7 +4,7 @@
 // =============================================================================
 // Propose a potential group move for a node.
 // =============================================================================
-NodePtr SBM::propose_move(NodePtr node, double eps)
+NodePtr SBM::propose_move(const NodePtr node, const double eps)
 {
   int group_level = node->level + 1;
   
@@ -34,11 +34,10 @@ NodePtr SBM::propose_move(NodePtr node, double eps)
 // =============================================================================
 // Make a decision on the proposed new group for node
 // =============================================================================
-Proposal_Res SBM::make_proposal_decision(
-    NodePtr node,
-    NodePtr new_group,
-    double eps,
-    double beta)
+Proposal_Res SBM::make_proposal_decision(const NodePtr node,
+                                         const NodePtr new_group,
+                                         const double eps,
+                                         const double beta)
 {
   // The level that this proposal is taking place on
   int group_level = node->level + 1;
@@ -193,10 +192,10 @@ Proposal_Res SBM::make_proposal_decision(
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-int SBM::mcmc_sweep(int level, 
-                    bool variable_num_groups, 
-                    double eps, 
-                    double beta) 
+int SBM::mcmc_sweep(const int level, 
+                    const bool variable_num_groups, 
+                    const double eps, 
+                    const double beta) 
 {
   
   int num_changes = 0;
@@ -272,7 +271,7 @@ int SBM::mcmc_sweep(int level,
 // Compute microcononical entropy of current model state
 // Note that this is currently only the degree corrected entropy
 // =============================================================================
-double SBM::compute_entropy(int level)
+double SBM::compute_entropy(const int level)
 {
   
   //============================================================================
@@ -366,10 +365,9 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 // =============================================================================
 // Merge groups at a given level based on the best probability of doing so
 // =============================================================================
-Merge_Step SBM::agglomerative_merge(
-    int group_level,
-    int num_merges_to_make,
-    Merge_Params params)
+Merge_Step SBM::agglomerative_merge(const int group_level,
+                                    const int num_merges_to_make,
+                                    const Merge_Params params)
 {
   // Quick check to make sure reasonable request
   if (num_merges_to_make == 0)
@@ -530,18 +528,14 @@ Merge_Step SBM::agglomerative_merge(
   return results;
 }
 
-
-
 // =============================================================================
 // Run mcmc chain initialization by finding best organization
 // of B' groups for all B from B = N to B = 1.
 // =============================================================================
-std::vector<Merge_Step> SBM::collapse_groups(
-    int node_level,
-    int num_mcmc_steps,
-    Merge_Params params,
-    int desired_num_groups
-)
+std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
+                                             const int num_mcmc_steps,
+                                             const Merge_Params params,
+                                             const int desired_num_groups)
 {
   int group_level = node_level + 1;
 

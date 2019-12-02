@@ -11,7 +11,7 @@ NodePtr Node::this_ptr()
 // =============================================================================
 // Add connection to another node
 // =============================================================================
-void Node::add_connection(NodePtr node_ptr)
+void Node::add_connection(const NodePtr node_ptr)
 {
   // Add element to connections list
   connections.push_back(node_ptr);
@@ -23,7 +23,7 @@ void Node::add_connection(NodePtr node_ptr)
 // =============================================================================
 // Update node's and all its parents degree
 // =============================================================================
-void Node::update_degree(int change_amnt)
+void Node::update_degree(const int change_amnt)
 {
   // propigate increase in degree upwards through hieararchy
   NodePtr current_node = this_ptr();
@@ -60,10 +60,10 @@ void Node::set_parent(NodePtr parent_node_ptr)
   parent_node_ptr->add_child(this_ptr());
 }
 
-// =============================================================================
+// =============================================================================f
 // Add a node to the children vector
 // =============================================================================
-void Node::add_child(NodePtr new_child_node)
+void Node::add_child(const NodePtr new_child_node)
 {
   // Add new child node to the set of children. An unordered set is used because
   // repeat children can't happen.
@@ -73,7 +73,7 @@ void Node::add_child(NodePtr new_child_node)
 // =============================================================================
 // Find and erase a child node
 // =============================================================================
-void Node::remove_child(NodePtr child_node)
+void Node::remove_child(const NodePtr child_node)
 {
   children.erase(children.find(child_node));
 }
@@ -81,7 +81,7 @@ void Node::remove_child(NodePtr child_node)
 // =============================================================================
 // Get all member nodes of current node at a given level
 // =============================================================================
-ChildSet Node::get_children_at_level(int desired_level)
+ChildSet Node::get_children_at_level(const int desired_level)
 {
   // Set to hold all the nodes that are found as children
   ChildSet children_nodes;
@@ -127,7 +127,7 @@ ChildSet Node::get_children_at_level(int desired_level)
 // =============================================================================
 // Get parent of current node at a given level
 // =============================================================================
-NodePtr Node::get_parent_at_level(int level_of_parent)
+NodePtr Node::get_parent_at_level(const int level_of_parent)
 {
 
   // First we need to make sure that the requested level is not less than that
@@ -158,7 +158,7 @@ NodePtr Node::get_parent_at_level(int level_of_parent)
 // We return a vector because we need random access to elements in this array
 // and that isn't provided to us with the list format.
 // =============================================================================
-std::vector<NodePtr> Node::get_connections_to_level(int desired_level)
+std::vector<NodePtr> Node::get_connections_to_level(const int desired_level)
 {
   // Vector to return containing parents at desired level for connections
   std::vector<NodePtr> connected_nodes;
@@ -199,7 +199,7 @@ std::vector<NodePtr> Node::get_connections_to_level(int desired_level)
 // Collapse a nodes connection to a given level into a map of
 // connected group id->count
 // =============================================================================
-std::map<NodePtr, int> Node::gather_connections_to_level(int level)
+std::map<NodePtr, int> Node::gather_connections_to_level(const int level)
 {
   // Gather all connections from the moved node to the level of the groups we're
   // working with
