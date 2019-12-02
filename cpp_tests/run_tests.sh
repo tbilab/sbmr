@@ -20,12 +20,12 @@ fi
 # Compile all the tests
 g++ -std=c++11 cpp_tests/tests-main.o \
   Node.o Network.o SBM.o helpers.o Sampler.o \
+  cpp_tests/tests-node.cpp \
+  cpp_tests/tests-sampler.cpp \
   cpp_tests/tests-network.cpp \
   cpp_tests/tests-sbm.cpp \
   -o cpp_tests/run_tests.o 
 
-  # cpp_tests/tests-node.cpp \
-  # cpp_tests/tests-sampler.cpp \
 
 
 echo "=============================================================================\nRunning Tests..."
