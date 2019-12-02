@@ -3,7 +3,7 @@
 // =============================================================================
 // Setup a new Node level
 // =============================================================================
-void Network::add_level(int level) 
+void Network::add_level(const int level) 
 {
   
   // First, make sure level doesn't already exist
@@ -20,7 +20,7 @@ void Network::add_level(int level)
 // Grab reference to a desired level map. If level doesn't exist yet, it will be
 // created
 // =============================================================================
-LevelPtr Network::get_level(int level) 
+LevelPtr Network::get_level(const int level) 
 {
   
   // Grab level for group node
@@ -44,7 +44,7 @@ LevelPtr Network::get_level(int level)
 // =============================================================================
 // Find and return a node by its id
 // =============================================================================
-NodePtr Network::get_node_by_id(string desired_id, int level) 
+NodePtr Network::get_node_by_id(const string desired_id, const int level) 
 {
   
   try {
@@ -57,14 +57,12 @@ NodePtr Network::get_node_by_id(string desired_id, int level)
   
 }
 
-
 // =============================================================================
 // Attempts to find node in network. If node doesn't exist, it will add it.
 // =============================================================================
-NodePtr Network::find_or_add_node(
-    string id,
-    int level,
-    int type)
+NodePtr Network::find_or_add_node(const string id,
+                                  const int level,
+                                  const int type)
 {
   LevelPtr node_level = get_level(level);
 
@@ -81,7 +79,9 @@ NodePtr Network::find_or_add_node(
 // =============================================================================
 // Builds a group id from a scaffold for generated new groups
 // =============================================================================
-string Network::build_group_id(int type, int level, int index) 
+string Network::build_group_id(const int type,
+                               const int level,
+                               const int index)
 {
   return std::to_string(type)  + "-" +
     std::to_string(level) + "_" +
@@ -92,9 +92,11 @@ string Network::build_group_id(int type, int level, int index)
 // =============================================================================
 // Adds a node with an id and type to network
 // =============================================================================
-NodePtr Network::add_node(string id, int type, int level)
+NodePtr Network::add_node(const string id,
+                          const int type,
+                          const int level)
 {
-  
+
   // Grab level
   LevelPtr node_level = get_level(level);
 
@@ -118,7 +120,7 @@ NodePtr Network::add_node(string id, int type, int level)
 // =============================================================================
 // Creates a new group node and add it to its neccesary level
 // =============================================================================
-NodePtr Network::create_group_node(int type, int level) 
+NodePtr Network::create_group_node(const int type, const int level) 
 {
 
   // Make sure requested level is not 0
@@ -136,10 +138,9 @@ NodePtr Network::create_group_node(int type, int level)
 // nodes returned are of the same type as specified, otherwise the nodes
 // returned are _not_ of the same type.
 // =============================================================================
-std::list<NodePtr> Network::get_nodes_from_level(
-    int type, 
-    int level, 
-    bool match_type) 
+std::list<NodePtr> Network::get_nodes_from_level(const int type,
+                                                 const int level,
+                                                 const bool match_type)
 {
   // Where we will store all the nodes found from level
   std::list<NodePtr> nodes_to_return;
@@ -174,7 +175,7 @@ std::list<NodePtr> Network::get_nodes_from_level(
 // =============================================================================
 // Return nodes of a desired type from level. 
 // =============================================================================
-std::list<NodePtr> Network::get_nodes_of_type_at_level(int type, int level) 
+std::list<NodePtr> Network::get_nodes_of_type_at_level(const int type, const int level) 
 {
   return get_nodes_from_level(type, level, true);
 }   
@@ -183,7 +184,7 @@ std::list<NodePtr> Network::get_nodes_of_type_at_level(int type, int level)
 // =============================================================================
 // Return nodes _not_ of a specified type from level
 // =============================================================================
-std::list<NodePtr> Network::get_nodes_not_of_type_at_level(int type, int level) 
+std::list<NodePtr> Network::get_nodes_not_of_type_at_level(const int type, const int level) 
 {
   return get_nodes_from_level(type, level, false);
 }   
@@ -192,7 +193,7 @@ std::list<NodePtr> Network::get_nodes_not_of_type_at_level(int type, int level)
 // =============================================================================
 // Adds a connection between two nodes based on their ids
 // =============================================================================
-void Network::add_connection(string node1_id, string node2_id) 
+void Network::add_connection(const string node1_id, const string node2_id) 
 {
   
   Node::connect_nodes(
@@ -206,7 +207,7 @@ void Network::add_connection(string node1_id, string node2_id)
 // =============================================================================
 // Adds a connection between two nodes based on their references
 // =============================================================================
-void Network::add_connection(NodePtr node1, NodePtr node2) 
+void Network::add_connection(const NodePtr node1, const NodePtr node2) 
 {
   
   Node::connect_nodes(
@@ -220,7 +221,7 @@ void Network::add_connection(NodePtr node1, NodePtr node2)
 // =============================================================================
 // Builds and assigns a group node for every node in a given level
 // =============================================================================
-void Network::give_every_node_at_level_own_group(int level) 
+void Network::give_every_node_at_level_own_group(const int level) 
 {
 
   // Grab all the nodes for the desired level
@@ -250,7 +251,7 @@ void Network::give_every_node_at_level_own_group(int level)
 // =============================================================================
 // Grabs the first node found at a given level, used in testing.
 // =============================================================================
-NodePtr Network::get_node_from_level(int level) 
+NodePtr Network::get_node_from_level(const int level) 
 {
   return nodes.at(level)->begin()->second;
 }
@@ -314,7 +315,7 @@ int Network::clean_empty_groups()
 // =============================================================================
 // Builds a id-id paired map of edge counts between nodes of the same level
 // =============================================================================
-EdgeCounts Network::gather_edge_counts(int level)
+EdgeCounts Network::gather_edge_counts(const int level)
 {
   // Setup our edge count map: 
   EdgeCounts e_rs;
@@ -356,7 +357,7 @@ EdgeCounts Network::gather_edge_counts(int level)
   return e_rs;
 }
 
-EdgeCounts* Network::get_edge_counts(int level)
+EdgeCounts* Network::get_edge_counts(const int level)
 {
   // First try and find the edge counts for level
 
@@ -372,9 +373,8 @@ EdgeCounts* Network::get_edge_counts(int level)
 // =============================================================================
 // Updates internal id-id paired map of edge counts between nodes 
 // =============================================================================
-void Network::update_edge_counts(
-    NodePtr updated_node,
-    NodePtr new_group)
+void Network::update_edge_counts(const NodePtr updated_node,
+                                 const NodePtr new_group)
 {
   NodePtr old_group = updated_node->parent;
   int group_level = new_group->level;
@@ -480,7 +480,7 @@ State_Dump Network::get_state()
 // =============================================================================
 // Load current state of nodes in model from state dump given Network::get_state() 
 // =============================================================================
-void Network::load_from_state(State_Dump state)
+void Network::load_from_state(const State_Dump state)
 { 
 
   int n = state.parent.size();

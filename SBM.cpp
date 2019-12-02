@@ -265,7 +265,7 @@ int SBM::mcmc_sweep(int level, bool variable_num_groups)
 // Compute microcononical entropy of current model state
 // Note that this is currently only the degree corrected entropy
 // =============================================================================
-double SBM::compute_entropy(int level)
+double SBM::compute_entropy(const int level)
 {
   
   //============================================================================
@@ -519,8 +519,6 @@ Merge_Step SBM::agglomerative_merge(
 
   return results;
 }
-
-
 
 // =============================================================================
 // Run mcmc chain initialization by finding best organization
