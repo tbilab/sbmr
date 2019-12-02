@@ -30,6 +30,15 @@
           "reveal": "always",
           "panel": "new"
         }
+      },
+      {
+        "label": "Profile Code",
+        "type": "shell",
+        "command": "./profiling/setup_profiling.sh",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        }
       }
     ]
   }
