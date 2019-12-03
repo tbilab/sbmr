@@ -252,7 +252,11 @@ void Network::give_every_node_at_level_own_group(const int level)
     // assign that group node to the node
     node_it->second->set_parent(new_group);
   }
-  
+
+  clean_empty_groups();
+
+  // Initialize a new edge count entry for this level
+  gather_edge_counts(level);
 }    
 
 
@@ -327,11 +331,12 @@ int Network::clean_empty_groups()
 // =============================================================================
 // Builds a id-id paired map of edge counts between nodes of the same level
 // =============================================================================
-EdgeCounts Network::gather_edge_counts(const int level)
+void Network::gather_edge_counts(const int level)
 {
   PROFILE_FUNCTION();
   // Setup our edge count map: 
-  EdgeCounts e_rs;
+  // EdgeCountPtr e_rs_ptr = std::make_unique<EdgeCounts>();
+  EdgeCountPtr e_rs_ptr(new EdgeCounts);
   
   // Grab current level
   LevelPtr node_level = nodes.at(level);
@@ -349,15 +354,15 @@ EdgeCounts Network::gather_edge_counts(const int level)
     for (auto group_s : group_r_cons)
     {
       // Add connection counts to the map
-      e_rs[find_edges(group_r, group_s)]++;
+      (*e_rs_ptr)[find_edges(group_r, group_s)]++;
     }
     
   } // end group r loop
   
   // All the off-diagonal elements will be doubled because they were added for
   // r->s and s->r, so divide them by two
-  for (auto node_pair = e_rs.begin(); 
-            node_pair != e_rs.end(); 
+  for (auto node_pair = e_rs_ptr->begin(); 
+            node_pair != e_rs_ptr->end(); 
             ++node_pair)
   {
     // Make sure wde're not on a diagonal
@@ -366,22 +371,21 @@ EdgeCounts Network::gather_edge_counts(const int level)
       node_pair->second /= 2;
     }
   }
-  
-  return e_rs;
+
+  // Set index of vector to proper value
+  edge_count_maps.emplace(level, std::move(e_rs_ptr));
 }
 
-EdgeCounts* Network::get_edge_counts(const int level)
+EdgeCountPtr Network::get_edge_counts(const int level)
 {
   PROFILE_FUNCTION();
   // First try and find the edge counts for level
-
   // If they dont exist, build them
-  if (edge_counts.find(level) == edge_counts.end())
+  if (edge_count_maps.find(level) == edge_count_maps.end())
   {
-    // Build an edge count for this level and then we're done...
-    edge_counts[level] = gather_edge_counts(level);
+    gather_edge_counts(level);
   }
-  return &edge_counts.at(level);
+  return edge_count_maps.at(level);
 }
 
 // =============================================================================
@@ -400,15 +404,9 @@ void Network::update_edge_counts(const NodePtr updated_node,
        level++)
   {
 
-    // Check if no counts exist for this level yet...
-    bool counts_dont_exist_yet = edge_counts.find(level) == edge_counts.end();
-    
-     // Grab reference to level so we're modifying the right thing
+    // Grab reference to level so we're modifying the right thing
     auto level_edges = get_edge_counts(level);
-
-    // If count didn't exist before request then no need to update
-    if (counts_dont_exist_yet) continue;
-   
+  
     // Get map of group -> num connections for updated node
     auto changed_connections = updated_node->gather_connections_to_level(level);
 
@@ -437,6 +435,22 @@ void Network::update_edge_counts(const NodePtr updated_node,
     } // end loop over connections
   }   // end loop over successive levels
 }
+
+
+// =============================================================================
+// Set a nodes parent and update edge counts
+// =============================================================================
+void Network::set_node_parent(NodePtr node, NodePtr new_parent)
+{
+  PROFILE_FUNCTION();
+
+  // Update edge counts to reflect this move
+  update_edge_counts(node, new_parent);
+
+  // Tell the node to move
+  node->set_parent(new_parent);
+}
+
 
 
 // =============================================================================

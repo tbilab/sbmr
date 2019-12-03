@@ -239,8 +239,7 @@ int SBM::mcmc_sweep(const int level, const bool variable_num_groups)
     if (move_accepted) 
     {   
       // Move the node
-      update_edge_counts(curr_node, proposed_new_group);
-      curr_node->set_parent(proposed_new_group);
+      set_node_parent(curr_node, proposed_new_group);
       
       num_changes++;
     }
@@ -314,12 +313,12 @@ double SBM::compute_entropy(const int level)
   // edges for group r. Note that we dont divide this edge_entropy by 2 because
   // we already accounted for repeats of edges by building a unique-pairs-only
   // map of edges between groups
-  EdgeCounts level_edges = gather_edge_counts(level + 1);
+  EdgeCountPtr level_edges = get_edge_counts(level + 1);
 
   double edge_entropy = 0.0;
   
-  for (auto edge_it  = level_edges.begin(); 
-            edge_it != level_edges.end(); 
+  for (auto edge_it  = level_edges->begin(); 
+            edge_it != level_edges->end(); 
             edge_it++)
   {
     NodePtr group_r = (edge_it->first).first;
@@ -354,7 +353,7 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 
   for (NodePtr member_node : children_to_move)
   {
-    member_node->set_parent(group_a);
+    set_node_parent(member_node, group_a);
   }
 }  
 
@@ -374,9 +373,6 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
 
   // Build a single meta-group for each node at desired level
   give_every_node_at_level_own_group(group_level);
-
-  // Clean up old groups
-  clean_empty_groups();
 
   // Grab all the groups we're looking to merge
   LevelPtr all_groups = get_level(group_level);

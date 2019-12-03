@@ -51,7 +51,7 @@ TEST_CASE("Calculate Model entropy", "[SBM]")
   // Setup simple SBM model
   SBM my_SBM = build_simple_SBM();
 
-  EdgeCounts l1_edges = my_SBM.gather_edge_counts(1);
+  EdgeCounts l1_edges = *my_SBM.get_edge_counts(1);
 
   // Compute full entropy at first level of nodes
   double model_entropy = my_SBM.compute_entropy(0);
@@ -78,7 +78,7 @@ TEST_CASE("Calculate Model entropy", "[SBM]")
 
   // Now we will actually move the desired node and test to see if entropy has changed
   // Move node
-  node_to_move->set_parent(to_group);
+  my_SBM.set_node_parent(node_to_move, to_group);
 
   // Recalculate entropy
   double new_entropy = my_SBM.compute_entropy(0);
