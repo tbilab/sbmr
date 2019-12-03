@@ -275,11 +275,14 @@ NodePtr Network::get_node_from_level(const int level)
 // Scan through entire Network and remove all group nodes that have no children. 
 // Returns the number removed
 // =============================================================================
-int Network::clean_empty_groups()
+std::vector<NodePtr> Network::clean_empty_groups()
 {
   PROFILE_FUNCTION();
   int num_levels = nodes.size();
   int total_deleted = 0;
+  
+  std::vector<NodePtr> groups_removed;
+
   
   // Scan through all levels up to final
   for (int level = 1; level < num_levels; ++level) 
@@ -305,7 +308,9 @@ int Network::clean_empty_groups()
         {
           current_group->parent->remove_child(current_group);
         }
-        
+
+        groups_removed.push_back(current_group);
+
         // Add current group to the removal list
         groups_to_delete.push(current_group->id);
       }
@@ -321,10 +326,9 @@ int Network::clean_empty_groups()
       // Increment total groups deleted counter
       total_deleted++;
     }
-
   }
   
-  return total_deleted;
+  return groups_removed;
 }                     
 
 

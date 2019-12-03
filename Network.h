@@ -116,7 +116,7 @@ public:
 
   // Scan through levels and remove all group nodes that have no children.
   // Returns number of groups removed
-  int clean_empty_groups();
+  std::vector<NodePtr> clean_empty_groups();
 
   // Builds a id-id paired map of edge counts between nodes of the same level
   void gather_edge_counts(int level);

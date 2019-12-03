@@ -173,7 +173,7 @@ TEST_CASE("Cleaning up empty groups", "[Network]")
 
 
     // Run group cleanup
-    int num_culled = my_net.clean_empty_groups();
+    int num_culled = my_net.clean_empty_groups().size();
 
     // Three groups should have been cleaned
     REQUIRE(3 == num_culled);
@@ -185,7 +185,7 @@ TEST_CASE("Cleaning up empty groups", "[Network]")
     REQUIRE(1 == my_net.nodes.at(2)->size());
 
     // Run group cleanup again
-    int num_culled_clean = my_net.clean_empty_groups();
+    int num_culled_clean = my_net.clean_empty_groups().size();
 
     // No groups should have been culled
     REQUIRE(0 == num_culled_clean);
