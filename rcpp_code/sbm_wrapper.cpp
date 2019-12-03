@@ -17,29 +17,26 @@ inline DataFrame state_to_df(State_Dump state)
 class Rcpp_SBM: public SBM {
 public:
   // Rcpp_SBM(int seed):sampler(seed) {};
-  void add_node_rcpp(
+  void add_node(
       const std::string id,
       const int type,
       const int level)
   {
-    add_node(id, type, level);
+    SBM::add_node(id, type, level);
   }
   
-  void add_connection_rcpp(const std::string node_a_id, const std::string node_b_id)
+  void add_connection(const std::string node_a_id, const std::string node_b_id)
   {
-    add_connection(node_a_id, node_b_id);
+    SBM::add_connection(node_a_id, node_b_id);
   }
 
-  DataFrame get_state_rcpp()
+  DataFrame get_state()
   {
-    // Grab state dump struct
-    State_Dump state = get_state();
-
-    // Create and return dump of state as dataframe
-    return state_to_df(state);
+    // Grab state dump struct return as dataframe
+    return state_to_df(SBM::get_state());
   }
 
-  void set_node_parent_rcpp(
+  void set_node_parent(
       const std::string child_id, 
       const std::string parent_id, 
       const int level = 0,
@@ -57,20 +54,20 @@ public:
     }
     else 
     {
-      set_node_parent(child_node, parent_node);
+      SBM::set_node_parent(child_node, parent_node);
     }
   }
 
-  double compute_entropy_rcpp(const int level)
+  double compute_entropy(const int level)
   {
-    return compute_entropy(level);
+    return SBM::compute_entropy(level);
   }
 
-  int mcmc_sweep_rcpp(
+  int mcmc_sweep(
       const int level,
       const bool variable_num_groups)
   {
-    return mcmc_sweep(level, variable_num_groups);
+    return SBM::mcmc_sweep(level, variable_num_groups);
   }
   
   // Getters and setters for inhereted fields
@@ -90,12 +87,12 @@ public:
   int get_n_checks_per_group() {return N_CHECKS_PER_GROUP;}
   
   
-  List collapse_groups_rcpp(
+  List collapse_groups(
       const int node_level,
       const int num_mcmc_steps)
   {
 
-    auto init_results = collapse_groups(node_level,num_mcmc_steps);
+    auto init_results = SBM::collapse_groups(node_level,num_mcmc_steps);
 
     List entropy_results;
 
@@ -114,7 +111,7 @@ public:
     return entropy_results;
   }
 
-  void load_from_state_rcpp(
+  void load_from_state(
       std::vector<string> id,
       std::vector<string> parent,
       std::vector<int> level,
@@ -122,7 +119,7 @@ public:
   {
     // Construct a state dump from vectors and
     // pass the constructed state to load_state function
-    load_from_state(State_Dump(id, parent, level, type));
+    SBM::load_from_state(State_Dump(id, parent, level, type));
   }
 };
 
@@ -138,14 +135,14 @@ RCPP_MODULE(sbm_module)
   .property("SIGMA", &Rcpp_SBM::get_sigma,  &Rcpp_SBM::set_sigma, "Sigma value for determining rate of agglomerative merging" )
   .property("N_CHECKS_PER_GROUP", &Rcpp_SBM::get_n_checks_per_group,  &Rcpp_SBM::set_n_checks_per_group, "If not in greedy mode, how many options do we check per node for moves in agglomerative merging?" )
   
-  .method("add_node_rcpp", &Rcpp_SBM::add_node_rcpp)
-  .method("add_connection_rcpp", &Rcpp_SBM::add_connection_rcpp)
-  .method("get_state_rcpp", &Rcpp_SBM::get_state_rcpp)
-  .method("load_from_state_rcpp", &Rcpp_SBM::load_from_state_rcpp)
-  .method("set_node_parent_rcpp", &Rcpp_SBM::set_node_parent_rcpp)
-  .method("compute_entropy_rcpp", &Rcpp_SBM::compute_entropy_rcpp)
-  .method("mcmc_sweep_rcpp", &Rcpp_SBM::mcmc_sweep_rcpp)
-  .method("collapse_groups_rcpp", &Rcpp_SBM::collapse_groups_rcpp)
+  .method("add_node", &Rcpp_SBM::add_node)
+  .method("add_connection", &Rcpp_SBM::add_connection)
+  .method("get_state", &Rcpp_SBM::get_state)
+  .method("load_from_state", &Rcpp_SBM::load_from_state)
+  .method("set_node_parent", &Rcpp_SBM::set_node_parent)
+  .method("compute_entropy", &Rcpp_SBM::compute_entropy)
+  .method("mcmc_sweep", &Rcpp_SBM::mcmc_sweep)
+  .method("collapse_groups", &Rcpp_SBM::collapse_groups)
   .method("set_epsilon", &Rcpp_SBM::set_epsilon)
   .method("set_greedy", &Rcpp_SBM::set_greedy)
   .method("set_beta", &Rcpp_SBM::set_beta)
@@ -159,45 +156,45 @@ RCPP_MODULE(sbm_module)
 /*** R
 sbm <- new(Rcpp_SBM)
 
-sbm$add_node_rcpp("a1", 0L, 0L)
-sbm$add_node_rcpp("a2", 0L, 0L)
-sbm$add_node_rcpp("a3", 0L, 0L)
-sbm$add_node_rcpp("b1", 1L, 0L)
-sbm$add_node_rcpp("b2", 1L, 0L)
-sbm$add_node_rcpp("b3", 1L, 0L)
+sbm$add_node("a1", 0L, 0L)
+sbm$add_node("a2", 0L, 0L)
+sbm$add_node("a3", 0L, 0L)
+sbm$add_node("b1", 1L, 0L)
+sbm$add_node("b2", 1L, 0L)
+sbm$add_node("b3", 1L, 0L)
 
-sbm$add_node_rcpp("a11", 0L, 1L)
-sbm$add_node_rcpp("a12", 0L, 1L)
-sbm$add_node_rcpp("b11", 1L, 1L)
-sbm$add_node_rcpp("b12", 1L, 1L)
-
-
-sbm$add_connection_rcpp("a1", "b1")
-sbm$add_connection_rcpp("a1", "b2")
-sbm$add_connection_rcpp("a1", "b3")
-sbm$add_connection_rcpp("a2", "b3")
-sbm$add_connection_rcpp("a3", "b2")
+sbm$add_node("a11", 0L, 1L)
+sbm$add_node("a12", 0L, 1L)
+sbm$add_node("b11", 1L, 1L)
+sbm$add_node("b12", 1L, 1L)
 
 
-sbm$set_node_parent_rcpp("a1", "a11", 0, TRUE)
-sbm$set_node_parent_rcpp("a2", "a11", 0, TRUE)
-sbm$set_node_parent_rcpp("a3", "a12", 0, TRUE)
-sbm$set_node_parent_rcpp("b1", "b11", 0, TRUE)
-sbm$set_node_parent_rcpp("b2", "b11", 0, TRUE)
-sbm$set_node_parent_rcpp("b3", "b12", 0, TRUE)
+sbm$add_connection("a1", "b1")
+sbm$add_connection("a1", "b2")
+sbm$add_connection("a1", "b3")
+sbm$add_connection("a2", "b3")
+sbm$add_connection("a3", "b2")
+
+
+sbm$set_node_parent("a1", "a11", 0, TRUE)
+sbm$set_node_parent("a2", "a11", 0, TRUE)
+sbm$set_node_parent("a3", "a12", 0, TRUE)
+sbm$set_node_parent("b1", "b11", 0, TRUE)
+sbm$set_node_parent("b2", "b11", 0, TRUE)
+sbm$set_node_parent("b3", "b12", 0, TRUE)
 
 
 load_state <- function(sbm, state_dump){
-  sbm$load_from_state_rcpp(
+  sbm$load_from_state(
     state_dump$id, 
     state_dump$parent, 
     state_dump$level, 
     state_dump$type)
 }
 
-original_state <- sbm$get_state_rcpp()
+original_state <- sbm$get_state()
 
-sbm$compute_entropy_rcpp(0L)
+sbm$compute_entropy(0L)
 
 # Set some model parameters
 sbm$GREEDY <- TRUE
@@ -205,15 +202,15 @@ sbm$BETA <- 1.5
 sbm$EPS <- 0.1
 sbm$N_CHECKS_PER_GROUP <- 5
 
-init_results <- sbm$collapse_groups_rcpp(0, 15)
+init_results <- sbm$collapse_groups(0, 15)
 
 # desired_state <- init_results[[1]]$state
-# sbm$load_from_state_rcpp(desired_state$id, desired_state$parent, desired_state$level, desired_state$type)
+# sbm$load_from_state(desired_state$id, desired_state$parent, desired_state$level, desired_state$type)
 
 
-# sbm$mcmc_sweep_rcpp(0,FALSE,0.1,1.5)
-# sbm$mcmc_sweep_rcpp(0L,FALSE)
-# sbm$compute_entropy_rcpp(0L)
+# sbm$mcmc_sweep(0,FALSE,0.1,1.5)
+# sbm$mcmc_sweep(0L,FALSE)
+# sbm$compute_entropy(0L)
 
 
 */
