@@ -49,14 +49,12 @@ public:
   Sampler sampler;
 
   // Parameters that control the mcmc and merging stuffs
-  struct Merge_Params
-  {
-    double eps = 0.1;
-    double sigma = 0.5;
-    double beta = 1.5;
-    bool greedy = true;
-    int n_checks_per_group = 5; // When not greedy
-  } Params;
+  double EPS = 0.1;
+  double SIGMA = 0.5;
+  double BETA = 1.5;
+  bool GREEDY = true;
+  int N_CHECKS_PER_GROUP = 5; // When not greedy
+
 
   // Methods
   // =========================================================================

@@ -23,7 +23,7 @@ NodePtr SBM::propose_move(const NodePtr node)
   int neighbor_group_degree = rand_neighbor->parent->degree;
   
   // Decide if we are going to choose a random group for our node
-  double ergo_amnt = Params.eps*potential_groups.size();
+  double ergo_amnt = EPS*potential_groups.size();
   double prob_of_random_group = ergo_amnt/(neighbor_group_degree + ergo_amnt);
   
   // Decide where we will get new group from and draw from potential candidates
@@ -169,18 +169,18 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     ];
     
     // Denominator of both probability fractions
-    double denom = group_t->degree + Params.eps*n_possible_groups;
+    double denom = group_t->degree + EPS*n_possible_groups;
     
     // Add new components to both the pre and post move probabilities. 
-    pre_move_prob  += e_it * (e_new_t_pre + Params.eps) / denom;
-    post_move_prob += e_it * (e_old_t_post + Params.eps) / denom;
+    pre_move_prob  += e_it * (e_new_t_pre + EPS) / denom;
+    post_move_prob += e_it * (e_old_t_post + EPS) / denom;
   }
 
   // Now we can clean up all the calculations into to entropy delta and the 
   // probability ratio for the moves and use those to calculate the acceptance 
   // probability for the proposed move.
   double entropy_delta = entropy_post - entropy_pre;
-  double acceptance_prob = exp(Params.beta*entropy_delta) * 
+  double acceptance_prob = exp(BETA*entropy_delta) * 
                           (pre_move_prob/post_move_prob);
   
   return Proposal_Res(
@@ -390,7 +390,7 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
   std::vector<NodePtr> to_groups;
   std::vector<double> move_delta;
 
-  const int size_to_return = Params.n_checks_per_group * all_groups->size();
+  const int size_to_return = N_CHECKS_PER_GROUP * all_groups->size();
   from_groups.reserve(size_to_return);
   to_groups.reserve(size_to_return);
   move_delta.reserve(size_to_return);
@@ -416,7 +416,7 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
 
     // If we're running algorithm in greedy mode we should just
     // add every possible group to the groups-to-search list
-    if (Params.greedy)
+    if (GREEDY)
     {
       // Get a list of all the potential merges for group
       metagroups_to_search =
@@ -424,9 +424,9 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
     }
     else
     {
-      metagroups_to_search.reserve(Params.n_checks_per_group);
+      metagroups_to_search.reserve(N_CHECKS_PER_GROUP);
       // Otherwise, we should sample a given number of groups to check
-      for (int i = 0; i < Params.n_checks_per_group; i++)
+      for (int i = 0; i < N_CHECKS_PER_GROUP; i++)
       {
         // Sample a group from potential groups
         metagroups_to_search.push_back(propose_move(curr_group));
@@ -562,7 +562,7 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
 
     // Decide how many merges we should do. 
     int num_merges = std::max(
-        int(curr_num_groups - (curr_num_groups / Params.sigma)),
+        int(curr_num_groups - (curr_num_groups / SIGMA)),
         1);
 
     // Make sure we don't overstep the goal number of groups

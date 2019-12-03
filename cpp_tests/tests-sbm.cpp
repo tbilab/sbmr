@@ -68,7 +68,7 @@ TEST_CASE("Calculate Model entropy", "[SBM]")
   NodePtr to_group = my_SBM.get_node_by_id("a12", 1);
 
 
-  my_SBM.Params.beta = 0.1;
+  my_SBM.BETA = 0.1;
   // Calculate the entropy delta along with acceptance prob
   Proposal_Res proposal_results = my_SBM.make_proposal_decision(
       node_to_move,
@@ -115,7 +115,7 @@ TEST_CASE("Basic MCMC sweeps", "[SBM]")
 
     for (int i = 0; i < num_sweeps; i++)
     {
-      my_SBM.Params.eps = eps;
+      my_SBM.EPS = eps;
       int n_changes = my_SBM.mcmc_sweep(0, false);
       total_num_changes += n_changes;
     }
@@ -174,8 +174,8 @@ TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
   int num_initial_groups = my_SBM.get_level(1)->size();
   double initial_entropy = my_SBM.compute_entropy(0);
 
-  my_SBM.Params.sigma = 2;
-  // my_SBM.Params.eps = 0.01;
+  my_SBM.SIGMA = 2;
+  // my_SBM.EPS = 0.01;
 
   // Run full agglomerative merging algorithm till we have just 3 groups left
   auto run_results = my_SBM.collapse_groups(
@@ -196,8 +196,8 @@ TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]"
 
   int desired_num_groups = 6;
 
-  my_SBM.Params.sigma = 0.5;
-  my_SBM.Params.eps = 2;
+  my_SBM.SIGMA = 0.5;
+  my_SBM.EPS = 2;
 
   // Run full agglomerative merging algorithm 
   auto run_results = my_SBM.collapse_groups(
@@ -220,7 +220,7 @@ TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]")
 
   int desired_num_groups = 4;
 
-  my_SBM.Params.greedy = false;
+  my_SBM.GREEDY = false;
   // Run full agglomerative merging algorithm till we have just 3 groups left
   auto run_results = my_SBM.collapse_groups(
     0,
