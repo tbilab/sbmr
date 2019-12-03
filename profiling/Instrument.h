@@ -123,8 +123,9 @@ private:
   bool m_Stopped;
 };
 
+// Enable profiling. This is set via the compile step but if it is needed to be
+// done manually this code is left in for that purpose.
 // #define PROFILING 1
-#define PROFILING 0
 #if PROFILING
 #define PROFILE_SCOPE(name) InstrumentationTimer timer##__LINE__(name)
 #define PROFILE_FUNCTION() PROFILE_SCOPE(__FUNCTION__)
