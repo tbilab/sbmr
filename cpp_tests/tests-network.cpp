@@ -262,7 +262,7 @@ TEST_CASE("Building an edge count map", "[Network]")
     REQUIRE(3 == my_net.nodes.at(2)->size());
 
     // Build the network connection map for first level
-    auto l1_edges = my_net.get_edge_counts(1);
+    auto l1_edges = my_net.get_edge_counts(1).counts;
 
     // The edge count map should have 6 non-empty entries 
     REQUIRE(6 == l1_edges->size());
@@ -316,7 +316,7 @@ TEST_CASE("Building an edge count map", "[Network]")
         (*l1_edges)[find_edges(b13, a13)]);
 
     // Repeat for level 2
-    auto l2_edges = my_net.get_edge_counts(2);
+    auto l2_edges = my_net.get_edge_counts(2).counts;
 
     // Check num edges between groups
     REQUIRE((*l2_edges)[find_edges(a22, b21)] == 9);

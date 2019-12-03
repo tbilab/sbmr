@@ -376,16 +376,20 @@ void Network::gather_edge_counts(const int level)
   edge_count_maps.emplace(level, std::move(e_rs_ptr));
 }
 
-EdgeCountPtr Network::get_edge_counts(const int level)
+Edge_Count_Res Network::get_edge_counts(const int level)
 {
   PROFILE_FUNCTION();
+
   // First try and find the edge counts for level
+  bool counts_dont_exist = edge_count_maps.find(level) == edge_count_maps.end();
+  
   // If they dont exist, build them
-  if (edge_count_maps.find(level) == edge_count_maps.end())
-  {
-    gather_edge_counts(level);
-  }
-  return edge_count_maps.at(level);
+  if (counts_dont_exist) gather_edge_counts(level);
+
+  return Edge_Count_Res(
+    edge_count_maps.at(level),
+    counts_dont_exist
+  );
 }
 
 // =============================================================================
@@ -405,7 +409,12 @@ void Network::update_edge_counts(const NodePtr updated_node,
   {
 
     // Grab reference to level so we're modifying the right thing
-    auto level_edges = get_edge_counts(level);
+    auto edge_count_retrieval = get_edge_counts(level);
+
+    // If we just build counts, no need to run adjustments
+    if(edge_count_retrieval.was_built) return;
+    
+    auto level_edges = edge_count_retrieval.counts;
   
     // Get map of group -> num connections for updated node
     auto changed_connections = updated_node->gather_connections_to_level(level);

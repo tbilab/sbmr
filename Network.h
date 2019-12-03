@@ -26,6 +26,7 @@ struct State_Dump
       std::vector<int> t) : id(i), parent(p), level(l), type(t) {}
 };
 
+
 // Some type definitions for cleaning up ugly syntax
 typedef std::shared_ptr<Node> NodePtr;
 typedef std::map<string, NodePtr> NodeLevel;
@@ -35,6 +36,13 @@ typedef std::map<int, LevelPtr> LevelMap;
 typedef std::map<std::pair<NodePtr, NodePtr>, int> EdgeCounts;
 typedef std::shared_ptr<EdgeCounts> EdgeCountPtr;
 
+struct Edge_Count_Res {
+  EdgeCountPtr counts;
+  bool was_built;
+  Edge_Count_Res(EdgeCountPtr ec, bool built):
+    counts(ec),
+    was_built(built){}
+};
 
 using std::string;
 
@@ -116,9 +124,10 @@ public:
   // Set a nodes parent and update edge counts
   void set_node_parent(NodePtr node, NodePtr new_parent);
 
-  // Get reference to edge count map so it can be updated
-  EdgeCountPtr get_edge_counts(int level);
-
+  // Get reference to edge count map so it can be updated. Second element
+  // in pair is boolean of edge counts needed to be built
+  Edge_Count_Res get_edge_counts(int level);
+  
   // Update network's internal edge counts map after structure change
   void update_edge_counts(NodePtr updated_node, NodePtr new_group);
 

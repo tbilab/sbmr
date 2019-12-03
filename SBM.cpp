@@ -146,7 +146,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   double pre_move_prob = 0.0;
   double post_move_prob = 0.0;
   
-  auto edge_counts = get_edge_counts(new_group->level);
+  auto edge_counts = get_edge_counts(new_group->level).counts;
 
   // Loop over all the node's connections to neighbor groups
   for(auto con_group_it = node_edges.begin(); 
@@ -313,7 +313,7 @@ double SBM::compute_entropy(const int level)
   // edges for group r. Note that we dont divide this edge_entropy by 2 because
   // we already accounted for repeats of edges by building a unique-pairs-only
   // map of edges between groups
-  EdgeCountPtr level_edges = get_edge_counts(level + 1);
+  EdgeCountPtr level_edges = get_edge_counts(level + 1).counts;
 
   double edge_entropy = 0.0;
   
