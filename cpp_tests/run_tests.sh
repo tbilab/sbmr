@@ -3,7 +3,7 @@ echo $PWD
 echo "=============================================================================\nCompiling Classes..."
 echo "=============================================================================\n"
 
-OPTIMIZATION_LEVEL=-O2
+OPTIMIZATION_LEVEL=""
 
 # Compile the main classes
 g++ -std=c++11 ${OPTIMIZATION_LEVEL} -c Node.cpp Network.cpp SBM.cpp helpers.cpp Sampler.cpp
