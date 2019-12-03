@@ -128,6 +128,8 @@ SBM build_simple_SBM()
   b3->set_parent(b12);
   b4->set_parent(b13);
 
+  my_SBM.gather_edge_counts(1);
+
   return my_SBM;
 }
 
