@@ -271,6 +271,7 @@ double SBM::compute_entropy(const int level)
   //============================================================================
   // First, calc the number of total edges and build a degree->num nodes map
   
+  std::cout << "Starting entropy calculation..." << std::endl;
   // Build map of number of nodes with given degree
   std::map<int, int> n_nodes_w_degree;
 
@@ -326,16 +327,24 @@ double SBM::compute_entropy(const int level)
     
     // Grab needed counts and convert to doubles
     double e_rs = edge_it->second;
+    double e_r = group_r->degree;
+    double e_s = group_s->degree;
+    
+    std::cout <<  group_r->id << " - " << group_s->id 
+              << "|  e_rs: " << e_rs 
+              << ", e_r: " << group_r->degree 
+              << ", e_s: " << group_s->degree << std::endl;
     
     // Check to make sure we don't try and take the log of zero. Also the
     // component of the addition will be turned to zero by the multiplication by
     // zero anyways so no need to attempt to add it
-    if (e_rs == 0) continue;
+    if ((e_rs == 0) | (e_r == 0) | (e_s == 0)) continue;
+    
 
     // Compute this iteration's controbution to sum
-    edge_entropy += e_rs * log(e_rs/(group_r->degree*group_s->degree));
+    edge_entropy += e_rs * log(e_rs/(e_r*e_s));
   }
-  
+
   // Add three components together to return
   return -1 * (n_total_edges + degree_summation + edge_entropy);
 }
@@ -516,7 +525,31 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
   }
 
   // Erase the empty groups and metagroups
-  clean_empty_groups();
+  auto removed_groups = clean_empty_groups();
+
+  // // Force regathering of edge counts now we're removed groups
+  // // go through all edge counts and remove entries pertaining to 
+  // // any of the just deleted groups
+  // auto level_counts = get_edge_counts(group_level).counts;
+
+  // for (auto edge_it = level_counts->begin();
+  //           edge_it != level_counts->end();
+  //           edge_it++)
+  // {
+  //   NodePtr group_r = (edge_it->first).first;
+  //   NodePtr group_s = (edge_it->first).second;
+
+  //   auto find_in_removed = [removed_groups](NodePtr group) {
+  //     return std::find(
+  //                removed_groups.begin(),
+  //                removed_groups.end(),
+  //                group) == removed_groups.end();
+  //   };
+
+  //   bool contains_removed_group = find_in_removed(group_r) | find_in_removed(group_s);
+
+  //   if (contains_removed_group) level_counts->erase(edge_it);
+  // }
 
   // Return the entropy for new model and merges done
   results.entropy = compute_entropy(group_level - 1);
@@ -587,6 +620,8 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
       break;
     }
 
+  
+
     if (num_mcmc_steps != 0)
     {
       // Let model equilibriate with new group layout...
@@ -606,6 +641,8 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
     // Gather info for return
     step_results.push_back(merge_results);
   }
+
+  
 
   return step_results;
 }
