@@ -172,7 +172,16 @@ std::vector<NodePtr> Node::get_connections_to_level(const int desired_level)
   // desired level and place in connected nodes vector
   for (auto connection : connections)
   {
-    level_cons.push_back(connection->get_parent_at_level(desired_level));
+    try
+    {
+      level_cons.push_back(connection->get_parent_at_level(desired_level));
+    }
+    catch (...)
+    {
+      // No connections at this level were found
+      throw "No parent at level " +
+          std::to_string(desired_level) + " for " + id;
+    }
   }
 
   return level_cons;
