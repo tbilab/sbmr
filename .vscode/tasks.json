@@ -34,7 +34,7 @@
       {
         "label": "Profile Code",
         "type": "shell",
-        "command": "./profiling/setup_profiling.sh",
+        "command": "./profiling/run_profiling.sh",
         "presentation": {
           "reveal": "always",
           "panel": "new"
