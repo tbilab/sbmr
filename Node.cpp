@@ -217,8 +217,6 @@ std::map<NodePtr, int> Node::gather_connections_to_level(const int level)
 void Node::connect_nodes(NodePtr node1_ptr, NodePtr node2_ptr)
 {
   //PROFILE_FUNCTION();
-  // Add node2 to connections of node1
   node1_ptr->add_connection(node2_ptr);
-  // Do the same for node2
   node2_ptr->add_connection(node1_ptr);
 }
