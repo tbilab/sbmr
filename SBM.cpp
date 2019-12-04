@@ -45,10 +45,6 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   // Reference to old group that would be swapped for new_group
   NodePtr old_group = node->parent;
   
-  // Grab number of groups that could belong to connections of node
-  double n_possible_groups = get_nodes_of_type_at_level(node->type, group_level)
-    .size();
-
   // Grab degree of the node to move
   double node_degree = node->degree;
 
@@ -168,12 +164,8 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
       find_edges(new_group, group_t)
     ];
     
-    // Denominator of both probability fractions
-    double denom = group_t->degree + EPS*n_possible_groups;
-    
-    // Add new components to both the pre and post move probabilities. 
-    pre_move_prob  += e_it * (e_new_t_pre + EPS) / denom;
-    post_move_prob += e_it * (e_old_t_post + EPS) / denom;
+    pre_move_prob  += e_new_t_pre + EPS;
+    post_move_prob += e_old_t_post + EPS;
   }
 
   // Now we can clean up all the calculations into to entropy delta and the 
