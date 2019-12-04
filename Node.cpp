@@ -4,7 +4,7 @@
 // =============================================================================
 // Replace 'this' with a shared smart pointer
 // =============================================================================
-NodePtr Node::this_ptr()
+inline NodePtr Node::this_ptr()
 {
   return shared_from_this();
 }
@@ -12,7 +12,7 @@ NodePtr Node::this_ptr()
 // =============================================================================
 // Add connection to another node
 // =============================================================================
-void Node::add_connection(const NodePtr node)
+inline void Node::add_connection(const NodePtr node)
 {
   //PROFILE_FUNCTION();
 
@@ -110,7 +110,7 @@ void Node::set_parent(NodePtr parent_node_ptr)
 // =============================================================================f
 // Add a node to the children vector
 // =============================================================================
-void Node::add_child(const NodePtr new_child_node)
+inline void Node::add_child(const NodePtr new_child_node)
 {
   //PROFILE_FUNCTION();
   // Add new child node to the set of children. An unordered set is used because
@@ -121,7 +121,7 @@ void Node::add_child(const NodePtr new_child_node)
 // =============================================================================
 // Find and erase a child node
 // =============================================================================
-void Node::remove_child(const NodePtr child_node)
+inline void Node::remove_child(const NodePtr child_node)
 {
   //PROFILE_FUNCTION();
   children.erase(children.find(child_node));
@@ -130,9 +130,8 @@ void Node::remove_child(const NodePtr child_node)
 // =============================================================================
 // Get parent of current node at a given level
 // =============================================================================
-NodePtr Node::get_parent_at_level(const int level_of_parent)
+inline NodePtr Node::get_parent_at_level(const int level_of_parent)
 {
-  //PROFILE_FUNCTION();
   // First we need to make sure that the requested level is not less than that
   // of the current node.
   if (level_of_parent < level)
