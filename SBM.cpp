@@ -250,7 +250,7 @@ double SBM::compute_entropy(const int level)
   std::map<int, int> n_nodes_w_degree;
 
   // Keep track of total number of edges as well
-  int sum_of_degrees = 0;
+  double n_total_edges = 0;
   
   // Grab pointer to current level and start loop
   LevelPtr node_level = get_level(level);
@@ -259,17 +259,15 @@ double SBM::compute_entropy(const int level)
             ++node_it)
   {
     int node_degree = node_it->second->degree;
-    sum_of_degrees += node_degree;
+    n_total_edges += node_degree;
     n_nodes_w_degree[node_degree]++;
   }
+  // Divide by two because we double counted all edges
+  n_total_edges/=2.0;
   
   //==========================================================================
   // Next, we calculate the summation of N_k*ln(K!) where K is degree size and
   // N_k is the number of nodes of that degree
-  
-  // Compute total number of edges and convert to double
-  double n_total_edges = double(sum_of_degrees)/2.0;
-
 
   // Calculate first component (sum of node degree counts portion)
   double degree_summation = 0.0;
@@ -277,11 +275,9 @@ double SBM::compute_entropy(const int level)
             degree_count != n_nodes_w_degree.end(); 
             ++degree_count)
   {
-    int k = degree_count->first;
-    int num_nodes = degree_count->second;
-
+   
     // Using std's built in lgamma here: lgamma(x + 1) = log(x!)
-    degree_summation += num_nodes * lgamma(k+1);
+    degree_summation += degree_count->second * lgamma(degree_count->first + 1);
   }
   
   //============================================================================
@@ -356,13 +352,6 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
   // Grab all the groups we're looking to merge
   LevelPtr all_groups = get_level(group_level);
 
-  // Gather how many groups of each type we have
-  std::map<int, int> n_groups_of_type;
-  for (auto group_it = all_groups->begin(); group_it != all_groups->end();
-       group_it++)
-  {
-    n_groups_of_type[group_it->second->type]++;
-  }
 
   // Build vectors for recording merges
   std::vector<NodePtr> from_groups;
@@ -376,18 +365,18 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
 
   // Make sure doing a merge makes sense by checking we have enough groups
   // of every type
-  for (auto node_type_it = n_groups_of_type.begin();
-       node_type_it != n_groups_of_type.end(); node_type_it++)
+  for (int i = 0; i < node_type_counts.size(); i++)
   {
-    if (node_type_it->second < 2)
+    if (node_type_counts[i][group_level] < 2)
     {
       throw "To few groups to perform merge.";
     }
   }
 
   // Loop over each group and find best merge option
-  for (auto group_it = all_groups->begin(); group_it != all_groups->end();
-       group_it++)
+  for (auto group_it = all_groups->begin(); 
+            group_it != all_groups->end();
+            group_it++)
   {
     NodePtr curr_group = group_it->second;
 
