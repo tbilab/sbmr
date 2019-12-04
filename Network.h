@@ -66,10 +66,6 @@ public:
   // A map keyed by level with the node to node edge counts for that level
   std::unordered_map<int, EdgeCountPtr> edge_count_maps;
   
-  // Vector storing all the unique types of nodes seen.
-  // Used to make sure the correct move proposals are made
-  std::unordered_set<int> unique_node_types;
-
   // A map keyed by type to a map keyed by level of node counts
   std::map<int, std::map<int, int>> node_type_counts;
 

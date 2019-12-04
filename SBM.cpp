@@ -564,7 +564,7 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
   clean_empty_groups();
 
   int num_steps = desired_num_groups == -1 
-    ? B_start - unique_node_types.size()
+    ? B_start - node_type_counts.size()
     : desired_num_groups;
 
   // Setup vector to hold all merge step results

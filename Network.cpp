@@ -112,9 +112,6 @@ NodePtr Network::add_node(const string id,
   
   (*node_level)[node_id] = new_node;
  
-  // Update node types set with new node's type
-  unique_node_types.insert(type);
-
   // Add this node to node counting map
   node_type_counts[type][level]++;
 

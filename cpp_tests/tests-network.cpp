@@ -58,7 +58,7 @@ TEST_CASE("Basic initialization of network", "[Network]")
   REQUIRE(my_net.nodes.size() == 2);
   
   // There should be two types of print_node_ids(*my_net.nodes.at(0))nodes
-  REQUIRE(my_net.unique_node_types.size() == 2);
+  REQUIRE(my_net.node_type_counts.size() == 2);
 }
 
 TEST_CASE("Tracking node types", "[Network]")
@@ -70,25 +70,25 @@ TEST_CASE("Tracking node types", "[Network]")
   my_net.add_node("n2", 0);
   
   // There should only be one type of node so far
-  REQUIRE(1 ==  my_net.unique_node_types.size());
+  REQUIRE(1 ==  my_net.node_type_counts.size());
   
   my_net.add_node("m1", 1);
   
   // There should now be two types of nodes
-  REQUIRE(2 == my_net.unique_node_types.size());
+  REQUIRE(2 == my_net.node_type_counts.size());
   
   my_net.add_node("m2", 1);
   my_net.add_node("n3", 0);
   
   // There should still just be two types of nodes
-  REQUIRE(2 == my_net.unique_node_types.size());
+  REQUIRE(2 == my_net.node_type_counts.size());
   
   my_net.add_node("m3", 1);
   my_net.add_node("o1", 2);
   my_net.add_node("o2", 2);
   
   // There should now be three types of nodes
-  REQUIRE(3 == my_net.unique_node_types.size());
+  REQUIRE(3 == my_net.node_type_counts.size());
 }
 
 
