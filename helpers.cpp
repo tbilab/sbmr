@@ -108,14 +108,3 @@ std::string print_node_ids(std::map<std::string, NodePtr> nodes) {
   return print_ids_to_string(node_ids);
 }
 
-
-
-
-// Gets average of the last n elements for a paseed vector of integers
-inline float avg_last_n(std::vector<int> vec, int n)
-{
-  return std::accumulate(vec.end() - n,
-                         vec.end(),
-                         0.0) /
-         float(n);
-}
