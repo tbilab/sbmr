@@ -2,24 +2,21 @@
 
 ## Running Tests
 
-To install the c++ testing framework Google Test:
+The tests are implemented using a precompiled header test library so testing 
+is as simple as cloning this repo and then running the shell script `run_tests.sh`.
 
-First, make sure `cmake` is installed and then running the following lines: 
-
-```bash
-git clone git@github.com:google/googletest.git
-cd googletest/
-mkdir install/
-cd install/
-cmake -DCMAKE_CXX_COMPILER="/usr/bin/g++" -DCMAKE_CXX_FLAGS="-std=c++11 -stdlib=libc++" ../
-make #compiles the code  
-sudo make install #installs the code 
-```
-
-Then modify the `cpp_tests/run_tests.sh` script to point to the newly installed library...
+E.g. 
 
 ```bash
-# Set location of the google test library
-GTEST_LIB=/Users/nick/cpp_code/googletest/googletest/include/
-LIBGTEST=/Users/nick/cpp_code/googletest/install/lib/libgtest.a
+sh cpp_tests/run_tests.sh
 ```
+
+The results should be output with timings etc. 
+
+## Profiling code
+
+Code profiling is done in much the same way, just using the script `profiling/run_profiling.sh`. 
+
+The script outputs `profiling/results.json` which can then be loaded into 
+`chrome://tracing` to view the flamegraph of the code exectuion for a agglomerative
+merging. 
