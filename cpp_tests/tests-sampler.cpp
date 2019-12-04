@@ -6,26 +6,6 @@
 #include "../helpers.h"
 
 
-TEST_CASE("Vector Normalization", "[Sampler]")
-{
-  double tol = 0.01;
-  // Setup generator
-  Sampler my_sampler;
-  
-  // Sample vector
-  std::vector<double> vec_raw = {1.0, 2.0, 3.0, 4.0};
-  
-  // Normalize vector
-  std::vector<double> vec_norm = normalize_vector(vec_raw);
-  
-  REQUIRE(vec_norm.size() == vec_raw.size());
-
-  REQUIRE(vec_norm[0] == Approx(0.1).epsilon(tol));
-  REQUIRE(vec_norm[1] == Approx(0.2).epsilon(tol));
-  REQUIRE(vec_norm[2] == Approx(0.3).epsilon(tol));
-  REQUIRE(vec_norm[3] == Approx(0.4).epsilon(tol));
-}
-
 TEST_CASE("Setting Seeds", "[Sampler]")
 {  
   // Setup multuple generators with same seed

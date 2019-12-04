@@ -111,31 +111,6 @@ std::string print_node_ids(std::map<std::string, NodePtr> nodes) {
 
 
 
-
-// ============================================================================
-// Normalizes a vector of doubles so all elements sum to 1 
-// ============================================================================
-std::vector<double> normalize_vector(std::vector<double> const &vec) 
-{
-  // Get sum of elements
-  double weights_sum = 0.0;
-  for (auto el = vec.begin(); el != vec.end(); ++el) 
-  {
-    weights_sum += *el;
-  }
-  
-  std::vector<double> normalized_vec;
-  normalized_vec.reserve(vec.size());
-  
-  for (auto el = vec.begin(); el != vec.end(); ++el)
-  {
-    normalized_vec.push_back(*el/weights_sum);
-  }
-
-  return normalized_vec;
-}
-
-
 // Gets average of the last n elements for a paseed vector of integers
 inline float avg_last_n(std::vector<int> vec, int n)
 {

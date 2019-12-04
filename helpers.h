@@ -32,11 +32,5 @@ std::string print_node_ids(std::map<std::string, NodePtr>);
 
 
 
-// ============================================================================
-// Normalizes a vector of doubles so all elements sum to 1 
-// ============================================================================
-std::vector<double> normalize_vector(std::vector<double> const &vec);
-
-
 // Gets average of the last n elements for a paseed vector of integers
 inline float avg_last_n(std::vector<int> vec, int n);
