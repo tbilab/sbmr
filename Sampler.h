@@ -57,9 +57,6 @@ public:
 
   // Sample random node from vector of nodes
   NodePtr sample(std::vector<NodePtr> nodes_to_sample);  
-
-  // Sample an index from a vector of weights
-  int sample(std::vector<double> const &weights); 
 };
 
 #endif

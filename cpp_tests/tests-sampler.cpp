@@ -57,37 +57,6 @@ TEST_CASE("Lots of Samples", "[Sampler]")
   REQUIRE(max_draw < 1.0);
 }
 
-TEST_CASE("Drawing from weighted vector", "[Sampler]")
-{
-  Sampler my_sampler;
-
-  // Setup some weights
-  std::vector<double> weights {0.1, 0.4, 0.3, 0.2};
-
-  int chosen_index = my_sampler.sample(weights);
-
-  // Hopefully chosen index is within range...
-  REQUIRE(chosen_index < 4);
-  REQUIRE(chosen_index > 0);
-
-  int num_samples = 10000;
-  int times_el_3_chosen = 0;
-    // Sample index from function a bunch of times and record
-  for (int i = 0; i < num_samples; ++i)
-  {
-    // Sample from weights and record if we chose the third element
-    if (my_sampler.sample(weights) == 2) times_el_3_chosen++;
-  }
-   
-  double prop_of_el_3 = double(times_el_3_chosen)/double(num_samples);
-
-  // Make sure that the element was chosen roughly as much as it should have
-  // been
-  REQUIRE(
-    Approx(prop_of_el_3).epsilon(0.05) ==
-    weights[2]
-  );
-}
 
 TEST_CASE("Uniform integer sampling", "[Sampler]")
 {  
