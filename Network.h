@@ -118,19 +118,9 @@ public:
   // Returns number of groups removed
   std::vector<NodePtr> clean_empty_groups();
 
-  // Builds a id-id paired map of edge counts between nodes of the same level
-  void gather_edge_counts(int level);
-
   // Set a nodes parent and update edge counts
   void set_node_parent(NodePtr node, NodePtr new_parent);
-
-  // Get reference to edge count map so it can be updated. Second element
-  // in pair is boolean of edge counts needed to be built
-  Edge_Count_Res get_edge_counts(int level);
-  
-  // Update network's internal edge counts map after structure change
-  void update_edge_counts(NodePtr updated_node, NodePtr new_group);
-
+ 
   // Builds a group id from a scaffold for generated new groups
   static string build_group_id(int type, int level, int index);
 };

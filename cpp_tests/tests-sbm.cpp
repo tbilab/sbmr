@@ -51,9 +51,7 @@ TEST_CASE("Calculate Model entropy", "[SBM]")
   // Setup simple SBM model
   SBM my_SBM = build_simple_SBM();
 
-  my_SBM.get_edge_counts(1);
-
-  // Compute full entropy at first level of nodes
+ // Compute full entropy at first level of nodes
   double model_entropy = my_SBM.compute_entropy(0);
 
   // Test entropy is near a hand-calculated value

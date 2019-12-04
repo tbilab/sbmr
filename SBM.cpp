@@ -498,30 +498,6 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
   // Erase the empty groups and metagroups
   auto removed_groups = clean_empty_groups();
 
-  // // Force regathering of edge counts now we're removed groups
-  // // go through all edge counts and remove entries pertaining to 
-  // // any of the just deleted groups
-  // auto level_counts = get_edge_counts(group_level).counts;
-
-  // for (auto edge_it = level_counts->begin();
-  //           edge_it != level_counts->end();
-  //           edge_it++)
-  // {
-  //   NodePtr group_r = (edge_it->first).first;
-  //   NodePtr group_s = (edge_it->first).second;
-
-  //   auto find_in_removed = [removed_groups](NodePtr group) {
-  //     return std::find(
-  //                removed_groups.begin(),
-  //                removed_groups.end(),
-  //                group) == removed_groups.end();
-  //   };
-
-  //   bool contains_removed_group = find_in_removed(group_r) | find_in_removed(group_s);
-
-  //   if (contains_removed_group) level_counts->erase(edge_it);
-  // }
-
   // Return the entropy for new model and merges done
   results.entropy = compute_entropy(group_level - 1);
 
