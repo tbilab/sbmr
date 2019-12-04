@@ -18,5 +18,5 @@ The results should be output with timings etc.
 Code profiling is done in much the same way, just using the script `profiling/run_profiling.sh`. 
 
 The script outputs `profiling/results.json` which can then be loaded into 
-`chrome://tracing` to view the flamegraph of the code exectuion for a agglomerative
+`chrome://tracing` to view the flamegraph of the code execution for a agglomerative
 merging. 
