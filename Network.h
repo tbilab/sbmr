@@ -70,6 +70,10 @@ public:
   // Used to make sure the correct move proposals are made
   std::unordered_set<int> unique_node_types;
 
+  // A map keyed by type to a map keyed by level of node counts
+  std::map<int, std::map<int, int>> node_type_counts;
+
+
   // Methods
   // =========================================================================
   // Export current state of nodes in model

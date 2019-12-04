@@ -114,6 +114,10 @@ NodePtr Network::add_node(const string id,
  
   // Update node types set with new node's type
   unique_node_types.insert(type);
+
+  // Add this node to node counting map
+  node_type_counts[type][level]++;
+
   
   return new_node;
 }; 
@@ -313,6 +317,9 @@ std::vector<NodePtr> Network::clean_empty_groups()
 
         // Add current group to the removal list
         groups_to_delete.push(current_group->id);
+
+        // Remove nodes contribution to node counts map
+        node_type_counts[current_group->type][level]--;
       }
     }
 
@@ -320,9 +327,10 @@ std::vector<NodePtr> Network::clean_empty_groups()
     while (!groups_to_delete.empty())
     {
       group_level->erase(groups_to_delete.front());
+      
       // Remove reference from queue
       groups_to_delete.pop();
-      
+
       // Increment total groups deleted counter
       total_deleted++;
     }
