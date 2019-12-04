@@ -79,9 +79,6 @@ public:
   // Grabs and returns node of specified id, at desired level. 
   NodePtr get_node_by_id(string id, int level = 0);
 
-  // Attempts to find node in network. If node doesn't exist, it will add it.
-  NodePtr find_or_add_node(string id, int level, int type);
-
   // Grabs the first node found at a given level, used in testing.
   NodePtr get_node_from_level(int level);
 

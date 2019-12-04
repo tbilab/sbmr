@@ -57,25 +57,6 @@ NodePtr Network::get_node_by_id(const string desired_id, const int level)
   
 }
 
-// =============================================================================
-// Attempts to find node in network. If node doesn't exist, it will add it.
-// =============================================================================
-NodePtr Network::find_or_add_node(const string id,
-                                  const int level,
-                                  const int type)
-{
-  PROFILE_FUNCTION();
-  LevelPtr node_level = get_level(level);
-
-  // Attempt to find the node in the network
-  auto node_loc = node_level->find(id);
-
-  // If it doesn't exist, build it
-  // If it does exist, just grab it
-  return node_loc == node_level->end() 
-    ? add_node(id, type, level) 
-    : node_loc->second;
-};
 
 // =============================================================================
 // Builds a group id from a scaffold for generated new groups
@@ -401,24 +382,38 @@ void Network::load_from_state(const State_Dump state)
 
   for (int i = 0; i < n; i++)
   {
-    int node_level = state.level[i];
+    int node_type = state.type[i];
+
+    string child_id = state.id[i];
+    int child_level = state.level[i];
+    
     string parent_id = state.parent[i];
+    int parent_level = child_level + 1;
+
+    auto aquire_node = [node_type, this](string node_id, int node_level) {
+      LevelPtr nodes_at_level = get_level(node_level);
+
+      // Attempt to find the node in the network
+      auto node_loc = nodes_at_level->find(node_id);
+
+      if (node_loc == nodes_at_level->end())
+      {
+        return add_node(node_id, node_type, node_level);
+      }
+      else
+      {
+        return node_loc->second;
+      }
+    };
 
     // "none" indicates the highest level has been reached
     if (parent_id == "none") continue;
 
-    // Grab pointer to level for current node
-    LevelPtr all_groups = get_level(node_level + 1);
-
     // Attempt to find the parent node in the network
-    NodePtr parent_node = find_or_add_node(parent_id,
-                                           state.type[i],
-                                           node_level + 1);
+    NodePtr parent_node = aquire_node(parent_id, parent_level);
 
     // Next grab the child node (this one should exist...)
-    NodePtr child_node = find_or_add_node(state.id[i],
-                                          state.type[i],
-                                          node_level);
+    NodePtr child_node = aquire_node(child_id, child_level);
 
     // Assign the parent node to the child node
     child_node->set_parent(parent_node);
