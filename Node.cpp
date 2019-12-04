@@ -1,6 +1,5 @@
 #include "Node.h"
 
-
 // =============================================================================
 // Replace 'this' with a shared smart pointer
 // =============================================================================
@@ -86,6 +85,11 @@ void Node::update_connections_from_node(const NodePtr node, const bool remove)
 void Node::set_parent(NodePtr parent_node_ptr)
 {
   //PROFILE_FUNCTION();
+
+  if(level != parent_node_ptr->level - 1)
+  {
+    throw "Parent node must be one level above child";
+  }
 
   // Remove self from previous parents children list (if it existed)
   if (parent)
