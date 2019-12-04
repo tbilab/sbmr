@@ -5,7 +5,6 @@
 #define __SAMPLER_INCLUDED__
 
 #include <random>
-#include "helpers.h"
 #include "Node.h"
 
 typedef std::mt19937 rand_int_gen;
