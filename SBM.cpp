@@ -68,9 +68,6 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 
   std::map<NodePtr, int> old_group_edges = old_group->gather_connections_to_level(group_level);
  
-  // Initialize edge counts to hold new and old group counts to connected groups
-  EdgeCounts post_move_edge_counts;
-
   // Lambda function to process a pair of groups contribution to edge entropy.
   // Needs to know what group is contributing the pair with moved_is_old_group.
   auto process_group_pair = [&](bool old_group_pair,

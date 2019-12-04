@@ -31,13 +31,6 @@ std::string print_node_ids(std::vector<NodePtr>);
 std::string print_node_ids(std::map<std::string, NodePtr>);
 
 
-// ============================================================================
-// Builds an alphabetical pair of node ids for looking up edges between groups.
-// Insures order doesn't matter for EdgeCount key pair 
-// ============================================================================
-// std::pair<string, string> find_edges(string, string);
-std::pair<NodePtr, NodePtr> find_edges(NodePtr, NodePtr);
-
 
 // ============================================================================
 // Normalizes a vector of doubles so all elements sum to 1 
