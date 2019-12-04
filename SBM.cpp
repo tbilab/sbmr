@@ -62,14 +62,11 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 
   // Gather connection maps for the node and its moved groups as these will have
   // changes in their entropy contribution
-  std::map<NodePtr, int> node_edges = node->
-    gather_connections_to_level(group_level);
+  std::map<NodePtr, int> node_edges = node->gather_connections_to_level(group_level);
 
-  std::map<NodePtr, int> new_group_edges = new_group->
-    gather_connections_to_level(group_level);
+  std::map<NodePtr, int> new_group_edges = new_group->gather_connections_to_level(group_level);
 
-  std::map<NodePtr, int> old_group_edges = old_group->
-    gather_connections_to_level(group_level);
+  std::map<NodePtr, int> old_group_edges = old_group->gather_connections_to_level(group_level);
  
   // Initialize edge counts to hold new and old group counts to connected groups
   EdgeCounts post_move_edge_counts;
@@ -100,12 +97,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     
     // Neighbor node degree
     double neighbor_degree = neighbor_group->degree;
-    
-    // Record edge counts for after move for pair
-    post_move_edge_counts.emplace(
-      find_edges(old_group_pair ? old_group: new_group, neighbor_group),
-      edge_count_post
-    );
+
     
     // Calculate entropy contribution pre move 
     entropy_pre += edge_count_pre > 0 ?
@@ -120,7 +112,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
       0;
   };
 
-  // Loop through and calculate the ntropy contribution for each pair of 
+  // Loop through and calculate the entropy contribution for each pair of 
   // old group - neighbor
   for(auto con_group_it = old_group_edges.begin(); 
            con_group_it != old_group_edges.end(); 
@@ -142,8 +134,6 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   double pre_move_prob = 0.0;
   double post_move_prob = 0.0;
   
-  auto edge_counts = get_edge_counts(new_group->level).counts;
-
   // Loop over all the node's connections to neighbor groups
   for(auto con_group_it = node_edges.begin(); 
            con_group_it != node_edges.end(); 
@@ -155,17 +145,13 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     double e_it = con_group_it->second;
     
     // Edges from new group to t pre move...
-    double e_new_t_pre = (*edge_counts)[
-      find_edges(old_group, group_t)
-    ];
-    
+    double new_to_t_edges = old_group_edges[group_t];
+ 
     // Edges from old group to t post move...
-    double e_old_t_post = post_move_edge_counts[
-      find_edges(new_group, group_t)
-    ];
+    double old_to_t_edges = new_group_edges[group_t];
     
-    pre_move_prob  += e_new_t_pre + EPS;
-    post_move_prob += e_old_t_post + EPS;
+    pre_move_prob  += new_to_t_edges + EPS;
+    post_move_prob += old_to_t_edges + EPS;
   }
 
   // Now we can clean up all the calculations into to entropy delta and the 
