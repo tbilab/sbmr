@@ -33,16 +33,6 @@ typedef std::map<string, NodePtr> NodeLevel;
 typedef std::shared_ptr<NodeLevel> LevelPtr;
 typedef std::map<int, LevelPtr> LevelMap;
 
-typedef std::map<std::pair<NodePtr, NodePtr>, int> EdgeCounts;
-typedef std::shared_ptr<EdgeCounts> EdgeCountPtr;
-
-struct Edge_Count_Res {
-  EdgeCountPtr counts;
-  bool was_built;
-  Edge_Count_Res(EdgeCountPtr ec, bool built):
-    counts(ec),
-    was_built(built){}
-};
 
 using std::string;
 
@@ -63,12 +53,9 @@ public:
   // A map keyed by level integer of each level of nodes
   LevelMap nodes;
 
-  // A map keyed by level with the node to node edge counts for that level
-  std::unordered_map<int, EdgeCountPtr> edge_count_maps;
-  
-  // Vector storing all the unique types of nodes seen.
-  // Used to make sure the correct move proposals are made
-  std::unordered_set<int> unique_node_types;
+  // A map keyed by type to a map keyed by level of node counts
+  std::map<int, std::map<int, int>> node_type_counts;
+
 
   // Methods
   // =========================================================================
@@ -118,19 +105,9 @@ public:
   // Returns number of groups removed
   std::vector<NodePtr> clean_empty_groups();
 
-  // Builds a id-id paired map of edge counts between nodes of the same level
-  void gather_edge_counts(int level);
-
   // Set a nodes parent and update edge counts
   void set_node_parent(NodePtr node, NodePtr new_parent);
-
-  // Get reference to edge count map so it can be updated. Second element
-  // in pair is boolean of edge counts needed to be built
-  Edge_Count_Res get_edge_counts(int level);
-  
-  // Update network's internal edge counts map after structure change
-  void update_edge_counts(NodePtr updated_node, NodePtr new_group);
-
+ 
   // Builds a group id from a scaffold for generated new groups
   static string build_group_id(int type, int level, int index);
 };

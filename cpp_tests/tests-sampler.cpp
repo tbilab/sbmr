@@ -6,26 +6,6 @@
 #include "../helpers.h"
 
 
-TEST_CASE("Vector Normalization", "[Sampler]")
-{
-  double tol = 0.01;
-  // Setup generator
-  Sampler my_sampler;
-  
-  // Sample vector
-  std::vector<double> vec_raw = {1.0, 2.0, 3.0, 4.0};
-  
-  // Normalize vector
-  std::vector<double> vec_norm = normalize_vector(vec_raw);
-  
-  REQUIRE(vec_norm.size() == vec_raw.size());
-
-  REQUIRE(vec_norm[0] == Approx(0.1).epsilon(tol));
-  REQUIRE(vec_norm[1] == Approx(0.2).epsilon(tol));
-  REQUIRE(vec_norm[2] == Approx(0.3).epsilon(tol));
-  REQUIRE(vec_norm[3] == Approx(0.4).epsilon(tol));
-}
-
 TEST_CASE("Setting Seeds", "[Sampler]")
 {  
   // Setup multuple generators with same seed
@@ -57,37 +37,6 @@ TEST_CASE("Lots of Samples", "[Sampler]")
   REQUIRE(max_draw < 1.0);
 }
 
-TEST_CASE("Drawing from weighted vector", "[Sampler]")
-{
-  Sampler my_sampler;
-
-  // Setup some weights
-  std::vector<double> weights {0.1, 0.4, 0.3, 0.2};
-
-  int chosen_index = my_sampler.sample(weights);
-
-  // Hopefully chosen index is within range...
-  REQUIRE(chosen_index < 4);
-  REQUIRE(chosen_index > 0);
-
-  int num_samples = 10000;
-  int times_el_3_chosen = 0;
-    // Sample index from function a bunch of times and record
-  for (int i = 0; i < num_samples; ++i)
-  {
-    // Sample from weights and record if we chose the third element
-    if (my_sampler.sample(weights) == 2) times_el_3_chosen++;
-  }
-   
-  double prop_of_el_3 = double(times_el_3_chosen)/double(num_samples);
-
-  // Make sure that the element was chosen roughly as much as it should have
-  // been
-  REQUIRE(
-    Approx(prop_of_el_3).epsilon(0.05) ==
-    weights[2]
-  );
-}
 
 TEST_CASE("Uniform integer sampling", "[Sampler]")
 {  

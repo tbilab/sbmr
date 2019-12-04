@@ -5,7 +5,6 @@
 #define __SAMPLER_INCLUDED__
 
 #include <random>
-#include "helpers.h"
 #include "Node.h"
 
 typedef std::mt19937 rand_int_gen;
@@ -57,9 +56,6 @@ public:
 
   // Sample random node from vector of nodes
   NodePtr sample(std::vector<NodePtr> nodes_to_sample);  
-
-  // Sample an index from a vector of weights
-  int sample(std::vector<double> const &weights); 
 };
 
 #endif

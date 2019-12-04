@@ -58,7 +58,7 @@ TEST_CASE("Basic initialization of network", "[Network]")
   REQUIRE(my_net.nodes.size() == 2);
   
   // There should be two types of print_node_ids(*my_net.nodes.at(0))nodes
-  REQUIRE(my_net.unique_node_types.size() == 2);
+  REQUIRE(my_net.node_type_counts.size() == 2);
 }
 
 TEST_CASE("Tracking node types", "[Network]")
@@ -70,25 +70,25 @@ TEST_CASE("Tracking node types", "[Network]")
   my_net.add_node("n2", 0);
   
   // There should only be one type of node so far
-  REQUIRE(1 ==  my_net.unique_node_types.size());
+  REQUIRE(1 ==  my_net.node_type_counts.size());
   
   my_net.add_node("m1", 1);
   
   // There should now be two types of nodes
-  REQUIRE(2 == my_net.unique_node_types.size());
+  REQUIRE(2 == my_net.node_type_counts.size());
   
   my_net.add_node("m2", 1);
   my_net.add_node("n3", 0);
   
   // There should still just be two types of nodes
-  REQUIRE(2 == my_net.unique_node_types.size());
+  REQUIRE(2 == my_net.node_type_counts.size());
   
   my_net.add_node("m3", 1);
   my_net.add_node("o1", 2);
   my_net.add_node("o2", 2);
   
   // There should now be three types of nodes
-  REQUIRE(3 == my_net.unique_node_types.size());
+  REQUIRE(3 == my_net.node_type_counts.size());
 }
 
 
@@ -192,19 +192,24 @@ TEST_CASE("Cleaning up empty groups", "[Network]")
 }
 
 
-TEST_CASE("Building an edge count map", "[Network]")
+
+TEST_CASE("Counting edges", "[Network]")
 {
     Network my_net;
+
 
     // Base-level nodes
     NodePtr a1 = my_net.add_node("a1", 0);
     NodePtr a2 = my_net.add_node("a2", 0);
     NodePtr a3 = my_net.add_node("a3", 0);
     NodePtr a4 = my_net.add_node("a4", 0);
+    NodePtr a5 = my_net.add_node("a5", 0);
+
     NodePtr b1 = my_net.add_node("b1", 1);
     NodePtr b2 = my_net.add_node("b2", 1);
     NodePtr b3 = my_net.add_node("b3", 1);
     NodePtr b4 = my_net.add_node("b4", 1);
+    NodePtr b5 = my_net.add_node("b5", 1);
 
     // level one groups
     NodePtr a11 = my_net.add_node("a11", 0, 1);
@@ -218,134 +223,155 @@ TEST_CASE("Building an edge count map", "[Network]")
     NodePtr a21 = my_net.add_node("a21", 0, 2);
     NodePtr a22 = my_net.add_node("a22", 0, 2);
     NodePtr b21 = my_net.add_node("b21", 1, 2);
+    NodePtr b22 = my_net.add_node("b22", 1, 2);
+
 
     // Add connections
     my_net.add_connection(a1, b1);
     my_net.add_connection(a1, b2);
 
     my_net.add_connection(a2, b1);
-    my_net.add_connection(a2, b2);
     my_net.add_connection(a2, b3);
-    my_net.add_connection(a2, b4);
+    my_net.add_connection(a2, b5);
 
-    my_net.add_connection(a3, b1);
     my_net.add_connection(a3, b2);
-    my_net.add_connection(a3, b3);
+   
 
-    my_net.add_connection(a4, b1);
-    my_net.add_connection(a4, b3);
+    my_net.add_connection(a4, b4);
+    my_net.add_connection(a4, b5);
+
+    my_net.add_connection(a5, b3);
 
     // Set hierarchy
 
     // Nodes -> level 1
     a1->set_parent(a11);
+
     a2->set_parent(a12);
     a3->set_parent(a12);
+
     a4->set_parent(a13);
+    a5->set_parent(a13);
+    
     b1->set_parent(b11);
     b2->set_parent(b11);
+
     b3->set_parent(b12);
+
     b4->set_parent(b13);
+    b5->set_parent(b13);
 
     // level 1 -> level 2
     a11->set_parent(a21);
-    a12->set_parent(a22);
+    a12->set_parent(a21);
     a13->set_parent(a22);
+
     b11->set_parent(b21);
     b12->set_parent(b21);
-    b13->set_parent(b21);
+    b13->set_parent(b22);
 
     // Make sure our network is the proper size
+
+    // There should be three total layers...
     REQUIRE(3 == my_net.nodes.size());
-    REQUIRE(8 == my_net.nodes.at(0)->size());
+    REQUIRE(3 == my_net.node_type_counts[0].size());
+
+    // 10 nodes at first level...
+    REQUIRE(10 == my_net.nodes.at(0)->size());
     REQUIRE(6 == my_net.nodes.at(1)->size());
-    REQUIRE(3 == my_net.nodes.at(2)->size());
+    REQUIRE(4 == my_net.nodes.at(2)->size());
 
-    // Build the network connection map for first level
-    auto l1_edges = my_net.get_edge_counts(1).counts;
 
-    // The edge count map should have 6 non-empty entries 
-    REQUIRE(6 == l1_edges->size());
+    // Make sure node degrees are correct
+    REQUIRE(a11->degree == 2);
+    REQUIRE(a12->degree == 4);
+    REQUIRE(a13->degree == 3);
+    REQUIRE(b11->degree == 4);
+    REQUIRE(b12->degree == 2);
+    REQUIRE(b13->degree == 3);
+
+    REQUIRE(a21->degree == 6);
+    REQUIRE(a22->degree == 3);
+    REQUIRE(b21->degree == 6);
+    REQUIRE(b22->degree == 3);
+
 
     // Check num edges between groups
-    REQUIRE((*l1_edges)[find_edges(a11, b11)] == 2);
-    REQUIRE((*l1_edges)[find_edges(a11, b12)] == 0);
-    REQUIRE((*l1_edges)[find_edges(a11, b13)] == 0);
-    REQUIRE((*l1_edges)[find_edges(a12, b11)] == 4);
-    REQUIRE((*l1_edges)[find_edges(a12, b12)] == 2);
-    REQUIRE((*l1_edges)[find_edges(a12, b13)] == 1);
-    REQUIRE((*l1_edges)[find_edges(a13, b11)] == 1);
-    REQUIRE((*l1_edges)[find_edges(a13, b12)] == 1);
-    REQUIRE((*l1_edges)[find_edges(a13, b13)] == 0);
+    auto a11_edges = a11->gather_connections_to_level(1);
+    REQUIRE(a11_edges[b11] == 2);
+    REQUIRE(a11_edges[b12] == 0);
+    REQUIRE(a11_edges[b13] == 0);
+
+    auto a12_edges = a12->gather_connections_to_level(1);
+    REQUIRE(a12_edges[b11] == 2);
+    REQUIRE(a12_edges[b12] == 1);
+    REQUIRE(a12_edges[b13] == 1);
+
+    auto a13_edges = a13->gather_connections_to_level(1);
+    REQUIRE(a13_edges[b11] == 0);
+    REQUIRE(a13_edges[b12] == 1);
+    REQUIRE(a13_edges[b13] == 2);
 
     // Direction shouldn't matter
-    REQUIRE(
-        (*l1_edges)[find_edges(a11, b11)] == 
-        (*l1_edges)[find_edges(b11, a11)]);
+    REQUIRE(a11->gather_connections_to_level(1)[b11] ==
+            b11->gather_connections_to_level(1)[a11]);
 
-    REQUIRE(
-        (*l1_edges)[find_edges(a11, b12)] ==
-        (*l1_edges)[find_edges(b12, a11)]);
-
-    REQUIRE(
-        (*l1_edges)[find_edges(a11, b13)] ==
-        (*l1_edges)[find_edges(b13, a11)]);
-
-    REQUIRE(
-        (*l1_edges)[find_edges(a12, b11)] ==
-        (*l1_edges)[find_edges(b11, a12)]);
-
-    REQUIRE(
-        (*l1_edges)[find_edges(a12, b12)] ==
-        (*l1_edges)[find_edges(b12, a12)]);
-
-    REQUIRE(
-        (*l1_edges)[find_edges(a12, b13)] ==
-        (*l1_edges)[find_edges(b13, a12)]);
-
-    REQUIRE(
-        (*l1_edges)[find_edges(a13, b11)] ==
-        (*l1_edges)[find_edges(b11, a13)]);
-
-    REQUIRE(
-        (*l1_edges)[find_edges(a13, b12)] ==
-        (*l1_edges)[find_edges(b12, a13)]);
-
-    REQUIRE(
-        (*l1_edges)[find_edges(a13, b13)] ==
-        (*l1_edges)[find_edges(b13, a13)]);
+    // Direction shouldn't matter
+    REQUIRE(a11->gather_connections_to_level(1)[b12] ==
+            b12->gather_connections_to_level(1)[a11]);
 
     // Repeat for level 2
-    auto l2_edges = my_net.get_edge_counts(2).counts;
+    auto a21_edges = a21->gather_connections_to_level(2);
+    REQUIRE(a21_edges[b21] == 5);
+    REQUIRE(a21_edges[b22] == 1);
 
-    // Check num edges between groups
-    REQUIRE((*l2_edges)[find_edges(a22, b21)] == 9);
-
-
-    // Now we will change the group for a node and make sure the changes are
-    // updated properly with the update_edge_counts() function
-
-    // Change a3's parent from a12 to a13.
+    auto a22_edges = a22->gather_connections_to_level(2);
+    REQUIRE(a22_edges[b21] == 1);
+    REQUIRE(a22_edges[b22] == 2);
+  
+  
+    // Now we will change the group for a node and make sure the changes are properly detected
 
     // Update the level 1 edge counts
-    my_net.update_edge_counts(a3, a13);
     a3->set_parent(a13);
 
-    // Make sure that the needed change were made to a12's connections:
-    REQUIRE((*l1_edges)[find_edges(a12, b11)] == 2);
-    REQUIRE((*l1_edges)[find_edges(a12, b12)] == 1);
-    REQUIRE((*l1_edges)[find_edges(a12, b13)] == 1);
+    // Make sure node degrees are correct
+    REQUIRE(a11->degree == 2);
+    REQUIRE(a12->degree == 3);
+    REQUIRE(a13->degree == 4);
+    REQUIRE(b11->degree == 4);
+    REQUIRE(b12->degree == 2);
+    REQUIRE(b13->degree == 3);
 
-    // And to a13's as well...
-    REQUIRE((*l1_edges)[find_edges(a13, b11)] == 3);
-    REQUIRE((*l1_edges)[find_edges(a13, b12)] == 2);
-    REQUIRE((*l1_edges)[find_edges(a13, b13)] == 0);
+    REQUIRE(a21->degree == 5);
+    REQUIRE(a22->degree == 4);
+    REQUIRE(b21->degree == 6);
+    REQUIRE(b22->degree == 3);
 
+        // Check num edges between groups
+    auto a11_edges_new = a11->gather_connections_to_level(1);
+    REQUIRE(a11_edges_new[b11] == 2);
+    REQUIRE(a11_edges_new[b12] == 0);
+    REQUIRE(a11_edges_new[b13] == 0);
 
-    // Nothing should have changed for the level 2 connections
-    // Check num edges between groups
-    REQUIRE((*l2_edges)[find_edges(a21, b21)] == 2);
-    REQUIRE((*l2_edges)[find_edges(a22, b21)] == 9);
+    auto a12_edges_new = a12->gather_connections_to_level(1);
+    REQUIRE(a12_edges_new[b11] == 1);
+    REQUIRE(a12_edges_new[b12] == 1);
+    REQUIRE(a12_edges_new[b13] == 1);
+
+    auto a13_edges_new = a13->gather_connections_to_level(1);
+    REQUIRE(a13_edges_new[b11] == 1);
+    REQUIRE(a13_edges_new[b12] == 1);
+    REQUIRE(a13_edges_new[b13] == 2);
+
+    // Repeat for level 2
+    auto a21_edges_new = a21->gather_connections_to_level(2);
+    REQUIRE(a21_edges_new[b21] == 4);
+    REQUIRE(a21_edges_new[b22] == 1);
+
+    auto a22_edges_new = a22->gather_connections_to_level(2);
+    REQUIRE(a22_edges_new[b21] == 2);
+    REQUIRE(a22_edges_new[b22] == 2);
 }
 
 

@@ -87,30 +87,5 @@ NodePtr Sampler::sample(std::vector<NodePtr> node_vec)
   return node_vec.at(random_index);
 }
 
-// =============================================================================
-// Choose an index of a vector of weights based with probability proportional to
-// those weights
-// =============================================================================
-int Sampler::sample(std::vector<double> const &weights) 
-{
-  // Make sure weights sum to 1
-  std::vector<double> weights_norm = normalize_vector(weights);
-
-  // Draw a random uniform value
-  double random_value = draw_unif();
-
-  double current_sum = 0;
-  int current_pos;
-
-  // Scan up through weights, stopping when the current sum passes drawn value
-  for (current_pos = 0; current_pos < weights_norm.size(); ++current_pos) {
-    current_sum += weights_norm[current_pos];
-
-    // If we've gone over the random value then we're done
-    if (current_sum >= random_value) break;
-  }
-
-  return current_pos;
-}
 
 
