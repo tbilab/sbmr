@@ -271,7 +271,6 @@ double SBM::compute_entropy(const int level)
   //============================================================================
   // First, calc the number of total edges and build a degree->num nodes map
   
-  std::cout << "Starting entropy calculation..." << std::endl;
   // Build map of number of nodes with given degree
   std::map<int, int> n_nodes_w_degree;
 
@@ -309,46 +308,40 @@ double SBM::compute_entropy(const int level)
   }
   
   //============================================================================
-  // Last, we calculate the summation of e_rs*ln(e_rs/e_r*e_s) where e_rs is
+  // Last, we calculate the summation of e_rs*ln(e_rs/e_r*e_s)/2 where e_rs is
   // number of connections between groups r and s and e_r is the total number of
-  // edges for group r. Note that we dont divide this edge_entropy by 2 because
-  // we already accounted for repeats of edges by building a unique-pairs-only
-  // map of edges between groups
-  EdgeCountPtr level_edges = get_edge_counts(level + 1).counts;
+  // edges for group r.
 
-  double edge_entropy = 0.0;
+  // Grab all group nodes
+  auto group_level = get_level(level + 1);
   
-  for (auto edge_it  = level_edges->begin(); 
-            edge_it != level_edges->end(); 
-            edge_it++)
-  {
-    NodePtr group_r = (edge_it->first).first;
-    NodePtr group_s = (edge_it->first).second;  
-    
-    // Grab needed counts and convert to doubles
-    double e_rs = edge_it->second;
-    double e_r = group_r->degree;
-    double e_s = group_s->degree;
-    
-    std::cout <<  group_r->id << " - " << group_s->id 
-              << "|  e_rs: " << e_rs 
-              << ", e_r: " << group_r->degree 
-              << ", e_s: " << group_s->degree << std::endl;
-    
-    // Check to make sure we don't try and take the log of zero. Also the
-    // component of the addition will be turned to zero by the multiplication by
-    // zero anyways so no need to attempt to add it
-    if ((e_rs == 0) | (e_r == 0) | (e_s == 0)) continue;
-    
+  double edge_entropy = 0.0;
 
-    // Compute this iteration's controbution to sum
-    edge_entropy += e_rs * log(e_rs/(e_r*e_s));
-  }
+  // Full loop over all group nodes
+  for (auto group_r_it = group_level->begin();
+       group_r_it != group_level->end();
+       group_r_it++)
+  {
+    NodePtr group_r = group_r_it->second;
+    // Gather all of group r's connections to our level
+    auto group_r_edge_counts = group_r->gather_connections_to_level(level + 1);
+
+    // Now loop over all the nodes connected to group r
+    for (auto group_s_it = group_r_edge_counts.begin();
+         group_s_it != group_r_edge_counts.end();
+         group_s_it++)
+    {
+      // Grab total number of connections between r and s
+      double e_rs = group_s_it->second;
+
+      // Compute this iteration's controbution to sum
+      edge_entropy += e_rs * log(e_rs / double(group_r->degree * group_s_it->first->degree));
+    } // end group s loop
+  }   // end group r loop
 
   // Add three components together to return
-  return -1 * (n_total_edges + degree_summation + edge_entropy);
+  return -1 * (n_total_edges + degree_summation + edge_entropy / 2);
 }
-
 
 // =============================================================================
 // Merge two groups, placing all nodes that were under group_b under group_a and 
