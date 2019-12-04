@@ -34,12 +34,12 @@ int main(int argc, char **argv)
   my_SBM.add_connection(a3, b2);
 
 
-  my_SBM.set_node_parent(a2, a11);
-  my_SBM.set_node_parent(a1, a11);
-  my_SBM.set_node_parent(b1, b11);
-  my_SBM.set_node_parent(a3, a12);
-  my_SBM.set_node_parent(b3, b12);
-  my_SBM.set_node_parent(b2, b11);
+  a2->set_parent(a11);
+  a1->set_parent(a11);
+  b1->set_parent(b11);
+  a3->set_parent(a12);
+  b3->set_parent(b12);
+  b2->set_parent(b11);
 
 
 

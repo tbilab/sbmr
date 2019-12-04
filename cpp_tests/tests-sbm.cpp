@@ -76,7 +76,7 @@ TEST_CASE("Calculate Model entropy", "[SBM]")
 
   // Now we will actually move the desired node and test to see if entropy has changed
   // Move node
-  my_SBM.set_node_parent(node_to_move, to_group);
+  node_to_move->set_parent(to_group);
 
   // Recalculate entropy
   double new_entropy = my_SBM.compute_entropy(0);

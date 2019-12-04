@@ -334,17 +334,6 @@ std::vector<NodePtr> Network::clean_empty_groups()
 }                     
 
 
-// =============================================================================
-// Set a nodes parent and update edge counts
-// =============================================================================
-void Network::set_node_parent(NodePtr node, NodePtr new_parent)
-{
-  PROFILE_FUNCTION();
-
-  // Tell the node to move
-  node->set_parent(new_parent);
-}
-
 
 
 // =============================================================================

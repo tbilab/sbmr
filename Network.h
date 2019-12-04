@@ -104,9 +104,7 @@ public:
   // Returns number of groups removed
   std::vector<NodePtr> clean_empty_groups();
 
-  // Set a nodes parent and update edge counts
-  void set_node_parent(NodePtr node, NodePtr new_parent);
- 
+
   // Builds a group id from a scaffold for generated new groups
   static string build_group_id(int type, int level, int index);
 };

@@ -206,7 +206,7 @@ int SBM::mcmc_sweep(const int level, const bool variable_num_groups)
     if (move_accepted) 
     {   
       // Move the node
-      set_node_parent(curr_node, proposed_new_group);
+      curr_node->set_parent(proposed_new_group);
       
       num_changes++;
     }
@@ -320,7 +320,7 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
 
   for (NodePtr member_node : children_to_move)
   {
-    set_node_parent(member_node, group_a);
+    member_node->set_parent(group_a);
   }
 }  
 
