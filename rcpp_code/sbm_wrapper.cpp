@@ -49,8 +49,9 @@ public:
     return SBM::compute_entropy(level);
   }
 
-  int mcmc_sweep(const int level, const bool variable_num_groups)
+  int mcmc_sweep(int level, bool variable_num_groups)
   {
+    std::cout << "Running rcpp_SBM mcmc function" << std::endl;
     return SBM::mcmc_sweep(level, variable_num_groups);
   }
 
@@ -129,7 +130,7 @@ RCPP_MODULE(sbm_module)
                 "If not in greedy mode, how many options do we check per node for moves in agglomerative merging?")
 
       .method("add_node",
-              &Rcpp_SBM::add_node)
+              &Rcpp_SBM::add_node) 
       .method("add_connection",
               &Rcpp_SBM::add_connection)
       .method("set_node_parent",
@@ -184,23 +185,42 @@ load_state <- function(sbm, state_dump){
     state_dump$type)
 }
 
-original_state <- sbm$get_state()
-
-sbm$compute_entropy(0L)
-
 # Set some model parameters
 sbm$GREEDY <- TRUE
 sbm$BETA <- 1.5
 sbm$EPS <- 0.1
 sbm$N_CHECKS_PER_GROUP <- 5
 
-init_results <- sbm$collapse_groups(0, 15)
+original_state <- sbm$get_state()
 
+# for(i in 1:10){
+#   entro_pre <- sbm$compute_entropy(0L)
+#   groups_moved <- sbm$mcmc_sweep(0L,FALSE)
+#   print(paste("started with entropy of", entro_pre, "and moved", groups_moved))
+# }
+# 
+# new_state <- sbm$get_state()
+# 
+# # Bring me back to original state
+# load_state(sbm, original_state)
+
+library(tidyverse)
+merge_results <- sbm$collapse_groups(0, 15)
+load_state(sbm, original_state)
+new_state <- sbm$get_state()
+
+sort_state <- . %>%  arrange(level, type, id)
+original_state %>% sort_state()
+new_state %>% sort_state()
+
+# 
+# 
 # desired_state <- init_results[[1]]$state
-# sbm$load_from_state(desired_state$id, desired_state$parent, desired_state$level, desired_state$type)
-
-
-# sbm$mcmc_sweep(0,FALSE,0.1,1.5)
+# 
+# sbm$get_state()
+# load_state(sbm, original_state)
+# sbm$get_state()
+# sbm$mcmc_sweep(0L,FALSE)
 # sbm$mcmc_sweep(0L,FALSE)
 # sbm$compute_entropy(0L)
 
