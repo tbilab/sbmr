@@ -279,7 +279,9 @@ double SBM::compute_entropy(const int level)
   {
     int k = degree_count->first;
     int num_nodes = degree_count->second;
-    degree_summation += num_nodes * log_factorial(k);
+
+    // Using std's built in lgamma here: lgamma(x + 1) = log(x!)
+    degree_summation += num_nodes * lgamma(k+1);
   }
   
   //============================================================================

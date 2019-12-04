@@ -3,13 +3,16 @@
 // ============================================================================
 // Takes a vector of node ids and returns a string of them pasted together
 // ============================================================================
-std::string print_ids_to_string(std::vector<std::string> node_ids) {
+inline std::string print_ids_to_string(std::vector<std::string> node_ids) {
   
   // Sort vector of id strings
   std::sort(node_ids.begin(), node_ids.end());
   
   // Final string that will be filled in
-  std::string node_id_string = "";
+  std::string node_id_string;
+
+  // A rough guess at how big the result will be
+  node_id_string.reserve(node_ids.size() * 5);
   
   // Dump vector of id strings to one big string
   for (auto node_id_it  = node_ids.begin(); 
@@ -129,37 +132,9 @@ std::vector<double> normalize_vector(std::vector<double> const &vec)
     normalized_vec.push_back(*el/weights_sum);
   }
 
-  
   return normalized_vec;
 }
 
-
-
-// ============================================================================
-// Compute's factorial of number by recursion
-// ============================================================================
-int factorial(int n)
-{
-  return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
-}
-
-// Calculate ln(n!), uses stirling's approximation if n is big
-double log_factorial(int N)
-{
-  int cutoff_for_stirling = 8;
-
-  if (N < cutoff_for_stirling)
-  {
-    return log(factorial(N));
-  }
-  else
-  {
-    double n = N;
-    double half_log_2_pi = 0.9189385;
-
-    return ((n + 0.5) * log(n)) - n + half_log_2_pi;
-  }
-}
 
 // Gets average of the last n elements for a paseed vector of integers
 inline float avg_last_n(std::vector<int> vec, int n)
