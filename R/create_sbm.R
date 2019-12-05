@@ -48,18 +48,23 @@ create_sbm <- function(edges, nodes = NULL, from_col = "from", to_col = "to"){
     }
   }
 
+  # Instantiate instance of sbm class
+  sbm <- new(SBM)
 
+  # Fill in all the needed nodes
+  for(i in 1:nrow(model_nodes)){
+    sbm$add_node(model_nodes$id[i], model_nodes$type[i], 0L)
+  }
 
-#
-#
-#
-#   # Instantiate instance of sbm class
-#   SBM <- new(Rcpp_SBM)
-#
-#   # Add each node to the class
-#
-#   sbm$add_node("a1", 0L, 0L)
+  # Connect all the nodes
+  for(i in 1:nrow(edges)){
+    sbm$add_connection(
+      edges[[from_col]][i],
+      edges[[to_col]][i]
+    )
+  }
 
-
+  # Temporarily return model state
+  sbm$get_state()
 
 }

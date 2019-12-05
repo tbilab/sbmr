@@ -4,8 +4,8 @@
 #'
 #' Imports
 #' @useDynLib sbmR, .registration = TRUE
-#' @export Rcpp_SBM
+#' @export SBM
 #' @importFrom Rcpp loadModule
 "_PACKAGE"
 
-Rcpp::loadModule("Rcpp_SBM", TRUE)
+Rcpp::loadModule("SBM", TRUE)

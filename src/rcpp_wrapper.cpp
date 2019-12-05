@@ -106,8 +106,7 @@ public:
 
   void set_node_parent(const std::string child_id,
                        const std::string parent_id,
-                       const int level = 0,
-                       const bool building_network = false)
+                       const int level = 0)
   {
     get_node_by_id(child_id, level)->set_parent(get_node_by_id(parent_id, level + 1));
   }
@@ -195,9 +194,9 @@ public:
   int get_n_checks_per_group() { return N_CHECKS_PER_GROUP; }
 };
 
-RCPP_MODULE(Rcpp_SBM)
+RCPP_MODULE(SBM)
 {
-  class_<Rcpp_SBM>("Rcpp_SBM")
+  class_<Rcpp_SBM>("SBM")
 
       .constructor()
 
@@ -240,7 +239,7 @@ RCPP_MODULE(Rcpp_SBM)
 }
 
 /*** R
-sbm <- new(Rcpp_SBM)
+sbm <- new(SBM)
 
 sbm$add_node("a1", "a", 0)
 sbm$add_node("a2", "a", 0)
@@ -252,52 +251,44 @@ sbm$add_node("b3", "b", 0)
 
 sbm$get_state()
 
-# sbm$add_node("a11", 0L, 1L)
-# sbm$add_node("a12", 0L, 1L)
-# sbm$add_node("b11", 1L, 1L)
-# sbm$add_node("b12", 1L, 1L)
-#
-# sbm$add_connection("a1", "b1")
-# sbm$add_connection("a1", "b2")
-# sbm$add_connection("a1", "b3")
-# sbm$add_connection("a2", "b3")
-# sbm$add_connection("a3", "b2")
-#
-#
-# sbm$set_node_parent("a1", "a11", 0, TRUE)
-# sbm$set_node_parent("a2", "a11", 0, TRUE)
-# sbm$set_node_parent("a3", "a12", 0, TRUE)
-# sbm$set_node_parent("b1", "b11", 0, TRUE)
-# sbm$set_node_parent("b2", "b11", 0, TRUE)
-# sbm$set_node_parent("b3", "b12", 0, TRUE)
-#
-#
-# load_state <- function(sbm, state_dump){
-#   sbm$load_from_state(
-#     state_dump$id,
-#     state_dump$parent,
-#     state_dump$level,
-#     state_dump$type)
-# }
-#
-# # Set some model parameters
-# sbm$GREEDY <- TRUE
-# sbm$BETA <- 1.5
-# sbm$EPS <- 0.1
-# sbm$N_CHECKS_PER_GROUP <- 5
-#
-# original_state <- sbm$get_state()
-#
-# # for(i in 1:10){
-# #   entro_pre <- sbm$compute_entropy(0L)
-# #   groups_moved <- sbm$mcmc_sweep(0L,FALSE)
-# #   print(paste("started with entropy of", entro_pre, "and moved", groups_moved))
-# # }
-# #
-# # new_state <- sbm$get_state()
-# #
-# # # Bring me back to original state
-# # load_state(sbm, original_state)
+sbm$add_node("a11", "a", 1L)
+sbm$add_node("a12", "a", 1L)
+sbm$add_node("b11", "b", 1L)
+sbm$add_node("b12", "b", 1L)
+
+sbm$add_connection("a1", "b1")
+sbm$add_connection("a1", "b2")
+sbm$add_connection("a1", "b3")
+sbm$add_connection("a2", "b3")
+sbm$add_connection("a3", "b2")
+
+
+sbm$set_node_parent("a1", "a11", 0)
+sbm$set_node_parent("a2", "a11", 0)
+sbm$set_node_parent("a3", "a12", 0)
+sbm$set_node_parent("b1", "b11", 0)
+sbm$set_node_parent("b2", "b11", 0)
+sbm$set_node_parent("b3", "b12", 0)
+
+
+# Set some model parameters
+sbm$GREEDY <- TRUE
+sbm$BETA <- 1.5
+sbm$EPS <- 0.1
+sbm$N_CHECKS_PER_GROUP <- 5
+
+original_state <- sbm$get_state()
+
+for(i in 1:10){
+  entro_pre <- sbm$compute_entropy(0L)
+  groups_moved <- sbm$mcmc_sweep(0L,FALSE)
+  print(paste("started with entropy of", entro_pre, "and moved", groups_moved))
+}
+
+new_state <- sbm$get_state()
+
+# Bring me back to original state
+# load_state(sbm, original_state)
 #
 # library(tidyverse)
 # merge_results <- sbm$collapse_groups(0, 15)

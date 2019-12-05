@@ -6,10 +6,10 @@
 using namespace Rcpp;
 
 
-RcppExport SEXP _rcpp_module_boot_Rcpp_SBM();
+RcppExport SEXP _rcpp_module_boot_SBM();
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_rcpp_module_boot_Rcpp_SBM", (DL_FUNC) &_rcpp_module_boot_Rcpp_SBM, 0},
+    {"_rcpp_module_boot_SBM", (DL_FUNC) &_rcpp_module_boot_SBM, 0},
     {NULL, NULL, 0}
 };
 

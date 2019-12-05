@@ -10,12 +10,9 @@
 #'
 #' @examples
 load_state <- function(sbm, state_dump){
-
   sbm$load_from_state(
     state_dump$id,
     state_dump$parent,
     state_dump$level,
     state_dump$type)
-
-  sbm
 }

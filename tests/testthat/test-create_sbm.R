@@ -21,7 +21,7 @@ test_that("Errors and warnings for malformed data work", {
   )
 
   expect_warning(
-    SBM(my_edges, my_nodes),
+    create_sbm(my_edges, my_nodes),
     "Node(s) c1, c2 are not seen in any of the edges",
     fixed = TRUE
   )
