@@ -103,7 +103,7 @@ public:
   int get_n_checks_per_group() { return N_CHECKS_PER_GROUP; }
 };
 
-RCPP_MODULE(sbm_module)
+RCPP_MODULE(Rcpp_SBM)
 {
   class_<Rcpp_SBM>("Rcpp_SBM")
 
@@ -130,7 +130,7 @@ RCPP_MODULE(sbm_module)
                 "If not in greedy mode, how many options do we check per node for moves in agglomerative merging?")
 
       .method("add_node",
-              &Rcpp_SBM::add_node) 
+              &Rcpp_SBM::add_node)
       .method("add_connection",
               &Rcpp_SBM::add_connection)
       .method("set_node_parent",
@@ -179,9 +179,9 @@ sbm$set_node_parent("b3", "b12", 0, TRUE)
 
 load_state <- function(sbm, state_dump){
   sbm$load_from_state(
-    state_dump$id, 
-    state_dump$parent, 
-    state_dump$level, 
+    state_dump$id,
+    state_dump$parent,
+    state_dump$level,
     state_dump$type)
 }
 
@@ -198,9 +198,9 @@ original_state <- sbm$get_state()
 #   groups_moved <- sbm$mcmc_sweep(0L,FALSE)
 #   print(paste("started with entropy of", entro_pre, "and moved", groups_moved))
 # }
-# 
+#
 # new_state <- sbm$get_state()
-# 
+#
 # # Bring me back to original state
 # load_state(sbm, original_state)
 
@@ -213,10 +213,10 @@ sort_state <- . %>%  arrange(level, type, id)
 original_state %>% sort_state()
 new_state %>% sort_state()
 
-# 
-# 
+#
+#
 # desired_state <- init_results[[1]]$state
-# 
+#
 # sbm$get_state()
 # load_state(sbm, original_state)
 # sbm$get_state()

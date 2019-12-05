@@ -1,13 +1,11 @@
-## usethis namespace: start
+#' sbmR
+#'
+#' Insert main package description here...
+#'
+#' Imports
 #' @useDynLib sbmR, .registration = TRUE
-## usethis namespace: end
-NULL
+#' @export Rcpp_SBM
+#' @importFrom Rcpp loadModule
+"_PACKAGE"
 
-## usethis namespace: start
-#' @importFrom Rcpp sourceCpp
-## usethis namespace: end
-NULL
-
-
-# Tell package we're using RCPP modules
 Rcpp::loadModule("Rcpp_SBM", TRUE)
