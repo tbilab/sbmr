@@ -35,3 +35,19 @@ test_that("Error thrown when adding an edge with a non-declared node", {
     fixed = TRUE
   )
 })
+
+test_that("Proper state is reflected from full edge node declaration", {
+
+  expected_state <- dplyr::tribble(
+    ~id, ~type, ~parent,  ~level,
+    "a1", "a",   "none",      0L,
+    "a2", "a",   "none",      0L,
+    "b1", "b",   "none",      0L,
+    "b2", "b",   "none",      0L
+  )
+
+  my_sbm <- create_sbm(my_edges, my_nodes)
+
+  expect_equal(expected_state, my_sbm$get_state())
+})
+

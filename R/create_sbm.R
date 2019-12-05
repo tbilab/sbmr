@@ -64,7 +64,6 @@ create_sbm <- function(edges, nodes = NULL, from_col = "from", to_col = "to"){
     )
   }
 
-  # Temporarily return model state
-  sbm$get_state()
-
+  # Return model
+  sbm
 }
