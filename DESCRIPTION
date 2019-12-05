@@ -16,3 +16,5 @@ LinkingTo:
     Rcpp
 Imports: 
     Rcpp
+Suggests: 
+    testthat (>= 2.1.0)
