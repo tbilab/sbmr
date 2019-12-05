@@ -1,5 +1,5 @@
 #include <Rcpp.h>
-#include "../SBM.h"
+#include "SBM.h"
 
 using namespace Rcpp;
 
