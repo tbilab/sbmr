@@ -17,13 +17,62 @@ inline DataFrame state_to_df(State_Dump state)
 class Rcpp_SBM : public SBM
 {
 public:
-  // Rcpp_SBM(int seed):sampler(seed) {};
-  void add_node(const std::string id,
-                const int type,
-                const int level)
+
+  // Keeps track of user friendly string types and turns them
+  // into c++ friendly integer types
+  int current_type_int = 0;
+  std::unordered_map<string, int> type_string_to_int;
+  std::unordered_map<int, string> type_int_to_string;
+
+
+  void add_node(const std::string id, const std::string type, const int level)
   {
-    SBM::add_node(id, type, level);
+    int node_int_type;
+
+    // See if the node's type is in our list
+    auto loc_of_int_type = type_string_to_int.find(type);
+
+    if (loc_of_int_type == type_string_to_int.end())
+    {
+      // If its a new type, we need to add a new entry for this type to both maps
+      type_string_to_int.emplace(type, current_type_int);
+      type_int_to_string.emplace(current_type_int, type);
+
+      // Set the value as newly designated integer
+      node_int_type = current_type_int;
+
+      // Iterate type integer keeper forward
+      current_type_int++;
+    }
+    else
+    {
+      node_int_type = loc_of_int_type->second;
+    }
+
+    // Check to make sure that this node doesn't already exist in the network
+    auto base_level = get_level(level);
+    if (base_level->find(id) != base_level->end())
+    {
+      warning(id + " already exists in network\n");
+    }
+    else
+    {
+      // Add node to model
+      SBM::add_node(id, node_int_type, level);
+    }
   }
+
+
+
+  // // Rcpp_SBM(int seed):sampler(seed) {};
+  // void add_node(const std::string id,
+  //               const int type,
+  //               const int level)
+  // {
+  //
+  //
+  //   SBM::add_node(id, type, level);
+  // }
 
   void add_connection(const std::string node_a_id, const std::string node_b_id)
   {
@@ -32,8 +81,27 @@ public:
 
   DataFrame get_state()
   {
-    // Grab state dump struct return as dataframe
-    return state_to_df(SBM::get_state());
+    // Grab state from class
+    auto state = SBM::get_state();
+
+    // Convert the type column to the string types
+    std::vector<string> string_types;
+    string_types.reserve(state.type.size());
+
+    for (auto type_it = state.type.begin();
+              type_it != state.type.end();
+              type_it++)
+    {
+      // Convert int to string and push to vector
+      string_types.push_back(type_int_to_string[*type_it]);
+    }
+
+    return DataFrame::create(
+      _["id"] = state.id,
+      _["parent"] = state.parent,
+      _["type"] = string_types,
+      _["level"] = state.level,
+      _["stringsAsFactors"] = false);
   }
 
   void set_node_parent(const std::string child_id,
@@ -79,11 +147,35 @@ public:
   void load_from_state(std::vector<string> id,
                        std::vector<string> parent,
                        std::vector<int> level,
-                       std::vector<int> type)
+                       std::vector<string> string_types)
   {
+    // Convert the types from strings to integers
+    // Convert the type column to the string types
+    std::vector<int> int_types;
+    int_types.reserve(string_types.size());
+
+    for (auto type_it = string_types.begin();
+         type_it != string_types.end();
+         type_it++)
+    {
+
+      // Make sure that the requested type has been seen by the model already and
+      // send message to R if it hasnt.
+
+      auto loc_of_int_type = type_string_to_int.find(*type_it);
+      if (loc_of_int_type == type_string_to_int.end())
+      {
+        throw (*type_it) + " not found in model";
+      } else {
+        // Convert string to int and push to vector
+        int_types.push_back(loc_of_int_type->second);
+      }
+
+    }
+
     // Construct a state dump from vectors and
     // pass the constructed state to load_state function
-    SBM::load_from_state(State_Dump(id, parent, level, type));
+    SBM::load_from_state(State_Dump(id, parent, level, int_types));
   }
 
   // Getters and setters for inhereted fields
@@ -150,68 +242,71 @@ RCPP_MODULE(Rcpp_SBM)
 /*** R
 sbm <- new(Rcpp_SBM)
 
-sbm$add_node("a1", 0L, 0L)
-sbm$add_node("a2", 0L, 0L)
-sbm$add_node("a3", 0L, 0L)
-sbm$add_node("b1", 1L, 0L)
-sbm$add_node("b2", 1L, 0L)
-sbm$add_node("b3", 1L, 0L)
-
-sbm$add_node("a11", 0L, 1L)
-sbm$add_node("a12", 0L, 1L)
-sbm$add_node("b11", 1L, 1L)
-sbm$add_node("b12", 1L, 1L)
-
-sbm$add_connection("a1", "b1")
-sbm$add_connection("a1", "b2")
-sbm$add_connection("a1", "b3")
-sbm$add_connection("a2", "b3")
-sbm$add_connection("a3", "b2")
+sbm$add_node("a1", "a", 0)
+sbm$add_node("a2", "a", 0)
+sbm$add_node("a3", "a", 0)
+sbm$add_node("b1", "b", 0)
+sbm$add_node("b2", "b", 0)
+sbm$add_node("b3", "b", 0)
 
 
-sbm$set_node_parent("a1", "a11", 0, TRUE)
-sbm$set_node_parent("a2", "a11", 0, TRUE)
-sbm$set_node_parent("a3", "a12", 0, TRUE)
-sbm$set_node_parent("b1", "b11", 0, TRUE)
-sbm$set_node_parent("b2", "b11", 0, TRUE)
-sbm$set_node_parent("b3", "b12", 0, TRUE)
+sbm$get_state()
 
-
-load_state <- function(sbm, state_dump){
-  sbm$load_from_state(
-    state_dump$id,
-    state_dump$parent,
-    state_dump$level,
-    state_dump$type)
-}
-
-# Set some model parameters
-sbm$GREEDY <- TRUE
-sbm$BETA <- 1.5
-sbm$EPS <- 0.1
-sbm$N_CHECKS_PER_GROUP <- 5
-
-original_state <- sbm$get_state()
-
-# for(i in 1:10){
-#   entro_pre <- sbm$compute_entropy(0L)
-#   groups_moved <- sbm$mcmc_sweep(0L,FALSE)
-#   print(paste("started with entropy of", entro_pre, "and moved", groups_moved))
+# sbm$add_node("a11", 0L, 1L)
+# sbm$add_node("a12", 0L, 1L)
+# sbm$add_node("b11", 1L, 1L)
+# sbm$add_node("b12", 1L, 1L)
+#
+# sbm$add_connection("a1", "b1")
+# sbm$add_connection("a1", "b2")
+# sbm$add_connection("a1", "b3")
+# sbm$add_connection("a2", "b3")
+# sbm$add_connection("a3", "b2")
+#
+#
+# sbm$set_node_parent("a1", "a11", 0, TRUE)
+# sbm$set_node_parent("a2", "a11", 0, TRUE)
+# sbm$set_node_parent("a3", "a12", 0, TRUE)
+# sbm$set_node_parent("b1", "b11", 0, TRUE)
+# sbm$set_node_parent("b2", "b11", 0, TRUE)
+# sbm$set_node_parent("b3", "b12", 0, TRUE)
+#
+#
+# load_state <- function(sbm, state_dump){
+#   sbm$load_from_state(
+#     state_dump$id,
+#     state_dump$parent,
+#     state_dump$level,
+#     state_dump$type)
 # }
 #
+# # Set some model parameters
+# sbm$GREEDY <- TRUE
+# sbm$BETA <- 1.5
+# sbm$EPS <- 0.1
+# sbm$N_CHECKS_PER_GROUP <- 5
+#
+# original_state <- sbm$get_state()
+#
+# # for(i in 1:10){
+# #   entro_pre <- sbm$compute_entropy(0L)
+# #   groups_moved <- sbm$mcmc_sweep(0L,FALSE)
+# #   print(paste("started with entropy of", entro_pre, "and moved", groups_moved))
+# # }
+# #
+# # new_state <- sbm$get_state()
+# #
+# # # Bring me back to original state
+# # load_state(sbm, original_state)
+#
+# library(tidyverse)
+# merge_results <- sbm$collapse_groups(0, 15)
+# load_state(sbm, original_state)
 # new_state <- sbm$get_state()
 #
-# # Bring me back to original state
-# load_state(sbm, original_state)
-
-library(tidyverse)
-merge_results <- sbm$collapse_groups(0, 15)
-load_state(sbm, original_state)
-new_state <- sbm$get_state()
-
-sort_state <- . %>%  arrange(level, type, id)
-original_state %>% sort_state()
-new_state %>% sort_state()
+# sort_state <- . %>%  arrange(level, type, id)
+# original_state %>% sort_state()
+# new_state %>% sort_state()
 
 #
 #
