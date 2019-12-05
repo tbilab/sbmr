@@ -12,6 +12,6 @@ Insert main package description here...
 Imports
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Nick Strayer \email{nick.strayer@gmail.com}
 
 }
