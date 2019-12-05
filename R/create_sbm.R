@@ -36,7 +36,7 @@ create_sbm <- function(edges, nodes = NULL, from_col = "from", to_col = "to"){
 
     # Check to make sure all nodes are accounted for in user passed df
     if(length(missing_from_nodes) > 0){
-      throw(paste("Passed nodes dataframe is missing node(s)",
+      stop(paste("Passed nodes dataframe is missing node(s)",
                   paste(missing_from_nodes, collapse = ", "),
                   "from edges"))
     }

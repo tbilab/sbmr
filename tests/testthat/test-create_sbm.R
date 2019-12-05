@@ -1,28 +1,37 @@
-test_that("Errors and warnings for malformed data work", {
-  my_edges <- dplyr::tribble(
-    ~from, ~to,
-    "a1", "b1",
-    "a1", "b2",
-    "a1", "b3",
-    "a2", "b3",
-    "a3", "b2"
-  )
+my_nodes <- dplyr::tribble(
+  ~id, ~type,
+  "a1", "a",
+  "a2", "a",
+  "b1", "b",
+  "b2", "b"
+)
 
-  my_nodes <- dplyr::tribble(
-    ~id, ~type,
-    "a1", "a",
-    "a2", "a",
-    "a3", "a",
-    "b1", "b",
-    "b2", "b",
-    "c1", "c",
-    "c2", "c",
-    "b3", "b"
-  )
+my_edges <- dplyr::tribble(
+  ~from, ~to,
+  "a1", "b1",
+  "a1", "b2",
+  "a2", "b1"
+)
+
+test_that("Warning given when adding a node that has no connections", {
+
+ node_too_many <- dplyr::bind_rows(my_nodes, c(id = "c1", type = "c"))
 
   expect_warning(
-    create_sbm(my_edges, my_nodes),
-    "Node(s) c1, c2 are not seen in any of the edges",
+    create_sbm(my_edges, node_too_many),
+    "Node(s) c1 are not seen in any of the edges",
+    fixed = TRUE
+  )
+})
+
+
+test_that("Error thrown when adding an edge with a non-declared node", {
+
+  w_bad_edge <- dplyr::bind_rows(my_edges, c(from = "c1", to = "b1"))
+
+  expect_error(
+    create_sbm(w_bad_edge, my_nodes),
+    "Passed nodes dataframe is missing node(s) c1 from edges",
     fixed = TRUE
   )
 })
