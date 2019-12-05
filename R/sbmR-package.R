@@ -15,7 +15,7 @@ Rcpp::loadModule("SBM", TRUE)
 setClass("Rcpp_SBM")
 setMethod( "show", "Rcpp_SBM" , function(object) {
   print(object$get_state())
-} )
+})
 
 
 
