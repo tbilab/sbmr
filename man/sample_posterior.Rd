@@ -12,6 +12,11 @@ sample_posterior(
   burnin_sweeps = 10,
   return_sweep_info = TRUE,
   starting_partition = "agglomerative",
+  beta = 1.5,
+  epsilon = 0.1,
+  greedy = TRUE,
+  n_checks_per_group = 5,
+  initialization_mcmc_steps = 15,
   verbose = c("initialization"),
   ...
 )
@@ -21,7 +26,7 @@ sample_posterior(
 
 \item{nodes}{Optional dataframe that links a node \code{id} to its \code{type}, for when model is polypartite.}
 
-\item{n_sweeps}{number of MCMC sweeps of all nodes (after burn-in)}
+\item{n_sweeps}{Number of MCMC sweeps of all nodes (after burn-in)}
 
 \item{n_chains}{How many seperate MCMC chains to start and run}
 
@@ -32,6 +37,22 @@ sweep (defaults to \code{TRUE})}
 
 \item{starting_partition}{Algorithm to start each chain with? Current options
 are \code{"agglomerative"} or \code{"random"}.}
+
+\item{beta}{Inverse temperature parameter for MCMC acceptance probability}
+
+\item{epsilon}{Parameter to inforce ergodicity of markov chain. Setting to
+zero will remove ergodicity from model, setting high will make model moves
+more random.}
+
+\item{greedy}{If using agglomerative initialization should algorithm search
+every possible merge?}
+
+\item{n_checks_per_group}{If not using agglomerative initialization, how many
+options for merging should be explored per group?}
+
+\item{initialization_mcmc_steps}{If using agglomerative initialization, how
+many steps of MCMC should be run after merging groups to allow model to
+find optimal layout in new group partition?}
 
 \item{verbose}{Array of what info should be printed as model runs. Default
 shows \code{"initialization"} info of model. Other options are \verb{"silent} to
