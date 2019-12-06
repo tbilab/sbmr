@@ -130,7 +130,7 @@ results_to_df <- function(merge_results){
 
 
 
-plot_merge_results <- function(merge_results_df, group_cutoff = 30){
+plot_merge_results <- function(merge_results_df, group_cutoff = 30, trim_axes = TRUE){
   
   results_below_cutoff <- merge_results_df %>% 
     filter(n_groups < group_cutoff)
@@ -138,14 +138,20 @@ plot_merge_results <- function(merge_results_df, group_cutoff = 30){
   max_entropy <- max(results_below_cutoff$entropy)
   min_entropy <- min(results_below_cutoff$entropy)
   
-  ggplot(merge_results_df, aes(x = n_groups, y = entropy)) +
+  p <- ggplot(merge_results_df, aes(x = n_groups, y = entropy)) +
     geom_line(alpha = 0.3) +
     geom_point(size = 0.5) +
-    geom_vline(xintercept = K_a + K_b, color = 'orangered') +
-    coord_cartesian(
-      xlim = c(0, group_cutoff),
-      ylim = c(min_entropy, max_entropy)
-    ) +
+    geom_vline(xintercept = K_a + K_b, color = 'orangered')
+    
+  if(trim_axes){
+    p <- p +
+      coord_cartesian(
+        xlim = c(0, group_cutoff),
+        ylim = c(min_entropy, max_entropy)
+      ) 
+  }
+  
+  p +
     scale_x_reverse() +
     theme_minimal() +
     labs(x = "number of groups")
@@ -203,7 +209,7 @@ merges_over_sweeps_and_greedy <- expand.grid(
         merge_results <- new_sbm$collapse_groups(0L, as.integer(.x))
         results_to_df(merge_results) %>% 
           mutate(mcmc_sweeps = .x,
-                 greedy = .y)
+                 greedy = paste("greedy = ", .y))
       }
     )
   }
@@ -212,5 +218,22 @@ merges_over_sweeps_and_greedy <- expand.grid(
 plot_merge_results(merges_over_sweeps_and_greedy) + 
   facet_grid(mcmc_sweeps~greedy) +
   ggtitle("Tuning and greedy status and number of mcmc sweeps per stage")
+```
+
+
+```{r}
+purrr::map_dfr(
+  seq(from = 0.9, to = 2, length.out = 5),
+  ~{
+    new_sbm <- create_sbm(edges, nodes)
+    new_sbm$GREEDY <- FALSE
+    new_sbm$N_CHECKS_PER_GROUP <- 10
+    new_sbm$SIGMA <- .x
+    merge_results <- new_sbm$collapse_groups(0L, 15L)
+    results_to_df(merge_results) %>% mutate(sigma = .x)
+  }) %>% 
+  plot_merge_results(trim_axes = FALSE) + 
+  facet_wrap(~sigma) +
+  ggtitle("Tuning sigma value for merging")
 ```
 
