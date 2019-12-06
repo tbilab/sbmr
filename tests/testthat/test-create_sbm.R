@@ -51,3 +51,21 @@ test_that("Proper state is reflected from full edge node declaration", {
   expect_equal(expected_state, my_sbm$get_state())
 })
 
+test_that("Different column names for edges work", {
+
+  expected_state <- dplyr::tribble(
+    ~id, ~type, ~parent,  ~level,
+    "a1", "a",   "none",      0L,
+    "a2", "a",   "none",      0L,
+    "b1", "b",   "none",      0L,
+    "b2", "b",   "none",      0L
+  )
+
+  edges_w_names <- dplyr::rename(my_edges, a_node = from, b_node = to)
+
+  my_sbm <- create_sbm(edges_w_names, my_nodes, from_col = a_node, to_col = b_node)
+
+  expect_equal(expected_state, my_sbm$get_state())
+})
+
+

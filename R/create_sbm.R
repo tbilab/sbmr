@@ -12,12 +12,15 @@
 #' @export
 #'
 #' @examples
-create_sbm <- function(edges, nodes = NULL, from_col = "from", to_col = "to"){
+create_sbm <- function(edges, nodes = NULL, from_col = from, to_col = to){
+
+  edges_to <- dplyr::pull(edges, !!rlang::enquo(to_col))
+  edges_from <- dplyr::pull(edges, !!rlang::enquo(from_col))
 
   # Break edges down to unique nodes. from_edges is used to find out if a node
   # isnt present in the edges but is in the optional nodes dataframe
   model_nodes <- dplyr::tibble(
-    id = unique(c(edges[[from_col]], edges[[to_col]])),
+    id = unique(c(edges_from, edges_to)),
     from_edges = TRUE
   )
 
@@ -58,8 +61,8 @@ create_sbm <- function(edges, nodes = NULL, from_col = "from", to_col = "to"){
   # Connect all the nodes
   for(i in 1:nrow(edges)){
     sbm$add_connection(
-      edges[[from_col]][i],
-      edges[[to_col]][i]
+      edges_from[i],
+      edges_to[i]
     )
   }
 
