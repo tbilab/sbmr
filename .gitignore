@@ -9,3 +9,4 @@ my_googletest
 *.out*
 *.json
 *.h.gch
+inst/doc
