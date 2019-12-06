@@ -1,6 +1,5 @@
 #include "SBM.h" 
 
-
 // =============================================================================
 // Propose a potential group move for a node.
 // =============================================================================
@@ -517,15 +516,20 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
   {
     
     // Get the current number of groups we have
-    int curr_num_groups = get_level(group_level)->size();
+    const int curr_num_groups = get_level(group_level)->size();
 
     // Decide how many merges we should do. 
-    int num_merges = std::max(
-        int(curr_num_groups - (curr_num_groups / SIGMA)),
-        1);
+    int num_merges = int(curr_num_groups - (curr_num_groups / SIGMA));
+    
+    // Need to remove at least 1 group
+    if (num_merges < 1) 
+    {
+      num_merges = 1;
+    }
 
     // Make sure we don't overstep the goal number of groups
-    if ((curr_num_groups - num_merges) < desired_num_groups)
+    int num_groups_after_merge = curr_num_groups - num_merges;
+    if (num_groups_after_merge < desired_num_groups)
     {
       num_merges = curr_num_groups - desired_num_groups;
     }
