@@ -3,5 +3,6 @@
 export(SBM)
 export(create_sbm)
 export(load_state)
+export(sample_posterior)
 importFrom(Rcpp,loadModule)
 useDynLib(sbmR, .registration = TRUE)
