@@ -1,4 +1,3 @@
-
 #' Create SBM
 #'
 #' Build an SBM instance from dataframe of edges. Optionally a nodes dataframe

@@ -287,6 +287,9 @@ for(i in 1:10){
 
 new_state <- sbm$get_state()
 
+load_state(sbm, original_state)
+
+
 # Bring me back to original state
 # load_state(sbm, original_state)
 #
