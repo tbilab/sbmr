@@ -137,6 +137,9 @@
 <a class="sourceLine" id="cb2-39" data-line-number="39"><span class="co">#&gt; 4 a12   none    a     0</span></a>
 <a class="sourceLine" id="cb2-40" data-line-number="40"><span class="co">#&gt; 5 a13   none    a     0</span></a>
 <a class="sourceLine" id="cb2-41" data-line-number="41"><span class="co">#&gt; 6 a14   none    a     0</span></a></code></pre></div>
+<div id="basic-merging" class="section level2">
+<h2 class="hasAnchor">
+<a href="#basic-merging" class="anchor"></a>Basic merging</h2>
 <p>Now that we have our model setup there are two parameters that control this merging.</p>
 <p>First we have <code>GREEDY</code>. When this is set to <code>TRUE</code>, the at every merge step the model will check every possible merge for each node and select the best one.</p>
 <p>Second is <code>N_CHECKS_PER_GROUP</code>. When <code>GREEDY</code> is set to <code>FALSE</code>, this parameter controls how many possible merges the model explores for each node before choosing the best one. Higher means a longer run time. Note that these potential merges are done by a random sample of neighbor groups so even if <code>N_CHECKS_PER_GROUP</code> is set to the total number of nodes in the network we are not guarenteed to explore all options like <code>GREEDY</code> does.</p>
@@ -159,13 +162,13 @@
 <a class="sourceLine" id="cb5-10" data-line-number="10">}</a>
 <a class="sourceLine" id="cb5-11" data-line-number="11"></a>
 <a class="sourceLine" id="cb5-12" data-line-number="12"><span class="kw">extract_n_groups</span>(merge_results) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>()</a>
-<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; [1] 99 51 41 37 33 30</span></a></code></pre></div>
+<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; [1] 99 50 41 37 32 29</span></a></code></pre></div>
 <p>Next we can look at how that number of groups corresponds to the entropy of the model.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">extract_entropy &lt;-<span class="st"> </span><span class="cf">function</span>(merge_results){</a>
 <a class="sourceLine" id="cb6-2" data-line-number="2">  merge_results <span class="op">%&gt;%</span><span class="st"> </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map_dbl</a></span>(<span class="st">'entropy'</span>)</a>
 <a class="sourceLine" id="cb6-3" data-line-number="3">}</a>
 <a class="sourceLine" id="cb6-4" data-line-number="4"><span class="kw">extract_entropy</span>(merge_results) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>()</a>
-<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt; [1] 1266.833 1331.157 1358.811 1394.901 1419.088 1430.638</span></a></code></pre></div>
+<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt; [1] 1297.207 1346.819 1385.187 1409.766 1436.112 1448.282</span></a></code></pre></div>
 <p>We should almost always see the entropy decrease as we remove groups but if there is signal in the model and the algorithm found it, we should see a relativel “lack of decrease” around the true structure value. We know the true number of groups in this data is 6 so we can reference that here…</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">results_to_df &lt;-<span class="st"> </span><span class="cf">function</span>(merge_results){</a>
 <a class="sourceLine" id="cb7-2" data-line-number="2">  <span class="kw">tibble</span>(</a>
@@ -204,6 +207,10 @@
 <a class="sourceLine" id="cb7-35" data-line-number="35">}</a></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">merge_results <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">results_to_df</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">plot_merge_results</span>()</a></code></pre></div>
 <p><img src="agglomerative_merging_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+</div>
+<div id="non-greedy-merge-proposals" class="section level2">
+<h2 class="hasAnchor">
+<a href="#non-greedy-merge-proposals" class="anchor"></a>Non-Greedy merge proposals</h2>
 <p>We can perform the same setup but this time not using greedy but the sampling version</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">new_sbm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/create_sbm.html">create_sbm</a></span>(edges, nodes)</a>
 <a class="sourceLine" id="cb9-2" data-line-number="2">new_sbm<span class="op">$</span>GREEDY &lt;-<span class="st"> </span><span class="ot">FALSE</span></a>
@@ -212,6 +219,10 @@
 <a class="sourceLine" id="cb9-5" data-line-number="5"></a>
 <a class="sourceLine" id="cb9-6" data-line-number="6">non_greedy_merge_results <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">results_to_df</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">plot_merge_results</span>()</a></code></pre></div>
 <p><img src="agglomerative_merging_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+</div>
+<div id="controlling-number-of-merge-checks-per-node" class="section level2">
+<h2 class="hasAnchor">
+<a href="#controlling-number-of-merge-checks-per-node" class="anchor"></a>Controlling number of merge checks per node</h2>
 <p>We can try scanning over different number of checks per group to see how it changes results</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">merges_over_changes &lt;-<span class="st"> </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map_dfr</a></span>(</a>
 <a class="sourceLine" id="cb10-2" data-line-number="2">  <span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="dv">5</span>, <span class="dv">50</span>, <span class="dt">by =</span> <span class="dv">5</span>),</a>
@@ -227,6 +238,12 @@
 <a class="sourceLine" id="cb10-12" data-line-number="12"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>checks) <span class="op">+</span></a>
 <a class="sourceLine" id="cb10-13" data-line-number="13"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"Tuning number of merge checks per node"</span>)</a></code></pre></div>
 <p><img src="agglomerative_merging_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+</div>
+<div id="controlling-number-of-mcmc-sweeps-between-merge-steps" class="section level2">
+<h2 class="hasAnchor">
+<a href="#controlling-number-of-mcmc-sweeps-between-merge-steps" class="anchor"></a>Controlling number of MCMC sweeps between merge steps</h2>
+<p>Another tuning parameter that will effect results is how many mcmc sweeps are performed between each merge step. When we let the model perform more MCMC sweeps in theory it will equilibriate to the best partition with the current number of groups, meaning we would get a better picture of the best entropy for a given number of clusters.</p>
+<p>Here we scan over different numbers of MCMC sweeps and if we use greedy or not for our merging (in theory greedy should not be particularly helpful here.)</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">merges_over_sweeps_and_greedy &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/expand.grid.html">expand.grid</a></span>(</a>
 <a class="sourceLine" id="cb11-2" data-line-number="2">  <span class="dt">mcmc_sweeps =</span> <span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="dv">1</span>, <span class="dv">101</span>, <span class="dt">by =</span> <span class="dv">25</span>),</a>
 <a class="sourceLine" id="cb11-3" data-line-number="3">  <span class="dt">greedy =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>)</a>
@@ -251,6 +268,11 @@
 <a class="sourceLine" id="cb11-22" data-line-number="22"><span class="st">  </span><span class="kw">facet_grid</span>(mcmc_sweeps<span class="op">~</span>greedy) <span class="op">+</span></a>
 <a class="sourceLine" id="cb11-23" data-line-number="23"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"Tuning and greedy status and number of mcmc sweeps per stage"</span>)</a></code></pre></div>
 <p><img src="agglomerative_merging_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+</div>
+<div id="controlling-collapsing-rate-sigma" class="section level2">
+<h2 class="hasAnchor">
+<a href="#controlling-collapsing-rate-sigma" class="anchor"></a>Controlling collapsing rate (sigma)</h2>
+<p>Another important parameter to tune is <code>SIGMA</code>. This controls the rate that the network collapses. For each merge step the model will remove <code>B_curr/SIGMA</code> groups. This means a value of <code>SIGMA = 2</code> will cut the group size in half each step.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map_dfr</a></span>(</a>
 <a class="sourceLine" id="cb12-2" data-line-number="2">  <span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="dt">from =</span> <span class="fl">0.9</span>, <span class="dt">to =</span> <span class="dv">2</span>, <span class="dt">length.out =</span> <span class="dv">5</span>),</a>
 <a class="sourceLine" id="cb12-3" data-line-number="3">  <span class="op">~</span>{</a>
@@ -265,10 +287,22 @@
 <a class="sourceLine" id="cb12-12" data-line-number="12"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>sigma) <span class="op">+</span></a>
 <a class="sourceLine" id="cb12-13" data-line-number="13"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"Tuning sigma value for merging"</span>)</a></code></pre></div>
 <p><img src="agglomerative_merging_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
 
+        <div id="tocnav">
+      <h2 class="hasAnchor">
+<a href="#tocnav" class="anchor"></a>Contents</h2>
+      <ul class="nav nav-pills nav-stacked">
+<li><a href="#basic-merging">Basic merging</a></li>
+      <li><a href="#non-greedy-merge-proposals">Non-Greedy merge proposals</a></li>
+      <li><a href="#controlling-number-of-merge-checks-per-node">Controlling number of merge checks per node</a></li>
+      <li><a href="#controlling-number-of-mcmc-sweeps-between-merge-steps">Controlling number of MCMC sweeps between merge steps</a></li>
+      <li><a href="#controlling-collapsing-rate-sigma">Controlling collapsing rate (sigma)</a></li>
+      </ul>
+</div>
       </div>
 
 </div>

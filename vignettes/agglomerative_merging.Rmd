@@ -66,6 +66,7 @@ my_sbm %>% show() %>% head()
 
 ```
 
+## Basic merging
 
 Now that we have our model setup there are two parameters that control this merging. 
 
@@ -163,6 +164,8 @@ plot_merge_results <- function(merge_results_df, group_cutoff = 30, trim_axes = 
 merge_results %>% results_to_df() %>% plot_merge_results()
 ```
 
+## Non-Greedy merge proposals
+
 
 We can perform the same setup but this time not using greedy but the sampling version
 ```{r}
@@ -173,6 +176,9 @@ non_greedy_merge_results <- new_sbm$collapse_groups(0L, 15L)
 
 non_greedy_merge_results %>% results_to_df() %>% plot_merge_results()
 ```
+
+
+## Controlling number of merge checks per node
 
 We can try scanning over different number of checks per group to see how it changes results
 
@@ -193,6 +199,11 @@ plot_merge_results(merges_over_changes) +
 ```
 
 
+## Controlling number of MCMC sweeps between merge steps
+
+Another tuning parameter that will effect results is how many mcmc sweeps are performed between each merge step. When we let the model perform more MCMC sweeps in theory it will equilibriate to the best partition with the current number of groups, meaning we would get a better picture of the best entropy for a given number of clusters. 
+
+Here we scan over different numbers of MCMC sweeps and if we use greedy or not for our merging (in theory greedy should not be particularly helpful here.)
 
 ```{r}
 merges_over_sweeps_and_greedy <- expand.grid(
@@ -219,6 +230,11 @@ plot_merge_results(merges_over_sweeps_and_greedy) +
   facet_grid(mcmc_sweeps~greedy) +
   ggtitle("Tuning and greedy status and number of mcmc sweeps per stage")
 ```
+
+
+## Controlling collapsing rate (sigma)
+
+Another important parameter to tune is `SIGMA`. This controls the rate that the network collapses. For each merge step the model will remove `B_curr/SIGMA` groups. This means a value of `SIGMA = 2` will cut the group size in half each step. 
 
 
 ```{r}
