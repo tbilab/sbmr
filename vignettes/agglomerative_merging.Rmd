@@ -146,7 +146,9 @@ plot_merge_results <- function(merge_results_df, group_cutoff = 30){
       xlim = c(0, group_cutoff),
       ylim = c(min_entropy, max_entropy)
     ) +
-    theme_minimal()
+    scale_x_reverse() +
+    theme_minimal() +
+    labs(x = "number of groups")
 }
 ```
 
@@ -185,25 +187,10 @@ plot_merge_results(merges_over_changes) +
 ```
 
 
-```{r}
-merges_over_sweeps <- purrr::map_dfr(
-  seq(1, 50, by = 5),
-  ~{
-    new_sbm <- create_sbm(edges, nodes)
-    merge_results <- new_sbm$collapse_groups(0L, as.integer(.x))
-    results_to_df(merge_results) %>% mutate(mcmc_sweeps = .x)
-  })
-
-
-plot_merge_results(merges_over_sweeps) + 
-  facet_wrap(~mcmc_sweeps) +
-  ggtitle("Tuning number of mcmc sweeps per stage")
-```
-
 
 ```{r}
 merges_over_sweeps_and_greedy <- expand.grid(
-  mcmc_sweeps = seq(1, 51, by = 10),
+  mcmc_sweeps = seq(1, 101, by = 25),
   greedy = c(TRUE, FALSE)
 ) %>% 
   {
@@ -224,6 +211,6 @@ merges_over_sweeps_and_greedy <- expand.grid(
 
 plot_merge_results(merges_over_sweeps_and_greedy) + 
   facet_grid(mcmc_sweeps~greedy) +
-  ggtitle("Tuning number of mcmc sweeps per stage")
+  ggtitle("Tuning and greedy status and number of mcmc sweeps per stage")
 ```
 
