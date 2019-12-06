@@ -19,15 +19,51 @@ One technique of finding the optimal number of clusters/ best partitioning is us
 Agglomerative merging can be acomplished with the SBM class using the method `collapse_groups()`. 
 
 
-First we will setup a model using an included simulated bipartite network dataset. The true number of groups in this dataset is __6__.
+First we will setup a model using a simulated bipartite network dataset. The true number of groups in this dataset is __6__.
 
 ```{r setup}
+library(bisbmsim)
 library(sbmR)
 library(tidyverse)
+```
+
+
+```{r}
+N_a <- 50  # Number of nodes of the a type
+N_b <- 50  # Number of nodes of the b type
+K_a <- 5    # How many blocks of a type nodes are there
+K_b <- 5    # How many blocks of the b type nodes are there
+b_a <- assign_group_membership(N = N_a, K = K_a) # Block membership for each a node
+b_b <- assign_group_membership(N = N_b, K = K_b) # Block membership for each b node
+
+
+edges <- draw_from_model(
+  b_a, b_b,
+  Lambda = generate_random_lambda(K_a = K_a, K_b = K_b)
+) %>%
+  filter(num_edges > 0) %>%
+  select(a, b) %>%
+  transmute(
+    from = paste0('a',a),
+    to = paste0('b', b)
+  )
+
+nodes <- dplyr::bind_rows(
+  tibble(
+    id = unique(edges$from),
+    type = "a"
+  ),
+  tibble(
+    id = unique(edges$to),
+    type = "b"
+  )
+)
+
 
 # Setup SBM model
-my_sbm <- create_sbm(simulated_network$edges, simulated_network$nodes)
+my_sbm <- create_sbm(edges, nodes)
 my_sbm %>% show() %>% head()
+
 ```
 
 
@@ -47,7 +83,7 @@ Now that we have our model and parameters set we can run the algorithm using the
 
 ```{r}
 # Run initialization algorithm on base level nodes
-merge_results <- my_sbm$collapse_groups(0L, 15L)
+merge_results <- my_sbm$collapse_groups(0L, 1L)
 ```
 
 This method returns a list containing the entropy and state of the model at each merge step. We can use these to look at how the merges progressed. 
@@ -55,8 +91,10 @@ This method returns a list containing the entropy and state of the model at each
 
 First we will grab the number of groups at each merge step. To do this we pull out the state element and find how many nodes in it have a level of 1 (aka group level).
 
+
 ```{r}
-n_groups <-  merge_results %>%
+extract_n_groups <- function(merge_results){
+  merge_results %>%
   purrr::map('state') %>%
   purrr::map_int(~{
     .x %>%
@@ -64,23 +102,90 @@ n_groups <-  merge_results %>%
       dplyr::pull(id) %>%
       length()
   })
+}
 
-n_groups %>% head()
+extract_n_groups(merge_results) %>% head()
 ```
 
 
-Next we can look at how that number of groups corresponds to the entropy of the model. We should almost always see the entropy decrease as we remove groups but if there is signal in the model and the algorithm found it, we should see a relativel "lack of decrease" around the true structure value. We know the true number of groups in this data is 6 so we can reference that here...
+Next we can look at how that number of groups corresponds to the entropy of the model. 
 
 ```{r}
-tibble(
-    n_groups = n_groups,
-    entropy = merge_results %>% purrr::map_dbl('entropy')
-  ) %>%
-  ggplot(aes(x = n_groups, y = entropy)) +
-  # geom_step(direction = 'vh') +
-  geom_line() +
-  geom_vline(xintercept = 6, color = 'orangered')
+extract_entropy <- function(merge_results){
+  merge_results %>% purrr::map_dbl('entropy')
+}
+extract_entropy(merge_results) %>% head()
 ```
 
 
+We should almost always see the entropy decrease as we remove groups but if there is signal in the model and the algorithm found it, we should see a relativel "lack of decrease" around the true structure value. We know the true number of groups in this data is 6 so we can reference that here...
+
+```{r}
+results_to_df <- function(merge_results){
+  tibble(
+    n_groups = extract_n_groups(merge_results),
+    entropy = extract_entropy(merge_results)
+  )
+}
+
+
+
+plot_merge_results <- function(merge_results_df){
+  ggplot(merge_results_df, aes(x = n_groups, y = entropy)) +
+    geom_line(alpha = 0.3) +
+    geom_point(size = 0.5) +
+    geom_vline(xintercept = K_a + K_b, color = 'orangered') +
+    coord_cartesian(xlim = c(0, 30)) 
+}
+```
+
+
+```{r}
+merge_results %>% results_to_df() %>% plot_merge_results()
+```
+
+
+We can perform the same setup but this time not using greedy but the sampling version
+```{r}
+new_sbm <- create_sbm(simulated_network$edges, simulated_network$nodes)
+new_sbm$GREEDY <- FALSE
+new_sbm$N_CHECKS_PER_GROUP <- 10
+non_greedy_merge_results <- new_sbm$collapse_groups(0L, 15L)
+
+non_greedy_merge_results %>% results_to_df() %>% plot_merge_results()
+```
+
+We can try scanning over different number of checks per group to see how it changes results
+
+```{r}
+merges_over_changes <- purrr::map_dfr(
+  seq(5, 50, by = 5),
+  ~{
+    new_sbm <- create_sbm(simulated_network$edges, simulated_network$nodes)
+    new_sbm$GREEDY <- FALSE
+    new_sbm$N_CHECKS_PER_GROUP <- .x
+    merge_results <- new_sbm$collapse_groups(0L, 15L)
+    results_to_df(merge_results) %>% mutate(checks = .x)
+  })
+
+plot_merge_results(merges_over_changes) + 
+  facet_wrap(~checks) +
+  ggtitle("Tuning number of merge checks per node")
+```
+
+
+```{r}
+merges_over_sweeps <- purrr::map_dfr(
+  seq(1, 50, by = 5),
+  ~{
+    new_sbm <- create_sbm(simulated_network$edges, simulated_network$nodes)
+    merge_results <- new_sbm$collapse_groups(0L, as.integer(.x))
+    results_to_df(merge_results) %>% mutate(mcmc_sweeps = .x)
+  })
+
+
+plot_merge_results(merges_over_sweeps) + 
+  facet_wrap(~mcmc_sweeps) +
+  ggtitle("Tuning number of mcmc sweeps per stage")
+```
 

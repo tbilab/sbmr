@@ -84,59 +84,143 @@
     
 <p>One technique of finding the optimal number of clusters/ best partitioning is using the efficient agglomerative merging algorithm. This is typically used to find the initial state for MCMC chains but can stand on its own as a clustering method.</p>
 <p>Agglomerative merging can be acomplished with the SBM class using the method <code>collapse_groups()</code>.</p>
-<p>First we will setup a model using an included simulated bipartite network dataset. The true number of groups in this dataset is <strong>6</strong>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(sbmR)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(tidyverse)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co">#&gt; ── Attaching packages ───────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──</span></a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co">#&gt; ✔ ggplot2 3.2.1     ✔ purrr   0.3.3</span></a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">#&gt; ✔ tibble  2.1.3     ✔ dplyr   0.8.3</span></a>
-<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co">#&gt; ✔ tidyr   1.0.0     ✔ stringr 1.4.0</span></a>
-<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co">#&gt; ✔ readr   1.3.1     ✔ forcats 0.4.0</span></a>
-<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co">#&gt; ── Conflicts ──────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──</span></a>
-<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="co">#&gt; ✖ dplyr::filter() masks stats::filter()</span></a>
-<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co">#&gt; ✖ dplyr::lag()    masks stats::lag()</span></a>
-<a class="sourceLine" id="cb1-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="co"># Setup SBM model</span></a>
-<a class="sourceLine" id="cb1-13" data-line-number="13">my_sbm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/create_sbm.html">create_sbm</a></span>(simulated_network<span class="op">$</span>edges, simulated_network<span class="op">$</span>nodes)</a>
-<a class="sourceLine" id="cb1-14" data-line-number="14">my_sbm <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">show</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>()</a>
-<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="co">#&gt;    id parent type level</span></a>
-<a class="sourceLine" id="cb1-16" data-line-number="16"><span class="co">#&gt; 1  a1   none    a     0</span></a>
-<a class="sourceLine" id="cb1-17" data-line-number="17"><span class="co">#&gt; 2 a10   none    a     0</span></a>
-<a class="sourceLine" id="cb1-18" data-line-number="18"><span class="co">#&gt; 3 a11   none    a     0</span></a>
-<a class="sourceLine" id="cb1-19" data-line-number="19"><span class="co">#&gt; 4 a12   none    a     0</span></a>
-<a class="sourceLine" id="cb1-20" data-line-number="20"><span class="co">#&gt; 5 a13   none    a     0</span></a>
-<a class="sourceLine" id="cb1-21" data-line-number="21"><span class="co">#&gt; 6 a14   none    a     0</span></a></code></pre></div>
+<p>First we will setup a model using a simulated bipartite network dataset. The true number of groups in this dataset is <strong>6</strong>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(bisbmsim)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(sbmR)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(tidyverse)</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co">#&gt; ── Attaching packages ───────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──</span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">#&gt; ✔ ggplot2 3.2.1     ✔ purrr   0.3.3</span></a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co">#&gt; ✔ tibble  2.1.3     ✔ dplyr   0.8.3</span></a>
+<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co">#&gt; ✔ tidyr   1.0.0     ✔ stringr 1.4.0</span></a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co">#&gt; ✔ readr   1.3.1     ✔ forcats 0.4.0</span></a>
+<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="co">#&gt; ── Conflicts ──────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──</span></a>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co">#&gt; ✖ dplyr::filter() masks stats::filter()</span></a>
+<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co">#&gt; ✖ dplyr::lag()    masks stats::lag()</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">N_a &lt;-<span class="st"> </span><span class="dv">50</span>  <span class="co"># Number of nodes of the a type</span></a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">N_b &lt;-<span class="st"> </span><span class="dv">50</span>  <span class="co"># Number of nodes of the b type</span></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">K_a &lt;-<span class="st"> </span><span class="dv">5</span>    <span class="co"># How many blocks of a type nodes are there</span></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">K_b &lt;-<span class="st"> </span><span class="dv">5</span>    <span class="co"># How many blocks of the b type nodes are there</span></a>
+<a class="sourceLine" id="cb2-5" data-line-number="5">b_a &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/bisbmsim/man/assign_group_membership.html">assign_group_membership</a></span>(<span class="dt">N =</span> N_a, <span class="dt">K =</span> K_a) <span class="co"># Block membership for each a node</span></a>
+<a class="sourceLine" id="cb2-6" data-line-number="6">b_b &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/bisbmsim/man/assign_group_membership.html">assign_group_membership</a></span>(<span class="dt">N =</span> N_b, <span class="dt">K =</span> K_b) <span class="co"># Block membership for each b node</span></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb2-9" data-line-number="9">edges &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/bisbmsim/man/draw_from_model.html">draw_from_model</a></span>(</a>
+<a class="sourceLine" id="cb2-10" data-line-number="10">  b_a, b_b,</a>
+<a class="sourceLine" id="cb2-11" data-line-number="11">  <span class="dt">Lambda =</span> <span class="kw"><a href="https://rdrr.io/pkg/bisbmsim/man/generate_random_lambda.html">generate_random_lambda</a></span>(<span class="dt">K_a =</span> K_a, <span class="dt">K_b =</span> K_b)</a>
+<a class="sourceLine" id="cb2-12" data-line-number="12">) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span>(num_edges <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="st">  </span><span class="kw">select</span>(a, b) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="st">  </span><span class="kw">transmute</span>(</a>
+<a class="sourceLine" id="cb2-16" data-line-number="16">    <span class="dt">from =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'a'</span>,a),</a>
+<a class="sourceLine" id="cb2-17" data-line-number="17">    <span class="dt">to =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'b'</span>, b)</a>
+<a class="sourceLine" id="cb2-18" data-line-number="18">  )</a>
+<a class="sourceLine" id="cb2-19" data-line-number="19"></a>
+<a class="sourceLine" id="cb2-20" data-line-number="20">nodes &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/bind.html">bind_rows</a></span>(</a>
+<a class="sourceLine" id="cb2-21" data-line-number="21">  <span class="kw">tibble</span>(</a>
+<a class="sourceLine" id="cb2-22" data-line-number="22">    <span class="dt">id =</span> <span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(edges<span class="op">$</span>from),</a>
+<a class="sourceLine" id="cb2-23" data-line-number="23">    <span class="dt">type =</span> <span class="st">"a"</span></a>
+<a class="sourceLine" id="cb2-24" data-line-number="24">  ),</a>
+<a class="sourceLine" id="cb2-25" data-line-number="25">  <span class="kw">tibble</span>(</a>
+<a class="sourceLine" id="cb2-26" data-line-number="26">    <span class="dt">id =</span> <span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(edges<span class="op">$</span>to),</a>
+<a class="sourceLine" id="cb2-27" data-line-number="27">    <span class="dt">type =</span> <span class="st">"b"</span></a>
+<a class="sourceLine" id="cb2-28" data-line-number="28">  )</a>
+<a class="sourceLine" id="cb2-29" data-line-number="29">)</a>
+<a class="sourceLine" id="cb2-30" data-line-number="30"></a>
+<a class="sourceLine" id="cb2-31" data-line-number="31"></a>
+<a class="sourceLine" id="cb2-32" data-line-number="32"><span class="co"># Setup SBM model</span></a>
+<a class="sourceLine" id="cb2-33" data-line-number="33">my_sbm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/create_sbm.html">create_sbm</a></span>(edges, nodes)</a>
+<a class="sourceLine" id="cb2-34" data-line-number="34">my_sbm <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">show</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>()</a>
+<a class="sourceLine" id="cb2-35" data-line-number="35"><span class="co">#&gt;    id parent type level</span></a>
+<a class="sourceLine" id="cb2-36" data-line-number="36"><span class="co">#&gt; 1  a1   none    a     0</span></a>
+<a class="sourceLine" id="cb2-37" data-line-number="37"><span class="co">#&gt; 2 a10   none    a     0</span></a>
+<a class="sourceLine" id="cb2-38" data-line-number="38"><span class="co">#&gt; 3 a11   none    a     0</span></a>
+<a class="sourceLine" id="cb2-39" data-line-number="39"><span class="co">#&gt; 4 a12   none    a     0</span></a>
+<a class="sourceLine" id="cb2-40" data-line-number="40"><span class="co">#&gt; 5 a13   none    a     0</span></a>
+<a class="sourceLine" id="cb2-41" data-line-number="41"><span class="co">#&gt; 6 a14   none    a     0</span></a></code></pre></div>
 <p>Now that we have our model setup there are two parameters that control this merging.</p>
 <p>First we have <code>GREEDY</code>. When this is set to <code>TRUE</code>, the at every merge step the model will check every possible merge for each node and select the best one.</p>
 <p>Second is <code>N_CHECKS_PER_GROUP</code>. When <code>GREEDY</code> is set to <code>FALSE</code>, this parameter controls how many possible merges the model explores for each node before choosing the best one. Higher means a longer run time. Note that these potential merges are done by a random sample of neighbor groups so even if <code>N_CHECKS_PER_GROUP</code> is set to the total number of nodes in the network we are not guarenteed to explore all options like <code>GREEDY</code> does.</p>
 <p>We will perform a greedy merging here.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">my_sbm<span class="op">$</span>GREEDY &lt;-<span class="st"> </span><span class="ot">TRUE</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">my_sbm<span class="op">$</span>GREEDY &lt;-<span class="st"> </span><span class="ot">TRUE</span></a></code></pre></div>
 <p>Now that we have our model and parameters set we can run the algorithm using the <code>collapse_groups()</code> method. This method takes two arguments, the first is the level to perform the agglomerative merge on (in this case the node-level or <code>0</code>), and the number of MCMC steps to perform in between each merge to equilibriate the model.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># Run initialization algorithm on base level nodes</span></a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">merge_results &lt;-<span class="st"> </span>my_sbm<span class="op">$</span><span class="kw">collapse_groups</span>(0L, 15L)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># Run initialization algorithm on base level nodes</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">merge_results &lt;-<span class="st"> </span>my_sbm<span class="op">$</span><span class="kw">collapse_groups</span>(0L, 1L)</a></code></pre></div>
 <p>This method returns a list containing the entropy and state of the model at each merge step. We can use these to look at how the merges progressed.</p>
 <p>First we will grab the number of groups at each merge step. To do this we pull out the state element and find how many nodes in it have a level of 1 (aka group level).</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">n_groups &lt;-<span class="st">  </span>merge_results <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="st">  </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span>(<span class="st">'state'</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="st">  </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map_int</a></span>(<span class="op">~</span>{</a>
-<a class="sourceLine" id="cb4-4" data-line-number="4">    .x <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="st">      </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(level <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="st">      </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span>(id) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="st">      </span><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>()</a>
-<a class="sourceLine" id="cb4-8" data-line-number="8">  })</a>
-<a class="sourceLine" id="cb4-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10">n_groups <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>()</a>
-<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt; [1] 49 22 14 12 10  7</span></a></code></pre></div>
-<p>Next we can look at how that number of groups corresponds to the entropy of the model. We should almost always see the entropy decrease as we remove groups but if there is signal in the model and the algorithm found it, we should see a relativel “lack of decrease” around the true structure value. We know the true number of groups in this data is 6 so we can reference that here…</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">tibble</span>(</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">    <span class="dt">n_groups =</span> n_groups,</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">    <span class="dt">entropy =</span> merge_results <span class="op">%&gt;%</span><span class="st"> </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map_dbl</a></span>(<span class="st">'entropy'</span>)</a>
-<a class="sourceLine" id="cb5-4" data-line-number="4">  ) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> n_groups, <span class="dt">y =</span> entropy)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="st">  </span><span class="co"># geom_step(direction = 'vh') +</span></a>
-<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="st">  </span><span class="kw">geom_line</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="st">  </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> <span class="dv">6</span>, <span class="dt">color =</span> <span class="st">'orangered'</span>)</a></code></pre></div>
-<p><img src="agglomerative_merging_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">extract_n_groups &lt;-<span class="st"> </span><span class="cf">function</span>(merge_results){</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">  merge_results <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="st">  </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span>(<span class="st">'state'</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="st">  </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map_int</a></span>(<span class="op">~</span>{</a>
+<a class="sourceLine" id="cb5-5" data-line-number="5">    .x <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="st">      </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(level <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="st">      </span>dplyr<span class="op">::</span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span>(id) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="st">      </span><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>()</a>
+<a class="sourceLine" id="cb5-9" data-line-number="9">  })</a>
+<a class="sourceLine" id="cb5-10" data-line-number="10">}</a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="kw">extract_n_groups</span>(merge_results) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>()</a>
+<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; [1] 99 55 45 40 32 30</span></a></code></pre></div>
+<p>Next we can look at how that number of groups corresponds to the entropy of the model.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">extract_entropy &lt;-<span class="st"> </span><span class="cf">function</span>(merge_results){</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">  merge_results <span class="op">%&gt;%</span><span class="st"> </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map_dbl</a></span>(<span class="st">'entropy'</span>)</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">}</a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="kw">extract_entropy</span>(merge_results) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>()</a>
+<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt; [1] 1292.981 1381.148 1413.521 1472.310 1475.906 1487.943</span></a></code></pre></div>
+<p>We should almost always see the entropy decrease as we remove groups but if there is signal in the model and the algorithm found it, we should see a relativel “lack of decrease” around the true structure value. We know the true number of groups in this data is 6 so we can reference that here…</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">results_to_df &lt;-<span class="st"> </span><span class="cf">function</span>(merge_results){</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">  <span class="kw">tibble</span>(</a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">    <span class="dt">n_groups =</span> <span class="kw">extract_n_groups</span>(merge_results),</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">    <span class="dt">entropy =</span> <span class="kw">extract_entropy</span>(merge_results)</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">  )</a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">}</a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10">plot_merge_results &lt;-<span class="st"> </span><span class="cf">function</span>(merge_results_df){</a>
+<a class="sourceLine" id="cb7-11" data-line-number="11">  <span class="kw">ggplot</span>(merge_results_df, <span class="kw">aes</span>(<span class="dt">x =</span> n_groups, <span class="dt">y =</span> entropy)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="st">    </span><span class="kw">geom_line</span>(<span class="dt">alpha =</span> <span class="fl">0.3</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="st">    </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="fl">0.5</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-14" data-line-number="14"><span class="st">    </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> K_a <span class="op">+</span><span class="st"> </span>K_b, <span class="dt">color =</span> <span class="st">'orangered'</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-15" data-line-number="15"><span class="st">    </span><span class="kw">coord_cartesian</span>(<span class="dt">xlim =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>, <span class="dv">30</span>)) </a>
+<a class="sourceLine" id="cb7-16" data-line-number="16">}</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">merge_results <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">results_to_df</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">plot_merge_results</span>()</a></code></pre></div>
+<p><img src="agglomerative_merging_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<p>We can perform the same setup but this time not using greedy but the sampling version</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">new_sbm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/create_sbm.html">create_sbm</a></span>(simulated_network<span class="op">$</span>edges, simulated_network<span class="op">$</span>nodes)</a>
+<a class="sourceLine" id="cb9-2" data-line-number="2">new_sbm<span class="op">$</span>GREEDY &lt;-<span class="st"> </span><span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3">new_sbm<span class="op">$</span>N_CHECKS_PER_GROUP &lt;-<span class="st"> </span><span class="dv">10</span></a>
+<a class="sourceLine" id="cb9-4" data-line-number="4">non_greedy_merge_results &lt;-<span class="st"> </span>new_sbm<span class="op">$</span><span class="kw">collapse_groups</span>(0L, 15L)</a>
+<a class="sourceLine" id="cb9-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb9-6" data-line-number="6">non_greedy_merge_results <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">results_to_df</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">plot_merge_results</span>()</a></code></pre></div>
+<p><img src="agglomerative_merging_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+<p>We can try scanning over different number of checks per group to see how it changes results</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">merges_over_changes &lt;-<span class="st"> </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map_dfr</a></span>(</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">  <span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="dv">5</span>, <span class="dv">50</span>, <span class="dt">by =</span> <span class="dv">5</span>),</a>
+<a class="sourceLine" id="cb10-3" data-line-number="3">  <span class="op">~</span>{</a>
+<a class="sourceLine" id="cb10-4" data-line-number="4">    new_sbm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/create_sbm.html">create_sbm</a></span>(simulated_network<span class="op">$</span>edges, simulated_network<span class="op">$</span>nodes)</a>
+<a class="sourceLine" id="cb10-5" data-line-number="5">    new_sbm<span class="op">$</span>GREEDY &lt;-<span class="st"> </span><span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb10-6" data-line-number="6">    new_sbm<span class="op">$</span>N_CHECKS_PER_GROUP &lt;-<span class="st"> </span>.x</a>
+<a class="sourceLine" id="cb10-7" data-line-number="7">    merge_results &lt;-<span class="st"> </span>new_sbm<span class="op">$</span><span class="kw">collapse_groups</span>(0L, 15L)</a>
+<a class="sourceLine" id="cb10-8" data-line-number="8">    <span class="kw">results_to_df</span>(merge_results) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">checks =</span> .x)</a>
+<a class="sourceLine" id="cb10-9" data-line-number="9">  })</a>
+<a class="sourceLine" id="cb10-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb10-11" data-line-number="11"><span class="kw">plot_merge_results</span>(merges_over_changes) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb10-12" data-line-number="12"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>checks) <span class="op">+</span></a>
+<a class="sourceLine" id="cb10-13" data-line-number="13"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"Tuning number of merge checks per node"</span>)</a></code></pre></div>
+<p><img src="agglomerative_merging_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">merges_over_sweeps &lt;-<span class="st"> </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map_dfr</a></span>(</a>
+<a class="sourceLine" id="cb11-2" data-line-number="2">  <span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="dv">1</span>, <span class="dv">50</span>, <span class="dt">by =</span> <span class="dv">5</span>),</a>
+<a class="sourceLine" id="cb11-3" data-line-number="3">  <span class="op">~</span>{</a>
+<a class="sourceLine" id="cb11-4" data-line-number="4">    new_sbm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/create_sbm.html">create_sbm</a></span>(simulated_network<span class="op">$</span>edges, simulated_network<span class="op">$</span>nodes)</a>
+<a class="sourceLine" id="cb11-5" data-line-number="5">    merge_results &lt;-<span class="st"> </span>new_sbm<span class="op">$</span><span class="kw">collapse_groups</span>(0L, <span class="kw"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span>(.x))</a>
+<a class="sourceLine" id="cb11-6" data-line-number="6">    <span class="kw">results_to_df</span>(merge_results) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">mcmc_sweeps =</span> .x)</a>
+<a class="sourceLine" id="cb11-7" data-line-number="7">  })</a>
+<a class="sourceLine" id="cb11-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb11-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb11-10" data-line-number="10"><span class="kw">plot_merge_results</span>(merges_over_sweeps) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb11-11" data-line-number="11"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>mcmc_sweeps) <span class="op">+</span></a>
+<a class="sourceLine" id="cb11-12" data-line-number="12"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"Tuning number of mcmc sweeps per stage"</span>)</a></code></pre></div>
+<p><img src="agglomerative_merging_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
