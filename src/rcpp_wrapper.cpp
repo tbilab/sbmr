@@ -62,18 +62,6 @@ public:
     }
   }
 
-
-
-  // // Rcpp_SBM(int seed):sampler(seed) {};
-  // void add_node(const std::string id,
-  //               const int type,
-  //               const int level)
-  // {
-  //
-  //
-  //   SBM::add_node(id, type, level);
-  // }
-
   void add_connection(const std::string node_a_id, const std::string node_b_id)
   {
     SBM::add_connection(node_a_id, node_b_id);
@@ -221,21 +209,30 @@ RCPP_MODULE(SBM)
                 "If not in greedy mode, how many options do we check per node for moves in agglomerative merging?")
 
       .method("add_node",
-              &Rcpp_SBM::add_node)
+              &Rcpp_SBM::add_node,
+              "Add a node to the network. Takes the node id (string), the node type (string), and the node level (int). Use level = 0 for data-level nodes."
+              )
       .method("add_connection",
-              &Rcpp_SBM::add_connection)
+              &Rcpp_SBM::add_connection,
+              "Connects two nodes in network (at level 0) by their ids (string).")
       .method("set_node_parent",
-              &Rcpp_SBM::set_node_parent)
+              &Rcpp_SBM::set_node_parent,
+              "Sets the parent node (or group) for a given node. Takes child node's id (string), parent node's id (string), and the level of child node (int).")
       .method("get_state",
-              &Rcpp_SBM::get_state)
+              &Rcpp_SBM::get_state,
+              "Exports the current state of the network as dataframe with each node as a row and columns for node id, parent id, node type, and node level.")
       .method("load_from_state",
-              &Rcpp_SBM::load_from_state)
+              &Rcpp_SBM::load_from_state,
+              "Takes model state export as given by SBM$get_state() and returns model to specified state. This is useful for resetting model before running various algorithms such as agglomerative merging.")
       .method("compute_entropy",
-              &Rcpp_SBM::compute_entropy)
+              &Rcpp_SBM::compute_entropy,
+              "Computes the (degree-corrected) entropy for the network at the specified level (int).")
       .method("mcmc_sweep",
-              &Rcpp_SBM::mcmc_sweep)
+              &Rcpp_SBM::mcmc_sweep,
+              "Runs a single MCMC sweep across all nodes at specified level. Each node is given a chance to move groups or stay in current group and all nodes are processed in random order. Takes the level that the sweep should take place on (int) and if new groups groups can be proposed and empty groups removed (boolean).")
       .method("collapse_groups",
-              &Rcpp_SBM::collapse_groups);
+              &Rcpp_SBM::collapse_groups,
+              "Performs agglomerative merging on network, starting with each group has a single node down to one group per node type. Arguments are level to perform merge at (int) and number of MCMC steps to peform between each collapsing to equilibriate group. Returns list with entropy and model state at each merge.");
 }
 
 /*** R
