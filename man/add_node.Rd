@@ -16,7 +16,7 @@ add_node(sbm, id, type = "node", level = 0)
 \item{level}{Level in node hierarchy. Level \code{0} indicates node is at the data level, levels greater than \code{0} are group nodes.}
 }
 \value{
-SBM model object modified with node added (note that object is modified in place as well.)
+SBM model object modified with node added. \emph{Note that object is modified in place as well.}
 }
 \description{
 Add a node to the network. Takes the node id (string), the node type

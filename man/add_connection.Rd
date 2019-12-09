@@ -14,7 +14,7 @@ add_connection(sbm, a_node, b_node)
 \item{b_node}{Id of second node in connection}
 }
 \value{
-SBM model object modified with connection added (note that object is modified in place as well.)
+SBM model object modified with connection added. \emph{Note that object is modified in place as well.}
 }
 \description{
 Connects two nodes in network (at level 0) by their ids (string).

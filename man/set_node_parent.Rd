@@ -17,8 +17,7 @@ set_node_parent(sbm, child_id, parent_id, level = 0)
 value of \code{0}.}
 }
 \value{
-SBM model object modified with node hierarchy modified. Note that
-object is modified in place as well.
+SBM model object modified with node hierarchy modified. \emph{Note that object is modified in place as well.}
 }
 \description{
 Sets the parent node (or group) for a given node. Takes child node's id

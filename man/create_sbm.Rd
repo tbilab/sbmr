@@ -4,7 +4,7 @@
 \alias{create_sbm}
 \title{Create SBM}
 \usage{
-create_sbm(edges, nodes = NULL, from_col = from, to_col = to)
+create_sbm(edges = NULL, nodes = NULL, from_col = from, to_col = to)
 }
 \arguments{
 \item{edges}{Dataframe with a from and two column encoding edges between string node ids (direction does not matter).}

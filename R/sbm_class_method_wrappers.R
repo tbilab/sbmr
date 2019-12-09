@@ -13,7 +13,7 @@
 #' @param type Type of node (string). This is used to distinguish multipartite networks. E.g. "person", or "publication", etc..
 #' @param level Level in node hierarchy. Level `0` indicates node is at the data level, levels greater than `0` are group nodes.
 #'
-#' @return SBM model object modified with node added (note that object is modified in place as well.)
+#' @return SBM model object modified with node added. \emph{Note that object is modified in place as well.}
 #' @export
 #'
 #' @examples
@@ -32,7 +32,7 @@ add_node <- function(sbm, id, type = "node", level = 0){
 #' @param a_node Id of first node in connection
 #' @param b_node Id of second node in connection
 #'
-#' @return SBM model object modified with connection added (note that object is modified in place as well.)
+#' @return SBM model object modified with connection added. \emph{Note that object is modified in place as well.}
 #' @export
 #'
 #' @examples
@@ -54,8 +54,7 @@ add_connection <- function(sbm, a_node, b_node){
 #' @param level Level of child node. This will almost always stay at default
 #'   value of `0`.
 #'
-#' @return SBM model object modified with node hierarchy modified. Note that
-#'   object is modified in place as well.
+#' @return SBM model object modified with node hierarchy modified. \emph{Note that object is modified in place as well.}
 #' @export
 #'
 #' @examples
@@ -98,7 +97,7 @@ get_state <- function(sbm){
 #' @param state SBM state dump dataframe as provided by \code{\link{get_state}}.
 #'
 #' @return SBM model object modified with state modified to matched passed state
-#'   dump. Note that object is modified in place as well.
+#'   dump. \emph{Note that object is modified in place as well.}
 #'
 #' @export
 #'

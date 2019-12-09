@@ -13,7 +13,7 @@ load_from_state(sbm, state)
 }
 \value{
 SBM model object modified with state modified to matched passed state
-dump. Note that object is modified in place as well.
+dump. \emph{Note that object is modified in place as well.}
 }
 \description{
 Takes model state export as given by SBM$get_state and returns model to
