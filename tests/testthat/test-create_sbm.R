@@ -69,3 +69,29 @@ test_that("Different column names for edges work", {
 })
 
 
+test_that("Creates empty object when passed nothing", {
+
+
+  my_sbm <- create_sbm()
+
+
+  expect_equal(nrow(get_state(my_sbm)), 0)
+})
+
+test_that("Creates network with zero connections when passed just nodes...", {
+  # Model never keeps track of all the connections in a single place so this is a hard one to test...
+
+  my_sbm <- create_sbm(nodes = my_nodes)
+
+  expected_state <- dplyr::tribble(
+    ~id, ~type, ~parent,  ~level,
+    "a1", "a",   "none",      0L,
+    "a2", "a",   "none",      0L,
+    "b1", "b",   "none",      0L,
+    "b2", "b",   "none",      0L
+  )
+
+  expect_equal(expected_state, get_state(my_sbm))
+})
+
+

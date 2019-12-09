@@ -12,25 +12,56 @@
 #' @export
 #'
 #' @examples
-create_sbm <- function(edges, nodes = NULL, from_col = from, to_col = to){
+create_sbm <- function(edges = NULL, nodes = NULL, from_col = from, to_col = to){
 
-  edges_to <- dplyr::pull(edges, !!rlang::enquo(to_col))
-  edges_from <- dplyr::pull(edges, !!rlang::enquo(from_col))
+  no_edges <- is.null(edges)
+  no_nodes <- is.null(nodes)
 
-  # Break edges down to unique nodes. from_edges is used to find out if a node
-  # isnt present in the edges but is in the optional nodes dataframe
-  model_nodes <- dplyr::tibble(
-    id = unique(c(edges_from, edges_to)),
-    from_edges = TRUE
-  )
+  # We have 4 total possiblilities for model specification
+  no_data <- no_edges & no_nodes
+  nodes_w_no_edges <- (!no_nodes) & no_edges
+  edges_w_no_nodes <- (!no_edges) & no_nodes
+  edges_and_nodes <- (!no_edges) & (!no_nodes)
 
-  # If the user didn't provide a node dataframe, assume all nodes are the same
-  # type
-  if(is.null(nodes)){
-    model_nodes$type = "a"
-  } else {
-    # Otherwise join the passed and internal nodes dataframes
-    model_nodes <- dplyr::full_join(model_nodes, nodes, by = "id")
+
+  # Instantiate instance of sbm class
+  sbm <- new(SBM)
+
+  # If we have any edges should gather their unique nodes
+  if(!no_edges){
+    edges_to <- dplyr::pull(edges, !!rlang::enquo(to_col))
+    edges_from <- dplyr::pull(edges, !!rlang::enquo(from_col))
+
+    # Break edges down to unique nodes. from_edges is used to find out if a node
+    # isnt present in the edges but is in the optional nodes dataframe
+    nodes_from_edges <- dplyr::tibble(
+      id = unique(c(edges_from, edges_to)),
+      from_edges = TRUE
+    )
+
+  }
+
+
+
+  if (no_data){
+
+    # If the user just called the function empty, return the new empty SBM object.
+    return(sbm)
+
+  } else if (nodes_w_no_edges){
+
+    # If user just passed us nodes, make model nodes dataframe out of that
+    model_nodes <- nodes
+
+  } else if(edges_w_no_nodes){
+    # If the user didn't provide a node dataframe, assume all nodes are the same
+    # type
+    model_nodes <- dplyr::mutate(nodes_from_edges, type = "node")
+
+  } else if(edges_and_nodes) {
+
+    # If we have both edges and nodes, merge those dataframes
+    model_nodes <- dplyr::full_join(nodes_from_edges, nodes, by = "id")
 
     # Check on how well the dataframes match up
     missing_from_nodes <- model_nodes$id[is.na(model_nodes$type)]
@@ -39,8 +70,8 @@ create_sbm <- function(edges, nodes = NULL, from_col = from, to_col = to){
     # Check to make sure all nodes are accounted for in user passed df
     if(length(missing_from_nodes) > 0){
       stop(paste("Passed nodes dataframe is missing node(s)",
-                  paste(missing_from_nodes, collapse = ", "),
-                  "from edges"))
+                 paste(missing_from_nodes, collapse = ", "),
+                 "from edges"))
     }
 
     if(length(missing_from_edges) > 0){
@@ -48,22 +79,24 @@ create_sbm <- function(edges, nodes = NULL, from_col = from, to_col = to){
                     paste(missing_from_edges, collapse = ", "),
                     "are not seen in any of the edges"))
     }
+
   }
 
-  # Instantiate instance of sbm class
-  sbm <- new(SBM)
+
 
   # Fill in all the needed nodes
   for(i in 1:nrow(model_nodes)){
     sbm$add_node(model_nodes$id[i], model_nodes$type[i], 0L)
   }
 
-  # Connect all the nodes
-  for(i in 1:nrow(edges)){
-    sbm$add_connection(
-      edges_from[i],
-      edges_to[i]
-    )
+  # Connect all the nodes if we have edges to do so
+  if(!no_edges){
+    for(i in 1:nrow(edges)){
+      sbm$add_connection(
+        edges_from[i],
+        edges_to[i]
+      )
+    }
   }
 
   # Return model
