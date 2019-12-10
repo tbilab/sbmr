@@ -83,7 +83,11 @@ test_that("Add connection", {
   my_sbm %>% add_connection('node_1', 'node_2')
 
   # This should thrown a nice helpful error message, but it doesn't.
-  # my_sbm %>% add_connection('node_4', 'node_2')
+  expect_error(
+    add_connection(my_sbm, 'node_4', 'node_2'),
+    "Can't find node node_4 at level 0",
+    fixed = TRUE
+  )
 })
 
 
@@ -113,9 +117,13 @@ test_that("Set node parent", {
 
   # Try and assign a parent node that is same level as node 1
   # Again, this should throw an error!
-  # my_sbm %>%
-  #   add_node('node_2') %>%
-  #   set_node_parent(child_id = 'node_1', parent_id = 'node_2')
+  expect_error(
+    my_sbm %>%
+      add_node('node_2') %>%
+      set_node_parent(child_id = 'node_1', parent_id = 'node_2'),
+    "Can't find node node_2 at level 1",
+    fixed = TRUE
+  )
 })
 
 test_that("Initializing a single group per node", {
@@ -135,7 +143,6 @@ test_that("Randomly assigning initial groups", {
   n_groups <- 3;
   n_nodes_each_type <- 10;
   max_n_types <- 5
-
 
   get_num_initialized_groups <- function(my_nodes){
     # Default parameters should create a single group per node

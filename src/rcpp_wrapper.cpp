@@ -62,9 +62,23 @@ public:
     }
   }
 
+  NodePtr find_node_by_id(const std::string node_id, const int level)
+  {
+    try
+    {
+      return nodes.at(level)->at(node_id);
+    }
+    catch (...)
+    {
+      stop("Can't find node " + node_id + " at level " + std::to_string(level));
+    }
+  }
+
   void add_connection(const std::string node_a_id, const std::string node_b_id)
   {
-    SBM::add_connection(node_a_id, node_b_id);
+
+    SBM::add_connection(find_node_by_id(node_a_id, 0),
+                        find_node_by_id(node_b_id, 0));
   }
 
   DataFrame get_state()
@@ -96,7 +110,7 @@ public:
                        const std::string parent_id,
                        const int level = 0)
   {
-    get_node_by_id(child_id, level)->set_parent(get_node_by_id(parent_id, level + 1));
+    find_node_by_id(child_id, level)->set_parent(find_node_by_id(parent_id, level + 1));
   }
 
   void initialize_groups(const int num_groups, const int level)
