@@ -212,31 +212,79 @@ void Network::add_connection(const NodePtr node1, const NodePtr node2)
 // Builds and assigns a group node for every node in a given level
 // =============================================================================
 void Network::give_every_node_at_level_own_group(const int level) 
+{ 
+  initialize_groups(-1, level);
+}    
+
+// =============================================================================
+// Adds a desired number of groups and randomly assigns them for a given level
+// num_groups = -1 means every node gets their own group
+// =============================================================================
+void Network::initialize_groups(const int num_groups, const int level)
 {
   PROFILE_FUNCTION();
+
   // Grab all the nodes for the desired level
   LevelPtr node_level = nodes.at(level);
-  
-  // Make sure level has nodes before looping through it
-  if (node_level->size() == 0) throw "Requested level is empty.";
-  
 
-  
-  // Loop through each of the nodes,
+  const int num_nodes_in_level = node_level->size();
+
+  // Setup a sampler
+  Sampler group_sampler;
+
+  // Make sure level has nodes before looping through it
+  if (num_nodes_in_level == 0) throw "Requested level is empty.";
+
+  // Figure out how we're making groups, is it one group per node or a set number
+  // of groups total?
+  bool one_group_per_node = num_groups == -1;
+
+  // Make a map that gives us type -> array of new groups
+  std::map<int, std::vector<NodePtr>> type_to_groups;
+
+  // If we're randomly distributing nodes, we'll use this map to sample a random
+  // group for a given node by its type
+  if (!one_group_per_node) 
+  {
+    for (auto type_it = node_type_counts.begin();
+              type_it != node_type_counts.end();
+              type_it++)
+    {
+      // Reserve proper number of slots for new groups
+      type_to_groups[type_it->first].reserve(num_groups);
+
+      // Buid new groups to fill those slots
+      for (int i = 0; i < num_groups; i++)
+      {
+        // build a group node at the next level
+        type_to_groups[type_it->first].push_back(create_group_node(type_it->first, level + 1));
+      }
+    }
+  }
+
+  // Loop through every node in the level and assign it its new parent
+   // Loop through each of the nodes,
   for (auto node_it  = node_level->begin(); 
             node_it != node_level->end(); 
             ++node_it) 
   {
-    // build a group node at the next level
-    NodePtr new_group = create_group_node(node_it->second->type, 
-                                          level + 1);
+    const int node_type = node_it->second->type;
 
+    // build a group node at the next level
+    // We either build a new group for node if we're giving each node a group
+    // or sample new group from available list of groups for this type
+    NodePtr new_group = one_group_per_node ?
+      create_group_node(node_type, level + 1):
+      group_sampler.sample(type_to_groups[node_type]);
+      
     // assign that group node to the node
     node_it->second->set_parent(new_group);
   }
 
+  // Clean up group level
   clean_empty_groups();
-}    
+}
+
 
 
 // =============================================================================

@@ -3,6 +3,7 @@
 
 #include "Node.h"
 #include "helpers.h"
+#include "Sampler.h"
 
 #include <unordered_map>
 
@@ -96,6 +97,10 @@ public:
 
   // Builds and assigns a group node for every node in a given level
   void give_every_node_at_level_own_group(int level);
+  
+  // Adds a desired number of groups and randomly assigns them for a given level
+  // num_groups = -1 means every node gets their own group
+  void initialize_groups(int num_groups, int level);
 
   // Scan through levels and remove all group nodes that have no children.
   // Returns number of groups removed
