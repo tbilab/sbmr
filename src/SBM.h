@@ -45,7 +45,7 @@ public:
 
   // Attributes
   // =========================================================================
-  // A random sampler generation sclass.
+  // A random sampler generation class.
   Sampler sampler;
 
   // Parameters that control the mcmc and merging stuffs
