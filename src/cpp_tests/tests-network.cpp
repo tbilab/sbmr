@@ -131,6 +131,40 @@ TEST_CASE("Initializing a group for every node", "[Network]")
     REQUIRE(1 == my_net.get_node_from_level(1)->children.size());
 }
 
+TEST_CASE("Randomly assigning a given number of groups", "[Network]")
+{
+    Network my_net;
+
+    my_net.add_node("a1", 1);
+    my_net.add_node("a2", 1);
+    my_net.add_node("a3", 1);
+    my_net.add_node("a4", 1);
+    my_net.add_node("a5", 1);
+    my_net.add_node("a6", 1);
+    my_net.add_node("a7", 1);
+    my_net.add_node("a8", 1);
+    my_net.add_node("a9", 1);
+    my_net.add_node("a10", 1);
+        
+    my_net.add_node("b1", 0);
+    my_net.add_node("b2", 0);
+    my_net.add_node("b3", 0);
+    my_net.add_node("b4", 0);
+    my_net.add_node("b5", 0);
+    my_net.add_node("b6", 0);
+    my_net.add_node("b7", 0);
+    my_net.add_node("b8", 0);
+    my_net.add_node("b9", 0);
+    my_net.add_node("b10", 0);
+
+   
+    // Distribute 3 total groups for each type across nodes randomly
+    my_net.initialize_groups(3, 0);
+
+    // There should now be a total of 6 nodes at level 1
+    REQUIRE(6 == my_net.get_level(1)->size());
+}
+
 
 TEST_CASE("Cleaning up empty groups", "[Network]")
 {
