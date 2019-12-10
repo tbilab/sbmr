@@ -86,6 +86,7 @@ set_node_parent <- function(sbm, child_id, parent_id, level = 0){
 initialize_groups <- function(sbm, num_groups = -1, level = 0){
   if(num_groups < -1) stop(paste("Can't initialize", num_groups, "groups."))
   sbm$initialize_groups(as.integer(num_groups), as.integer(level))
+  sbm
 }
 
 
