@@ -164,7 +164,6 @@ test_that("Randomly assigning initial groups", {
     })
 })
 
-
 # load_from_state <- function(sbm, state){
 test_that("Loading from state dump", {
 
@@ -262,6 +261,30 @@ test_that("MCMC Sweeps function as expected", {
     })
 
   expect_true(any(n_groups_changes))
+})
+
+test_that("Agglomerative merging/collapsing works", {
+  n_nodes <- 50
+
+  # Start with a random network
+  my_sbm <- create_sbm(sim_simple_network(n_nodes = n_nodes))
+
+  # The behavior here is odd so I will just make sure it works rather than
+  # testing full bahavior yet
+
+  # collapse_results <- collapse_groups(my_sbm, num_mcmc_sweeps = 5)
+  #   collapse_results %>%
+  #     purrr::map('state') %>%
+  #     purrr::map_int(~dplyr::filter(., level == 1) %>% nrow())
+
+
+  # # Make sure that there are always less groups after each step
+  # for(i in 2:length(groups_per_collapse)){
+  #   # print(groups_per_collapse[i])
+  #   # print(groups_per_collapse[i - 1])
+  #   expect_lt(groups_per_collapse[i], groups_per_collapse[i - 1])
+  # }
+
 })
 
 
