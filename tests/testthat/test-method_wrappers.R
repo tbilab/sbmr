@@ -1,5 +1,13 @@
 requireNamespace("lobstr", quietly = TRUE)
 
+# Helper to get number of groups from a given state
+get_num_groups <- function(sbm){
+  sbm %>%
+    get_state() %>%
+    dplyr::filter(level == 1) %>%
+    nrow()
+}
+
 test_that("Get state returns the actual state", {
   my_nodes <- dplyr::tribble(
     ~id, ~type,
@@ -118,8 +126,7 @@ test_that("Initializing a single group per node", {
     add_node('node_3') %>%
     initialize_groups()
 
-  expect_equal(get_state(my_sbm) %>% dplyr::filter(level == 1) %>% nrow(),
-               3)
+  expect_equal(get_num_groups(my_sbm),3)
 
 })
 
@@ -227,13 +234,34 @@ test_that("computing entropy", {
 })
 
 test_that("MCMC Sweeps function as expected", {
+  n_nodes <- 10
+  n_groups <- 5
+  n_sweeps <- 10
+
   # Start with a random network
-  my_sbm <- create_sbm(sim_simple_network(n_nodes = 10))
+  my_sbm <- create_sbm(sim_simple_network(n_nodes = n_nodes)) %>%
+    initialize_groups(num_groups = n_groups)
+
+  original_num_groups <- get_num_groups(my_sbm)
+
+  # Run MCMC sweeps that do not allow group numbers to change
+  n_groups_stays_same <- 1:n_sweeps %>%
+    purrr::map_int(~{
+      mcmc_sweep(my_sbm, variable_num_groups = FALSE)
+      get_num_groups(my_sbm) == original_num_groups
+    })
+
+  expect_true(all(n_groups_stays_same))
 
 
-  # Run a single MCMC sweep that does not allow group numbers to change
+  # Now let the model change number of groups and see if it ever does
+  n_groups_changes <- 1:n_sweeps %>%
+    purrr::map_int(~{
+      mcmc_sweep(my_sbm, variable_num_groups = TRUE)
+      get_num_groups(my_sbm) != original_num_groups
+    })
 
-
+  expect_true(any(n_groups_changes))
 })
 
 
