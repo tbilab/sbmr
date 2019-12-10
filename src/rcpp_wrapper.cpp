@@ -111,7 +111,7 @@ public:
 
   int mcmc_sweep(int level, bool variable_num_groups)
   {
-    std::cout << "Running rcpp_SBM mcmc function" << std::endl;
+    // std::cout << "Running rcpp_SBM mcmc function" << std::endl;
     return SBM::mcmc_sweep(level, variable_num_groups);
   }
 
