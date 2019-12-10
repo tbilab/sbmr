@@ -1,4 +1,5 @@
 #include "Node.h"
+#include <iostream>
 
 // =============================================================================
 // Replace 'this' with a shared smart pointer
@@ -88,7 +89,7 @@ void Node::set_parent(NodePtr parent_node_ptr)
 
   if(level != parent_node_ptr->level - 1)
   {
-    throw "Parent node must be one level above child";
+    throw std::logic_error("Parent node must be one level above child");
   }
 
   // Remove self from previous parents children list (if it existed)
@@ -140,7 +141,9 @@ inline NodePtr Node::get_parent_at_level(const int level_of_parent)
   // of the current node.
   if (level_of_parent < level)
   {
-    throw "Requested parent level lower than current node level.";
+    std::string error_msg = "Requested parent level (" +std::to_string(level_of_parent) + ") lower than current node level (" + std::to_string(level) + ").";
+    std::cerr << error_msg;
+    throw std::logic_error(error_msg);
   }
 
   // Start with this node as current node
@@ -148,8 +151,11 @@ inline NodePtr Node::get_parent_at_level(const int level_of_parent)
 
   while (current_node->level != level_of_parent)
   {
-    if (!parent)
-      throw "No parent present at requested level";
+    if (!parent) {
+      std::string error_msg = "No parent at level " + std::to_string(level_of_parent) + " for " + id;
+      std::cerr << error_msg;
+      throw std::range_error(error_msg);
+    }
 
     // Traverse up parents until we've reached just below where we want to go
     current_node = current_node->parent;
@@ -175,16 +181,7 @@ std::vector<NodePtr> Node::get_connections_to_level(const int desired_level)
   // desired level and place in connected nodes vector
   for (auto connection : connections)
   {
-    try
-    {
-      level_cons.push_back(connection->get_parent_at_level(desired_level));
-    }
-    catch (...)
-    {
-      // No connections at this level were found
-      throw "No parent at level " +
-          std::to_string(desired_level) + " for " + id;
-    }
+    level_cons.push_back(connection->get_parent_at_level(desired_level));
   }
 
   return level_cons;

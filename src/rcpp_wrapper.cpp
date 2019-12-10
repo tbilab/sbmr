@@ -76,7 +76,6 @@ public:
 
   void add_connection(const std::string node_a_id, const std::string node_b_id)
   {
-
     SBM::add_connection(find_node_by_id(node_a_id, 0),
                         find_node_by_id(node_b_id, 0));
   }
@@ -171,7 +170,7 @@ public:
       auto loc_of_int_type = type_string_to_int.find(*type_it);
       if (loc_of_int_type == type_string_to_int.end())
       {
-        throw (*type_it) + " not found in model";
+        stop((*type_it) + " not found in model");
       } else {
         // Convert string to int and push to vector
         int_types.push_back(loc_of_int_type->second);

@@ -12,6 +12,7 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <exception>
 
 #include "profiling/Instrument.h"
 
