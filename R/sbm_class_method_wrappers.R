@@ -63,6 +63,31 @@ set_node_parent <- function(sbm, child_id, parent_id, level = 0){
   sbm
 }
 
+#' Initialize groups
+#'
+#' Initializes groups for a given level of network. When `num_groups = -1` (the
+#' default) this will simply give every node its own group. Otherwise it will
+#' randomly draw each nodes group from `num_group` possible parent nodes for
+#' each node type. E.g. if network is bipartite and `num_groups == 3` a total of
+#' `3*2 = 6` groups will be added and assigned randomly to nodes. Because of
+#' random assignment of parents there may sometimes be less groups than
+#' `num_groups * <num_types>` due to some group nodes never being assigned to a
+#' child node.
+#'
+#' @inheritParams set_node_parent
+#' @param num_groups Total number of groups to initialize for each unique node
+#'   type. If set to `-1`, then a single group is made for every node.
+#'
+#' @return SBM model object modified with new group nodes and node hierarchy
+#'   modified. \emph{Note that object is modified in place as well.}
+#' @export
+#'
+#' @examples
+initialize_groups <- function(sbm, num_groups = -1, level = 0){
+  if(num_groups < -1) stop(paste("Can't initialize", num_groups, "groups."))
+  sbm$initialize_groups(as.integer(num_groups), as.integer(level))
+}
+
 
 #' Get state
 #'

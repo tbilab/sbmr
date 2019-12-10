@@ -99,6 +99,11 @@ public:
     get_node_by_id(child_id, level)->set_parent(get_node_by_id(parent_id, level + 1));
   }
 
+  void initialize_groups(const int num_groups, const int level)
+  {
+   Network::initialize_groups(num_groups, level);
+  }
+
   double compute_entropy(const int level)
   {
     return SBM::compute_entropy(level);
@@ -218,6 +223,9 @@ RCPP_MODULE(SBM)
       .method("set_node_parent",
               &Rcpp_SBM::set_node_parent,
               "Sets the parent node (or group) for a given node. Takes child node's id (string), parent node's id (string), and the level of child node (int).")
+      .method("initialize_groups",
+             &Rcpp_SBM::initialize_groups,
+             "Adds a desired number of groups and randomly assigns them for a given level. num_groups = -1 means every node gets their own group")
       .method("get_state",
               &Rcpp_SBM::get_state,
               "Exports the current state of the network as dataframe with each node as a row and columns for node id, parent id, node type, and node level.")
