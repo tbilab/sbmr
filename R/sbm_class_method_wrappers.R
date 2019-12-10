@@ -103,7 +103,11 @@ get_state <- function(sbm){
 #'
 #' @examples
 load_from_state <- function(sbm, state){
-  sbm$load_from_state(state)
+  sbm$load_from_state(
+    state$id,
+    state$parent,
+    state$level,
+    state$type)
   sbm
 }
 
