@@ -1,5 +1,25 @@
 requireNamespace("lobstr", quietly = TRUE)
 
+test_that("Get state returns the actual state", {
+  my_nodes <- dplyr::tribble(
+    ~id, ~type,
+    "a1", "a",
+    "a2", "a",
+    "b1", "b",
+    "b2", "b"
+  )
+
+  expected_state <- my_nodes %>%
+    dplyr::mutate(
+      level = 0L,
+      parent = 'none'
+    )
+
+  my_sbm <- create_sbm(nodes = my_nodes)
+  expect_equal(dplyr::as_tibble(get_state(my_sbm)), expected_state)
+})
+
+
 test_that("Assignment and mutation keep pointing to same object", {
 
   # Start with network with 5 nodes.
@@ -88,5 +108,132 @@ test_that("Set node parent", {
   # my_sbm %>%
   #   add_node('node_2') %>%
   #   set_node_parent(child_id = 'node_1', parent_id = 'node_2')
-  #
 })
+
+test_that("Initializing a single group per node", {
+  # Default parameters should create a single group per node
+  my_sbm <- create_sbm() %>%
+    add_node('node_1') %>%
+    add_node('node_2') %>%
+    add_node('node_3') %>%
+    initialize_groups()
+
+  expect_equal(get_state(my_sbm) %>% dplyr::filter(level == 1) %>% nrow(),
+               3)
+
+})
+
+test_that("Randomly assigning initial groups", {
+  n_samples <- 10 # due to stochastic sampling need to try a few times and make sure average works as expected
+  n_groups <- 3;
+  n_nodes_each_type <- 10;
+  max_n_types <- 5
+
+
+  get_num_initialized_groups <- function(my_nodes){
+    # Default parameters should create a single group per node
+    create_sbm(nodes = my_nodes) %>%
+      initialize_groups(num_groups = n_groups) %>%
+      get_state() %>%
+      dplyr::filter(level == 1) %>%
+      nrow()
+  }
+
+  # Loop over a range of number of types and make sure desired number of groups is made
+  1:max_n_types %>%
+    purrr::walk(function(n_types){
+      types <- letters[1:n_types]
+
+      # Setup some nodes
+      my_nodes <- dplyr::tibble(
+        type = rep(types, each = n_nodes_each_type),
+        id = paste0(type, 1:(n_nodes_each_type*n_types))
+      )
+
+      num_groups_per_sample <- 1:n_samples %>%
+        purrr::map_int(~get_num_initialized_groups(my_nodes))
+
+      expect_true(any(num_groups_per_sample == n_groups*n_types))
+    })
+})
+
+
+# load_from_state <- function(sbm, state){
+test_that("Loading from state dump", {
+
+  # Start with nodes 3 nodes attached to 2 groups
+  my_sbm <- create_sbm() %>%
+    add_node('node_1') %>%
+    add_node('node_2') %>%
+    add_node('node_3') %>%
+    add_node('node_11', level = 1) %>%
+    add_node('node_12', level = 1) %>%
+    set_node_parent(child_id = 'node_1', parent_id = 'node_11') %>%
+    set_node_parent(child_id = 'node_2', parent_id = 'node_11') %>%
+    set_node_parent(child_id = 'node_3', parent_id = 'node_12')
+
+  # Grab state
+  initial_state <- my_sbm %>% get_state()
+
+  # Modify state by adding a new group and attaching node 3 to it
+  my_sbm %>%
+    add_node('node_13', level = 1) %>%
+    set_node_parent('node_3', parent_id = 'node_13')
+
+  intermediate_state <- my_sbm %>% get_state()
+
+  # Make sure initial and intermediate are not equal
+  testthat::expect_false(isTRUE(all.equal(intermediate_state, initial_state)))
+
+  # Now restore model state using initial snapshot
+  my_sbm %>% load_from_state(initial_state)
+  final_state <- my_sbm %>% get_state()
+
+  expect_equal(initial_state, final_state)
+})
+
+test_that("computing entropy", {
+  # Start with nodes 3 nodes attached to 2 groups
+  my_sbm <- create_sbm() %>%
+    add_node('node_1') %>%
+    add_node('node_2') %>%
+    add_node('node_3') %>%
+    add_node('node_4') %>%
+    add_node('node_11', level = 1) %>%
+    add_node('node_12', level = 1) %>%
+    add_node('node_13', level = 1) %>%
+    add_connection('node_1', 'node_2') %>%
+    add_connection('node_1', 'node_3') %>%
+    add_connection('node_1', 'node_4') %>%
+    add_connection('node_2', 'node_3') %>%
+    add_connection('node_2', 'node_4') %>%
+    add_connection('node_3', 'node_4') %>%
+    add_connection('node_4', 'node_1') %>%
+    set_node_parent(child_id = 'node_1', parent_id = 'node_11') %>%
+    set_node_parent(child_id = 'node_2', parent_id = 'node_11') %>%
+    set_node_parent(child_id = 'node_3', parent_id = 'node_12') %>%
+    set_node_parent(child_id = 'node_4', parent_id = 'node_13')
+
+  first_entropy <- my_sbm %>% compute_entropy()
+
+  # Change parentage of a node
+  my_sbm %>% set_node_parent(child_id = 'node_2', parent_id = 'node_12')
+
+  # Record entropy again
+  second_entropy <- my_sbm %>% compute_entropy()
+
+  # Entropy should have changed
+  expect_false(first_entropy == second_entropy)
+})
+
+test_that("MCMC Sweeps function as expected", {
+  # Start with a random network
+  my_sbm <- create_sbm(sim_simple_network(n_nodes = 10))
+
+
+  # Run a single MCMC sweep that does not allow group numbers to change
+
+
+})
+
+
