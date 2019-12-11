@@ -4,13 +4,18 @@
 \alias{sim_sbm_network}
 \title{Simulate SBM Network}
 \usage{
-sim_sbm_network(group_info, connection_propensities, edge_dist = rpois)
+sim_sbm_network(
+  group_info,
+  connection_propensities,
+  edge_dist = rpois,
+  allow_self_connections = FALSE
+)
 }
 \arguments{
 \item{group_info}{A dataframe/tibble with two columns: \code{group}: the id of the
 group, and \code{n_nodes}: the number of nodes to simulate from that group.}
 
-\item{connection_propensities}{A datafrae with 3 columns: \code{group_1}: the id
+\item{connection_propensities}{A dataframe with 3 columns: \code{group_1}: the id
 of the from group, \code{group_2}: the id of the to group, and \code{propensity}: the
 parameter for \code{edge_dist} that controls if and or how many edges should
 occur between the pair of groups on average.}
@@ -22,6 +27,9 @@ takes two arguments: \code{n} and \code{lambda}. In this scenario the \code{prop
 connections between two nodes is provided to \code{lambda} and thus is the
 average number of connections for each pair of nodes between two given
 groups.}
+
+\item{allow_self_connections}{Should nodes be allowed to have connections to
+themselves? Default is \code{FALSE}.}
 }
 \value{
 A list with a \code{nodes} dataframe (containing a node's \code{id} and \code{group}
@@ -54,6 +62,5 @@ connection_propensities <- dplyr::tribble(
 )
 
 sim_sbm_network(group_info, connection_propensities, edge_dist = purrr::rbernoulli)
-
 
 }

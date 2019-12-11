@@ -19,6 +19,8 @@
 #'   connections between two nodes is provided to `lambda` and thus is the
 #'   average number of connections for each pair of nodes between two given
 #'   groups.
+#' @param allow_self_connections Should nodes be allowed to have connections to
+#'   themselves? Default is `FALSE`.
 #'
 #' @return A list with a `nodes` dataframe (containing a node's `id` and `group`
 #'   membership) and a `edges` dataframe (containing `from` and `to` nodes along
@@ -45,7 +47,7 @@
 #'
 #' sim_sbm_network(group_info, connection_propensities, edge_dist = purrr::rbernoulli)
 #'
-sim_sbm_network <- function(group_info, connection_propensities, edge_dist = rpois){
+sim_sbm_network <- function(group_info, connection_propensities, edge_dist = rpois, allow_self_connections = FALSE){
 
   # Generate all the node names and their groups
   nodes <- purrr::map2_dfr(
@@ -77,8 +79,16 @@ sim_sbm_network <- function(group_info, connection_propensities, edge_dist = rpo
       node_1 = id,
       node_2 = id1,
       groups = sorted_group_collapse(group, group1)
-    ) %>%
-    dplyr::full_join(
+    )
+
+  # Remove self connections if needed
+  if(!allow_self_connections){
+    edges <- edges %>%
+      dplyr::filter(node_1 != node_2)
+  }
+
+  edges <- dplyr::full_join(
+      edges,
       dplyr::transmute(
         connection_propensities,
         groups = sorted_group_collapse(group_1, group_2),
