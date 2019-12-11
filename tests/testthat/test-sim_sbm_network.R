@@ -57,9 +57,9 @@ test_that("Partite structure can be reflected by zeroing out or ommitting group 
 test_that("Higher propensity group combos should be reflected with more edges", {
   group_info <- dplyr::tribble(
     ~group, ~n_nodes,
-    "a",       25,
-    "b",       25,
-    "c",       25
+    "a",       50,
+    "b",       50,
+    "c",       50
   )
 
   connection_propensities <- dplyr::tribble(
