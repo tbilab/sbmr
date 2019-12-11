@@ -16,7 +16,8 @@ LinkingTo:
     Rcpp
 Imports: 
     Rcpp,
-    rlang
+    rlang,
+    magrittr
 Suggests: 
     testthat (>= 2.1.0),
     knitr,
