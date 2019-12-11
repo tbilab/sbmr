@@ -81,22 +81,26 @@ sim_sbm_network <- function(
   # to get propensity of each given connection. Then draw from provided
   # distribution and return edge list with pairs of nodes returned if the draw
   # returned greater than 0 connections
-  edges <- tidyr::expand_grid(node_1 = nodes, node_2 = nodes) %>%
-    purrr::flatten_dfc() %>%
-    dplyr::transmute(
-      node_1 = id,
-      node_2 = id1,
-      groups = sorted_group_collapse(group, group1)
-    )
 
-  # Remove self connections if needed
-  if(!allow_self_connections){
-    edges <- edges %>%
-      dplyr::filter(node_1 != node_2)
-  }
+  # Get all possible combinations of node-node pairs by their indices in
+  # the nodes dataframe...
+  edge_pairs_inds <- gtools::combinations(
+    n = length(nodes$id),
+    r = 2,
+    repeats.allowed = allow_self_connections
+  )
 
-  edges <- dplyr::full_join(
-      edges,
+  # Extract indices from combination matrix and use to build an edge tibble
+  node_1_inds <- edge_pairs_inds[,1]
+  node_2_inds <- edge_pairs_inds[,2]
+
+  edges <- dplyr::tibble(
+      node_1 = nodes$id[node_1_inds],
+      node_2 = nodes$id[node_2_inds],
+      groups = sorted_group_collapse(nodes$group[node_1_inds],
+                                     nodes$group[node_2_inds])
+    ) %>%
+    dplyr::full_join(
       dplyr::transmute(
         connection_propensities,
         groups = sorted_group_collapse(group_1, group_2),
