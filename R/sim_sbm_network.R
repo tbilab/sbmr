@@ -20,7 +20,10 @@
 #'   average number of connections for each pair of nodes between two given
 #'   groups.
 #' @param allow_self_connections Should nodes be allowed to have connections to
-#'   themselves? Default is `FALSE`.
+#'   themselves?
+#' @param keep_connection_counts Should the connection counts stay on returned
+#'   edges? If edges distribution is a binary yes or no then you will likely
+#'   want to set this to `TRUE`.
 #'
 #' @return A list with a `nodes` dataframe (containing a node's `id` and `group`
 #'   membership) and a `edges` dataframe (containing `from` and `to` nodes along
@@ -47,7 +50,12 @@
 #'
 #' sim_sbm_network(group_info, connection_propensities, edge_dist = purrr::rbernoulli)
 #'
-sim_sbm_network <- function(group_info, connection_propensities, edge_dist = rpois, allow_self_connections = FALSE){
+sim_sbm_network <- function(
+  group_info,
+  connection_propensities,
+  edge_dist = rpois,
+  allow_self_connections = FALSE,
+  keep_connection_counts = TRUE){
 
   # Generate all the node names and their groups
   nodes <- purrr::map2_dfr(
@@ -104,6 +112,11 @@ sim_sbm_network <- function(group_info, connection_propensities, edge_dist = rpo
       to = node_2,
       connections
     )
+
+  if (!keep_connection_counts){
+    edges <- edges %>%
+      dplyr::select(-connections)
+  }
 
   list(nodes = nodes, edges = edges)
 }
