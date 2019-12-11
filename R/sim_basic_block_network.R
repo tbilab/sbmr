@@ -41,14 +41,13 @@ sim_basic_block_network <- function(
   # Build connection propensities by going through all combinations of group
   # pairs and drawing the connection propensity from the passed
   # prob_of_connections_dist function.
-  connection_propensities <- gtools::combinations(
-      n = n_groups,
-      r = 2,
-      v = groups$group,
-      repeats.allowed = TRUE
-    ) %>%
-    dplyr::as_tibble(.name_repair = function(x) paste0("group_",1:length(x))) %>%
-    dplyr::mutate(propensity = prob_of_connections_dist(1:dplyr::n()))
+  group_pair_inds <- get_combination_indices(n_groups, repeats = TRUE)
+  n_pairs <- length(group_pair_inds$a)
+  connection_propensities <- dplyr::tibble(
+    group_1 = groups$group[group_pair_inds$a],
+    group_2 = groups$group[group_pair_inds$b],
+    propensity = prob_of_connections_dist(n_pairs)
+  )
 
   # Pass the constructed dataframes to the main sbm simulation function and remove connections
   sim_sbm_network(

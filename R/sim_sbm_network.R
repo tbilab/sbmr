@@ -84,15 +84,11 @@ sim_sbm_network <- function(
 
   # Get all possible combinations of node-node pairs by their indices in
   # the nodes dataframe...
-  edge_pairs_inds <- gtools::combinations(
-    n = length(nodes$id),
-    r = 2,
-    repeats.allowed = allow_self_connections
-  )
+  edge_pairs_inds <- get_combination_indices(length(nodes$id), repeats = allow_self_connections)
 
   # Extract indices from combination matrix and use to build an edge tibble
-  node_1_inds <- edge_pairs_inds[,1]
-  node_2_inds <- edge_pairs_inds[,2]
+  node_1_inds <- edge_pairs_inds$a
+  node_2_inds <- edge_pairs_inds$b
 
   edges <- dplyr::tibble(
       node_1 = nodes$id[node_1_inds],
