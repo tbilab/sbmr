@@ -17,7 +17,8 @@ LinkingTo:
 Imports: 
     Rcpp,
     rlang,
-    magrittr
+    magrittr,
+    gtools
 Suggests: 
     testthat (>= 2.1.0),
     knitr,

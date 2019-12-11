@@ -17,7 +17,7 @@ sim_simple_network(
 occuring}
 
 \item{allow_self_connections}{Should nodes be allowed to have connections to
-themselves? Default is \code{FALSE}.}
+themselves?}
 }
 \value{
 An edge dataframe with node ids for connections in the \code{from} and

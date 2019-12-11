@@ -8,7 +8,8 @@ sim_sbm_network(
   group_info,
   connection_propensities,
   edge_dist = rpois,
-  allow_self_connections = FALSE
+  allow_self_connections = FALSE,
+  keep_connection_counts = TRUE
 )
 }
 \arguments{
@@ -29,7 +30,11 @@ average number of connections for each pair of nodes between two given
 groups.}
 
 \item{allow_self_connections}{Should nodes be allowed to have connections to
-themselves? Default is \code{FALSE}.}
+themselves?}
+
+\item{keep_connection_counts}{Should the connection counts stay on returned
+edges? If edges distribution is a binary yes or no then you will likely
+want to set this to \code{TRUE}.}
 }
 \value{
 A list with a \code{nodes} dataframe (containing a node's \code{id} and \code{group}
