@@ -4,13 +4,20 @@
 \alias{sim_simple_network}
 \title{Simulate simple network}
 \usage{
-sim_simple_network(n_nodes = 5, prob_of_connection = 0.7)
+sim_simple_network(
+  n_nodes = 5,
+  prob_of_connection = 0.7,
+  allow_self_connections = FALSE
+)
 }
 \arguments{
 \item{n_nodes}{Total number of unique nodes to simulate}
 
 \item{prob_of_connection}{Probability of any given edges between two nodes
 occuring}
+
+\item{allow_self_connections}{Should nodes be allowed to have connections to
+themselves? Default is \code{FALSE}.}
 }
 \value{
 An edge dataframe with node ids for connections in the \code{from} and

@@ -6,6 +6,7 @@
 #' @param n_nodes Total number of unique nodes to simulate
 #' @param prob_of_connection Probability of any given edges between two nodes
 #'   occuring
+#' @inheritParams sim_sbm_network
 #'
 #' @return An edge dataframe with node ids for connections in the `from` and
 #'   `to` columns
@@ -13,17 +14,20 @@
 #'
 #' @examples
 #' sim_simple_network(n_nodes = 4, prob_of_connection = 0.9)
-sim_simple_network <- function(n_nodes = 5, prob_of_connection = 0.7){
-  # First generate an array of node ids
-  node_ids <- paste0("node_", 1:n_nodes)
+sim_simple_network <- function(n_nodes = 5, prob_of_connection = 0.7, allow_self_connections = FALSE){
 
-  edges <- dplyr::filter(
-    tidyr::expand_grid(
-      from = node_ids,
-      to = node_ids
+  sim_sbm_network(
+    group_info = dplyr::tibble(
+      group = "node",
+      n_nodes = n_nodes
     ),
-    from != to)
-
-  # Retain edges with probability as specified
-  dplyr::filter(edges, rbinom(nrow(edges), 1, prob = prob_of_connection) == 1)
+    connection_propensities = dplyr::tibble(
+      group_1 = "node",
+      group_2 = "node",
+      propensity = prob_of_connection
+    ),
+    edge_dist = purrr::rbernoulli,
+    allow_self_connections = allow_self_connections
+  )$edges %>%
+    dplyr::select(-connections)
 }
