@@ -271,18 +271,42 @@ test_that("MCMC Sweeps function as expected", {
 })
 
 test_that("Agglomerative merging/collapsing works", {
-  n_nodes <- 50
+
+
+  n_groups <- 2
+  n_nodes_per_group <- 30
+
+  # fail_with <- "greedy"
+  fail_with <- "not"
+
+  if(fail_with == "greedy"){
+    set.seed(1) # Creates a failure with Greedy <- TRUE
+    is_greedy <- TRUE
+  } else {
+    set.seed(1) # Creates a failure with Greedy <- FALSE
+
+  }
+
+  set.seed(1) # Fails with both greedy and not
+  # set.seed(3) # Works with greedy, fails with not
+  # is_greedy <- FALSE
+  is_greedy <- TRUE
+  simulated_network <- sim_basic_block_network(n_groups = n_groups,
+                                               n_nodes_per_group = n_nodes_per_group,
+                                               return_connection_propensities = TRUE)
+  # visualize_network(simulated_network)
 
   # Start with a random network
-  my_sbm <- create_sbm(sim_simple_network(n_nodes = n_nodes))
+  my_sbm <- create_sbm(simulated_network)
+  my_sbm$GREEDY <- is_greedy
+  collapse_results <- collapse_groups(my_sbm, num_mcmc_sweeps = 1)
 
   # The behavior here is odd so I will just make sure it works rather than
   # testing full bahavior yet
 
-  # collapse_results <- collapse_groups(my_sbm, num_mcmc_sweeps = 5)
-  #   collapse_results %>%
-  #     purrr::map('state') %>%
-  #     purrr::map_int(~dplyr::filter(., level == 1) %>% nrow())
+  # collapse_results %>%
+  #   purrr::map('state') %>%
+  #   purrr::map_int(~dplyr::filter(., level == 1) %>% nrow())
 
 
   # # Make sure that there are always less groups after each step
