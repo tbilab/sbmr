@@ -18,8 +18,10 @@
 #' @seealso \code{\link{sim_sbm_network}} \code{\link{sim_simple_network}}
 #'
 #' @return A list with a `nodes` dataframe (containing a node's `id` and `group`
-#'   membership) and a `edges` dataframe (containing `from` and `to` nodes along
-#'   with the total number of `connections` as drawn from `edge_dist`.)
+#'   membership), an `edges` dataframe (containing `from` and `to` nodes along
+#'   with the total number of `connections` as drawn from `edge_dist`), and a
+#'   `connection_propensities` dataframe that shows the randomly drawn
+#'   connection propensities between groups.
 #' @export
 #'
 #' @examples
@@ -50,12 +52,15 @@ sim_basic_block_network <- function(
   )
 
   # Pass the constructed dataframes to the main sbm simulation function and remove connections
-  sim_sbm_network(
+  sim_results <- sim_sbm_network(
     group_info = groups,
     connection_propensities = connection_propensities,
     edge_dist = purrr::rbernoulli,
     allow_self_connections = allow_self_connections,
     keep_connection_counts = keep_connection_counts
   )
+
+  sim_results$connection_propensities <- connection_propensities
+  sim_results
 }
 
