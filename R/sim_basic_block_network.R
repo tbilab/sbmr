@@ -13,15 +13,19 @@
 #'   and returns a vector of connection propensities of specified size. Default
 #'   is drawing Bernouli probabilities from a symmetric beta distribution
 #'   centered at 0.5
+#' @param return_connection_propensities If set to `TRUE` the returned list will
+#'   also include the simulated connection propensities dataframe. This can be
+#'   used for recreating draws using \code{\link{sim_sbm_network()}}.
 #' @inheritParams sim_sbm_network
 #'
 #' @seealso \code{\link{sim_sbm_network}} \code{\link{sim_simple_network}}
 #'
 #' @return A list with a `nodes` dataframe (containing a node's `id` and `group`
 #'   membership), an `edges` dataframe (containing `from` and `to` nodes along
-#'   with the total number of `connections` as drawn from `edge_dist`), and a
-#'   `connection_propensities` dataframe that shows the randomly drawn
-#'   connection propensities between groups.
+#'   with the total number of `connections` as drawn from `edge_dist`), and if
+#'   `return_connection_propensities == TRUE`: `connection_propensities`
+#'   dataframe that shows the randomly drawn connection propensities between
+#'   groups.
 #' @export
 #'
 #' @examples
@@ -29,10 +33,11 @@
 sim_basic_block_network <- function(
   n_groups = 2,
   n_nodes_per_group = 5,
-  prob_of_connections_dist = function(n) rbeta(n = n, shape1 = 3.5, shape2 = 3.5),
+  prob_of_connections_dist = function(n) rbeta(n = n, shape1 = 2, shape2 = 2),
   edge_dist = purrr::rbernoulli,
   allow_self_connections = FALSE,
-  keep_connection_counts = FALSE){
+  keep_connection_counts = FALSE,
+  return_connection_propensities = FALSE){
 
   # Build groups option with a constant number of nodes per group
   groups <- dplyr::tibble(
@@ -60,7 +65,10 @@ sim_basic_block_network <- function(
     keep_connection_counts = keep_connection_counts
   )
 
-  sim_results$connection_propensities <- connection_propensities
+  if (return_connection_propensities){
+    sim_results$connection_propensities <- connection_propensities
+  }
+
   sim_results
 }
 
