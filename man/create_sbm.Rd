@@ -7,7 +7,12 @@
 create_sbm(edges = NULL, nodes = NULL, from_col = from, to_col = to)
 }
 \arguments{
-\item{edges}{Dataframe with a from and two column encoding edges between string node ids (direction does not matter).}
+\item{edges}{Dataframe with a from and two column encoding edges between
+string node ids (direction does not matter). A list containing both a
+\code{nodes} and \code{edges} dataframe can be passed to avoid having to unpack a
+list of nodes and edges to the arguments of the same name. This is helpful
+for the included simulation functions such as
+\code{\link{sim_sbm_network}}.}
 
 \item{nodes}{Optional dataframe that links a node \code{id} to its \code{type}, for when model is polypartite.}
 

@@ -3,7 +3,12 @@
 #' Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
 #' can be provided to give information about node type.
 #'
-#' @param edges Dataframe with a from and two column encoding edges between string node ids (direction does not matter).
+#' @param edges Dataframe with a from and two column encoding edges between
+#'   string node ids (direction does not matter). A list containing both a
+#'   `nodes` and `edges` dataframe can be passed to avoid having to unpack a
+#'   list of nodes and edges to the arguments of the same name. This is helpful
+#'   for the included simulation functions such as
+#'   \code{\link{sim_sbm_network}}.
 #' @param nodes Optional dataframe that links a node `id` to its `type`, for when model is polypartite.
 #' @param from_col Name of the from column for edges
 #' @param to_col Name of the to column for edges
@@ -15,8 +20,6 @@
 create_sbm <- function(edges = NULL, nodes = NULL, from_col = from, to_col = to){
   no_nodes <- is.null(nodes)
   no_edges <- is.null(edges)
-
-  # browser()
 
   # If the user gave us a bundled list of nodes and edges as returned by our
   # simulation functions then extract the nodes from this
