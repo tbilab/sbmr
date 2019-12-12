@@ -38,6 +38,15 @@ create_sbm <- function(edges = NULL, nodes = NULL, from_col = from, to_col = to)
     }
   }
 
+  if(!no_nodes){
+    # Make sure nodes have a type column. If it's missing, just add a constant type
+    have_type_col <- "type" %in% colnames(nodes)
+
+    if(!have_type_col){
+      nodes$type <- "node"
+    }
+  }
+
 
   # We have 4 total possiblilities for model specification
   no_data <- no_edges & no_nodes
