@@ -8,6 +8,7 @@ void Network::add_level(const int level)
   PROFILE_FUNCTION();
   // First, make sure level doesn't already exist
   if (nodes.find(level) != nodes.end()) {
+    std::cerr << "Requested level to create already exists." << std::endl;
     throw "Requested level to create already exists.";
   }
   
@@ -52,6 +53,7 @@ NodePtr Network::get_node_by_id(const string desired_id, const int level)
     return nodes.at(level)->at(desired_id);
   } catch (...) {
     // Throw informative error if it fails
+    std::cerr << "Could not find requested node" << std::endl;
     throw "Could not find requested node";
   }
   
@@ -110,6 +112,7 @@ NodePtr Network::create_group_node(const int type, const int level)
 
   // Make sure requested level is not 0
   if(level == 0) {
+    std::cerr << "Can't create group node at first level" << std::endl;
     throw "Can't create group node at first level";
   }
   
@@ -131,12 +134,18 @@ std::vector<NodePtr> Network::get_nodes_from_level(const int type,
   // Grab desired level reference
   LevelPtr node_level = nodes.at(level);
   
+  // Make sure level has nodes before looping through it
+  if (node_level->size() == 0) 
+  {
+    std::cerr << "Requested level " << level << " is empty of nodes of type " 
+              << type << " when " << (match_type ? "": "not ") << "matching type" 
+              << std::endl;
+    throw "Requested level is empty.";
+  }
+  
   // Where we will store all the nodes found from level
   std::vector<NodePtr> nodes_to_return;
   nodes_to_return.reserve(node_level->size());
-  
-  // Make sure level has nodes before looping through it
-  if (node_level->size() == 0) throw "Requested level is empty.";
 
   // Loop through every node belonging to the desired level
   for (auto node_it  = node_level->begin(); 
@@ -233,7 +242,11 @@ void Network::initialize_groups(const int num_groups, const int level)
   Sampler group_sampler;
 
   // Make sure level has nodes before looping through it
-  if (num_nodes_in_level == 0) throw "Requested level is empty.";
+  if (num_nodes_in_level == 0) 
+  {
+    std::cerr << "Requested level is empty. (initialize_groups())" << std::endl;
+    throw "Requested level is empty.";
+  }
 
   // Figure out how we're making groups, is it one group per node or a set number
   // of groups total?

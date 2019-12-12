@@ -13,6 +13,7 @@
 #include <map>
 #include <memory>
 #include <exception>
+#include <iostream>
 
 #include "profiling/Instrument.h"
 
