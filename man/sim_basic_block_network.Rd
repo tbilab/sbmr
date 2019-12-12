@@ -7,10 +7,11 @@
 sim_basic_block_network(
   n_groups = 2,
   n_nodes_per_group = 5,
-  prob_of_connections_dist = function(n) rbeta(n = n, shape1 = 3.5, shape2 = 3.5),
+  prob_of_connections_dist = function(n) rbeta(n = n, shape1 = 2, shape2 = 2),
   edge_dist = purrr::rbernoulli,
   allow_self_connections = FALSE,
-  keep_connection_counts = FALSE
+  keep_connection_counts = FALSE,
+  return_connection_propensities = FALSE
 )
 }
 \arguments{
@@ -37,11 +38,18 @@ themselves?}
 \item{keep_connection_counts}{Should the connection counts stay on returned
 edges? If edges distribution is a binary yes or no then you will likely
 want to set this to \code{TRUE}.}
+
+\item{return_connection_propensities}{If set to \code{TRUE} the returned list will
+also include the simulated connection propensities dataframe. This can be
+used for recreating draws using \code{\link{sim_sbm_network()}}.}
 }
 \value{
 A list with a \code{nodes} dataframe (containing a node's \code{id} and \code{group}
-membership) and a \code{edges} dataframe (containing \code{from} and \code{to} nodes along
-with the total number of \code{connections} as drawn from \code{edge_dist}.)
+membership), an \code{edges} dataframe (containing \code{from} and \code{to} nodes along
+with the total number of \code{connections} as drawn from \code{edge_dist}), and if
+\code{return_connection_propensities == TRUE}: \code{connection_propensities}
+dataframe that shows the randomly drawn connection propensities between
+groups.
 }
 \description{
 Simulates a simple block structured network with a desired number of constant
