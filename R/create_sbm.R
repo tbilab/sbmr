@@ -13,9 +13,28 @@
 #'
 #' @examples
 create_sbm <- function(edges = NULL, nodes = NULL, from_col = from, to_col = to){
-
-  no_edges <- is.null(edges)
   no_nodes <- is.null(nodes)
+  no_edges <- is.null(edges)
+
+  # browser()
+
+  # If the user gave us a bundled list of nodes and edges as returned by our
+  # simulation functions then extract the nodes from this
+  if(!no_edges & is_list_class(edges)){
+
+    # If the user didnt pass a seperate nodes dataframe and the list contains nodes
+    # fill in the nodes object with nodes value in network list
+    if(no_nodes & !is.null(edges$nodes)){
+      nodes <- edges$nodes
+      no_nodes <- FALSE
+    }
+
+    if(!is.null(edges$edges)){
+      # Overwrite the list with the edges values of network list
+      edges <- edges$edges
+    }
+  }
+
 
   # We have 4 total possiblilities for model specification
   no_data <- no_edges & no_nodes
