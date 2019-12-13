@@ -233,6 +233,11 @@ void Network::initialize_groups(const int num_groups, const int level)
 {
   PROFILE_FUNCTION();
 
+  const int group_level = level + 1;
+
+  // Clear all previous nodes in group level out
+  get_level(group_level)->clear();
+
   // Grab all the nodes for the desired level
   LevelPtr node_level = nodes.at(level);
 
@@ -293,9 +298,6 @@ void Network::initialize_groups(const int num_groups, const int level)
     // assign that group node to the node
     node_it->second->set_parent(new_group);
   }
-
-  // Clean up group level
-  clean_empty_groups();
 }
 
 
