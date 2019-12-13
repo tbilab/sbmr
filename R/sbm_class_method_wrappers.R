@@ -193,13 +193,26 @@ mcmc_sweep <- function(sbm, level = 0, variable_num_groups = TRUE){
 #' @param num_mcmc_sweeps Number of MCMC sweeps to run in between merge steps to
 #'   allow model to find best partitioning with given number of groups. Set to
 #'   zero for fast but more likely incorrect structure
+#' @param desired_num_groups How many groups should be left at the end of the
+#'   collapsing? Ignored if `exhaustive = TRUE`.
+#' @param exhaustive Should collapsing exhaust all possible number of groups?
+#'   I.e. should network be collapsed one group at a time down to one group per
+#'   node type?
 #'
 #' @return List with `entropy` and model `state` after each merge.
 #' @export
 #'
 #' @examples
-collapse_groups <- function(sbm, level = 0, num_mcmc_sweeps = 10){
-  sbm$collapse_groups(as.integer(level), as.integer(num_mcmc_sweeps))
+collapse_groups <- function(sbm, level = 0, num_mcmc_sweeps = 10, desired_num_groups = 1, exhaustive = TRUE){
+  # The C++ function arguments
+  # collapse_groups(const int node_level,
+  #                 const int num_mcmc_steps,
+  #                 int desired_num_groups,
+  #                 const bool exhaustive)
+  sbm$collapse_groups(as.integer(level),
+                      as.integer(num_mcmc_sweeps),
+                      as.integer(desired_num_groups),
+                      exhaustive)
 }
 
 
