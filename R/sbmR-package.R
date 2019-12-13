@@ -14,13 +14,10 @@ Rcpp::loadModule("SBM", TRUE)
 # object
 setClass("Rcpp_SBM")
 setMethod( "show", "Rcpp_SBM" , function(object) {
-  object$get_state()
+  show(object$get_state())
 })
 
-# setGeneric("preview", function(object) standardGeneric("preview"))
-# setMethod( "preview", "Rcpp_SBM" , function(object) {
-#   print(object$get_state() %>% head())
-# })
+
 
 
 
