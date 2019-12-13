@@ -12,7 +12,8 @@ collapse_groups(
   exhaustive = TRUE,
   beta = 1.5,
   greedy = FALSE,
-  num_group_proposals = 5
+  num_group_proposals = 5,
+  sigma = 2
 )
 }
 \arguments{
@@ -32,11 +33,19 @@ collapsing? Ignored if \code{exhaustive = TRUE}.}
 I.e. should network be collapsed one group at a time down to one group per
 node type?}
 
-\item{beta}{Inverse temperature parameter for determining move acceptance probability. Only applicable if \code{num_mcmc_sweeps > 0}.}
+\item{beta}{Inverse temperature parameter for determining move acceptance
+probability. Only applicable if \code{num_mcmc_sweeps > 0}.}
 
-\item{greedy}{Should all possible moves be considered for merging or should a set number of proposals be drawn?}
+\item{greedy}{Should all possible moves be considered for merging or should a
+set number of proposals be drawn?}
 
-\item{num_group_proposals}{If \code{greedy = FALSE}, how many move proposals should each node produce for merge options?}
+\item{num_group_proposals}{If \code{greedy = FALSE}, how many move proposals
+should each node produce for merge options?}
+
+\item{sigma}{Controls how fast collapse of network happens. For instance if
+set to \code{2} then half (\code{1/2}) of the nodes will be removed at each step
+until the desired number remains. If \code{exhaustive = TRUE} then this
+parameter will do nothing}
 }
 \value{
 List with \code{entropy} and model \code{state} after each merge.

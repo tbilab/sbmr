@@ -200,9 +200,16 @@ mcmc_sweep <- function(sbm, level = 0, variable_num_groups = TRUE, beta = 1.5){
 #' @param exhaustive Should collapsing exhaust all possible number of groups?
 #'   I.e. should network be collapsed one group at a time down to one group per
 #'   node type?
-#' @param beta Inverse temperature parameter for determining move acceptance probability. Only applicable if `num_mcmc_sweeps > 0`.
-#' @param greedy Should all possible moves be considered for merging or should a set number of proposals be drawn?
-#' @param num_group_proposals If `greedy = FALSE`, how many move proposals should each node produce for merge options?
+#' @param beta Inverse temperature parameter for determining move acceptance
+#'   probability. Only applicable if `num_mcmc_sweeps > 0`.
+#' @param greedy Should all possible moves be considered for merging or should a
+#'   set number of proposals be drawn?
+#' @param num_group_proposals If `greedy = FALSE`, how many move proposals
+#'   should each node produce for merge options?
+#' @param sigma Controls how fast collapse of network happens. For instance if
+#'   set to `2` then half (`1/2`) of the nodes will be removed at each step
+#'   until the desired number remains. If `exhaustive = TRUE` then this
+#'   parameter will do nothing
 #'
 #' @return List with `entropy` and model `state` after each merge.
 #' @export
@@ -216,13 +223,15 @@ collapse_groups <- function(
   exhaustive = TRUE,
   beta = 1.5,
   greedy = FALSE,
-  num_group_proposals = 5
+  num_group_proposals = 5,
+  sigma = 2
 ){
 
   # Set free parameters
   sbm$BETA <- beta
   sbm$GREEDY <- greedy
   sbm$N_CHECKS_PER_GROUP <- num_group_proposals
+  sbm$SIGMA <- sigma
 
   # The C++ function arguments
   # collapse_groups(const int node_level,
