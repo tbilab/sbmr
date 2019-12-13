@@ -145,8 +145,6 @@ public:
       desired_num_groups = node_type_counts.size();
     }
 
-
-    std::cout << "Collapsing groups w/  " << std::to_string(desired_num_groups) << " desired groups" << std::endl;
     // Perform collapse
     auto collapse_results = SBM::collapse_groups(node_level, num_mcmc_steps, desired_num_groups);
 
