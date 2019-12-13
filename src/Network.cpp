@@ -7,13 +7,11 @@ void Network::add_level(const int level)
 {
   PROFILE_FUNCTION();
   // First, make sure level doesn't already exist
-  if (nodes.find(level) != nodes.end()) {
-    std::cerr << "Requested level to create already exists." << std::endl;
-    throw "Requested level to create already exists.";
+  if (nodes.find(level) == nodes.end()) {
+    // Setup first level of the node map
+    nodes.emplace(level, std::make_shared<NodeLevel>());
   }
   
-  // Setup first level of the node map
-  nodes.emplace(level, std::make_shared<NodeLevel>());
 }
 
 
