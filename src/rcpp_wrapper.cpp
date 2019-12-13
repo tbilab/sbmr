@@ -142,19 +142,11 @@ public:
       SIGMA = 0.5;
 
       // Perform merge with single group per node type requested.
-      desired_num_groups = 0;
-
-      for (auto node_type_it = node_type_counts.begin();
-           node_type_it != node_type_counts.end();
-           node_type_it++)
-      {
-        // Grab map for this node type.
-        auto node_type = node_type_it->second;
-
-        // Add to count this types value at the node level
-        desired_num_groups += (node_type_it->second)[node_level];
-      }
+      desired_num_groups = node_type_counts.size();
     }
+
+
+    std::cout << "Collapsing groups w/  " << std::to_string(desired_num_groups) << " desired groups" << std::endl;
     // Perform collapse
     auto collapse_results = SBM::collapse_groups(node_level, num_mcmc_steps, desired_num_groups);
 
