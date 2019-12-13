@@ -31,8 +31,8 @@ library(tidyverse)
 ```{r}
 N_a <- 50  # Number of nodes of the a type
 N_b <- 50  # Number of nodes of the b type
-K_a <- 5    # How many blocks of a type nodes are there
-K_b <- 5    # How many blocks of the b type nodes are there
+K_a <- 3    # How many blocks of a type nodes are there
+K_b <- 3    # How many blocks of the b type nodes are there
 b_a <- assign_group_membership(N = N_a, K = K_a) # Block membership for each a node
 b_b <- assign_group_membership(N = N_b, K = K_b) # Block membership for each b node
 
@@ -74,17 +74,11 @@ First we have `GREEDY`. When this is set to `TRUE`, the at every merge step the 
 
 Second is `N_CHECKS_PER_GROUP`. When `GREEDY` is set to `FALSE`, this parameter controls how many possible merges the model explores for each node before choosing the best one. Higher means a longer run time. Note that these potential merges are done by a random sample of neighbor groups so even if `N_CHECKS_PER_GROUP` is set to the total number of nodes in the network we are not guarenteed to explore all options like `GREEDY` does. 
 
-We will perform a greedy merging here. 
-
-```{r}
-my_sbm$GREEDY <- TRUE
-```
-
-Now that we have our model and parameters set we can run the algorithm using the `collapse_groups()` method. This method takes two arguments, the first is the level to perform the agglomerative merge on (in this case the node-level or `0`), and the number of MCMC steps to perform in between each merge to equilibriate the model.
+First, we will perform a greedy merging. This is done with the `collapse_groups()` method. 
 
 ```{r}
 # Run initialization algorithm on base level nodes
-merge_results <- my_sbm$collapse_groups(0L, 1L)
+merge_results <- collapse_groups(my_sbm, greedy = TRUE)
 ```
 
 This method returns a list containing the entropy and state of the model at each merge step. We can use these to look at how the merges progressed. 
@@ -169,12 +163,10 @@ merge_results %>% results_to_df() %>% plot_merge_results()
 
 We can perform the same setup but this time not using greedy but the sampling version
 ```{r}
-new_sbm <- create_sbm(edges, nodes)
-new_sbm$GREEDY <- FALSE
-new_sbm$N_CHECKS_PER_GROUP <- 10
-non_greedy_merge_results <- new_sbm$collapse_groups(0L, 15L)
-
-non_greedy_merge_results %>% results_to_df() %>% plot_merge_results()
+create_sbm(edges, nodes) %>% 
+  collapse_groups(greedy = FALSE, num_group_proposals = 10) %>% 
+  results_to_df() %>% 
+  plot_merge_results()
 ```
 
 
@@ -186,11 +178,14 @@ We can try scanning over different number of checks per group to see how it chan
 merges_over_changes <- purrr::map_dfr(
   seq(5, 50, by = 5),
   ~{
-    new_sbm <- create_sbm(edges, nodes)
-    new_sbm$GREEDY <- FALSE
-    new_sbm$N_CHECKS_PER_GROUP <- .x
-    merge_results <- new_sbm$collapse_groups(0L, 15L)
-    results_to_df(merge_results) %>% mutate(checks = .x)
+    run_time <- system.time({
+      merge_results <- create_sbm(edges, nodes) %>% 
+        collapse_groups(num_group_proposals = .x) %>% 
+        results_to_df()
+    })
+    
+    merge_results %>% 
+      mutate(checks = .x, run_time = run_time[1])
   })
 
 plot_merge_results(merges_over_changes) + 
@@ -198,6 +193,23 @@ plot_merge_results(merges_over_changes) +
   ggtitle("Tuning number of merge checks per node")
 ```
 
+```{r}
+
+greedy_run_time <- system.time({
+  create_sbm(edges, nodes) %>% 
+    collapse_groups(greedy = TRUE) %>% 
+    results_to_df()
+}) %>% pluck(1)
+
+merges_over_changes %>% 
+  group_by(checks) %>% 
+  summarise(run_time = first(run_time)) %>% 
+  ggplot(aes(x = checks, y = run_time)) +
+  geom_line() + 
+  geom_hline(yintercept = greedy_run_time, color = 'orangered') +
+  labs(title = "Run time by number of merges checked per group",
+       subtitle = "Horizontal line is runtime of greedy merging")
+```
 
 ## Controlling number of MCMC sweeps between merge steps
 
@@ -215,12 +227,10 @@ merges_over_sweeps_and_greedy <- expand.grid(
       .$mcmc_sweeps,
       .$greedy,
       ~{
-        new_sbm <- create_sbm(edges, nodes)
-        new_sbm$GREEDY <- .y
-        merge_results <- new_sbm$collapse_groups(0L, as.integer(.x))
-        results_to_df(merge_results) %>% 
-          mutate(mcmc_sweeps = .x,
-                 greedy = paste("greedy = ", .y))
+        create_sbm(edges, nodes) %>% 
+          collapse_groups(greedy = .y, num_mcmc_sweeps = .x) %>% 
+          results_to_df() %>% 
+          mutate(mcmc_sweeps = .x, greedy = paste("greedy = ", .y))
       }
     )
   }
@@ -234,19 +244,17 @@ plot_merge_results(merges_over_sweeps_and_greedy) +
 
 ## Controlling collapsing rate (sigma)
 
-Another important parameter to tune is `SIGMA`. This controls the rate that the network collapses. For each merge step the model will remove `B_curr/SIGMA` groups. This means a value of `SIGMA = 2` will cut the group size in half each step. 
+Another important parameter to tune is `SIGMA`. This controls the rate that the network collapses. For each merge step the model will remove `B_curr/SIGMA` groups. This means a value of `SIGMA = 2` will cut the group size in half each step. If we were to set `SIGMA` below `1`, this would force the model to remove a single group at a time (if no MCMC sweeps are happening) because `B_curr/{x<1} > B_curr` so the smallest possible merge of a single group is taken.
 
 
 ```{r}
 purrr::map_dfr(
   seq(from = 0.9, to = 2, length.out = 5),
   ~{
-    new_sbm <- create_sbm(edges, nodes)
-    new_sbm$GREEDY <- FALSE
-    new_sbm$N_CHECKS_PER_GROUP <- 10
-    new_sbm$SIGMA <- .x
-    merge_results <- new_sbm$collapse_groups(0L, 15L)
-    results_to_df(merge_results) %>% mutate(sigma = .x)
+    create_sbm(edges, nodes) %>% 
+      collapse_groups(exhaustive = FALSE, sigma = .x, num_mcmc_sweeps = 0) %>% 
+      results_to_df() %>% 
+      mutate(sigma = .x)
   }) %>% 
   plot_merge_results(trim_axes = FALSE) + 
   facet_wrap(~sigma) +
