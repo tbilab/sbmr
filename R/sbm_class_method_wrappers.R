@@ -172,12 +172,14 @@ compute_entropy <- function(sbm, level = 0){
 #' @param variable_num_groups Should the model allow new groups to be created or
 #'   empty groups removed while sweeping or should number of groups remain
 #'   constant?
+#' @param beta Inverse temperature parameter for determining move acceptance probability.
 #'
 #' @return Total number of nodes that were changed in the previous sweep
 #' @export
 #'
 #' @examples
-mcmc_sweep <- function(sbm, level = 0, variable_num_groups = TRUE){
+mcmc_sweep <- function(sbm, level = 0, variable_num_groups = TRUE, beta = 1.5){
+  sbm$BETA <- beta
   sbm$mcmc_sweep(as.integer(level), variable_num_groups)
 }
 
@@ -198,12 +200,30 @@ mcmc_sweep <- function(sbm, level = 0, variable_num_groups = TRUE){
 #' @param exhaustive Should collapsing exhaust all possible number of groups?
 #'   I.e. should network be collapsed one group at a time down to one group per
 #'   node type?
+#' @param beta Inverse temperature parameter for determining move acceptance probability. Only applicable if `num_mcmc_sweeps > 0`.
+#' @param greedy Should all possible moves be considered for merging or should a set number of proposals be drawn?
+#' @param num_group_proposals If `greedy = FALSE`, how many move proposals should each node produce for merge options?
 #'
 #' @return List with `entropy` and model `state` after each merge.
 #' @export
 #'
 #' @examples
-collapse_groups <- function(sbm, level = 0, num_mcmc_sweeps = 10, desired_num_groups = 1, exhaustive = TRUE){
+collapse_groups <- function(
+  sbm,
+  level = 0,
+  num_mcmc_sweeps = 10,
+  desired_num_groups = 1,
+  exhaustive = TRUE,
+  beta = 1.5,
+  greedy = FALSE,
+  num_group_proposals = 5
+){
+
+  # Set free parameters
+  sbm$BETA <- beta
+  sbm$GREEDY <- greedy
+  sbm$N_CHECKS_PER_GROUP <- num_group_proposals
+
   # The C++ function arguments
   # collapse_groups(const int node_level,
   #                 const int num_mcmc_steps,

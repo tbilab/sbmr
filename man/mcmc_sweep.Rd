@@ -4,7 +4,7 @@
 \alias{mcmc_sweep}
 \title{MCMC Sweep}
 \usage{
-mcmc_sweep(sbm, level = 0, variable_num_groups = TRUE)
+mcmc_sweep(sbm, level = 0, variable_num_groups = TRUE, beta = 1.5)
 }
 \arguments{
 \item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
@@ -15,6 +15,8 @@ through MCMC proposal-accept routine.}
 \item{variable_num_groups}{Should the model allow new groups to be created or
 empty groups removed while sweeping or should number of groups remain
 constant?}
+
+\item{beta}{Inverse temperature parameter for determining move acceptance probability.}
 }
 \value{
 Total number of nodes that were changed in the previous sweep

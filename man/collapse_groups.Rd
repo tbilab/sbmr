@@ -4,7 +4,16 @@
 \alias{collapse_groups}
 \title{Collapse Groups}
 \usage{
-collapse_groups(sbm, level = 0, num_mcmc_sweeps = 10)
+collapse_groups(
+  sbm,
+  level = 0,
+  num_mcmc_sweeps = 10,
+  desired_num_groups = 1,
+  exhaustive = TRUE,
+  beta = 1.5,
+  greedy = FALSE,
+  num_group_proposals = 5
+)
 }
 \arguments{
 \item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
@@ -15,6 +24,19 @@ through MCMC proposal-accept routine.}
 \item{num_mcmc_sweeps}{Number of MCMC sweeps to run in between merge steps to
 allow model to find best partitioning with given number of groups. Set to
 zero for fast but more likely incorrect structure}
+
+\item{desired_num_groups}{How many groups should be left at the end of the
+collapsing? Ignored if \code{exhaustive = TRUE}.}
+
+\item{exhaustive}{Should collapsing exhaust all possible number of groups?
+I.e. should network be collapsed one group at a time down to one group per
+node type?}
+
+\item{beta}{Inverse temperature parameter for determining move acceptance probability. Only applicable if \code{num_mcmc_sweeps > 0}.}
+
+\item{greedy}{Should all possible moves be considered for merging or should a set number of proposals be drawn?}
+
+\item{num_group_proposals}{If \code{greedy = FALSE}, how many move proposals should each node produce for merge options?}
 }
 \value{
 List with \code{entropy} and model \code{state} after each merge.

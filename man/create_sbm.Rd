@@ -4,7 +4,7 @@
 \alias{create_sbm}
 \title{Create SBM}
 \usage{
-create_sbm(edges = NULL, nodes = NULL, from_col = from, to_col = to)
+create_sbm(edges = NULL, nodes = NULL, from_col = from, to_col = to, eps = 0.1)
 }
 \arguments{
 \item{edges}{Dataframe with a from and two column encoding edges between
@@ -19,6 +19,8 @@ for the included simulation functions such as
 \item{from_col}{Name of the from column for edges}
 
 \item{to_col}{Name of the to column for edges}
+
+\item{eps}{Epsilon value for ergodicity of move proposals of nodes.}
 }
 \value{
 Instance of SBM class.
@@ -26,4 +28,9 @@ Instance of SBM class.
 \description{
 Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
 can be provided to give information about node type.
+}
+\examples{
+# Create an empty model with modified epsilon parameter
+my_sbm <- create_sbm(eps = 0.4)
+
 }
