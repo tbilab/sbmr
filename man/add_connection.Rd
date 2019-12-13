@@ -19,3 +19,14 @@ SBM model object modified with connection added. \emph{Note that object is modif
 \description{
 Connects two nodes in network (at level 0) by their ids (string).
 }
+\examples{
+
+# Create SBM and add two nodes
+my_sbm <- create_sbm() \%>\%
+  add_node('node_1') \%>\%
+  add_node('node_2')
+
+# Add connection between two nodes
+my_sbm \%>\% add_connection('node_1', 'node_2')
+
+}

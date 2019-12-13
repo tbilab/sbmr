@@ -23,3 +23,15 @@ SBM model object modified with node hierarchy modified. \emph{Note that object i
 Sets the parent node (or group) for a given node. Takes child node's id
 (string), parent node's id (string), and the level of child node (int).
 }
+\examples{
+
+# Create a model with two nodes, one at the group level (1)
+my_sbm <- create_sbm() \%>\%
+  add_node('node_1') \%>\%
+  add_node('node_11', level = 1)
+
+# Assign node 11 as node 1's parent
+my_sbm \%>\%
+  set_node_parent(child_id = 'node_1', parent_id = 'node_11')
+
+}

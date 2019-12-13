@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create SBM — create_sbm • sbmR</title>
+<title>Visualize Network — visualize_network • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,9 +35,8 @@
 
 
 
-<meta property="og:title" content="Create SBM — create_sbm" />
-<meta property="og:description" content="Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
-can be provided to give information about node type." />
+<meta property="og:title" content="Visualize Network — visualize_network" />
+<meta property="og:description" content="Creates a simple interactive network visualization that visually encodes node membership and type (if present) for a passed network." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -113,17 +112,16 @@ can be provided to give information about node type." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create SBM</h1>
+    <h1>Visualize Network</h1>
     
-    <div class="hidden name"><code>create_sbm.Rd</code></div>
+    <div class="hidden name"><code>visualize_network.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
-can be provided to give information about node type.</p>
+    <p>Creates a simple interactive network visualization that visually encodes node membership and type (if present) for a passed network.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_sbm</span>(<span class='kw'>edges</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>from_col</span> <span class='kw'>=</span> <span class='no'>from</span>, <span class='kw'>to_col</span> <span class='kw'>=</span> <span class='no'>to</span>, <span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>0.1</span>)</pre>
+    <pre class="usage"><span class='fu'>visualize_network</span>(<span class='no'>edges</span>, <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>height</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -142,32 +140,30 @@ for the included simulation functions such as
       <td><p>Optional dataframe that links a node <code>id</code> to its <code>type</code>, for when model is polypartite.</p></td>
     </tr>
     <tr>
-      <th>from_col</th>
-      <td><p>Name of the from column for edges</p></td>
+      <th>width</th>
+      <td><p>Desired width for output widget.</p></td>
     </tr>
     <tr>
-      <th>to_col</th>
-      <td><p>Name of the to column for edges</p></td>
-    </tr>
-    <tr>
-      <th>eps</th>
-      <td><p>Epsilon value for ergodicity of move proposals of nodes.</p></td>
+      <th>height</th>
+      <td><p>Desired height for output widget.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>Instance of SBM class.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Create an empty model with modified epsilon parameter</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>create_sbm</span>(<span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>0.4</span>)</div></pre>
+    <pre class="examples"><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
+
+<span class='co'># Simulate a 3 group/cluster network with 15 nodes per group</span>
+<span class='no'>simulated_network</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_groups</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_group</span> <span class='kw'>=</span> <span class='fl'>15</span>)
+
+<span class='co'># Visualize network</span>
+<span class='fu'>visualize_network</span>(<span class='no'>simulated_network</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

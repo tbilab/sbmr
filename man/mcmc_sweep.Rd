@@ -29,3 +29,22 @@ chance to move groups or stay in current group and all nodes are processed in
 random order. Takes the level that the sweep should take place on (int) and
 if new groups groups can be proposed and empty groups removed (boolean).
 }
+\examples{
+
+set.seed(42)
+
+# Start with a random network and assign randomly to 4 groups
+n_groups <- 3
+my_sbm <- create_sbm(sim_basic_block_network(n_groups = n_groups, n_nodes_per_group = 15)) \%>\%
+  initialize_groups(num_groups = n_groups)
+
+# Calculate entropy with random groups
+compute_entropy(my_sbm)
+
+# Run 4 MCMC sweeps
+for(i in 1:4) my_sbm \%>\% mcmc_sweep(variable_num_groups = FALSE)
+
+# Calculate entropy after sweeps
+compute_entropy(my_sbm)
+
+}

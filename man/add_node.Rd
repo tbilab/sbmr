@@ -24,4 +24,10 @@ Add a node to the network. Takes the node id (string), the node type
 }
 \examples{
 
+my_sbm <- create_sbm() \%>\%
+  add_node('node_1') \%>\%
+  add_node('node_2')
+
+get_state(my_sbm)
+
 }

@@ -18,6 +18,12 @@
 #'
 #' @examples
 #'
+#' my_sbm <- create_sbm() %>%
+#'   add_node('node_1') %>%
+#'   add_node('node_2')
+#'
+#' get_state(my_sbm)
+#'
 add_node <- function(sbm, id, type = "node", level = 0){
   sbm$add_node(id, type, as.integer(level))
   sbm
@@ -36,6 +42,15 @@ add_node <- function(sbm, id, type = "node", level = 0){
 #' @export
 #'
 #' @examples
+#'
+#' # Create SBM and add two nodes
+#' my_sbm <- create_sbm() %>%
+#'   add_node('node_1') %>%
+#'   add_node('node_2')
+#'
+#' # Add connection between two nodes
+#' my_sbm %>% add_connection('node_1', 'node_2')
+#'
 add_connection <- function(sbm, a_node, b_node){
   sbm$add_connection(a_node, b_node)
   sbm
@@ -58,6 +73,16 @@ add_connection <- function(sbm, a_node, b_node){
 #' @export
 #'
 #' @examples
+#'
+#' # Create a model with two nodes, one at the group level (1)
+#' my_sbm <- create_sbm() %>%
+#'   add_node('node_1') %>%
+#'   add_node('node_11', level = 1)
+#'
+#' # Assign node 11 as node 1's parent
+#' my_sbm %>%
+#'   set_node_parent(child_id = 'node_1', parent_id = 'node_11')
+#'
 set_node_parent <- function(sbm, child_id, parent_id, level = 0){
   sbm$set_node_parent(child_id, parent_id, as.integer(level))
   sbm
@@ -83,6 +108,26 @@ set_node_parent <- function(sbm, child_id, parent_id, level = 0){
 #' @export
 #'
 #' @examples
+#' # Helper function to get number of groups in a model
+#' get_num_groups <- function(sbm){sum(get_state(sbm)$level == 1)}
+#'
+#' # Initialize a simple bipartite network with 6 total nodes (3 of each type)
+#' my_nodes <- dplyr::tibble(
+#'   id = c("a1", "a2", "a3", "b1", "b2", "b3"),
+#'   type = c("a", "a", "a", "b", "b", "b")
+#' )
+#' my_sbm <- create_sbm(nodes = my_nodes)
+#'
+#' # Default values of function will give every node its own group
+#' my_sbm %>% initialize_groups()
+#' get_num_groups(my_sbm)
+#'
+#' # You can also decide to have a given number of groups randomly assigned Here
+#' # four groups result because two random groups are made for each of the two
+#' # types
+#' my_sbm %>% initialize_groups(num_groups = 2)
+#' get_num_groups(my_sbm)
+#'
 initialize_groups <- function(sbm, num_groups = -1, level = 0){
   if(num_groups < -1) stop(paste("Can't initialize", num_groups, "groups."))
   sbm$initialize_groups(as.integer(num_groups), as.integer(level))
@@ -107,6 +152,18 @@ initialize_groups <- function(sbm, num_groups = -1, level = 0){
 #' @export
 #'
 #' @examples
+#'
+#' # Build a bipartite network with 1 node and one group for each type
+#' my_sbm <- create_sbm() %>%
+#'   add_node('a1', type = 'a') %>%
+#'   add_node('a11', type = 'a', level = 1) %>%
+#'   add_node('b1', type = 'b') %>%
+#'   add_node('b11', type = 'b', level = 1) %>%
+#'   set_node_parent('a1', 'a11') %>%
+#'   set_node_parent('b1', 'b11')
+#'
+#' my_sbm %>% get_state()
+#'
 get_state <- function(sbm){
   sbm$get_state()
 }
@@ -128,6 +185,25 @@ get_state <- function(sbm){
 #' @export
 #'
 #' @examples
+#'
+#' # A state dump dataframe as one would get from sbmR::get_state()
+#' desired_state <- dplyr::tribble(
+#'   ~id,  ~parent, ~type, ~level,
+#'   "a1",   "a11",   "a",      0,
+#'   "b1",   "b11",   "b",      0,
+#'  "a11",  "none",   "a",      1,
+#'  "b11",  "none",   "b",      1
+#' )
+#'
+#' # Create simple network with no group nodes
+#' my_sbm <- create_sbm() %>%
+#'   add_node('a1', type = 'a') %>%
+#'   add_node('b1', type = 'b')
+#'
+#' # Load our desired state
+#' my_sbm %>% load_from_state(desired_state)
+#' # Group nodes have been created and assigned to proper children nodes
+#'
 load_from_state <- function(sbm, state){
   sbm$load_from_state(
     state$id,
@@ -152,6 +228,24 @@ load_from_state <- function(sbm, state){
 #' @export
 #'
 #' @examples
+#'
+#' # Build basic network with 3 nodes and two groups
+#' my_sbm <- create_sbm() %>%
+#'   add_node('node_1') %>%
+#'   add_node('node_2') %>%
+#'   add_node('node_3') %>%
+#'   add_node('node_11', level = 1) %>%
+#'   add_node('node_12', level = 1) %>%
+#'   add_connection('node_1', 'node_2') %>%
+#'   add_connection('node_1', 'node_3') %>%
+#'   add_connection('node_2', 'node_3') %>%
+#'   set_node_parent(child_id = 'node_1', parent_id = 'node_11') %>%
+#'   set_node_parent(child_id = 'node_2', parent_id = 'node_11') %>%
+#'   set_node_parent(child_id = 'node_3', parent_id = 'node_12')
+#'
+#' # Compute entropy of network
+#' compute_entropy(my_sbm)
+#'
 compute_entropy <- function(sbm, level = 0){
   sbm$compute_entropy(as.integer(level))
 }
@@ -178,6 +272,23 @@ compute_entropy <- function(sbm, level = 0){
 #' @export
 #'
 #' @examples
+#'
+#' set.seed(42)
+#'
+#' # Start with a random network and assign randomly to 4 groups
+#' n_groups <- 3
+#' my_sbm <- create_sbm(sim_basic_block_network(n_groups = n_groups, n_nodes_per_group = 15)) %>%
+#'   initialize_groups(num_groups = n_groups)
+#'
+#' # Calculate entropy with random groups
+#' compute_entropy(my_sbm)
+#'
+#' # Run 4 MCMC sweeps
+#' for(i in 1:4) my_sbm %>% mcmc_sweep(variable_num_groups = FALSE)
+#'
+#' # Calculate entropy after sweeps
+#' compute_entropy(my_sbm)
+#'
 mcmc_sweep <- function(sbm, level = 0, variable_num_groups = TRUE, beta = 1.5){
   sbm$BETA <- beta
   sbm$mcmc_sweep(as.integer(level), variable_num_groups)
@@ -189,7 +300,8 @@ mcmc_sweep <- function(sbm, level = 0, variable_num_groups = TRUE, beta = 1.5){
 #' Performs agglomerative merging on network, starting with each group has a
 #' single node down to one group per node type. Arguments are level to perform
 #' merge at (int) and number of MCMC steps to peform between each collapsing to
-#' equilibriate group. Returns
+#' equilibriate group. See the `agglomerative_merging.Rmd` vignette for more
+#' complete discussion of options/behavior.
 #'
 #' @inheritParams mcmc_sweep
 #' @param num_mcmc_sweeps Number of MCMC sweeps to run in between merge steps to
@@ -215,6 +327,21 @@ mcmc_sweep <- function(sbm, level = 0, variable_num_groups = TRUE, beta = 1.5){
 #' @export
 #'
 #' @examples
+#'
+#' set.seed(42)
+#'
+#' # Start with a random network of two groups with 25 nodes each
+#' my_sbm <- sim_basic_block_network(n_groups = 2, n_nodes_per_group = 25) %>%
+#'   create_sbm()
+#'
+#' # Run agglomerative clustering with no intermediate MCMC steps on network
+#' collapse_results <- collapse_groups(my_sbm, num_mcmc_sweeps = 0)
+#'
+#' # Investigate number of nodes at each step
+#' collapse_results %>%
+#'   purrr::map('state') %>%
+#'   purrr::map_int(~dplyr::filter(., level == 1) %>% nrow())
+#'
 collapse_groups <- function(
   sbm,
   level = 0,

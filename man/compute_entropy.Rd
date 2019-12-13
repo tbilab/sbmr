@@ -20,3 +20,23 @@ Entropy value (numeric).
 Computes the (degree-corrected) entropy for the network at the specified
 level (int).
 }
+\examples{
+
+# Build basic network with 3 nodes and two groups
+my_sbm <- create_sbm() \%>\%
+  add_node('node_1') \%>\%
+  add_node('node_2') \%>\%
+  add_node('node_3') \%>\%
+  add_node('node_11', level = 1) \%>\%
+  add_node('node_12', level = 1) \%>\%
+  add_connection('node_1', 'node_2') \%>\%
+  add_connection('node_1', 'node_3') \%>\%
+  add_connection('node_2', 'node_3') \%>\%
+  set_node_parent(child_id = 'node_1', parent_id = 'node_11') \%>\%
+  set_node_parent(child_id = 'node_2', parent_id = 'node_11') \%>\%
+  set_node_parent(child_id = 'node_3', parent_id = 'node_12')
+
+# Compute entropy of network
+compute_entropy(my_sbm)
+
+}

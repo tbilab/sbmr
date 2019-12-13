@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create SBM — create_sbm • sbmR</title>
+<title>Pipe operator — %&gt;% • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,9 +35,8 @@
 
 
 
-<meta property="og:title" content="Create SBM — create_sbm" />
-<meta property="og:description" content="Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
-can be provided to give information about node type." />
+<meta property="og:title" content="Pipe operator — %&gt;%" />
+<meta property="og:description" content="See magrittr::%&amp;gt;% for details." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -113,62 +112,23 @@ can be provided to give information about node type." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create SBM</h1>
+    <h1>Pipe operator</h1>
     
-    <div class="hidden name"><code>create_sbm.Rd</code></div>
+    <div class="hidden name"><code>pipe.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
-can be provided to give information about node type.</p>
+    <p>See <code>magrittr::%&gt;%</code> for details.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_sbm</span>(<span class='kw'>edges</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>from_col</span> <span class='kw'>=</span> <span class='no'>from</span>, <span class='kw'>to_col</span> <span class='kw'>=</span> <span class='no'>to</span>, <span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>0.1</span>)</pre>
+    <pre class="usage"><span class='no'>lhs</span> <span class='kw'>%&gt;%</span> <span class='no'>rhs</span></pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>edges</th>
-      <td><p>Dataframe with a from and two column encoding edges between
-string node ids (direction does not matter). A list containing both a
-<code>nodes</code> and <code>edges</code> dataframe can be passed to avoid having to unpack a
-list of nodes and edges to the arguments of the same name. This is helpful
-for the included simulation functions such as
-<code><a href='sim_sbm_network.html'>sim_sbm_network</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>nodes</th>
-      <td><p>Optional dataframe that links a node <code>id</code> to its <code>type</code>, for when model is polypartite.</p></td>
-    </tr>
-    <tr>
-      <th>from_col</th>
-      <td><p>Name of the from column for edges</p></td>
-    </tr>
-    <tr>
-      <th>to_col</th>
-      <td><p>Name of the to column for edges</p></td>
-    </tr>
-    <tr>
-      <th>eps</th>
-      <td><p>Epsilon value for ergodicity of move proposals of nodes.</p></td>
-    </tr>
-    </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Instance of SBM class.</p>
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Create an empty model with modified epsilon parameter</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>create_sbm</span>(<span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>0.4</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>

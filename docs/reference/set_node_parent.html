@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create SBM — create_sbm • sbmR</title>
+<title>Set node parent — set_node_parent • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,9 +35,9 @@
 
 
 
-<meta property="og:title" content="Create SBM — create_sbm" />
-<meta property="og:description" content="Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
-can be provided to give information about node type." />
+<meta property="og:title" content="Set node parent — set_node_parent" />
+<meta property="og:description" content="Sets the parent node (or group) for a given node. Takes child node's id
+(string), parent node's id (string), and the level of child node (int)." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -113,55 +113,57 @@ can be provided to give information about node type." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create SBM</h1>
+    <h1>Set node parent</h1>
     
-    <div class="hidden name"><code>create_sbm.Rd</code></div>
+    <div class="hidden name"><code>set_node_parent.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
-can be provided to give information about node type.</p>
+    <p>Sets the parent node (or group) for a given node. Takes child node's id
+(string), parent node's id (string), and the level of child node (int).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_sbm</span>(<span class='kw'>edges</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>from_col</span> <span class='kw'>=</span> <span class='no'>from</span>, <span class='kw'>to_col</span> <span class='kw'>=</span> <span class='no'>to</span>, <span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>0.1</span>)</pre>
+    <pre class="usage"><span class='fu'>set_node_parent</span>(<span class='no'>sbm</span>, <span class='no'>child_id</span>, <span class='no'>parent_id</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>edges</th>
-      <td><p>Dataframe with a from and two column encoding edges between
-string node ids (direction does not matter). A list containing both a
-<code>nodes</code> and <code>edges</code> dataframe can be passed to avoid having to unpack a
-list of nodes and edges to the arguments of the same name. This is helpful
-for the included simulation functions such as
-<code><a href='sim_sbm_network.html'>sim_sbm_network</a></code>.</p></td>
+      <th>sbm</th>
+      <td><p>SBM model object as created by <code><a href='create_sbm.html'>create_sbm()</a></code>.</p></td>
     </tr>
     <tr>
-      <th>nodes</th>
-      <td><p>Optional dataframe that links a node <code>id</code> to its <code>type</code>, for when model is polypartite.</p></td>
+      <th>child_id</th>
+      <td><p>Id of node for which parent is being added</p></td>
     </tr>
     <tr>
-      <th>from_col</th>
-      <td><p>Name of the from column for edges</p></td>
+      <th>parent_id</th>
+      <td><p>Id of parent node</p></td>
     </tr>
     <tr>
-      <th>to_col</th>
-      <td><p>Name of the to column for edges</p></td>
-    </tr>
-    <tr>
-      <th>eps</th>
-      <td><p>Epsilon value for ergodicity of move proposals of nodes.</p></td>
+      <th>level</th>
+      <td><p>Level of child node. This will almost always stay at default
+value of <code>0</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Instance of SBM class.</p>
+    <p>SBM model object modified with node hierarchy modified. <em>Note that object is modified in place as well.</em></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Create an empty model with modified epsilon parameter</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>create_sbm</span>(<span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>0.4</span>)</div></pre>
+    <pre class="examples"><div class='input'>
+<span class='co'># Create a model with two nodes, one at the group level (1)</span>
+<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>() <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='add_node.html'>add_node</a></span>(<span class='st'>'node_1'</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='add_node.html'>add_node</a></span>(<span class='st'>'node_11'</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+
+<span class='co'># Assign node 11 as node 1's parent</span>
+<span class='no'>my_sbm</span> <span class='kw'>%&gt;%</span>
+  <span class='fu'>set_node_parent</span>(<span class='kw'>child_id</span> <span class='kw'>=</span> <span class='st'>'node_1'</span>, <span class='kw'>parent_id</span> <span class='kw'>=</span> <span class='st'>'node_11'</span>)</div><div class='output co'>#&gt;        id  parent type level
+#&gt; 1  node_1 node_11 node     0
+#&gt; 2 node_11    none node     1</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

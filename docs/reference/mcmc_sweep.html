@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create SBM — create_sbm • sbmR</title>
+<title>MCMC Sweep — mcmc_sweep • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,9 +35,13 @@
 
 
 
-<meta property="og:title" content="Create SBM — create_sbm" />
-<meta property="og:description" content="Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
-can be provided to give information about node type." />
+<meta property="og:title" content="MCMC Sweep — mcmc_sweep" />
+<meta property="og:description" content="Runs a single Metropolis Hastings MCMC sweep across all nodes at specified
+level (For algorithm details see
+Piexoto, 2018). Each node is given a
+chance to move groups or stay in current group and all nodes are processed in
+random order. Takes the level that the sweep should take place on (int) and
+if new groups groups can be proposed and empty groups removed (boolean)." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -113,55 +117,67 @@ can be provided to give information about node type." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create SBM</h1>
+    <h1>MCMC Sweep</h1>
     
-    <div class="hidden name"><code>create_sbm.Rd</code></div>
+    <div class="hidden name"><code>mcmc_sweep.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
-can be provided to give information about node type.</p>
+    <p>Runs a single Metropolis Hastings MCMC sweep across all nodes at specified
+level (For algorithm details see
+<a href='https://arxiv.org/abs/1705.10225'>Piexoto, 2018</a>). Each node is given a
+chance to move groups or stay in current group and all nodes are processed in
+random order. Takes the level that the sweep should take place on (int) and
+if new groups groups can be proposed and empty groups removed (boolean).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_sbm</span>(<span class='kw'>edges</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>from_col</span> <span class='kw'>=</span> <span class='no'>from</span>, <span class='kw'>to_col</span> <span class='kw'>=</span> <span class='no'>to</span>, <span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>0.1</span>)</pre>
+    <pre class="usage"><span class='fu'>mcmc_sweep</span>(<span class='no'>sbm</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>variable_num_groups</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>beta</span> <span class='kw'>=</span> <span class='fl'>1.5</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>edges</th>
-      <td><p>Dataframe with a from and two column encoding edges between
-string node ids (direction does not matter). A list containing both a
-<code>nodes</code> and <code>edges</code> dataframe can be passed to avoid having to unpack a
-list of nodes and edges to the arguments of the same name. This is helpful
-for the included simulation functions such as
-<code><a href='sim_sbm_network.html'>sim_sbm_network</a></code>.</p></td>
+      <th>sbm</th>
+      <td><p>SBM model object as created by <code><a href='create_sbm.html'>create_sbm()</a></code>.</p></td>
     </tr>
     <tr>
-      <th>nodes</th>
-      <td><p>Optional dataframe that links a node <code>id</code> to its <code>type</code>, for when model is polypartite.</p></td>
+      <th>level</th>
+      <td><p>Level of nodes who's groups will have their group membership run
+through MCMC proposal-accept routine.</p></td>
     </tr>
     <tr>
-      <th>from_col</th>
-      <td><p>Name of the from column for edges</p></td>
+      <th>variable_num_groups</th>
+      <td><p>Should the model allow new groups to be created or
+empty groups removed while sweeping or should number of groups remain
+constant?</p></td>
     </tr>
     <tr>
-      <th>to_col</th>
-      <td><p>Name of the to column for edges</p></td>
-    </tr>
-    <tr>
-      <th>eps</th>
-      <td><p>Epsilon value for ergodicity of move proposals of nodes.</p></td>
+      <th>beta</th>
+      <td><p>Inverse temperature parameter for determining move acceptance probability.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Instance of SBM class.</p>
+    <p>Total number of nodes that were changed in the previous sweep</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Create an empty model with modified epsilon parameter</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>create_sbm</span>(<span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>0.4</span>)</div></pre>
+    <pre class="examples"><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
+
+<span class='co'># Start with a random network and assign randomly to 4 groups</span>
+<span class='no'>n_groups</span> <span class='kw'>&lt;-</span> <span class='fl'>3</span>
+<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>(<span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_groups</span> <span class='kw'>=</span> <span class='no'>n_groups</span>, <span class='kw'>n_nodes_per_group</span> <span class='kw'>=</span> <span class='fl'>15</span>)) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='initialize_groups.html'>initialize_groups</a></span>(<span class='kw'>num_groups</span> <span class='kw'>=</span> <span class='no'>n_groups</span>)
+
+<span class='co'># Calculate entropy with random groups</span>
+<span class='fu'><a href='compute_entropy.html'>compute_entropy</a></span>(<span class='no'>my_sbm</span>)</div><div class='output co'>#&gt; [1] 766.4937</div><div class='input'>
+<span class='co'># Run 4 MCMC sweeps</span>
+<span class='kw'>for</span>(<span class='no'>i</span> <span class='kw'>in</span> <span class='fl'>1</span>:<span class='fl'>4</span>) <span class='no'>my_sbm</span> <span class='kw'>%&gt;%</span> <span class='fu'>mcmc_sweep</span>(<span class='kw'>variable_num_groups</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+
+<span class='co'># Calculate entropy after sweeps</span>
+<span class='fu'><a href='compute_entropy.html'>compute_entropy</a></span>(<span class='no'>my_sbm</span>)</div><div class='output co'>#&gt; [1] 762.2498</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

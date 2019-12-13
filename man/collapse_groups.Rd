@@ -54,5 +54,23 @@ List with \code{entropy} and model \code{state} after each merge.
 Performs agglomerative merging on network, starting with each group has a
 single node down to one group per node type. Arguments are level to perform
 merge at (int) and number of MCMC steps to peform between each collapsing to
-equilibriate group. Returns
+equilibriate group. See the \code{agglomerative_merging.Rmd} vignette for more
+complete discussion of options/behavior.
+}
+\examples{
+
+set.seed(42)
+
+# Start with a random network of two groups with 25 nodes each
+my_sbm <- sim_basic_block_network(n_groups = 2, n_nodes_per_group = 25) \%>\%
+  create_sbm()
+
+# Run agglomerative clustering with no intermediate MCMC steps on network
+collapse_results <- collapse_groups(my_sbm, num_mcmc_sweeps = 0)
+
+# Investigate number of nodes at each step
+collapse_results \%>\%
+  purrr::map('state') \%>\%
+  purrr::map_int(~dplyr::filter(., level == 1) \%>\% nrow())
+
 }

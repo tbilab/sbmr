@@ -21,3 +21,17 @@ A dataframe describing the current state of the network: \describe{
 Exports the current state of the network as dataframe with each node as a row
 and columns for node id, parent id, node type, and node level.
 }
+\examples{
+
+# Build a bipartite network with 1 node and one group for each type
+my_sbm <- create_sbm() \%>\%
+  add_node('a1', type = 'a') \%>\%
+  add_node('a11', type = 'a', level = 1) \%>\%
+  add_node('b1', type = 'b') \%>\%
+  add_node('b11', type = 'b', level = 1) \%>\%
+  set_node_parent('a1', 'a11') \%>\%
+  set_node_parent('b1', 'b11')
+
+my_sbm \%>\% get_state()
+
+}

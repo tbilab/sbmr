@@ -70,5 +70,10 @@ mcmc iteration as it happens.}
 
 }
 \description{
-Sample from SBM posterior
+Function is currently under construction
+}
+\examples{
+
+sample_posterior(sim_basic_block_network())
+
 }

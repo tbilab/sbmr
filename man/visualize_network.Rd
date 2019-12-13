@@ -23,3 +23,14 @@ for the included simulation functions such as
 \description{
 Creates a simple interactive network visualization that visually encodes node membership and type (if present) for a passed network.
 }
+\examples{
+
+set.seed(42)
+
+# Simulate a 3 group/cluster network with 15 nodes per group
+simulated_network <- sim_basic_block_network(n_groups = 3, n_nodes_per_group = 15)
+
+# Visualize network
+visualize_network(simulated_network)
+
+}

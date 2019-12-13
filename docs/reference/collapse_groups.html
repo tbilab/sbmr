@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Sample from SBM posterior — sample_posterior • sbmR</title>
+<title>Collapse Groups — collapse_groups • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,12 @@
 
 
 
-<meta property="og:title" content="Sample from SBM posterior — sample_posterior" />
-<meta property="og:description" content="Function is currently under construction" />
+<meta property="og:title" content="Collapse Groups — collapse_groups" />
+<meta property="og:description" content="Performs agglomerative merging on network, starting with each group has a
+single node down to one group per node type. Arguments are level to perform
+merge at (int) and number of MCMC steps to peform between each collapsing to
+equilibriate group. See the agglomerative_merging.Rmd vignette for more
+complete discussion of options/behavior." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -112,128 +116,104 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Sample from SBM posterior</h1>
+    <h1>Collapse Groups</h1>
     
-    <div class="hidden name"><code>sample_posterior.Rd</code></div>
+    <div class="hidden name"><code>collapse_groups.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Function is currently under construction</p>
+    <p>Performs agglomerative merging on network, starting with each group has a
+single node down to one group per node type. Arguments are level to perform
+merge at (int) and number of MCMC steps to peform between each collapsing to
+equilibriate group. See the <code>agglomerative_merging.Rmd</code> vignette for more
+complete discussion of options/behavior.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sample_posterior</span>(
-  <span class='no'>edges</span>,
-  <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>n_sweeps</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>n_chains</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>burnin_sweeps</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>return_sweep_info</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>starting_partition</span> <span class='kw'>=</span> <span class='st'>"agglomerative"</span>,
+    <pre class="usage"><span class='fu'>collapse_groups</span>(
+  <span class='no'>sbm</span>,
+  <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>num_mcmc_sweeps</span> <span class='kw'>=</span> <span class='fl'>10</span>,
+  <span class='kw'>desired_num_groups</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>exhaustive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>beta</span> <span class='kw'>=</span> <span class='fl'>1.5</span>,
-  <span class='kw'>epsilon</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
-  <span class='kw'>greedy</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>n_checks_per_group</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>initialization_mcmc_steps</span> <span class='kw'>=</span> <span class='fl'>15</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"initialization"</span>),
-  <span class='no'>...</span>
+  <span class='kw'>greedy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>num_group_proposals</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>2</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>edges</th>
-      <td><p>Dataframe with a from and two column encoding edges between
-string node ids (direction does not matter). A list containing both a
-<code>nodes</code> and <code>edges</code> dataframe can be passed to avoid having to unpack a
-list of nodes and edges to the arguments of the same name. This is helpful
-for the included simulation functions such as
-<code><a href='sim_sbm_network.html'>sim_sbm_network</a></code>.</p></td>
+      <th>sbm</th>
+      <td><p>SBM model object as created by <code><a href='create_sbm.html'>create_sbm()</a></code>.</p></td>
     </tr>
     <tr>
-      <th>nodes</th>
-      <td><p>Optional dataframe that links a node <code>id</code> to its <code>type</code>, for when model is polypartite.</p></td>
+      <th>level</th>
+      <td><p>Level of nodes who's groups will have their group membership run
+through MCMC proposal-accept routine.</p></td>
     </tr>
     <tr>
-      <th>n_sweeps</th>
-      <td><p>Number of MCMC sweeps of all nodes (after burn-in)</p></td>
+      <th>num_mcmc_sweeps</th>
+      <td><p>Number of MCMC sweeps to run in between merge steps to
+allow model to find best partitioning with given number of groups. Set to
+zero for fast but more likely incorrect structure</p></td>
     </tr>
     <tr>
-      <th>n_chains</th>
-      <td><p>How many seperate MCMC chains to start and run</p></td>
+      <th>desired_num_groups</th>
+      <td><p>How many groups should be left at the end of the
+collapsing? Ignored if <code>exhaustive = TRUE</code>.</p></td>
     </tr>
     <tr>
-      <th>burnin_sweeps</th>
-      <td><p>How many sweeps to run before starting to record</p></td>
-    </tr>
-    <tr>
-      <th>return_sweep_info</th>
-      <td><p>Return entropy and number of nodes changed for each
-sweep (defaults to <code>TRUE</code>)</p></td>
-    </tr>
-    <tr>
-      <th>starting_partition</th>
-      <td><p>Algorithm to start each chain with? Current options
-are <code>"agglomerative"</code> or <code>"random"</code>.</p></td>
+      <th>exhaustive</th>
+      <td><p>Should collapsing exhaust all possible number of groups?
+I.e. should network be collapsed one group at a time down to one group per
+node type?</p></td>
     </tr>
     <tr>
       <th>beta</th>
-      <td><p>Inverse temperature parameter for MCMC acceptance probability</p></td>
-    </tr>
-    <tr>
-      <th>epsilon</th>
-      <td><p>Parameter to inforce ergodicity of markov chain. Setting to
-zero will remove ergodicity from model, setting high will make model moves
-more random.</p></td>
+      <td><p>Inverse temperature parameter for determining move acceptance
+probability. Only applicable if <code>num_mcmc_sweeps &gt; 0</code>.</p></td>
     </tr>
     <tr>
       <th>greedy</th>
-      <td><p>If using agglomerative initialization should algorithm search
-every possible merge?</p></td>
+      <td><p>Should all possible moves be considered for merging or should a
+set number of proposals be drawn?</p></td>
     </tr>
     <tr>
-      <th>n_checks_per_group</th>
-      <td><p>If not using agglomerative initialization, how many
-options for merging should be explored per group?</p></td>
+      <th>num_group_proposals</th>
+      <td><p>If <code>greedy = FALSE</code>, how many move proposals
+should each node produce for merge options?</p></td>
     </tr>
     <tr>
-      <th>initialization_mcmc_steps</th>
-      <td><p>If using agglomerative initialization, how
-many steps of MCMC should be run after merging groups to allow model to
-find optimal layout in new group partition?</p></td>
-    </tr>
-    <tr>
-      <th>verbose</th>
-      <td><p>Array of what info should be printed as model runs. Default
-shows <code>"initialization"</code> info of model. Other options are <code>"silent</code> to
-print nothing, or <code>"iteration progress"</code> which prints out results of each
-mcmc iteration as it happens.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Additional arguments to <code><a href='create_sbm.html'>create_sbm</a></code></p></td>
+      <th>sigma</th>
+      <td><p>Controls how fast collapse of network happens. For instance if
+set to <code>2</code> then half (<code>1/2</code>) of the nodes will be removed at each step
+until the desired number remains. If <code>exhaustive = TRUE</code> then this
+parameter will do nothing</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    
-
-
+    <p>List with <code>entropy</code> and model <code>state</code> after each merge.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'>sample_posterior</span>(<span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>())</div><div class='output co'>#&gt;      id parent type level
-#&gt; 1  g1_1   none node     0
-#&gt; 2  g1_2   none node     0
-#&gt; 3  g1_3   none node     0
-#&gt; 4  g1_4   none node     0
-#&gt; 5  g1_5   none node     0
-#&gt; 6  g2_1   none node     0
-#&gt; 7  g2_2   none node     0
-#&gt; 8  g2_3   none node     0
-#&gt; 9  g2_4   none node     0
-#&gt; 10 g2_5   none node     0</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
+
+<span class='co'># Start with a random network of two groups with 25 nodes each</span>
+<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_groups</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>n_nodes_per_group</span> <span class='kw'>=</span> <span class='fl'>25</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>()
+
+<span class='co'># Run agglomerative clustering with no intermediate MCMC steps on network</span>
+<span class='no'>collapse_results</span> <span class='kw'>&lt;-</span> <span class='fu'>collapse_groups</span>(<span class='no'>my_sbm</span>, <span class='kw'>num_mcmc_sweeps</span> <span class='kw'>=</span> <span class='fl'>0</span>)
+
+<span class='co'># Investigate number of nodes at each step</span>
+<span class='no'>collapse_results</span> <span class='kw'>%&gt;%</span>
+  <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map</a></span>(<span class='st'>'state'</span>) <span class='kw'>%&gt;%</span>
+  <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map_int</a></span>(~<span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>.</span>, <span class='no'>level</span> <span class='kw'>==</span> <span class='fl'>1</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span>())</div><div class='output co'>#&gt;  [1] 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25
+#&gt; [26] 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

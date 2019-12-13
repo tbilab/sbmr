@@ -48,6 +48,7 @@ test_that("Assignment and mutation keep pointing to same object", {
   expect_equal(lobstr::obj_addr(my_sbm), lobstr::obj_addr(my_sbm2))
  })
 
+
 test_that("Add Node", {
   # Start with network with 5 nodes.
   my_sbm <- create_sbm(edges = sim_simple_network(n_nodes = 5, prob_of_connection = 1))
@@ -126,6 +127,7 @@ test_that("Set node parent", {
   )
 })
 
+
 test_that("Initializing a single group per node", {
   # Default parameters should create a single group per node
   my_sbm <- create_sbm() %>%
@@ -137,6 +139,7 @@ test_that("Initializing a single group per node", {
   expect_equal(get_num_groups(my_sbm),3)
 
 })
+
 
 test_that("Randomly assigning initial groups", {
   n_samples <- 10 # due to stochastic sampling need to try a few times and make sure average works as expected
@@ -205,6 +208,7 @@ test_that("Loading from state dump", {
   expect_equal(initial_state, final_state)
 })
 
+
 test_that("computing entropy", {
   # Start with nodes 3 nodes attached to 2 groups
   my_sbm <- create_sbm() %>%
@@ -238,6 +242,7 @@ test_that("computing entropy", {
   # Entropy should have changed
   expect_false(first_entropy == second_entropy)
 })
+
 
 test_that("MCMC Sweeps function as expected", {
   n_nodes <- 10
