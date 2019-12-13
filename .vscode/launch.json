@@ -9,7 +9,7 @@
             "name": "Run Debug.cpp",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/debugging/debug.out",
+            "program": "${workspaceFolder}/src/debugging/debug.out",
             "args": [],
             "preLaunchTask": "Build debug w/ g++"
         }
