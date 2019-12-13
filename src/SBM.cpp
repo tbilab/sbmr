@@ -494,44 +494,36 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
                                              const int desired_num_groups)
 {
   PROFILE_FUNCTION();
-  int group_level = node_level + 1;
+  const int group_level = node_level + 1;
 
   // Start by giving every node at the desired level its own group
   give_every_node_at_level_own_group(node_level);
 
-  // Get starting number of clusters
-  int B_start = get_level(group_level)->size();
+  // Grab reference to the group nodes container
+  auto group_level_ptr = get_level(group_level);
 
-  // Now clean up the empty groups
-  // (if there were previously group nodes for the level)
-  clean_empty_groups();
+  // A conservative estimate of how many steps collapsing will take as
+  // anytime we're not doing an exhaustive search we will use less than 
+  // B_start - B_end moves.  
+  const int num_steps = group_level_ptr->size() - desired_num_groups;
 
-  int num_steps = desired_num_groups == -1 
-    ? B_start - node_type_counts.size()
-    : desired_num_groups;
-
-  // Setup vector to hold all merge step results
+  // Setup vector to hold all merge step results. 
   std::vector<Merge_Step> step_results;
   step_results.reserve(num_steps);
-
-  int i;
-  for (i = 0; i < num_steps; i++)
+  
+  // Get the current number of groups we have
+  int curr_num_groups = group_level_ptr->size();
+  
+  while (curr_num_groups > desired_num_groups) 
   {
-    
-    // Get the current number of groups we have
-    const int curr_num_groups = get_level(group_level)->size();
-
     // Decide how many merges we should do. 
     int num_merges = int(curr_num_groups - (curr_num_groups / SIGMA));
     
     // Need to remove at least 1 group
-    if (num_merges < 1) 
-    {
-      num_merges = 1;
-    }
+    if (num_merges < 1) num_merges = 1;
 
     // Make sure we don't overstep the goal number of groups
-    int num_groups_after_merge = curr_num_groups - num_merges;
+    const int num_groups_after_merge = curr_num_groups - num_merges;
     if (num_groups_after_merge < desired_num_groups)
     {
       num_merges = curr_num_groups - desired_num_groups;
@@ -561,10 +553,9 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
       // Let model equilibriate with new group layout...
       for (int j = 0; j < num_mcmc_steps; j++)
       {
-        mcmc_sweep(
-            node_level,
-            false);
+        mcmc_sweep(node_level, false);
       }
+      clean_empty_groups();
       // Update the step entropy results with new equilibriated model
       merge_results.entropy = compute_entropy(node_level);
     }
@@ -574,9 +565,10 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
 
     // Gather info for return
     step_results.push_back(merge_results);
-  }
 
-  
+    // Update current number of groups
+    curr_num_groups = group_level_ptr->size();
+  }
 
   return step_results;
 }

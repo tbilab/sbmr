@@ -128,18 +128,47 @@ public:
     return SBM::mcmc_sweep(level, variable_num_groups);
   }
 
-  List collapse_groups(const int node_level, const int num_mcmc_steps)
+  List collapse_groups(const int node_level,
+                       const int num_mcmc_steps,
+                       int desired_num_groups,
+                       const bool exhaustive)
   {
+    // Book keep sigma value in case we change it with exhaustive mode
+    const int old_sigma = SIGMA;
 
-    auto init_results = SBM::collapse_groups(node_level, num_mcmc_steps);
+    if (exhaustive)
+    {
+      // Set Sigma value below 1 to insure a single group is merged each step
+      SIGMA = 0.5;
+
+      // Perform merge with single group per node type requested.
+      desired_num_groups = 0;
+
+      for (auto node_type_it = node_type_counts.begin();
+           node_type_it != node_type_counts.end();
+           node_type_it++)
+      {
+        // Grab map for this node type.
+        auto node_type = node_type_it->second;
+
+        // Add to count this types value at the node level
+        desired_num_groups += (node_type_it->second)[node_level];
+      }
+    }
+    // Perform collapse
+    auto collapse_results = SBM::collapse_groups(node_level, num_mcmc_steps, desired_num_groups);
+
+    // Reset to old sigma value if needed
+    if (exhaustive) {
+      SIGMA = old_sigma;
+    }
 
     List entropy_results;
 
-    for (auto step = init_results.begin();
-         step != init_results.end();
+    for (auto step = collapse_results.begin();
+         step != collapse_results.end();
          step++)
     {
-
       entropy_results.push_back(
           List::create(
               _["entropy"] = step->entropy,
