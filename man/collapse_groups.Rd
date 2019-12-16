@@ -44,11 +44,13 @@ should each node produce for merge options?}
 
 \item{sigma}{Controls how fast collapse of network happens. For instance if
 set to \code{2} then half (\code{1/2}) of the nodes will be removed at each step
-until the desired number remains. If \code{exhaustive = TRUE} then this
-parameter will do nothing}
+until the desired number remains. If \code{exhaustive = TRUE} then this parameter
+will do nothing}
 }
 \value{
-List with \code{entropy} and model \code{state} after each merge.
+Tibble with three columns with rows corresponding to the result of
+each merge step:  \code{entropy}, \code{num_groups} left in model, and a list column
+of \code{state} which is the state dump dataframe for model at end of merge.
 }
 \description{
 Performs agglomerative merging on network, starting with each group has a
@@ -70,7 +72,6 @@ collapse_results <- collapse_groups(my_sbm, num_mcmc_sweeps = 0)
 
 # Investigate number of nodes at each step
 collapse_results \%>\%
-  purrr::map('state') \%>\%
-  purrr::map_int(~dplyr::filter(., level == 1) \%>\% nrow())
+  select(-state)
 
 }
