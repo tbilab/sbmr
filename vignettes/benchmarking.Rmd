@@ -1,0 +1,94 @@
+---
+title: "benchmarking"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{benchmarking}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(sbmR)
+library(tidyverse)
+```
+
+## Setup
+
+Before we can run benchmarks we need to simulate some data and get a chain starting point using the agglomerative merging algorithm...
+
+```{r}
+set.seed(42)
+
+group_info <- dplyr::tribble(
+  ~group, ~n_nodes,
+     "a",       20,
+     "b",       22,
+     "c",       25
+)
+
+connection_propensities <- dplyr::tribble(
+ ~group_1, ~group_2, ~propensity,
+      "a",      "a",         0.8,
+      "a",      "b",         0.2,
+      "a",      "c",         0.3,
+      "b",      "b",         0.9,
+      "b",      "c",         0.15,
+      "c",      "c",         0.4,
+)
+
+# Simulate network
+network <- sim_sbm_network(group_info, connection_propensities, edge_dist = purrr::rbernoulli)
+
+visualize_network(network, width = '100%')
+```
+
+
+Initialize SBM object from simulated network and run collapsing algorithm to find optimal initial partitioning..
+
+```{r}
+collapse_results <- create_sbm(network) %>% 
+  collapse_groups(exhaustive = TRUE, 
+                  num_group_proposals = 8, 
+                  num_mcmc_sweeps = 15)
+```
+
+## Timing
+
+Now that we have our network setup we can run our benchmarking tests.
+
+```{r}
+run_mcmc_sweeps <- function(n_sweeps, just_init = FALSE){
+  # Re-initialize network with new epsilon (old epsilon was 0.1) and reload the collapsed state
+  my_sbm <- create_sbm(network, eps = 0.01) %>% 
+    choose_best_collapse_state(collapse_results, heuristic = 'lowest')
+  
+  if(just_init) return(NULL)
+  # Run sweeps
+  purrr::map(1:n_sweeps, ~mcmc_sweep(my_sbm))
+}
+
+benchmark_sweep <- function(n_sweeps, just_init){
+   bench::mark(
+    run_mcmc_sweeps(n_sweeps, just_init = just_init), 
+    filter_gc = FALSE, 
+    min_iterations = 15)
+}
+n_sweeps <- 500
+full_runs <- benchmark_sweep(n_sweeps = n_sweeps, just_init = FALSE)
+init_runs <- benchmark_sweep(n_sweeps = n_sweeps, just_init = TRUE)
+
+
+# Subtract our initialization timing from the full timing to isolate the portion
+# of time from sweeps
+median_time <- full_runs$median - init_runs$median
+```
+
+Median time for `r n_sweeps` sweeps is __`r median_time`__, or approximately __`r median_time/n_sweeps` per sweep.__
+
