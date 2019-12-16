@@ -174,7 +174,7 @@ test_that("Randomly assigning initial groups", {
     })
 })
 
-# load_from_state <- function(sbm, state){
+
 test_that("Loading from state dump", {
 
   # Start with nodes 3 nodes attached to 2 groups
@@ -287,7 +287,6 @@ test_that("MCMC Sweeps function as expected", {
 })
 
 
-
 test_that("Agglomerative merging with MCMC works", {
 
   n_groups <- 2
@@ -311,7 +310,6 @@ test_that("Agglomerative merging with MCMC works", {
     expect_lt(groups_per_collapse[i], groups_per_collapse[i - 1])
   }
 })
-
 
 
 test_that("Agglomerative merging without MCMC works", {
