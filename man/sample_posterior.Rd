@@ -2,7 +2,7 @@
 % Please edit documentation in R/sample_posterior.R
 \name{sample_posterior}
 \alias{sample_posterior}
-\title{Sample from SBM posterior}
+\title{Sample from model posterior}
 \usage{
 sample_posterior(
   edges,

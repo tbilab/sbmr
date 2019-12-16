@@ -1,4 +1,4 @@
-#' Compute Entropy
+#' Compute entropy for current model state
 #'
 #' Computes the (degree-corrected) entropy for the network at the specified
 #' level (int).

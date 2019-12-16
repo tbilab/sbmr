@@ -1,4 +1,4 @@
-#' Get state
+#' Dump state of model to dataframe
 #'
 #' Exports the current state of the network as dataframe with each node as a row
 #' and columns for node id, parent id, node type, and node level.

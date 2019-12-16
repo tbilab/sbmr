@@ -2,7 +2,7 @@
 % Please edit documentation in R/compute_entropy.R
 \name{compute_entropy}
 \alias{compute_entropy}
-\title{Compute Entropy}
+\title{Compute entropy for current model state}
 \usage{
 compute_entropy(sbm, level = 0)
 }

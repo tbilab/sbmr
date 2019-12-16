@@ -2,7 +2,7 @@
 % Please edit documentation in R/collapse_groups.R
 \name{collapse_groups}
 \alias{collapse_groups}
-\title{Collapse Groups}
+\title{Agglomeratively merge groups}
 \usage{
 collapse_groups(
   sbm,

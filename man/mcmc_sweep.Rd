@@ -2,7 +2,7 @@
 % Please edit documentation in R/mcmc_sweep.R
 \name{mcmc_sweep}
 \alias{mcmc_sweep}
-\title{MCMC Sweep}
+\title{Run a single MCMC sweep over nodes}
 \usage{
 mcmc_sweep(sbm, level = 0, variable_num_groups = TRUE, beta = 1.5)
 }

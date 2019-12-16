@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_state.R
 \name{get_state}
 \alias{get_state}
-\title{Get state}
+\title{Dump state of model to dataframe}
 \usage{
 get_state(sbm)
 }

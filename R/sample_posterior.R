@@ -1,4 +1,4 @@
-#' Sample from SBM posterior
+#' Sample from model posterior
 #'
 #' Function is currently under construction
 #'

@@ -1,4 +1,4 @@
-#' Simulate SBM Network
+#' Simulate network using stochastic block model
 #'
 #' Simulates nodes and edges from a network where edge connections are derived
 #' from the Stochastic Block Model. A dataframe describing the different groups

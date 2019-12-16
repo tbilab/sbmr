@@ -1,4 +1,4 @@
-#' Set node parent
+#' Set the parent of a node
 #'
 #' Sets the parent node (or group) for a given node. Takes child node's id
 #' (string), parent node's id (string), and the level of child node (int).

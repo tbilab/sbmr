@@ -2,7 +2,7 @@
 % Please edit documentation in R/sim_sbm_network.R
 \name{sim_sbm_network}
 \alias{sim_sbm_network}
-\title{Simulate SBM Network}
+\title{Simulate network using stochastic block model}
 \usage{
 sim_sbm_network(
   group_info,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/set_node_parent.R
 \name{set_node_parent}
 \alias{set_node_parent}
-\title{Set node parent}
+\title{Set the parent of a node}
 \usage{
 set_node_parent(sbm, child_id, parent_id, level = 0)
 }

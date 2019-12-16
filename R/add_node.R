@@ -1,4 +1,4 @@
-#' Add node to network
+#' Add a new node to network
 #'
 #' Add a node to the network. Takes the node id (string), the node type
 #' (string), and the node level (int).

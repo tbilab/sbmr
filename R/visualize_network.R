@@ -1,4 +1,4 @@
-#' Visualize Network
+#' Visualize network stucture
 #'
 #' Creates a simple interactive network visualization that visually encodes node membership and type (if present) for a passed network.
 #'

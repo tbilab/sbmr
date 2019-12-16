@@ -6,7 +6,7 @@
 \alias{sbmR-package}
 \title{sbmR}
 \description{
-Insert main package description here...
+Inference and visualization of network data using the Stochastic Block Model.
 }
 \details{
 Imports

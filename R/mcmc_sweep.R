@@ -1,4 +1,4 @@
-#' MCMC Sweep
+#' Run a single MCMC sweep over nodes
 #'
 #' Runs a single Metropolis Hastings MCMC sweep across all nodes at specified
 #' level (For algorithm details see

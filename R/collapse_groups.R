@@ -1,4 +1,4 @@
-#' Collapse Groups
+#' Agglomeratively merge groups
 #'
 #' Performs agglomerative merging on network, starting with each group has a
 #' single node down to one group per node type. Arguments are level to perform

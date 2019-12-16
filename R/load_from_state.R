@@ -1,4 +1,4 @@
-#' Load from state
+#' Load model state from state dump
 #'
 #' Takes model state export as given by SBM$get_state and returns model to
 #' specified state. This is useful for resetting model before running various

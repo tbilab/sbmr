@@ -1,6 +1,6 @@
 #' sbmR
 #'
-#' Insert main package description here...
+#' Inference and visualization of network data using the Stochastic Block Model.
 #'
 #' Imports
 #' @useDynLib sbmR, .registration = TRUE

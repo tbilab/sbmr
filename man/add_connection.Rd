@@ -2,7 +2,7 @@
 % Please edit documentation in R/add_connection.R
 \name{add_connection}
 \alias{add_connection}
-\title{Add connection/ edge}
+\title{Add connection/edge between two nodes in network}
 \usage{
 add_connection(sbm, a_node, b_node)
 }

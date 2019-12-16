@@ -2,7 +2,7 @@
 % Please edit documentation in R/load_from_state.R
 \name{load_from_state}
 \alias{load_from_state}
-\title{Load from state}
+\title{Load model state from state dump}
 \usage{
 load_from_state(sbm, state)
 }

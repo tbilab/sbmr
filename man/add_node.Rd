@@ -2,7 +2,7 @@
 % Please edit documentation in R/add_node.R
 \name{add_node}
 \alias{add_node}
-\title{Add node to network}
+\title{Add a new node to network}
 \usage{
 add_node(sbm, id, type = "node", level = 0)
 }

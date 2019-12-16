@@ -2,7 +2,7 @@
 % Please edit documentation in R/sim_basic_block_network.R
 \name{sim_basic_block_network}
 \alias{sim_basic_block_network}
-\title{Simulate basic block network}
+\title{Simulate stochastic block model of given number of groups}
 \usage{
 sim_basic_block_network(
   n_groups = 2,
@@ -63,5 +63,5 @@ average of a 50\% chance of connection.
 sim_basic_block_network(n_groups = 4, n_nodes_per_group = 10)
 }
 \seealso{
-\code{\link{sim_sbm_network}} \code{\link{sim_simple_network}}
+\code{\link{sim_sbm_network}} \code{\link{sim_random_network}}
 }

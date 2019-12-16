@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_sbm.R
 \name{create_sbm}
 \alias{create_sbm}
-\title{Create SBM}
+\title{Create a new instance of an SBM model}
 \usage{
 create_sbm(edges = NULL, nodes = NULL, from_col = from, to_col = to, eps = 0.1)
 }
@@ -32,5 +32,9 @@ can be provided to give information about node type.
 \examples{
 # Create an empty model with modified epsilon parameter
 my_sbm <- create_sbm(eps = 0.4)
+
+# Create model from simple simulated data
+my_sbm <- create_sbm(sim_basic_block_network(n_groups = 2, n_nodes_per_group = 25))
+
 
 }

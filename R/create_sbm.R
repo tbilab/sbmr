@@ -1,4 +1,4 @@
-#' Create SBM
+#' Create a new instance of an SBM model
 #'
 #' Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
 #' can be provided to give information about node type.
@@ -20,6 +20,10 @@
 #' @examples
 #' # Create an empty model with modified epsilon parameter
 #' my_sbm <- create_sbm(eps = 0.4)
+#'
+#' # Create model from simple simulated data
+#' my_sbm <- create_sbm(sim_basic_block_network(n_groups = 2, n_nodes_per_group = 25))
+#'
 #'
 create_sbm <- function(
   edges = NULL,

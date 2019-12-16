@@ -2,7 +2,7 @@
 % Please edit documentation in R/visualize_network.R
 \name{visualize_network}
 \alias{visualize_network}
-\title{Visualize Network}
+\title{Visualize network stucture}
 \usage{
 visualize_network(edges, nodes = NULL, width = NULL, height = NULL)
 }

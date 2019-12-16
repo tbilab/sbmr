@@ -1,4 +1,4 @@
-#' Add connection/ edge
+#' Add connection/edge between two nodes in network
 #'
 #' Connects two nodes in network (at level 0) by their ids (string).
 #'

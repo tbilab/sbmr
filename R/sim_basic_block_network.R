@@ -1,4 +1,4 @@
-#' Simulate basic block network
+#' Simulate stochastic block model of given number of groups
 #'
 #' Simulates a simple block structured network with a desired number of constant
 #' sized groups. The probability of connections between given groups will be
@@ -18,7 +18,7 @@
 #'   used for recreating draws using \code{\link{sim_sbm_network()}}.
 #' @inheritParams sim_sbm_network
 #'
-#' @seealso \code{\link{sim_sbm_network}} \code{\link{sim_simple_network}}
+#' @seealso \code{\link{sim_sbm_network}} \code{\link{sim_random_network}}
 #'
 #' @return A list with a `nodes` dataframe (containing a node's `id` and `group`
 #'   membership), an `edges` dataframe (containing `from` and `to` nodes along

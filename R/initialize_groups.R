@@ -1,4 +1,4 @@
-#' Initialize groups
+#' Assign groups for all nodes
 #'
 #' Initializes groups for a given level of network. When `num_groups = -1` (the
 #' default) this will simply give every node its own group. Otherwise it will
