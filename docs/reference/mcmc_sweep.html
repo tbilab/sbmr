@@ -97,7 +97,7 @@ if new groups groups can be proposed and empty groups removed (boolean)." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/agglomerative_merging.html">agglomerative_merging</a>
+      <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
   </ul>
 </li>
@@ -153,13 +153,16 @@ constant?</p></td>
     </tr>
     <tr>
       <th>beta</th>
-      <td><p>Inverse temperature parameter for determining move acceptance probability.</p></td>
+      <td><p>Inverse temperature parameter for determining move acceptance
+probability.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Total number of nodes that were changed in the previous sweep</p>
+    <p>List with array of all nodes that were moved in the
+sweep (<code>nodes_moved</code>) and the sweeps impact on the model's entropy
+(<code>entropy_delta</code>).</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>

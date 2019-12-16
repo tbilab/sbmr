@@ -90,7 +90,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/agglomerative_merging.html">agglomerative_merging</a>
+      <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
   </ul>
 </li>
@@ -124,11 +124,31 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
+          <h2 id="section-model-setup" class="hasAnchor"><a href="#section-model-setup" class="anchor"></a>Model Setup</h2>
           <p class="section-desc"></p>
         </th>
       </tr>
       <tr>
+        
+        <td>
+          <p><code><a href="create_sbm.html">create_sbm()</a></code> </p>
+        </td>
+        <td><p>Create SBM</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-network" class="hasAnchor"><a href="#section-network" class="anchor"></a>Network</h2>
+          <p class="section-desc"><p>Functions for manipulating underlying network structure of SBM model</p></p>
+        </th>
+      </tr>
+      <tr>
+        
+        <td>
+          <p><code><a href="add_node.html">add_node()</a></code> </p>
+        </td>
+        <td><p>Add node to network</p></td>
+      </tr><tr>
         
         <td>
           <p><code><a href="add_connection.html">add_connection()</a></code> </p>
@@ -137,9 +157,41 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="add_node.html">add_node()</a></code> </p>
+          <p><code><a href="set_node_parent.html">set_node_parent()</a></code> </p>
         </td>
-        <td><p>Add node to network</p></td>
+        <td><p>Set node parent</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="initialize_groups.html">initialize_groups()</a></code> </p>
+        </td>
+        <td><p>Initialize groups</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_state.html">get_state()</a></code> </p>
+        </td>
+        <td><p>Get state</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="load_from_state.html">load_from_state()</a></code> </p>
+        </td>
+        <td><p>Load from state</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-modeling" class="hasAnchor"><a href="#section-modeling" class="anchor"></a>Modeling</h2>
+          <p class="section-desc"><p>Function to fit or investigate fit of SBM model</p></p>
+        </th>
+      </tr>
+      <tr>
+        
+        <td>
+          <p><code><a href="mcmc_sweep.html">mcmc_sweep()</a></code> </p>
+        </td>
+        <td><p>MCMC Sweep</p></td>
       </tr><tr>
         
         <td>
@@ -155,58 +207,32 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="create_sbm.html">create_sbm()</a></code> </p>
-        </td>
-        <td><p>Create SBM</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_combination_indices.html">get_combination_indices()</a></code> </p>
-        </td>
-        <td><p>Get Combination Indices</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_state.html">get_state()</a></code> </p>
-        </td>
-        <td><p>Get state</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="initialize_groups.html">initialize_groups()</a></code> </p>
-        </td>
-        <td><p>Initialize groups</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="load_from_state.html">load_from_state()</a></code> </p>
-        </td>
-        <td><p>Load from state</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="mcmc_sweep.html">mcmc_sweep()</a></code> </p>
-        </td>
-        <td><p>MCMC Sweep</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="sample_posterior.html">sample_posterior()</a></code> </p>
         </td>
         <td><p>Sample from SBM posterior</p></td>
-      </tr><tr>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-visualization" class="hasAnchor"><a href="#section-visualization" class="anchor"></a>Visualization</h2>
+          <p class="section-desc"><p>Functions to visualize the structure of network and/or results of modeling</p></p>
+        </th>
+      </tr>
+      <tr>
         
         <td>
-          <p><code><a href="sbmR-package.html">sbmR-package</a></code> </p>
+          <p><code><a href="visualize_network.html">visualize_network()</a></code> </p>
         </td>
-        <td><p>sbmR</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="set_node_parent.html">set_node_parent()</a></code> </p>
-        </td>
-        <td><p>Set node parent</p></td>
-      </tr><tr>
+        <td><p>Visualize Network</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-network-simulation" class="hasAnchor"><a href="#section-network-simulation" class="anchor"></a>Network Simulation</h2>
+          <p class="section-desc"><p>Functions to generate networks using the stochastic block model. Usefull for testing etc..</p></p>
+        </th>
+      </tr>
+      <tr>
         
         <td>
           <p><code><a href="sim_basic_block_network.html">sim_basic_block_network()</a></code> </p>
@@ -224,12 +250,6 @@
           <p><code><a href="sim_simple_network.html">sim_simple_network()</a></code> </p>
         </td>
         <td><p>Simulate simple network</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="visualize_network.html">visualize_network()</a></code> </p>
-        </td>
-        <td><p>Visualize Network</p></td>
       </tr>
     </tbody>
     </table>
@@ -238,7 +258,11 @@
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
+      <li><a href="#section-model-setup">Model Setup</a></li>
+      <li><a href="#section-network">Network</a></li>
+      <li><a href="#section-modeling">Modeling</a></li>
+      <li><a href="#section-visualization">Visualization</a></li>
+      <li><a href="#section-network-simulation">Network Simulation</a></li>
     </ul>
   </div>
 </div>

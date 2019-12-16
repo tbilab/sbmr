@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>agglomerative_merging • sbmR</title>
+<title>Agglomerative Merging • sbmR</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="agglomerative_merging">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Agglomerative Merging">
 <meta property="og:description" content="">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -54,7 +54,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/agglomerative_merging.html">agglomerative_merging</a>
+      <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
   </ul>
 </li>
@@ -72,7 +72,7 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>agglomerative_merging</h1>
+      <h1>Agglomerative Merging</h1>
             
       
       
@@ -130,13 +130,108 @@
 <a class="sourceLine" id="cb2-32" data-line-number="32"><span class="co"># Setup SBM model</span></a>
 <a class="sourceLine" id="cb2-33" data-line-number="33">my_sbm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/create_sbm.html">create_sbm</a></span>(edges, nodes)</a>
 <a class="sourceLine" id="cb2-34" data-line-number="34">my_sbm <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">show</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>()</a>
-<a class="sourceLine" id="cb2-35" data-line-number="35"><span class="co">#&gt;    id parent type level</span></a>
-<a class="sourceLine" id="cb2-36" data-line-number="36"><span class="co">#&gt; 1  a1   none    a     0</span></a>
-<a class="sourceLine" id="cb2-37" data-line-number="37"><span class="co">#&gt; 2 a10   none    a     0</span></a>
-<a class="sourceLine" id="cb2-38" data-line-number="38"><span class="co">#&gt; 3 a11   none    a     0</span></a>
-<a class="sourceLine" id="cb2-39" data-line-number="39"><span class="co">#&gt; 4 a12   none    a     0</span></a>
-<a class="sourceLine" id="cb2-40" data-line-number="40"><span class="co">#&gt; 5 a13   none    a     0</span></a>
-<a class="sourceLine" id="cb2-41" data-line-number="41"><span class="co">#&gt; 6 a14   none    a     0</span></a></code></pre></div>
+<a class="sourceLine" id="cb2-35" data-line-number="35"><span class="co">#&gt;      id parent type level</span></a>
+<a class="sourceLine" id="cb2-36" data-line-number="36"><span class="co">#&gt; 1    a1   none    a     0</span></a>
+<a class="sourceLine" id="cb2-37" data-line-number="37"><span class="co">#&gt; 2   a10   none    a     0</span></a>
+<a class="sourceLine" id="cb2-38" data-line-number="38"><span class="co">#&gt; 3   a11   none    a     0</span></a>
+<a class="sourceLine" id="cb2-39" data-line-number="39"><span class="co">#&gt; 4   a12   none    a     0</span></a>
+<a class="sourceLine" id="cb2-40" data-line-number="40"><span class="co">#&gt; 5   a13   none    a     0</span></a>
+<a class="sourceLine" id="cb2-41" data-line-number="41"><span class="co">#&gt; 6   a14   none    a     0</span></a>
+<a class="sourceLine" id="cb2-42" data-line-number="42"><span class="co">#&gt; 7   a15   none    a     0</span></a>
+<a class="sourceLine" id="cb2-43" data-line-number="43"><span class="co">#&gt; 8   a16   none    a     0</span></a>
+<a class="sourceLine" id="cb2-44" data-line-number="44"><span class="co">#&gt; 9   a17   none    a     0</span></a>
+<a class="sourceLine" id="cb2-45" data-line-number="45"><span class="co">#&gt; 10  a18   none    a     0</span></a>
+<a class="sourceLine" id="cb2-46" data-line-number="46"><span class="co">#&gt; 11  a19   none    a     0</span></a>
+<a class="sourceLine" id="cb2-47" data-line-number="47"><span class="co">#&gt; 12   a2   none    a     0</span></a>
+<a class="sourceLine" id="cb2-48" data-line-number="48"><span class="co">#&gt; 13  a20   none    a     0</span></a>
+<a class="sourceLine" id="cb2-49" data-line-number="49"><span class="co">#&gt; 14  a21   none    a     0</span></a>
+<a class="sourceLine" id="cb2-50" data-line-number="50"><span class="co">#&gt; 15  a22   none    a     0</span></a>
+<a class="sourceLine" id="cb2-51" data-line-number="51"><span class="co">#&gt; 16  a23   none    a     0</span></a>
+<a class="sourceLine" id="cb2-52" data-line-number="52"><span class="co">#&gt; 17  a24   none    a     0</span></a>
+<a class="sourceLine" id="cb2-53" data-line-number="53"><span class="co">#&gt; 18  a25   none    a     0</span></a>
+<a class="sourceLine" id="cb2-54" data-line-number="54"><span class="co">#&gt; 19  a26   none    a     0</span></a>
+<a class="sourceLine" id="cb2-55" data-line-number="55"><span class="co">#&gt; 20  a27   none    a     0</span></a>
+<a class="sourceLine" id="cb2-56" data-line-number="56"><span class="co">#&gt; 21  a28   none    a     0</span></a>
+<a class="sourceLine" id="cb2-57" data-line-number="57"><span class="co">#&gt; 22  a29   none    a     0</span></a>
+<a class="sourceLine" id="cb2-58" data-line-number="58"><span class="co">#&gt; 23   a3   none    a     0</span></a>
+<a class="sourceLine" id="cb2-59" data-line-number="59"><span class="co">#&gt; 24  a30   none    a     0</span></a>
+<a class="sourceLine" id="cb2-60" data-line-number="60"><span class="co">#&gt; 25  a31   none    a     0</span></a>
+<a class="sourceLine" id="cb2-61" data-line-number="61"><span class="co">#&gt; 26  a32   none    a     0</span></a>
+<a class="sourceLine" id="cb2-62" data-line-number="62"><span class="co">#&gt; 27  a33   none    a     0</span></a>
+<a class="sourceLine" id="cb2-63" data-line-number="63"><span class="co">#&gt; 28  a34   none    a     0</span></a>
+<a class="sourceLine" id="cb2-64" data-line-number="64"><span class="co">#&gt; 29  a35   none    a     0</span></a>
+<a class="sourceLine" id="cb2-65" data-line-number="65"><span class="co">#&gt; 30  a36   none    a     0</span></a>
+<a class="sourceLine" id="cb2-66" data-line-number="66"><span class="co">#&gt; 31  a37   none    a     0</span></a>
+<a class="sourceLine" id="cb2-67" data-line-number="67"><span class="co">#&gt; 32  a38   none    a     0</span></a>
+<a class="sourceLine" id="cb2-68" data-line-number="68"><span class="co">#&gt; 33  a39   none    a     0</span></a>
+<a class="sourceLine" id="cb2-69" data-line-number="69"><span class="co">#&gt; 34   a4   none    a     0</span></a>
+<a class="sourceLine" id="cb2-70" data-line-number="70"><span class="co">#&gt; 35  a40   none    a     0</span></a>
+<a class="sourceLine" id="cb2-71" data-line-number="71"><span class="co">#&gt; 36  a41   none    a     0</span></a>
+<a class="sourceLine" id="cb2-72" data-line-number="72"><span class="co">#&gt; 37  a42   none    a     0</span></a>
+<a class="sourceLine" id="cb2-73" data-line-number="73"><span class="co">#&gt; 38  a43   none    a     0</span></a>
+<a class="sourceLine" id="cb2-74" data-line-number="74"><span class="co">#&gt; 39  a44   none    a     0</span></a>
+<a class="sourceLine" id="cb2-75" data-line-number="75"><span class="co">#&gt; 40  a45   none    a     0</span></a>
+<a class="sourceLine" id="cb2-76" data-line-number="76"><span class="co">#&gt; 41  a46   none    a     0</span></a>
+<a class="sourceLine" id="cb2-77" data-line-number="77"><span class="co">#&gt; 42  a47   none    a     0</span></a>
+<a class="sourceLine" id="cb2-78" data-line-number="78"><span class="co">#&gt; 43  a48   none    a     0</span></a>
+<a class="sourceLine" id="cb2-79" data-line-number="79"><span class="co">#&gt; 44  a49   none    a     0</span></a>
+<a class="sourceLine" id="cb2-80" data-line-number="80"><span class="co">#&gt; 45   a5   none    a     0</span></a>
+<a class="sourceLine" id="cb2-81" data-line-number="81"><span class="co">#&gt; 46  a50   none    a     0</span></a>
+<a class="sourceLine" id="cb2-82" data-line-number="82"><span class="co">#&gt; 47   a6   none    a     0</span></a>
+<a class="sourceLine" id="cb2-83" data-line-number="83"><span class="co">#&gt; 48   a7   none    a     0</span></a>
+<a class="sourceLine" id="cb2-84" data-line-number="84"><span class="co">#&gt; 49   a8   none    a     0</span></a>
+<a class="sourceLine" id="cb2-85" data-line-number="85"><span class="co">#&gt; 50   a9   none    a     0</span></a>
+<a class="sourceLine" id="cb2-86" data-line-number="86"><span class="co">#&gt; 51   b1   none    b     0</span></a>
+<a class="sourceLine" id="cb2-87" data-line-number="87"><span class="co">#&gt; 52  b10   none    b     0</span></a>
+<a class="sourceLine" id="cb2-88" data-line-number="88"><span class="co">#&gt; 53  b11   none    b     0</span></a>
+<a class="sourceLine" id="cb2-89" data-line-number="89"><span class="co">#&gt; 54  b12   none    b     0</span></a>
+<a class="sourceLine" id="cb2-90" data-line-number="90"><span class="co">#&gt; 55  b13   none    b     0</span></a>
+<a class="sourceLine" id="cb2-91" data-line-number="91"><span class="co">#&gt; 56  b14   none    b     0</span></a>
+<a class="sourceLine" id="cb2-92" data-line-number="92"><span class="co">#&gt; 57  b15   none    b     0</span></a>
+<a class="sourceLine" id="cb2-93" data-line-number="93"><span class="co">#&gt; 58  b16   none    b     0</span></a>
+<a class="sourceLine" id="cb2-94" data-line-number="94"><span class="co">#&gt; 59  b17   none    b     0</span></a>
+<a class="sourceLine" id="cb2-95" data-line-number="95"><span class="co">#&gt; 60  b18   none    b     0</span></a>
+<a class="sourceLine" id="cb2-96" data-line-number="96"><span class="co">#&gt; 61  b19   none    b     0</span></a>
+<a class="sourceLine" id="cb2-97" data-line-number="97"><span class="co">#&gt; 62   b2   none    b     0</span></a>
+<a class="sourceLine" id="cb2-98" data-line-number="98"><span class="co">#&gt; 63  b20   none    b     0</span></a>
+<a class="sourceLine" id="cb2-99" data-line-number="99"><span class="co">#&gt; 64  b21   none    b     0</span></a>
+<a class="sourceLine" id="cb2-100" data-line-number="100"><span class="co">#&gt; 65  b22   none    b     0</span></a>
+<a class="sourceLine" id="cb2-101" data-line-number="101"><span class="co">#&gt; 66  b23   none    b     0</span></a>
+<a class="sourceLine" id="cb2-102" data-line-number="102"><span class="co">#&gt; 67  b24   none    b     0</span></a>
+<a class="sourceLine" id="cb2-103" data-line-number="103"><span class="co">#&gt; 68  b25   none    b     0</span></a>
+<a class="sourceLine" id="cb2-104" data-line-number="104"><span class="co">#&gt; 69  b26   none    b     0</span></a>
+<a class="sourceLine" id="cb2-105" data-line-number="105"><span class="co">#&gt; 70  b27   none    b     0</span></a>
+<a class="sourceLine" id="cb2-106" data-line-number="106"><span class="co">#&gt; 71  b28   none    b     0</span></a>
+<a class="sourceLine" id="cb2-107" data-line-number="107"><span class="co">#&gt; 72  b29   none    b     0</span></a>
+<a class="sourceLine" id="cb2-108" data-line-number="108"><span class="co">#&gt; 73   b3   none    b     0</span></a>
+<a class="sourceLine" id="cb2-109" data-line-number="109"><span class="co">#&gt; 74  b30   none    b     0</span></a>
+<a class="sourceLine" id="cb2-110" data-line-number="110"><span class="co">#&gt; 75  b31   none    b     0</span></a>
+<a class="sourceLine" id="cb2-111" data-line-number="111"><span class="co">#&gt; 76  b32   none    b     0</span></a>
+<a class="sourceLine" id="cb2-112" data-line-number="112"><span class="co">#&gt; 77  b33   none    b     0</span></a>
+<a class="sourceLine" id="cb2-113" data-line-number="113"><span class="co">#&gt; 78  b34   none    b     0</span></a>
+<a class="sourceLine" id="cb2-114" data-line-number="114"><span class="co">#&gt; 79  b35   none    b     0</span></a>
+<a class="sourceLine" id="cb2-115" data-line-number="115"><span class="co">#&gt; 80  b36   none    b     0</span></a>
+<a class="sourceLine" id="cb2-116" data-line-number="116"><span class="co">#&gt; 81  b37   none    b     0</span></a>
+<a class="sourceLine" id="cb2-117" data-line-number="117"><span class="co">#&gt; 82  b38   none    b     0</span></a>
+<a class="sourceLine" id="cb2-118" data-line-number="118"><span class="co">#&gt; 83  b39   none    b     0</span></a>
+<a class="sourceLine" id="cb2-119" data-line-number="119"><span class="co">#&gt; 84   b4   none    b     0</span></a>
+<a class="sourceLine" id="cb2-120" data-line-number="120"><span class="co">#&gt; 85  b40   none    b     0</span></a>
+<a class="sourceLine" id="cb2-121" data-line-number="121"><span class="co">#&gt; 86  b41   none    b     0</span></a>
+<a class="sourceLine" id="cb2-122" data-line-number="122"><span class="co">#&gt; 87  b42   none    b     0</span></a>
+<a class="sourceLine" id="cb2-123" data-line-number="123"><span class="co">#&gt; 88  b43   none    b     0</span></a>
+<a class="sourceLine" id="cb2-124" data-line-number="124"><span class="co">#&gt; 89  b44   none    b     0</span></a>
+<a class="sourceLine" id="cb2-125" data-line-number="125"><span class="co">#&gt; 90  b45   none    b     0</span></a>
+<a class="sourceLine" id="cb2-126" data-line-number="126"><span class="co">#&gt; 91  b46   none    b     0</span></a>
+<a class="sourceLine" id="cb2-127" data-line-number="127"><span class="co">#&gt; 92  b47   none    b     0</span></a>
+<a class="sourceLine" id="cb2-128" data-line-number="128"><span class="co">#&gt; 93  b48   none    b     0</span></a>
+<a class="sourceLine" id="cb2-129" data-line-number="129"><span class="co">#&gt; 94  b49   none    b     0</span></a>
+<a class="sourceLine" id="cb2-130" data-line-number="130"><span class="co">#&gt; 95   b5   none    b     0</span></a>
+<a class="sourceLine" id="cb2-131" data-line-number="131"><span class="co">#&gt; 96  b50   none    b     0</span></a>
+<a class="sourceLine" id="cb2-132" data-line-number="132"><span class="co">#&gt; 97   b6   none    b     0</span></a>
+<a class="sourceLine" id="cb2-133" data-line-number="133"><span class="co">#&gt; 98   b7   none    b     0</span></a>
+<a class="sourceLine" id="cb2-134" data-line-number="134"><span class="co">#&gt; 99   b8   none    b     0</span></a>
+<a class="sourceLine" id="cb2-135" data-line-number="135"><span class="co">#&gt; 100  b9   none    b     0</span></a>
+<a class="sourceLine" id="cb2-136" data-line-number="136"><span class="co">#&gt; NULL</span></a></code></pre></div>
 <div id="basic-merging" class="section level2">
 <h2 class="hasAnchor">
 <a href="#basic-merging" class="anchor"></a>Basic merging</h2>
@@ -160,13 +255,13 @@
 <a class="sourceLine" id="cb4-10" data-line-number="10">}</a>
 <a class="sourceLine" id="cb4-11" data-line-number="11"></a>
 <a class="sourceLine" id="cb4-12" data-line-number="12"><span class="kw">extract_n_groups</span>(merge_results) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>()</a>
-<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; [1] 35 24 23 21 18 17</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; [1] 37 23 20 17 14 13</span></a></code></pre></div>
 <p>Next we can look at how that number of groups corresponds to the entropy of the model.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">extract_entropy &lt;-<span class="st"> </span><span class="cf">function</span>(merge_results){</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2">  merge_results <span class="op">%&gt;%</span><span class="st"> </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map_dbl</a></span>(<span class="st">'entropy'</span>)</a>
 <a class="sourceLine" id="cb5-3" data-line-number="3">}</a>
 <a class="sourceLine" id="cb5-4" data-line-number="4"><span class="kw">extract_entropy</span>(merge_results) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>()</a>
-<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; [1] 1397.011 1459.723 1451.982 1450.707 1462.816 1467.009</span></a></code></pre></div>
+<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; [1] 1242.383 1228.133 1219.325 1216.063 1180.654 1195.559</span></a></code></pre></div>
 <p>We should almost always see the entropy decrease as we remove groups but if there is signal in the model and the algorithm found it, we should see a relativel “lack of decrease” around the true structure value. We know the true number of groups in this data is 6 so we can reference that here…</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">results_to_df &lt;-<span class="st"> </span><span class="cf">function</span>(merge_results){</a>
 <a class="sourceLine" id="cb6-2" data-line-number="2">  <span class="kw">tibble</span>(</a>
