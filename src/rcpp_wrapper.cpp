@@ -3,16 +3,6 @@
 
 using namespace Rcpp;
 
-inline DataFrame state_to_df(State_Dump state)
-{
-  // Create and return dump of state as dataframe
-  return DataFrame::create(
-      _["id"] = state.id,
-      _["parent"] = state.parent,
-      _["type"] = state.type,
-      _["level"] = state.level,
-      _["stringsAsFactors"] = false);
-}
 
 class Rcpp_SBM : public SBM
 {
@@ -124,17 +114,21 @@ public:
     return int_types;
   }
 
+  inline DataFrame state_to_df(State_Dump state)
+  {
+    // Create and return dump of state as dataframe
+    return DataFrame::create(
+        _["id"] = state.id,
+        _["parent"] = state.parent,
+        _["type"] = type_to_string(state.type),
+        _["level"] = state.level,
+        _["stringsAsFactors"] = false);
+  }
+
+
   DataFrame get_state()
   {
-    // Grab state from class
-    auto state = SBM::get_state();
-
-    return DataFrame::create(
-      _["id"] = state.id,
-      _["parent"] = state.parent,
-      _["type"] = type_to_string(state.type),
-      _["level"] = state.level,
-      _["stringsAsFactors"] = false);
+    return state_to_df(SBM::get_state());
   }
 
   void set_node_parent(const std::string child_id,
