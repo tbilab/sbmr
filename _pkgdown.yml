@@ -1,1 +1,29 @@
 destination: docs
+reference:
+- title: Model Setup
+  contents:
+  - create_sbm
+- title: Network
+  desc: Functions for manipulating underlying network structure of SBM model
+  contents:
+  - add_node
+  - add_connection
+  - set_node_parent
+  - initialize_groups
+  - get_state
+  - load_from_state
+- title: Modeling
+  desc: Function to fit or investigate fit of SBM model
+  contents:
+  - mcmc_sweep
+  - collapse_groups
+  - compute_entropy
+  - sample_posterior
+- title: Visualization
+  desc: Functions to visualize the structure of network and/or results of modeling
+  contents:
+  - starts_with('visualize_')
+- title: Network Simulation
+  desc: Functions to generate networks using the stochastic block model. Usefull for testing etc..
+  contents:
+  - starts_with('sim_')
