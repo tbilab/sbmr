@@ -12,6 +12,10 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+library(bisbmsim)
+library(sbmR)
+library(tidyverse)
 ```
 
 One technique of finding the optimal number of clusters/ best partitioning is using the efficient agglomerative merging algorithm. This is typically used to find the initial state for MCMC chains but can stand on its own as a clustering method. 
@@ -21,7 +25,7 @@ Agglomerative merging can be acomplished with the SBM class using the method `co
 
 First we will setup a model using a simulated bipartite network dataset. The true number of groups in this dataset is __6__.
 
-```{r setup}
+```{r, eval = FALSE}
 library(bisbmsim)
 library(sbmR)
 library(tidyverse)
@@ -81,59 +85,26 @@ First, we will perform a greedy merging. This is done with the `collapse_groups(
 merge_results <- collapse_groups(my_sbm, greedy = TRUE)
 ```
 
-This method returns a list containing the entropy and state of the model at each merge step. We can use these to look at how the merges progressed. 
-
-
-First we will grab the number of groups at each merge step. To do this we pull out the state element and find how many nodes in it have a level of 1 (aka group level).
+This method returns a dataframe containing the entropy, number of groups, and state of the model at each merge step. We can use these to look at how the merges progressed. 
 
 
 ```{r}
-extract_n_groups <- function(merge_results){
-  merge_results %>%
-  purrr::map('state') %>%
-  purrr::map_int(~{
-    .x %>%
-      dplyr::filter(level == 1) %>%
-      dplyr::pull(id) %>%
-      length()
-  })
-}
-
-extract_n_groups(merge_results) %>% head()
-```
-
-
-Next we can look at how that number of groups corresponds to the entropy of the model. 
-
-```{r}
-extract_entropy <- function(merge_results){
-  merge_results %>% purrr::map_dbl('entropy')
-}
-extract_entropy(merge_results) %>% head()
+merge_results %>% select(-state) %>% head()
 ```
 
 
 We should almost always see the entropy decrease as we remove groups but if there is signal in the model and the algorithm found it, we should see a relativel "lack of decrease" around the true structure value. We know the true number of groups in this data is 6 so we can reference that here...
 
 ```{r}
-results_to_df <- function(merge_results){
-  tibble(
-    n_groups = extract_n_groups(merge_results),
-    entropy = extract_entropy(merge_results)
-  )
-}
-
-
-
-plot_merge_results <- function(merge_results_df, group_cutoff = 30, trim_axes = TRUE){
+plot_merge_results <- function(merge_results, group_cutoff = 30, trim_axes = TRUE){
   
-  results_below_cutoff <- merge_results_df %>% 
-    filter(n_groups < group_cutoff)
+  results_below_cutoff <- merge_results %>% 
+    filter(num_groups < group_cutoff)
   
   max_entropy <- max(results_below_cutoff$entropy)
   min_entropy <- min(results_below_cutoff$entropy)
   
-  p <- ggplot(merge_results_df, aes(x = n_groups, y = entropy)) +
+  p <- ggplot(merge_results, aes(x = num_groups, y = entropy)) +
     geom_line(alpha = 0.3) +
     geom_point(size = 0.5) +
     geom_vline(xintercept = K_a + K_b, color = 'orangered')
@@ -155,7 +126,7 @@ plot_merge_results <- function(merge_results_df, group_cutoff = 30, trim_axes = 
 
 
 ```{r}
-merge_results %>% results_to_df() %>% plot_merge_results()
+merge_results %>% plot_merge_results()
 ```
 
 ## Non-Greedy merge proposals
@@ -165,7 +136,6 @@ We can perform the same setup but this time not using greedy but the sampling ve
 ```{r}
 create_sbm(edges, nodes) %>% 
   collapse_groups(greedy = FALSE, num_group_proposals = 10) %>% 
-  results_to_df() %>% 
   plot_merge_results()
 ```
 
@@ -180,8 +150,7 @@ merges_over_changes <- purrr::map_dfr(
   ~{
     run_time <- system.time({
       merge_results <- create_sbm(edges, nodes) %>% 
-        collapse_groups(num_group_proposals = .x) %>% 
-        results_to_df()
+        collapse_groups(num_group_proposals = .x)
     })
     
     merge_results %>% 
@@ -194,11 +163,8 @@ plot_merge_results(merges_over_changes) +
 ```
 
 ```{r}
-
 greedy_run_time <- system.time({
-  create_sbm(edges, nodes) %>% 
-    collapse_groups(greedy = TRUE) %>% 
-    results_to_df()
+  collapse_groups(create_sbm(edges, nodes), greedy = TRUE) 
 }) %>% pluck(1)
 
 merges_over_changes %>% 
@@ -219,7 +185,7 @@ Here we scan over different numbers of MCMC sweeps and if we use greedy or not f
 
 ```{r}
 merges_over_sweeps_and_greedy <- expand.grid(
-  mcmc_sweeps = seq(1, 101, by = 25),
+  mcmc_sweeps = seq(1, 101, by = 33),
   greedy = c(TRUE, FALSE)
 ) %>% 
   {
@@ -229,7 +195,6 @@ merges_over_sweeps_and_greedy <- expand.grid(
       ~{
         create_sbm(edges, nodes) %>% 
           collapse_groups(greedy = .y, num_mcmc_sweeps = .x) %>% 
-          results_to_df() %>% 
           mutate(mcmc_sweeps = .x, greedy = paste("greedy = ", .y))
       }
     )
@@ -253,7 +218,6 @@ purrr::map_dfr(
   ~{
     create_sbm(edges, nodes) %>% 
       collapse_groups(exhaustive = FALSE, sigma = .x, num_mcmc_sweeps = 0) %>% 
-      results_to_df() %>% 
       mutate(sigma = .x)
   }) %>% 
   plot_merge_results(trim_axes = FALSE) + 

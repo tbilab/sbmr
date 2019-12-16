@@ -94,6 +94,12 @@
     <li>
       <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
+    <li>
+      <a href="../articles/benchmarking.html">benchmarking</a>
+    </li>
+    <li>
+      <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -121,7 +127,14 @@
     <p>Creates a simple interactive network visualization that visually encodes node membership and type (if present) for a passed network.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>visualize_network</span>(<span class='no'>edges</span>, <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>height</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>visualize_network</span>(
+  <span class='no'>edges</span>,
+  <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>width</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>height</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>node_color_col</span> <span class='kw'>=</span> <span class='st'>"group"</span>,
+  <span class='kw'>node_shape_col</span> <span class='kw'>=</span> <span class='st'>"type"</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -147,6 +160,14 @@ for the included simulation functions such as
       <th>height</th>
       <td><p>Desired height for output widget.</p></td>
     </tr>
+    <tr>
+      <th>node_color_col</th>
+      <td><p>Name of column in the <code>nodes</code> dataframe that should be encoded with color of nodes in the plot</p></td>
+    </tr>
+    <tr>
+      <th>node_shape_col</th>
+      <td><p>Name of column in the <code>nodes</code> dataframe that should be encoded with shape of nodes in the plot</p></td>
+    </tr>
     </table>
 
 
@@ -157,8 +178,11 @@ for the included simulation functions such as
 <span class='co'># Simulate a 3 group/cluster network with 15 nodes per group</span>
 <span class='no'>simulated_network</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_groups</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_group</span> <span class='kw'>=</span> <span class='fl'>15</span>)
 
-<span class='co'># Visualize network</span>
-<span class='fu'>visualize_network</span>(<span class='no'>simulated_network</span>)</div></pre>
+<span class='co'># Visualize network with color encoding the groups</span>
+<span class='fu'>visualize_network</span>(<span class='no'>simulated_network</span>)
+
+<span class='co'># Visualize network with shape encoding the groups</span>
+<span class='fu'>visualize_network</span>(<span class='no'>simulated_network</span>, <span class='kw'>node_shape_col</span> <span class='kw'>=</span> <span class='st'>'group'</span>, <span class='kw'>node_color_col</span> <span class='kw'>=</span> <span class='st'>'type'</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

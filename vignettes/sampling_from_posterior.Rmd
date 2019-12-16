@@ -13,10 +13,14 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.width = 7
 )
+library(tidyverse)
+library(glue)
+library(sbmR)
 ```
 
-```{r setup}
+```{r, eval = FALSE}
 library(sbmR)
+library(glue)
 library(tidyverse)
 ```
 
@@ -135,11 +139,7 @@ Now that we have our model in a decent starting place we can initiate the MCMC s
 ```{r}
 num_sweeps <- 1000
 
-sweep_results <- 1:num_sweeps %>% 
-  purrr::map(~mcmc_sweep(my_sbm))
-
-
-plot_sweep_results <- function(sweep_results){
+sweep_results_to_df <- function(sweep_results, label = 'results'){
   sweep_results %>% 
     map_dfr(~tibble(
       n_moved = length(.$nodes_moved),
@@ -147,12 +147,23 @@ plot_sweep_results <- function(sweep_results){
     )) %>% 
     mutate(sweep = 1:n()) %>% 
     pivot_longer(-sweep, names_to = 'stat') %>% 
+    mutate(label = label)
+}
+
+sweep_results <- 1:num_sweeps %>% 
+  purrr::map(~mcmc_sweep(my_sbm)) %>% 
+  sweep_results_to_df(label = 'eps = 0.1')
+
+
+plot_sweep_results <- function(sweep_results_df){
+   sweep_results_df %>% 
     ggplot(aes(x = sweep, y = value)) +
     geom_line() +
     facet_grid(stat~., scales = 'free_y')
 }
 
-plot_sweep_results(sweep_results) +
+sweep_results %>% 
+  plot_sweep_results() +
   labs(
     title = glue::glue('Result of {num_sweeps} MCMC sweeps'),
     subtitle = "Entropy Delta of sweep and number of nodes moved for sweep"
@@ -186,33 +197,30 @@ Let's first repeat another `r num_sweeps` sweeps with a lower epsilon. We will r
 
 ```{r}
 # Re-initialize network with new epsilon (old epsilon was 0.1) and reload the collapsed state
-my_sbm <- create_sbm(network, eps = 0.01) %>% 
+lower_eps <- 0.005
+my_sbm <- create_sbm(network, eps = lower_eps) %>% 
   choose_best_collapse_state(collapse_results, heuristic = 'lowest')
 
 # Run our mcmc sweeps again
 sweep_results_lower_eps <- 1:num_sweeps %>% 
-  purrr::map(~mcmc_sweep(my_sbm))
+  purrr::map(~mcmc_sweep(my_sbm)) %>% 
+  sweep_results_to_df(label = glue('eps = {lower_eps}'))
 
-plot_sweep_results(sweep_results_lower_eps) +
-  labs(title = glue::glue('Result of {num_sweeps} MCMC sweeps w/ eps = 0.01'))
+sweep_results_lower_eps %>% 
+  plot_sweep_results() +
+  labs(title = glue::glue('Result of {num_sweeps} MCMC sweeps w/ eps = {lower_eps}'))
 ```
 
+### Comparing samples
+
+Now we can put the two sweep runs side-by-side to see how they compare. We see that on average the results of the lower epsilon value are more stable, which intuitively makes sense as the model won't try too many crazy proposals. 
+
 ```{r}
-run_mcmc_sweeps <- function(n_sweeps, just_init = FALSE){
-  # Re-initialize network with new epsilon (old epsilon was 0.1) and reload the collapsed state
-  my_sbm <- create_sbm(network, eps = 0.01) %>% 
-    choose_best_collapse_state(collapse_results, heuristic = 'lowest')
-  
-  if(just_init) return(NULL)
-  # Run sweeps
-  purrr::map(1:num_sweeps, ~mcmc_sweep(my_sbm))
-}
-
-
-n_sweeps <- 1000
-full_runs <- bench::mark(run_mcmc_sweeps(n_sweeps))
-just_inits <- bench::mark(run_mcmc_sweeps(n_sweeps, just_init = TRUE))
-
-median_time <- full_runs$median - just_inits$median
+bind_rows(
+  sweep_results,
+  sweep_results_lower_eps
+) %>% 
+  plot_sweep_results() +
+  facet_grid(stat~label, scales = 'free_y')
 ```
 

@@ -98,6 +98,12 @@ complete discussion of options/behavior." />
     <li>
       <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
+    <li>
+      <a href="../articles/benchmarking.html">benchmarking</a>
+    </li>
+    <li>
+      <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -189,14 +195,16 @@ should each node produce for merge options?</p></td>
       <th>sigma</th>
       <td><p>Controls how fast collapse of network happens. For instance if
 set to <code>2</code> then half (<code>1/2</code>) of the nodes will be removed at each step
-until the desired number remains. If <code>exhaustive = TRUE</code> then this
-parameter will do nothing</p></td>
+until the desired number remains. If <code>exhaustive = TRUE</code> then this parameter
+will do nothing</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>List with <code>entropy</code> and model <code>state</code> after each merge.</p>
+    <p>Tibble with three columns with rows corresponding to the result of
+each merge step:  <code>entropy</code>, <code>num_groups</code> left in model, and a list column
+of <code>state</code> which is the state dump dataframe for model at end of merge.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
@@ -211,9 +219,7 @@ parameter will do nothing</p></td>
 
 <span class='co'># Investigate number of nodes at each step</span>
 <span class='no'>collapse_results</span> <span class='kw'>%&gt;%</span>
-  <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map</a></span>(<span class='st'>'state'</span>) <span class='kw'>%&gt;%</span>
-  <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='fu'><a href='https://purrr.tidyverse.org/reference/map.html'>map_int</a></span>(~<span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>.</span>, <span class='no'>level</span> <span class='kw'>==</span> <span class='fl'>1</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span>())</div><div class='output co'>#&gt;  [1] 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25
-#&gt; [26] 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1</div><div class='input'>
+  <span class='fu'>select</span>(-<span class='no'>state</span>)</div><div class='output co'>#&gt; <span class='error'>Error in select(., -state): could not find function "select"</span></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
