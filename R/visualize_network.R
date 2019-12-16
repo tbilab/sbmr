@@ -26,16 +26,15 @@
 #'
 visualize_network <- function(edges, nodes = NULL, width = NULL, height = NULL, node_color_col = 'group', node_shape_col = 'type') {
 
-
-  if(!is_list_class(edges)){
-    data_for_d3 <- list(
-      edges = edges$edges,
-      nodes = nodes$nodes
-    )
-  } else {
+  # CHeck if we were passed a list of edges and nodes or the edges and nodes seperately
+  if(is_list_class(edges)){
     data_for_d3 <- edges
+  } else {
+    data_for_d3 <- list(
+      edges = edges,
+      nodes = nodes
+    )
   }
-
 
   r2d3::r2d3(
     data = data_for_d3,
