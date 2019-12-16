@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create a new instance of an SBM model — create_sbm • sbmR</title>
+<title>Simulate completely random network — sim_random_network • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,9 +35,9 @@
 
 
 
-<meta property="og:title" content="Create a new instance of an SBM model — create_sbm" />
-<meta property="og:description" content="Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
-can be provided to give information about node type." />
+<meta property="og:title" content="Simulate completely random network — sim_random_network" />
+<meta property="og:description" content="Generate an edge dataframe from an Erdos-Renyi network. An edge will occur
+between two nodes with a uniform common probability." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -113,58 +113,55 @@ can be provided to give information about node type." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create a new instance of an SBM model</h1>
+    <h1>Simulate completely random network</h1>
     
-    <div class="hidden name"><code>create_sbm.Rd</code></div>
+    <div class="hidden name"><code>sim_random_network.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
-can be provided to give information about node type.</p>
+    <p>Generate an edge dataframe from an <a href='https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93R%C3%A9nyi_model'>Erdos-Renyi network.</a> An edge will occur
+between two nodes with a uniform common probability.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_sbm</span>(<span class='kw'>edges</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>from_col</span> <span class='kw'>=</span> <span class='no'>from</span>, <span class='kw'>to_col</span> <span class='kw'>=</span> <span class='no'>to</span>, <span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>0.1</span>)</pre>
+    <pre class="usage"><span class='fu'>sim_random_network</span>(
+  <span class='kw'>n_nodes</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>prob_of_connection</span> <span class='kw'>=</span> <span class='fl'>0.7</span>,
+  <span class='kw'>allow_self_connections</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>edges</th>
-      <td><p>Dataframe with a from and two column encoding edges between
-string node ids (direction does not matter). A list containing both a
-<code>nodes</code> and <code>edges</code> dataframe can be passed to avoid having to unpack a
-list of nodes and edges to the arguments of the same name. This is helpful
-for the included simulation functions such as
-<code><a href='sim_sbm_network.html'>sim_sbm_network</a></code>.</p></td>
+      <th>n_nodes</th>
+      <td><p>Total number of unique nodes to simulate</p></td>
     </tr>
     <tr>
-      <th>nodes</th>
-      <td><p>Optional dataframe that links a node <code>id</code> to its <code>type</code>, for when model is polypartite.</p></td>
+      <th>prob_of_connection</th>
+      <td><p>Probability of any given edges between two nodes
+occuring</p></td>
     </tr>
     <tr>
-      <th>from_col</th>
-      <td><p>Name of the from column for edges</p></td>
-    </tr>
-    <tr>
-      <th>to_col</th>
-      <td><p>Name of the to column for edges</p></td>
-    </tr>
-    <tr>
-      <th>eps</th>
-      <td><p>Epsilon value for ergodicity of move proposals of nodes.</p></td>
+      <th>allow_self_connections</th>
+      <td><p>Should nodes be allowed to have connections to
+themselves?</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Instance of SBM class.</p>
+    <p>An edge dataframe with node ids for connections in the <code>from</code> and
+<code>to</code> columns</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Create an empty model with modified epsilon parameter</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>create_sbm</span>(<span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>0.4</span>)
-
-<span class='co'># Create model from simple simulated data</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>create_sbm</span>(<span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_groups</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>n_nodes_per_group</span> <span class='kw'>=</span> <span class='fl'>25</span>))</div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>sim_random_network</span>(<span class='kw'>n_nodes</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>prob_of_connection</span> <span class='kw'>=</span> <span class='fl'>0.9</span>)</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 5 x 2</span><span>
+#&gt;   from   to    
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> 
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> node_1 node_2
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> node_1 node_4
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> node_2 node_3
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> node_2 node_4
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> node_3 node_4</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

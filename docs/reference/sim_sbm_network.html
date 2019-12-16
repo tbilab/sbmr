@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Simulate SBM Network — sim_sbm_network • sbmR</title>
+<title>Simulate network using stochastic block model — sim_sbm_network • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,7 +35,7 @@
 
 
 
-<meta property="og:title" content="Simulate SBM Network — sim_sbm_network" />
+<meta property="og:title" content="Simulate network using stochastic block model — sim_sbm_network" />
 <meta property="og:description" content="Simulates nodes and edges from a network where edge connections are derived
 from the Stochastic Block Model. A dataframe describing the different groups
 present and the number of nodes within them, a dataframe that provides the
@@ -116,7 +116,7 @@ who's main parameter the propensity value defines are needed." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Simulate SBM Network</h1>
+    <h1>Simulate network using stochastic block model</h1>
     
     <div class="hidden name"><code>sim_sbm_network.Rd</code></div>
     </div>
@@ -200,36 +200,36 @@ with the total number of <code>connections</code> as drawn from <code>edge_dist<
 )
 
 <span class='fu'>sim_sbm_network</span>(<span class='no'>group_info</span>, <span class='no'>connection_propensities</span>, <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='no'><a href='https://purrr.tidyverse.org/reference/rbernoulli.html'>rbernoulli</a></span>)</div><div class='output co'>#&gt; $nodes
-#&gt; <span style='color: #555555;'># A tibble: 37 x 2</span><span>
+#&gt; <span style='color: #949494;'># A tibble: 37 x 2</span><span>
 #&gt;    id    group
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> a_1   a    
-#&gt; </span><span style='color: #555555;'> 2</span><span> a_2   a    
-#&gt; </span><span style='color: #555555;'> 3</span><span> a_3   a    
-#&gt; </span><span style='color: #555555;'> 4</span><span> a_4   a    
-#&gt; </span><span style='color: #555555;'> 5</span><span> a_5   a    
-#&gt; </span><span style='color: #555555;'> 6</span><span> a_6   a    
-#&gt; </span><span style='color: #555555;'> 7</span><span> a_7   a    
-#&gt; </span><span style='color: #555555;'> 8</span><span> a_8   a    
-#&gt; </span><span style='color: #555555;'> 9</span><span> a_9   a    
-#&gt; </span><span style='color: #555555;'>10</span><span> a_10  a    
-#&gt; </span><span style='color: #555555;'># … with 27 more rows</span><span>
+#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> a_1   a    
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> a_2   a    
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> a_3   a    
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> a_4   a    
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> a_5   a    
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> a_6   a    
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> a_7   a    
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> a_8   a    
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> a_9   a    
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span> a_10  a    
+#&gt; </span><span style='color: #949494;'># … with 27 more rows</span><span>
 #&gt; 
 #&gt; $edges
-#&gt; </span><span style='color: #555555;'># A tibble: 263 x 3</span><span>
+#&gt; </span><span style='color: #949494;'># A tibble: 264 x 3</span><span>
 #&gt;    from  to    connections
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> a_1   a_2             1
-#&gt; </span><span style='color: #555555;'> 2</span><span> a_1   a_4             1
-#&gt; </span><span style='color: #555555;'> 3</span><span> a_1   a_5             1
-#&gt; </span><span style='color: #555555;'> 4</span><span> a_1   a_6             1
-#&gt; </span><span style='color: #555555;'> 5</span><span> a_1   a_7             1
-#&gt; </span><span style='color: #555555;'> 6</span><span> a_1   a_8             1
-#&gt; </span><span style='color: #555555;'> 7</span><span> a_1   a_9             1
-#&gt; </span><span style='color: #555555;'> 8</span><span> a_1   a_10            1
-#&gt; </span><span style='color: #555555;'> 9</span><span> a_1   b_6             1
-#&gt; </span><span style='color: #555555;'>10</span><span> a_1   b_11            1
-#&gt; </span><span style='color: #555555;'># … with 253 more rows</span><span>
+#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> a_1   a_2             1
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> a_1   a_3             1
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> a_1   a_4             1
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> a_1   a_5             1
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> a_1   a_6             1
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> a_1   a_8             1
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> a_1   a_9             1
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> a_1   a_10            1
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> a_1   b_5             1
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span> a_1   b_12            1
+#&gt; </span><span style='color: #949494;'># … with 254 more rows</span><span>
 #&gt; </div><div class='input'>
 </div></span></pre>
   </div>
