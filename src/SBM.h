@@ -29,6 +29,12 @@ struct Proposal_Res
                                      prob_of_accept(p){};
 };
 
+struct Sweep_Res
+{
+  int num_changed = 0;
+  double entropy_delta = 0;
+};
+
 // =============================================================================
 // Main node class declaration
 // =============================================================================
@@ -73,7 +79,7 @@ public:
   Proposal_Res make_proposal_decision(NodePtr node, NodePtr new_group);
 
   // Runs efficient MCMC sweep algorithm on desired node level
-  int mcmc_sweep(int level, bool variable_num_groups);
+  Sweep_Res mcmc_sweep(int level, bool variable_num_groups);
 
   // Merge two groups at a given level based on the probability of doing so
   Merge_Step agglomerative_merge( int level_of_groups, int n_merges);

@@ -158,11 +158,15 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-int SBM::mcmc_sweep(const int level, const bool variable_num_groups) 
+Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_groups) 
 {
   PROFILE_FUNCTION();
+  const int group_level = level + 1;
+  
+  // Initialize the results holder
+  Sweep_Res results;
   int num_changes = 0;
-  int group_level = level + 1;
+  double entropy_delta = 0;
 
   // Grab level map
   LevelPtr node_map = get_level(level);
@@ -208,7 +212,9 @@ int SBM::mcmc_sweep(const int level, const bool variable_num_groups)
       // Move the node
       curr_node->set_parent(proposed_new_group);
       
-      num_changes++;
+      // Update results 
+      results.num_changed++;
+      results.entropy_delta += proposal_results.entropy_delta;
     }
     
     // Check if we're running sweep with variable group numbers. If we are, we
@@ -224,7 +230,7 @@ int SBM::mcmc_sweep(const int level, const bool variable_num_groups)
     }
   } // End loop over all nodes
   
-  return num_changes;
+  return results;
 }                           
 
 
