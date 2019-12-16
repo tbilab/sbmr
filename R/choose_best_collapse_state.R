@@ -21,6 +21,5 @@ choose_best_collapse_state <- function(sbm, collapse_results, heuristic = 'lowes
     stop("Other choice heuristics not yet implemented.")
   }
 
-
-  my_sbm %>% load_from_state(best_state)
+  sbm %>% load_from_state(best_state)
 }
