@@ -255,24 +255,35 @@ test_that("MCMC Sweeps function as expected", {
 
   original_num_groups <- get_num_groups(my_sbm)
 
-  # Run MCMC sweeps that do not allow group numbers to change
-  n_groups_stays_same <- 1:n_sweeps %>%
-    purrr::map_int(~{
-      mcmc_sweep(my_sbm, variable_num_groups = FALSE)
-      get_num_groups(my_sbm) == original_num_groups
-    })
+  sweep_and_check_n_groups <- function(i, variable_num_groups, sbm){
+    sweep <- mcmc_sweep(sbm, variable_num_groups = variable_num_groups)
+    sweep$total_num_groups <- get_num_groups(sbm)
+    sweep
+  }
 
-  expect_true(all(n_groups_stays_same))
+  # Run MCMC sweeps that do not allow group numbers to change
+  n_groups_stays_same_results <- 1:n_sweeps %>%
+    purrr::map(sweep_and_check_n_groups, variable_num_groups = FALSE, sbm = my_sbm)
+
+  # Every step should result in the same number of groups in model
+  n_groups_stays_same_results %>%
+    purrr::map_int('total_num_groups') %>%
+    magrittr::equals(original_num_groups) %>%
+    all() %>%
+    expect_true()
 
 
   # Now let the model change number of groups and see if it ever does
   n_groups_changes <- 1:n_sweeps %>%
-    purrr::map_int(~{
-      mcmc_sweep(my_sbm, variable_num_groups = TRUE)
-      get_num_groups(my_sbm) != original_num_groups
-    })
+    purrr::map(sweep_and_check_n_groups, variable_num_groups = TRUE, sbm = my_sbm)
 
-  expect_true(any(n_groups_changes))
+  # Expect at least one group change
+  n_groups_changes %>%
+    purrr::map_int('total_num_groups') %>%
+    magrittr::equals(original_num_groups) %>%
+    magrittr::not() %>%
+    any() %>%
+    expect_true()
 })
 
 

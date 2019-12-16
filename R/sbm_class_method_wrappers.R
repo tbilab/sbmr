@@ -89,6 +89,7 @@ set_node_parent <- function(sbm, child_id, parent_id, level = 0){
 }
 
 #' Initialize groups
+
 #'
 #' Initializes groups for a given level of network. When `num_groups = -1` (the
 #' default) this will simply give every node its own group. Otherwise it will
@@ -266,9 +267,12 @@ compute_entropy <- function(sbm, level = 0){
 #' @param variable_num_groups Should the model allow new groups to be created or
 #'   empty groups removed while sweeping or should number of groups remain
 #'   constant?
-#' @param beta Inverse temperature parameter for determining move acceptance probability.
+#' @param beta Inverse temperature parameter for determining move acceptance
+#'   probability.
 #'
-#' @return Total number of nodes that were changed in the previous sweep
+#' @return List with total number of nodes that were changed in the previous
+#'   sweep (`num_changed`) and the sweeps impact on the model's entropy
+#'   (`entropy_delta`).
 #' @export
 #'
 #' @examples

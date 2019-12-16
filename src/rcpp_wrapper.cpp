@@ -122,10 +122,15 @@ public:
     return SBM::compute_entropy(level);
   }
 
-  int mcmc_sweep(int level, bool variable_num_groups)
+  List mcmc_sweep(int level, bool variable_num_groups)
   {
-    // std::cout << "Running rcpp_SBM mcmc function" << std::endl;
-    return SBM::mcmc_sweep(level, variable_num_groups);
+    // Run sweep method
+    Sweep_Res result = SBM::mcmc_sweep(level, variable_num_groups);
+
+    // Package result struct into a list
+    return List::create(
+        _["num_changed"] = result.num_changed,
+        _["entropy_delta"] = result.entropy_delta);
   }
 
   List collapse_groups(const int node_level,
