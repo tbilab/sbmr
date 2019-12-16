@@ -80,27 +80,59 @@ public:
                         find_node_by_id(node_b_id, 0));
   }
 
-  DataFrame get_state()
+ // Convert the types from integers (cpp friendly) to strings (r friendly)
+  std::vector<string> type_to_string(const std::vector<int> & int_types)
   {
-    // Grab state from class
-    auto state = SBM::get_state();
-
-    // Convert the type column to the string types
+   // Convert the type column to the string types
     std::vector<string> string_types;
-    string_types.reserve(state.type.size());
+    string_types.reserve(int_types.size());
 
-    for (auto type_it = state.type.begin();
-              type_it != state.type.end();
+    for (auto type_it = int_types.begin();
+              type_it != int_types.end();
               type_it++)
     {
       // Convert int to string and push to vector
       string_types.push_back(type_int_to_string[*type_it]);
     }
 
+    return string_types;
+  }
+  // Convert the types from strings to integers
+  std::vector<int> type_to_int(const std::vector<string> & string_types)
+  {
+    std::vector<int> int_types;
+    int_types.reserve(string_types.size());
+
+    for (auto type_it = string_types.begin();
+         type_it != string_types.end();
+         type_it++)
+    {
+
+      // Make sure that the requested type has been seen by the model already and
+      // send message to R if it hasnt.
+      auto loc_of_int_type = type_string_to_int.find(*type_it);
+      if (loc_of_int_type == type_string_to_int.end())
+      {
+        stop((*type_it) + " not found in model");
+      } else {
+        // Convert string to int and push to vector
+        int_types.push_back(loc_of_int_type->second);
+      }
+
+    }
+
+    return int_types;
+  }
+
+  DataFrame get_state()
+  {
+    // Grab state from class
+    auto state = SBM::get_state();
+
     return DataFrame::create(
       _["id"] = state.id,
       _["parent"] = state.parent,
-      _["type"] = string_types,
+      _["type"] = type_to_string(state.type),
       _["level"] = state.level,
       _["stringsAsFactors"] = false);
   }
@@ -167,7 +199,8 @@ public:
       entropy_results.push_back(
           List::create(
               _["entropy"] = step->entropy,
-              _["state"] = state_to_df(step->state)));
+              _["state"] = state_to_df(step->state),
+              _["num_groups"] = step->num_groups));
     }
 
     return entropy_results;
@@ -178,33 +211,10 @@ public:
                        std::vector<int> level,
                        std::vector<string> string_types)
   {
-    // Convert the types from strings to integers
-    // Convert the type column to the string types
-    std::vector<int> int_types;
-    int_types.reserve(string_types.size());
-
-    for (auto type_it = string_types.begin();
-         type_it != string_types.end();
-         type_it++)
-    {
-
-      // Make sure that the requested type has been seen by the model already and
-      // send message to R if it hasnt.
-
-      auto loc_of_int_type = type_string_to_int.find(*type_it);
-      if (loc_of_int_type == type_string_to_int.end())
-      {
-        stop((*type_it) + " not found in model");
-      } else {
-        // Convert string to int and push to vector
-        int_types.push_back(loc_of_int_type->second);
-      }
-
-    }
-
+   
     // Construct a state dump from vectors and
     // pass the constructed state to load_state function
-    SBM::load_from_state(State_Dump(id, parent, level, int_types));
+    SBM::load_from_state(State_Dump(id, parent, level, type_to_int(string_types)));
   }
 
   // Getters and setters for inhereted fields
