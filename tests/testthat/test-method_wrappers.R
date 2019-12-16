@@ -300,10 +300,7 @@ test_that("Agglomerative merging with MCMC works", {
   my_sbm <- create_sbm(simulated_network)
   collapse_results <- collapse_groups(my_sbm, num_mcmc_sweeps = 1)
 
-  groups_per_collapse <- collapse_results %>%
-    purrr::map('state') %>%
-    purrr::map_int(~dplyr::filter(., level == 1) %>% nrow())
-
+  groups_per_collapse <- collapse_results$num_groups
 
   # Make sure that there are always fewer groups after each step
   for(i in 2:length(groups_per_collapse)){
@@ -325,10 +322,7 @@ test_that("Agglomerative merging without MCMC works", {
   my_sbm <- create_sbm(simulated_network)
   collapse_results <- collapse_groups(my_sbm, num_mcmc_sweeps = 0)
 
-  groups_per_collapse <- collapse_results %>%
-    purrr::map('state') %>%
-    purrr::map_int(~dplyr::filter(., level == 1) %>% nrow())
-
+  groups_per_collapse <- collapse_results$num_groups
 
   # Make sure that there are always fewer groups after each step
   for(i in 2:length(groups_per_collapse)){

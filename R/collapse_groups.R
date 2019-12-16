@@ -23,10 +23,12 @@
 #'   should each node produce for merge options?
 #' @param sigma Controls how fast collapse of network happens. For instance if
 #'   set to `2` then half (`1/2`) of the nodes will be removed at each step
-#'   until the desired number remains. If `exhaustive = TRUE` then this
-#'   parameter will do nothing
+#' until the desired number remains. If `exhaustive = TRUE` then this parameter
+#' will do nothing
 #'
-#' @return List with `entropy` and model `state` after each merge.
+#' @return Tibble with three columns with rows corresponding to the result of
+#'   each merge step:  `entropy`, `num_groups` left in model, and a list column
+#'   of `state` which is the state dump dataframe for model at end of merge.
 #' @export
 #'
 #' @examples
@@ -42,8 +44,7 @@
 #'
 #' # Investigate number of nodes at each step
 #' collapse_results %>%
-#'   purrr::map('state') %>%
-#'   purrr::map_int(~dplyr::filter(., level == 1) %>% nrow())
+#'   select(-state)
 #'
 collapse_groups <- function(
   sbm,
@@ -68,10 +69,17 @@ collapse_groups <- function(
   #                 const int num_mcmc_steps,
   #                 int desired_num_groups,
   #                 const bool exhaustive)
-  sbm$collapse_groups(as.integer(level),
-                      as.integer(num_mcmc_sweeps),
-                      as.integer(desired_num_groups),
-                      exhaustive)
+  collapse_results <- sbm$collapse_groups(as.integer(level),
+                     as.integer(num_mcmc_sweeps),
+                     as.integer(desired_num_groups),
+                     exhaustive)
+
+  purrr::map_dfr(
+    collapse_results,
+    ~dplyr::tibble(entropy = .$entropy,
+                   num_groups = .$num_groups)
+  ) %>%
+    dplyr::mutate(state = purrr::map(collapse_results, 'state'))
 }
 
 
