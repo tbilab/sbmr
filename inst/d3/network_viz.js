@@ -1,27 +1,34 @@
-// !preview r2d3 data=sim_basic_block_network(3, 20)
+// !preview r2d3 data=sim_basic_block_network(3, 20), options = list(color_col = 'group', shape_col = 'type')
+svg.attr("viewBox", [0, 0, width, height]);
+
+// Get color and shape column names from options
+const {color_col, shape_col} = options;
 
 // Clean up data into the node and link format that d3 needs
-svg.attr("viewBox", [0, 0, width, height]);
 const links = HTMLWidgets.dataframeToD3(data.edges)
   .map(function(edge){return({source: edge.from, target: edge.to})});
 const nodes = HTMLWidgets.dataframeToD3(data.nodes);
 
 
-// If we're missing groups or types fill them in with constant values.
-if(!nodes[0].group){
-  nodes.forEach(function(node){node.group = "group"});
+// If we're missing values for our aesthetic mapping columns,  fill them in with constant values.
+if(!nodes[0][color_col]){
+  nodes.forEach(function(node){node[color_col] = color_col});
 }
-if(!nodes[0].type){
-  nodes.forEach(function(node){node.type = "type"});
+if(!nodes[0][shape_col]){
+  nodes.forEach(function(node){node[shape_col] = shape_col});
 }
 
 // Color encodes the node's group
-const Color = d3.scaleOrdinal(d3.schemeCategory10, unique(nodes.map(d => d.group)));
-const color_node = node => Color(node.group);
+const Color = d3.scaleOrdinal(d3.schemeCategory10, unique(nodes.map(d => d[color_col])));
+const color_node = node => Color(node[color_col]);
 
 // Shape encodes the node's type
-const Shape = d3.scaleOrdinal(d3.symbols, unique(nodes.map(d => d.type)));
-const draw_shape = node => d3.symbol().size(150)(Shape(node.type));
+const Shape = d3.scaleOrdinal()
+  .range(d3.symbols)
+  .domain(unique(nodes.map(d => d[shape_col])));
+const draw_shape = node => d3.symbol().size(150)
+  .type(Shape(node[shape_col]))();
+
 
 const padding = 15;
 const X = d3.scaleLinear()
