@@ -567,6 +567,9 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
     // Dump state into step results
     merge_results.state = get_state();
 
+    // Record how many groups we have after this step
+    merge_results.num_groups = curr_num_groups;
+
     // Gather info for return
     step_results.push_back(merge_results);
 
