@@ -106,3 +106,21 @@ So even though we know our true number of groups is `3` we see a minimum entropy
 my_sbm <- my_sbm %>% choose_best_collapse_state(collapse_results, heuristic = 'lowest')
 ```
 
+
+### Visualizing these results. We can use our visualization function to look at the results of this clustering and compare that to the known structure...
+
+```{r}
+merged_state <- my_sbm %>% 
+  get_state() %>% 
+  select(id, parent)
+
+nodes_w_inferred_group <- network$nodes  %>%
+  left_join(merged_state, by = 'id') %>% 
+  rename(inferred = parent)
+
+visualize_network(edges = network$edges, 
+                  nodes = nodes_w_inferred_group, 
+                  node_color_col = 'inferred', 
+                  node_shape_col = 'group')
+```
+
