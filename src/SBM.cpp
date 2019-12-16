@@ -1,4 +1,4 @@
-#include "SBM.h" 
+#include "SBM.h"
 
 // =============================================================================
 // Propose a potential group move for a node.
@@ -8,7 +8,7 @@ NodePtr SBM::propose_move(const NodePtr node)
   PROFILE_FUNCTION();
 
   int group_level = node->level + 1;
-  
+
   // Grab a list of all the groups that the node could join
   std::vector<NodePtr> potential_groups = get_nodes_of_type_at_level(
     node->type,
@@ -18,14 +18,14 @@ NodePtr SBM::propose_move(const NodePtr node)
   NodePtr rand_neighbor = sampler.sample(
     node->get_connections_to_level(node->level)
   );
-  
+
   // Get number total number connections for neighbor's group
   int neighbor_group_degree = rand_neighbor->parent->degree;
-  
+
   // Decide if we are going to choose a random group for our node
   double ergo_amnt = EPS*potential_groups.size();
   double prob_of_random_group = ergo_amnt/(neighbor_group_degree + ergo_amnt);
-  
+
   // Decide where we will get new group from and draw from potential candidates
   return sampler.draw_unif() < prob_of_random_group ?
     sampler.sample(potential_groups):
@@ -76,7 +76,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 
   // Reference to old group that would be swapped for new_group
   NodePtr old_group = node->parent;
-  
+
   // Grab degree of the node to move
   double node_degree = node->degree;
 
@@ -87,7 +87,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   // Get degrees of the two groups post-move
   double old_group_degree_post = old_group_degree_pre - node_degree;
   double new_group_degree_post = new_group_degree_pre + node_degree;
- 
+
   // Initialize the partial edge entropy sum holders
   double entropy_pre = 0;
   double entropy_post = 0;
@@ -125,8 +125,8 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
                        &entropy_post);
   }
 
-  // Now we move on to calculating the probability ratios for the node moving 
-  // from old->new and then new->old assuming node was already in new.  
+  // Now we move on to calculating the probability ratios for the node moving
+  // from old->new and then new->old assuming node was already in new.
   double pre_move_prob = 0.0;
   double post_move_prob = 0.0;
 
@@ -142,13 +142,13 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     post_move_prob += new_group_edges[con_group_it->first] + EPS;
   }
 
-  // Now we can clean up all the calculations into to entropy delta and the 
-  // probability ratio for the moves and use those to calculate the acceptance 
+  // Now we can clean up all the calculations into to entropy delta and the
+  // probability ratio for the moves and use those to calculate the acceptance
   // probability for the proposed move.
   double entropy_delta = entropy_post - entropy_pre;
-  double acceptance_prob = exp(BETA*entropy_delta) * 
+  double acceptance_prob = exp(BETA*entropy_delta) *
                           (pre_move_prob/post_move_prob);
-  
+
   return Proposal_Res(
     entropy_delta,
     acceptance_prob > 1 ? 1: acceptance_prob
@@ -158,32 +158,30 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_groups) 
+Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_groups)
 {
   PROFILE_FUNCTION();
   const int group_level = level + 1;
-  
+
   // Initialize the results holder
   Sweep_Res results;
-  int num_changes = 0;
-  double entropy_delta = 0;
 
   // Grab level map
   LevelPtr node_map = get_level(level);
-    
+
   // Get all the nodes at the given level in a shuffleable vector format
   // Initialize vector to hold nodes
   std::vector<NodePtr> node_vec;
   node_vec.reserve(node_map->size());
 
   // Fill in vector with map elements
-  for (auto node_it = node_map->begin(); 
-            node_it != node_map->end(); 
+  for (auto node_it = node_map->begin();
+            node_it != node_map->end();
             node_it++)
   {
     node_vec.push_back(node_it->second);
   }
-  
+
   // Shuffle node order
   std::shuffle(node_vec.begin(), node_vec.end(), sampler.int_gen);
 
@@ -191,47 +189,47 @@ Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_groups)
   for (auto node_it = node_vec.begin(); node_it != node_vec.end(); ++node_it)
   {
     NodePtr curr_node = *node_it;
-    
+
     // Get a move proposal
     NodePtr proposed_new_group = propose_move(curr_node);
 
     // If the propsosed group is the nodes current group, we don't need to waste
     // time checking because decision will always result in same state.
     if(curr_node->parent->id == proposed_new_group->id) continue;
-    
+
     // Calculate acceptance probability based on posterior changes
     Proposal_Res proposal_results = make_proposal_decision(
       curr_node,
       proposed_new_group
     );
-    
+
     bool move_accepted = sampler.draw_unif() < proposal_results.prob_of_accept;
 
-    if (move_accepted) 
-    {   
+    if (move_accepted)
+    {
       // Move the node
       curr_node->set_parent(proposed_new_group);
-      
-      // Update results 
-      results.num_changed++;
+
+      // Update results
+      results.nodes_moved.push_back(curr_node->id);
       results.entropy_delta += proposal_results.entropy_delta;
     }
-    
+
     // Check if we're running sweep with variable group numbers. If we are, we
     // need to remove empty groups and add a new group as a potential for the
     // node to enter
-    if (variable_num_groups) 
+    if (variable_num_groups)
     {
       // Clean up empty groups
       clean_empty_groups();
-      
+
       // Add a new group node for the current node type
       create_group_node(curr_node->type, group_level);
     }
   } // End loop over all nodes
-  
+
   return results;
-}                           
+}
 
 
 // =============================================================================
@@ -243,17 +241,17 @@ double SBM::compute_entropy(const int level)
   PROFILE_FUNCTION();
   //============================================================================
   // First, calc the number of total edges and build a degree->num nodes map
-  
+
   // Build map of number of nodes with given degree
   std::map<int, int> n_nodes_w_degree;
 
   // Keep track of total number of edges as well
   double n_total_edges = 0;
-  
+
   // Grab pointer to current level and start loop
   LevelPtr node_level = get_level(level);
-  for (auto node_it = node_level->begin(); 
-            node_it != node_level->end(); 
+  for (auto node_it = node_level->begin();
+            node_it != node_level->end();
             ++node_it)
   {
     int node_degree = node_it->second->degree;
@@ -262,22 +260,22 @@ double SBM::compute_entropy(const int level)
   }
   // Divide by two because we double counted all edges
   n_total_edges/=2.0;
-  
+
   //==========================================================================
   // Next, we calculate the summation of N_k*ln(K!) where K is degree size and
   // N_k is the number of nodes of that degree
 
   // Calculate first component (sum of node degree counts portion)
   double degree_summation = 0.0;
-  for (auto degree_count =  n_nodes_w_degree.begin(); 
-            degree_count != n_nodes_w_degree.end(); 
+  for (auto degree_count =  n_nodes_w_degree.begin();
+            degree_count != n_nodes_w_degree.end();
             ++degree_count)
   {
-   
+
     // Using std's built in lgamma here: lgamma(x + 1) = log(x!)
     degree_summation += degree_count->second * lgamma(degree_count->first + 1);
   }
-  
+
   //============================================================================
   // Last, we calculate the summation of e_rs*ln(e_rs/e_r*e_s)/2 where e_rs is
   // number of connections between groups r and s and e_r is the total number of
@@ -285,7 +283,7 @@ double SBM::compute_entropy(const int level)
 
   // Grab all group nodes
   auto group_level = get_level(level + 1);
-  
+
   double edge_entropy = 0.0;
 
   // Full loop over all group nodes
@@ -315,7 +313,7 @@ double SBM::compute_entropy(const int level)
 }
 
 // =============================================================================
-// Merge two groups, placing all nodes that were under group_b under group_a and 
+// Merge two groups, placing all nodes that were under group_b under group_a and
 // deleting group_a from model.
 // =============================================================================
 void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
@@ -328,7 +326,7 @@ void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
   {
     member_node->set_parent(group_a);
   }
-}  
+}
 
 // =============================================================================
 // Merge groups at a given level based on the best probability of doing so
@@ -373,7 +371,7 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
   }
 
   // Loop over each group and find best merge option
-  for (auto group_it = all_groups->begin(); 
+  for (auto group_it = all_groups->begin();
             group_it != all_groups->end();
             group_it++)
   {
@@ -509,22 +507,22 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
   auto group_level_ptr = get_level(group_level);
 
   // A conservative estimate of how many steps collapsing will take as
-  // anytime we're not doing an exhaustive search we will use less than 
-  // B_start - B_end moves.  
+  // anytime we're not doing an exhaustive search we will use less than
+  // B_start - B_end moves.
   const int num_steps = group_level_ptr->size() - desired_num_groups;
 
-  // Setup vector to hold all merge step results. 
+  // Setup vector to hold all merge step results.
   std::vector<Merge_Step> step_results;
   step_results.reserve(num_steps);
-  
+
   // Get the current number of groups we have
   int curr_num_groups = group_level_ptr->size();
-  
-  while (curr_num_groups > desired_num_groups) 
+
+  while (curr_num_groups > desired_num_groups)
   {
-    // Decide how many merges we should do. 
+    // Decide how many merges we should do.
     int num_merges = int(curr_num_groups - (curr_num_groups / SIGMA));
-    
+
     // Need to remove at least 1 group
     if (num_merges < 1) num_merges = 1;
 
@@ -547,9 +545,9 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
     }
     catch (...)
     {
-      std::cerr << "Collapsibility limit of network reached so we break early\n" 
+      std::cerr << "Collapsibility limit of network reached so we break early\n"
                 << "There are currently " << curr_num_groups << " groups left.\n";
-                   
+
       // We reached the collapsibility limit of our network so we break early
       break;
     }

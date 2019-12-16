@@ -31,7 +31,7 @@ struct Proposal_Res
 
 struct Sweep_Res
 {
-  int num_changed = 0;
+  std::list<std::string> nodes_moved;
   double entropy_delta = 0;
 };
 
