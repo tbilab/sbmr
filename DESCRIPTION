@@ -1,0 +1,26 @@
+Package: sbmR
+Title: Fit and investigate Stochastic Block Models in R
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Nick",
+           family = "Strayer",
+           role = c("aut", "cre"),
+           email = "nick.strayer@gmail.com")
+Description: Fit and investigate Stochastic Block Models in R. Built for speed using custom C++ code and primarily focused on investigating uncertianty in model clusteirng results using posterior sampling. 
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.0.2
+LinkingTo: 
+    Rcpp
+Imports: 
+    Rcpp,
+    rlang,
+    magrittr
+Suggests: 
+    testthat (>= 2.1.0),
+    knitr,
+    rmarkdown,
+    lobstr
+VignetteBuilder: knitr

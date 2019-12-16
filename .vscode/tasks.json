@@ -8,20 +8,20 @@
         "args": [
           "-std=c++11",
           "-g",
-          "debugging/debug.cpp",
-          "Node.cpp",
-          "Network.cpp",
-          "SBM.cpp",
-          "helpers.cpp",
-          "Sampler.cpp",
+          "src/debugging/debug.cpp",
+          "src/Node.cpp",
+          "src/Network.cpp",
+          "src/SBM.cpp",
+          "src/helpers.cpp",
+          "src/Sampler.cpp",
           "-o",
-          "debugging/debug.out"
+          "src/debugging/debug.out"
         ]
       },
       {
         "label": "Run tests",
         "type": "shell",
-        "command": "./cpp_tests/run_tests.sh",
+        "command": "./src/cpp_tests/run_tests.sh",
         "group": {
           "kind": "build",
           "isDefault": true
@@ -34,7 +34,7 @@
       {
         "label": "Profile Code",
         "type": "shell",
-        "command": "./profiling/run_profiling.sh",
+        "command": "./src/profiling/run_profiling.sh",
         "presentation": {
           "reveal": "always",
           "panel": "new"

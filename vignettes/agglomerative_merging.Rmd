@@ -1,0 +1,263 @@
+---
+title: "Agglomerative Merging"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{agglomerative_merging}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+One technique of finding the optimal number of clusters/ best partitioning is using the efficient agglomerative merging algorithm. This is typically used to find the initial state for MCMC chains but can stand on its own as a clustering method. 
+
+Agglomerative merging can be acomplished with the SBM class using the method `collapse_groups()`. 
+
+
+First we will setup a model using a simulated bipartite network dataset. The true number of groups in this dataset is __6__.
+
+```{r setup}
+library(bisbmsim)
+library(sbmR)
+library(tidyverse)
+```
+
+
+```{r}
+N_a <- 50  # Number of nodes of the a type
+N_b <- 50  # Number of nodes of the b type
+K_a <- 3    # How many blocks of a type nodes are there
+K_b <- 3    # How many blocks of the b type nodes are there
+b_a <- assign_group_membership(N = N_a, K = K_a) # Block membership for each a node
+b_b <- assign_group_membership(N = N_b, K = K_b) # Block membership for each b node
+
+
+edges <- draw_from_model(
+  b_a, b_b,
+  Lambda = generate_random_lambda(K_a = K_a, K_b = K_b)
+) %>%
+  filter(num_edges > 0) %>%
+  select(a, b) %>%
+  transmute(
+    from = paste0('a',a),
+    to = paste0('b', b)
+  )
+
+nodes <- dplyr::bind_rows(
+  tibble(
+    id = unique(edges$from),
+    type = "a"
+  ),
+  tibble(
+    id = unique(edges$to),
+    type = "b"
+  )
+)
+
+
+# Setup SBM model
+my_sbm <- create_sbm(edges, nodes)
+my_sbm %>% show() %>% head()
+
+```
+
+## Basic merging
+
+Now that we have our model setup there are two parameters that control this merging. 
+
+First we have `GREEDY`. When this is set to `TRUE`, the at every merge step the model will check every possible merge for each node and select the best one. 
+
+Second is `N_CHECKS_PER_GROUP`. When `GREEDY` is set to `FALSE`, this parameter controls how many possible merges the model explores for each node before choosing the best one. Higher means a longer run time. Note that these potential merges are done by a random sample of neighbor groups so even if `N_CHECKS_PER_GROUP` is set to the total number of nodes in the network we are not guarenteed to explore all options like `GREEDY` does. 
+
+First, we will perform a greedy merging. This is done with the `collapse_groups()` method. 
+
+```{r}
+# Run initialization algorithm on base level nodes
+merge_results <- collapse_groups(my_sbm, greedy = TRUE)
+```
+
+This method returns a list containing the entropy and state of the model at each merge step. We can use these to look at how the merges progressed. 
+
+
+First we will grab the number of groups at each merge step. To do this we pull out the state element and find how many nodes in it have a level of 1 (aka group level).
+
+
+```{r}
+extract_n_groups <- function(merge_results){
+  merge_results %>%
+  purrr::map('state') %>%
+  purrr::map_int(~{
+    .x %>%
+      dplyr::filter(level == 1) %>%
+      dplyr::pull(id) %>%
+      length()
+  })
+}
+
+extract_n_groups(merge_results) %>% head()
+```
+
+
+Next we can look at how that number of groups corresponds to the entropy of the model. 
+
+```{r}
+extract_entropy <- function(merge_results){
+  merge_results %>% purrr::map_dbl('entropy')
+}
+extract_entropy(merge_results) %>% head()
+```
+
+
+We should almost always see the entropy decrease as we remove groups but if there is signal in the model and the algorithm found it, we should see a relativel "lack of decrease" around the true structure value. We know the true number of groups in this data is 6 so we can reference that here...
+
+```{r}
+results_to_df <- function(merge_results){
+  tibble(
+    n_groups = extract_n_groups(merge_results),
+    entropy = extract_entropy(merge_results)
+  )
+}
+
+
+
+plot_merge_results <- function(merge_results_df, group_cutoff = 30, trim_axes = TRUE){
+  
+  results_below_cutoff <- merge_results_df %>% 
+    filter(n_groups < group_cutoff)
+  
+  max_entropy <- max(results_below_cutoff$entropy)
+  min_entropy <- min(results_below_cutoff$entropy)
+  
+  p <- ggplot(merge_results_df, aes(x = n_groups, y = entropy)) +
+    geom_line(alpha = 0.3) +
+    geom_point(size = 0.5) +
+    geom_vline(xintercept = K_a + K_b, color = 'orangered')
+    
+  if(trim_axes){
+    p <- p +
+      coord_cartesian(
+        xlim = c(0, group_cutoff),
+        ylim = c(min_entropy, max_entropy)
+      ) 
+  }
+  
+  p +
+    scale_x_reverse() +
+    theme_minimal() +
+    labs(x = "number of groups")
+}
+```
+
+
+```{r}
+merge_results %>% results_to_df() %>% plot_merge_results()
+```
+
+## Non-Greedy merge proposals
+
+
+We can perform the same setup but this time not using greedy but the sampling version
+```{r}
+create_sbm(edges, nodes) %>% 
+  collapse_groups(greedy = FALSE, num_group_proposals = 10) %>% 
+  results_to_df() %>% 
+  plot_merge_results()
+```
+
+
+## Controlling number of merge checks per node
+
+We can try scanning over different number of checks per group to see how it changes results
+
+```{r}
+merges_over_changes <- purrr::map_dfr(
+  seq(5, 50, by = 5),
+  ~{
+    run_time <- system.time({
+      merge_results <- create_sbm(edges, nodes) %>% 
+        collapse_groups(num_group_proposals = .x) %>% 
+        results_to_df()
+    })
+    
+    merge_results %>% 
+      mutate(checks = .x, run_time = run_time[1])
+  })
+
+plot_merge_results(merges_over_changes) + 
+  facet_wrap(~checks) +
+  ggtitle("Tuning number of merge checks per node")
+```
+
+```{r}
+
+greedy_run_time <- system.time({
+  create_sbm(edges, nodes) %>% 
+    collapse_groups(greedy = TRUE) %>% 
+    results_to_df()
+}) %>% pluck(1)
+
+merges_over_changes %>% 
+  group_by(checks) %>% 
+  summarise(run_time = first(run_time)) %>% 
+  ggplot(aes(x = checks, y = run_time)) +
+  geom_line() + 
+  geom_hline(yintercept = greedy_run_time, color = 'orangered') +
+  labs(title = "Run time by number of merges checked per group",
+       subtitle = "Horizontal line is runtime of greedy merging")
+```
+
+## Controlling number of MCMC sweeps between merge steps
+
+Another tuning parameter that will effect results is how many mcmc sweeps are performed between each merge step. When we let the model perform more MCMC sweeps in theory it will equilibriate to the best partition with the current number of groups, meaning we would get a better picture of the best entropy for a given number of clusters. 
+
+Here we scan over different numbers of MCMC sweeps and if we use greedy or not for our merging (in theory greedy should not be particularly helpful here.)
+
+```{r}
+merges_over_sweeps_and_greedy <- expand.grid(
+  mcmc_sweeps = seq(1, 101, by = 25),
+  greedy = c(TRUE, FALSE)
+) %>% 
+  {
+    purrr::map2_dfr(
+      .$mcmc_sweeps,
+      .$greedy,
+      ~{
+        create_sbm(edges, nodes) %>% 
+          collapse_groups(greedy = .y, num_mcmc_sweeps = .x) %>% 
+          results_to_df() %>% 
+          mutate(mcmc_sweeps = .x, greedy = paste("greedy = ", .y))
+      }
+    )
+  }
+
+
+plot_merge_results(merges_over_sweeps_and_greedy) + 
+  facet_grid(mcmc_sweeps~greedy) +
+  ggtitle("Tuning and greedy status and number of mcmc sweeps per stage")
+```
+
+
+## Controlling collapsing rate (sigma)
+
+Another important parameter to tune is `SIGMA`. This controls the rate that the network collapses. For each merge step the model will remove `B_curr/SIGMA` groups. This means a value of `SIGMA = 2` will cut the group size in half each step. If we were to set `SIGMA` below `1`, this would force the model to remove a single group at a time (if no MCMC sweeps are happening) because `B_curr/{x<1} > B_curr` so the smallest possible merge of a single group is taken.
+
+
+```{r}
+purrr::map_dfr(
+  seq(from = 0.9, to = 2, length.out = 5),
+  ~{
+    create_sbm(edges, nodes) %>% 
+      collapse_groups(exhaustive = FALSE, sigma = .x, num_mcmc_sweeps = 0) %>% 
+      results_to_df() %>% 
+      mutate(sigma = .x)
+  }) %>% 
+  plot_merge_results(trim_axes = FALSE) + 
+  facet_wrap(~sigma) +
+  ggtitle("Tuning sigma value for merging")
+```
+
