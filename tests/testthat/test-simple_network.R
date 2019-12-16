@@ -8,7 +8,7 @@ test_that("Proper number of connections happens", {
   sim_avg_con_count <- function(self_connections){
     1:n_samples %>%
       purrr::map_int(~{
-        nrow(sim_simple_network(n_nodes, prob_of_connection, allow_self_connections = self_connections))
+        nrow(sim_random_network(n_nodes, prob_of_connection, allow_self_connections = self_connections))
       }) %>%
       mean()
   }

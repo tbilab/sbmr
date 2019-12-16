@@ -51,7 +51,7 @@ test_that("Assignment and mutation keep pointing to same object", {
 
 test_that("Add Node", {
   # Start with network with 5 nodes.
-  my_sbm <- create_sbm(edges = sim_simple_network(n_nodes = 5, prob_of_connection = 1))
+  my_sbm <- create_sbm(edges = sim_random_network(n_nodes = 5, prob_of_connection = 1))
   expect_equal(my_sbm %>% get_state() %>% nrow(), 5)
 
   # Add a node using piped in place testing
@@ -250,7 +250,7 @@ test_that("MCMC Sweeps function as expected", {
   n_sweeps <- 10
 
   # Start with a random network
-  my_sbm <- create_sbm(sim_simple_network(n_nodes = n_nodes)) %>%
+  my_sbm <- create_sbm(sim_random_network(n_nodes = n_nodes)) %>%
     initialize_groups(num_groups = n_groups)
 
   original_num_groups <- get_num_groups(my_sbm)
