@@ -129,7 +129,7 @@ public:
 
     // Package result struct into a list
     return List::create(
-        _["num_changed"] = result.num_changed,
+        _["nodes_moved"] = result.nodes_moved,
         _["entropy_delta"] = result.entropy_delta);
   }
 

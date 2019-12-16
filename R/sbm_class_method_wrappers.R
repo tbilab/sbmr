@@ -270,8 +270,8 @@ compute_entropy <- function(sbm, level = 0){
 #' @param beta Inverse temperature parameter for determining move acceptance
 #'   probability.
 #'
-#' @return List with total number of nodes that were changed in the previous
-#'   sweep (`num_changed`) and the sweeps impact on the model's entropy
+#' @return List with array of all nodes that were moved in the
+#'   sweep (`nodes_moved`) and the sweeps impact on the model's entropy
 #'   (`entropy_delta`).
 #' @export
 #'
