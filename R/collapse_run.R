@@ -34,6 +34,11 @@ collapse_run <- function(
     as.integer(end_group_num)
   )
 
+  # dplyr::tibble(entropy = collapse_results$entropy,
+  #               num_groups = collapse_results$num_groups,
+  #               state = collapse_results$state)
+
+
   purrr::map_dfr(
     collapse_results,
     ~dplyr::tibble(entropy = .$entropy,

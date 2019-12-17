@@ -206,42 +206,49 @@ public:
 
   List collapse_run(const int node_level,
                     const int num_mcmc_steps,
-                    const int start_num_groups,
-                    const int end_num_groups)
+                    const int start_num,
+                    const int end_num)
   {
 
-    if (start_num_groups >= end_num_groups)
+    const int num_steps = end_num - start_num;
+    if(num_steps <= 0) stop("End number of groups for collapse run to be higher than start.");
+
+    // std::vector<double> entropies;
+    // entropies.reserve(num_steps);
+    //
+    // std::vector<int> num_groups;
+    // num_groups.reserve(num_steps);
+    //
+    // std::vector<DataFrame> states;
+    // states.reserve(num_steps);
+
+    List return_to_r;
+    for (int target_num = start_num; target_num <= end_num;  target_num++)
     {
-      stop("Start number of groups needs to be lower than the end number");
+      return_to_r.push_back(
+        collapse_groups(
+           node_level,
+           num_mcmc_steps,
+           target_num,
+           false,
+           false
+        )[0]
+      );
+
+      // auto step = SBM::collapse_groups(node_level,
+      //                                  num_mcmc_steps,
+      //                                  target_num,
+      //                                  false)[0];
+      //
+      // entropies.push_back(step.entropy);
+      // num_groups.push_back(step.num_groups);
+      // states.push_back(state_to_df(step.state));
     }
-
-    // Setup vector to hold all merge step results.
-    std::vector<Merge_Step> collapse_results;
-    collapse_results.reserve(end_num_groups - start_num_groups);
-
-    for (int num_groups = start_num_groups; num_groups < end_num_groups; num_groups++)
-    {
-      collapse_results.push_back(
-          SBM::collapse_groups(node_level,
-                               num_mcmc_steps,
-                               num_groups,
-                               false)[1]);
-    }
-
-    List results_for_r;
-
-    for (auto step = collapse_results.begin();
-         step != collapse_results.end();
-         step++)
-    {
-      results_for_r.push_back(
-          List::create(
-              _["entropy"] = step->entropy,
-              _["state"] = state_to_df(step->state),
-              _["num_groups"] = step->num_groups));
-    }
-
-    return results_for_r;
+    return return_to_r;
+    // return List::create(
+    //   _["entropy"] = entropies,
+    //   _["num_groups"] = num_groups,
+    //   _["state"] = states);
   }
 
   void load_from_state(std::vector<string> id,
