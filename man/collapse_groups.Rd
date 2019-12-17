@@ -9,11 +9,12 @@ collapse_groups(
   level = 0,
   num_mcmc_sweeps = 10,
   desired_num_groups = 1,
-  exhaustive = TRUE,
+  report_all_steps = FALSE,
   beta = 1.5,
   greedy = FALSE,
   num_group_proposals = 5,
-  sigma = 2
+  sigma = 2,
+  exhaustive = FALSE
 )
 }
 \arguments{
@@ -29,9 +30,10 @@ zero for fast but more likely incorrect structure}
 \item{desired_num_groups}{How many groups should be left at the end of the
 collapsing? Ignored if \code{exhaustive = TRUE}.}
 
-\item{exhaustive}{Should collapsing exhaust all possible number of groups?
-I.e. should network be collapsed one group at a time down to one group per
-node type?}
+\item{report_all_steps}{Do we want every step's information to be shared or
+just the final step? Setting to \code{TRUE} will slow down algorithm
+considerably but could be used if attempting to perform merge in one
+collapse step, usually combined with \code{exhaustive = TRUE}.}
 
 \item{beta}{Inverse temperature parameter for determining move acceptance
 probability. Only applicable if \code{num_mcmc_sweeps > 0}.}
@@ -44,8 +46,12 @@ should each node produce for merge options?}
 
 \item{sigma}{Controls how fast collapse of network happens. For instance if
 set to \code{2} then half (\code{1/2}) of the nodes will be removed at each step
-until the desired number remains. If \code{exhaustive = TRUE} then this parameter
-will do nothing}
+until the desired number remains. If \code{exhaustive = TRUE} then this
+parameter will do nothing}
+
+\item{exhaustive}{Should collapsing exhaust all possible number of groups?
+I.e. should network be collapsed one group at a time down to one group per
+node type?}
 }
 \value{
 Tibble with three columns with rows corresponding to the result of
