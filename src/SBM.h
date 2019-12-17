@@ -18,8 +18,9 @@ struct Merge_Step
   std::vector<string> from_node;
   std::vector<string> to_node;
   Merge_Step() {}
-  Merge_Step(double e, State_Dump s) : entropy(e),
-                                       state(s) {}
+  Merge_Step(const double e, const State_Dump s, const int n) : entropy(e),
+                                              state(s),
+                                              num_groups(n) {}
 };
 
 struct Proposal_Res
@@ -90,7 +91,8 @@ public:
   std::vector<Merge_Step> collapse_groups(
       int node_level,
       int num_mcmc_steps,
-      int desired_num_groups = -1); // Default value which lets model drop to 1 group per type.
+      int desired_num_groups, // Default value which lets model drop to 1 group per type.
+      bool report_all_steps);
 
 }; // End SBM class declaration
 

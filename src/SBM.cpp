@@ -495,7 +495,8 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
 // =============================================================================
 std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
                                              const int num_mcmc_steps,
-                                             const int desired_num_groups)
+                                             const int desired_num_groups,
+                                             const bool report_all_steps)
 {
   PROFILE_FUNCTION();
   const int group_level = node_level + 1;
@@ -513,7 +514,7 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
 
   // Setup vector to hold all merge step results.
   std::vector<Merge_Step> step_results;
-  step_results.reserve(num_steps);
+  step_results.reserve(report_all_steps ? num_steps: 1);
 
   // Get the current number of groups we have
   int curr_num_groups = group_level_ptr->size();
@@ -561,21 +562,35 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
       }
       clean_empty_groups();
       // Update the step entropy results with new equilibriated model
-      merge_results.entropy = compute_entropy(node_level);
+      if (report_all_steps) merge_results.entropy = compute_entropy(node_level);
     }
-
-    // Dump state into step results
-    merge_results.state = get_state();
-
-    // Record how many groups we have after this step
-    merge_results.num_groups = curr_num_groups;
-
-    // Gather info for return
-    step_results.push_back(merge_results);
 
     // Update current number of groups
     curr_num_groups = group_level_ptr->size();
-  }
+
+    if (report_all_steps) 
+    {
+      // Dump state into step results
+      merge_results.state = get_state();
+
+      // Record how many groups we have after this step
+      merge_results.num_groups = curr_num_groups;
+
+      // Gather info for return
+      step_results.push_back(merge_results);
+    }
+  } // End main while loop
+
+  // Gather results if we're only reporting final result
+  if (!report_all_steps) 
+    {
+      // Gather info for return
+      step_results.push_back(Merge_Step(
+        compute_entropy(node_level),
+        get_state(),
+        curr_num_groups
+      ));
+    }
 
   return step_results;
 }
