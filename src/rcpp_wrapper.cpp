@@ -216,22 +216,29 @@ public:
     }
 
     // Setup vector to hold all merge step results.
-    List results_for_r;
+    std::vector<Merge_Step> collapse_results;
+    collapse_results.reserve(end_num_groups - start_num_groups);
 
     for (int num_groups = start_num_groups; num_groups < end_num_groups; num_groups++)
     {
-      // Run step and record results
-      auto step_result = SBM::collapse_groups(
-          node_level,
-          num_mcmc_steps,
-          num_groups,
-          false)[1];
+      collapse_results.push_back(
+          SBM::collapse_groups(node_level,
+                               num_mcmc_steps,
+                               num_groups,
+                               false)[1]);
+    }
 
+    List results_for_r;
+
+    for (auto step = collapse_results.begin();
+         step != collapse_results.end();
+         step++)
+    {
       results_for_r.push_back(
           List::create(
-              _["entropy"] = step_result.entropy,
-              _["state"] = state_to_df(step_result.state),
-              _["num_groups"] = step_result.num_groups));
+              _["entropy"] = step->entropy,
+              _["state"] = state_to_df(step->state),
+              _["num_groups"] = step->num_groups));
     }
 
     return results_for_r;
