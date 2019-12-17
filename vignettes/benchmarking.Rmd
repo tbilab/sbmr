@@ -97,3 +97,85 @@ median_time <- full_runs$median - init_runs$median
 
 Median time for `r n_sweeps` sweeps is __`r median_time`__, or approximately __`r median_time/n_sweeps` per sweep.__
 
+
+
+## Agglomerative Merging Algorithms
+
+```{r}
+
+
+```
+
+
+```{r}
+library(tidyverse)
+library(furrr)
+library(sbmR)
+
+plan(multiprocess)
+
+n_groups <- 4    # Four total groups
+group_size <- 40 # W/ 50 nodes in each
+
+set.seed(42)
+network <- sim_basic_block_network(
+  n_groups = n_groups,     
+  n_nodes_per_group = group_size,  
+  return_connection_propensities = TRUE
+)
+
+low_num <- 2
+high_num <- 10
+sigma <- 2
+num_group_proposals <- 5
+num_mcmc_sweeps <- 5
+
+collapse_to_desired_num <- function(desired_num){
+  create_sbm(network) %>% 
+  collapse_groups(desired_num_groups = desired_num, 
+                  sigma = sigma,
+                  num_group_proposals = num_group_proposals,
+                  num_mcmc_sweeps = num_mcmc_sweeps) %>% 
+    select(-state) %>% 
+    mutate(desired_num = desired_num)
+}
+
+
+r_sequential <- function(){
+  purrr::map_dfr(
+    low_num:high_num,
+    collapse_to_desired_num
+  )
+}
+
+r_parallel <- function(){
+  future_map_dfr(
+    low_num:high_num,
+    collapse_to_desired_num
+  )
+}
+
+cpp_sequential <- function(){
+  collapse_run(
+    create_sbm(network),
+    start_group_num = low_num, 
+    end_group_num = high_num,
+    sigma = sigma,
+    num_group_proposals = num_group_proposals,
+    num_mcmc_sweeps = num_mcmc_sweeps
+  )
+}
+
+timing_results <- bench::mark(
+  r_sequential = r_sequential(),
+  r_parallel = r_parallel(),
+  cpp_sequential = cpp_sequential(),
+  check = FALSE,
+  min_iterations = 5
+)
+
+
+plot(timing_results)
+```
+
+
