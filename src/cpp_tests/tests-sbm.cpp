@@ -179,7 +179,8 @@ TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
   auto run_results = my_SBM.collapse_groups(
     0,
     0,
-    3
+    3, 
+    false
   );
 
   // Make sure that we now have just 3 groups left
@@ -201,7 +202,8 @@ TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]"
   auto run_results = my_SBM.collapse_groups(
     0,
     0,
-    desired_num_groups
+    desired_num_groups,
+    true
   );
 
   int num_groups_removed = my_SBM.get_level(0)->size() - my_SBM.get_level(1)->size();
@@ -223,20 +225,10 @@ TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]")
   auto run_results = my_SBM.collapse_groups(
     0,
     0,
-    desired_num_groups
+    desired_num_groups,
+    false
   );
 
   // Make sure that we have lumped together at least some groups
   REQUIRE(my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size());
-}
-
-TEST_CASE("Initialize MCMC chain with agglomerative merging", "[SBM]")
-{
-  // Setup simple SBM model
-  SBM my_SBM = build_simulated_SBM();
-
-  auto results = my_SBM.collapse_groups(
-      0,
-      30);
-
 }

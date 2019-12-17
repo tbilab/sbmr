@@ -162,6 +162,7 @@ public:
   List collapse_groups(const int node_level,
                        const int num_mcmc_steps,
                        int desired_num_groups,
+                       const bool report_all_steps, 
                        const bool exhaustive)
   {
     // Book keep sigma value in case we change it with exhaustive mode
@@ -177,7 +178,10 @@ public:
     }
 
     // Perform collapse
-    auto collapse_results = SBM::collapse_groups(node_level, num_mcmc_steps, desired_num_groups);
+    auto collapse_results = SBM::collapse_groups(node_level,
+                                                 num_mcmc_steps,
+                                                 desired_num_groups,
+                                                 report_all_steps);
 
     // Reset to old sigma value if needed
     if (exhaustive) {

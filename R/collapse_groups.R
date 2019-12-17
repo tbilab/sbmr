@@ -12,9 +12,10 @@
 #'   zero for fast but more likely incorrect structure
 #' @param desired_num_groups How many groups should be left at the end of the
 #'   collapsing? Ignored if `exhaustive = TRUE`.
-#' @param exhaustive Should collapsing exhaust all possible number of groups?
-#'   I.e. should network be collapsed one group at a time down to one group per
-#'   node type?
+#' @param report_all_steps Do we want every step's information to be shared or
+#'   just the final step? Setting to `TRUE` will slow down algorithm
+#'   considerably but could be used if attempting to perform merge in one
+#'   collapse step, usually combined with `exhaustive = TRUE`.
 #' @param beta Inverse temperature parameter for determining move acceptance
 #'   probability. Only applicable if `num_mcmc_sweeps > 0`.
 #' @param greedy Should all possible moves be considered for merging or should a
@@ -23,8 +24,11 @@
 #'   should each node produce for merge options?
 #' @param sigma Controls how fast collapse of network happens. For instance if
 #'   set to `2` then half (`1/2`) of the nodes will be removed at each step
-#' until the desired number remains. If `exhaustive = TRUE` then this parameter
-#' will do nothing
+#'   until the desired number remains. If `exhaustive = TRUE` then this
+#'   parameter will do nothing
+#' @param exhaustive Should collapsing exhaust all possible number of groups?
+#'   I.e. should network be collapsed one group at a time down to one group per
+#'   node type?
 #'
 #' @return Tibble with three columns with rows corresponding to the result of
 #'   each merge step:  `entropy`, `num_groups` left in model, and a list column
@@ -51,11 +55,12 @@ collapse_groups <- function(
   level = 0,
   num_mcmc_sweeps = 10,
   desired_num_groups = 1,
-  exhaustive = TRUE,
+  report_all_steps = FALSE,
   beta = 1.5,
   greedy = FALSE,
   num_group_proposals = 5,
-  sigma = 2
+  sigma = 2,
+  exhaustive = FALSE
 ){
 
   # Set free parameters
@@ -64,15 +69,13 @@ collapse_groups <- function(
   sbm$N_CHECKS_PER_GROUP <- num_group_proposals
   sbm$SIGMA <- sigma
 
-  # The C++ function arguments
-  # collapse_groups(const int node_level,
-  #                 const int num_mcmc_steps,
-  #                 int desired_num_groups,
-  #                 const bool exhaustive)
-  collapse_results <- sbm$collapse_groups(as.integer(level),
-                     as.integer(num_mcmc_sweeps),
-                     as.integer(desired_num_groups),
-                     exhaustive)
+  collapse_results <- sbm$collapse_groups(
+    as.integer(level),
+    as.integer(num_mcmc_sweeps),
+    as.integer(desired_num_groups),
+    report_all_steps,
+    exhaustive
+  )
 
   purrr::map_dfr(
     collapse_results,
