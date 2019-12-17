@@ -162,7 +162,7 @@ public:
   List collapse_groups(const int node_level,
                        const int num_mcmc_steps,
                        int desired_num_groups,
-                       const bool report_all_steps, 
+                       const bool report_all_steps,
                        const bool exhaustive)
   {
     // Book keep sigma value in case we change it with exhaustive mode
@@ -204,12 +204,45 @@ public:
     return entropy_results;
   }
 
+  List collapse_run(const int node_level,
+                    const int num_mcmc_steps,
+                    const int start_num_groups,
+                    const int end_num_groups)
+  {
+
+    if (start_num_groups >= end_num_groups)
+    {
+      stop("Start number of groups needs to be lower than the end number");
+    }
+
+    // Setup vector to hold all merge step results.
+    List results_for_r;
+
+    for (int num_groups = start_num_groups; num_groups < end_num_groups; num_groups++)
+    {
+      // Run step and record results
+      auto step_result = SBM::collapse_groups(
+          node_level,
+          num_mcmc_steps,
+          num_groups,
+          false)[1];
+
+      results_for_r.push_back(
+          List::create(
+              _["entropy"] = step_result.entropy,
+              _["state"] = state_to_df(step_result.state),
+              _["num_groups"] = step_result.num_groups));
+    }
+
+    return results_for_r;
+  }
+
   void load_from_state(std::vector<string> id,
                        std::vector<string> parent,
                        std::vector<int> level,
                        std::vector<string> string_types)
   {
-   
+
     // Construct a state dump from vectors and
     // pass the constructed state to load_state function
     SBM::load_from_state(State_Dump(id, parent, level, type_to_int(string_types)));
@@ -285,9 +318,11 @@ RCPP_MODULE(SBM)
               "Runs a single MCMC sweep across all nodes at specified level. Each node is given a chance to move groups or stay in current group and all nodes are processed in random order. Takes the level that the sweep should take place on (int) and if new groups groups can be proposed and empty groups removed (boolean).")
       .method("collapse_groups",
               &Rcpp_SBM::collapse_groups,
-              "Performs agglomerative merging on network, starting with each group has a single node down to one group per node type. Arguments are level to perform merge at (int) and number of MCMC steps to peform between each collapsing to equilibriate group. Returns list with entropy and model state at each merge.");
+              "Performs agglomerative merging on network, starting with each group has a single node down to one group per node type. Arguments are level to perform merge at (int) and number of MCMC steps to peform between each collapsing to equilibriate group. Returns list with entropy and model state at each merge.")
+      .method("collapse_run",
+              &Rcpp_SBM::collapse_run,
+              "Performs a sequence of group collapse steps on network. Targets a range of final groups numbers and collapses to them and returns final result form each collapse.");
 }
-
 /*** R
 sbm <- new(SBM)
 
