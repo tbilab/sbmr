@@ -97,9 +97,6 @@ average of a 50% chance of connection." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
-    </li>
-    <li>
       <a href="../articles/benchmarking.html">benchmarking</a>
     </li>
     <li>
@@ -140,7 +137,8 @@ average of a 50% chance of connection.</p>
     <pre class="usage"><span class='fu'>sim_basic_block_network</span>(
   <span class='kw'>n_groups</span> <span class='kw'>=</span> <span class='fl'>2</span>,
   <span class='kw'>n_nodes_per_group</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>prob_of_connections_dist</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>n</span>) <span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='no'>n</span>, <span class='kw'>shape1</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>shape2</span> <span class='kw'>=</span> <span class='fl'>2</span>),
+  <span class='kw'>propensity_drawer</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>n</span>) {     <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span>(<span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>5</span>), <span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span>(<span class='fl'>1</span>, <span class='fl'>5</span>, <span class='fl'>1</span>),
+    <span class='kw'>length.out</span> <span class='kw'>=</span> <span class='no'>n</span>)) },
   <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='no'><a href='https://purrr.tidyverse.org/reference/rbernoulli.html'>rbernoulli</a></span>,
   <span class='kw'>allow_self_connections</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>keep_connection_counts</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
@@ -159,11 +157,10 @@ average of a 50% chance of connection.</p>
       <td><p>How many nodes in each group</p></td>
     </tr>
     <tr>
-      <th>prob_of_connections_dist</th>
-      <td><p>Function that takes a single size argumenet
-and returns a vector of connection propensities of specified size. Default
-is drawing Bernouli probabilities from a symmetric beta distribution
-centered at 0.5</p></td>
+      <th>propensity_drawer</th>
+      <td><p>Function that takes a single size argumenet and
+returns a vector of connection propensities of specified size. Default
+draws propensity from <code>n</code> evenly spaced values in the 0-1 range.</p></td>
     </tr>
     <tr>
       <th>edge_dist</th>
@@ -224,20 +221,20 @@ groups.</p>
 #&gt; </span><span style='color: #555555;'># … with 30 more rows</span><span>
 #&gt; 
 #&gt; $edges
-#&gt; </span><span style='color: #555555;'># A tibble: 366 x 2</span><span>
+#&gt; </span><span style='color: #555555;'># A tibble: 501 x 2</span><span>
 #&gt;    from  to   
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> g1_1  g1_2 
-#&gt; </span><span style='color: #555555;'> 2</span><span> g1_1  g1_3 
+#&gt; </span><span style='color: #555555;'> 1</span><span> g1_1  g1_5 
+#&gt; </span><span style='color: #555555;'> 2</span><span> g1_1  g1_6 
 #&gt; </span><span style='color: #555555;'> 3</span><span> g1_1  g1_7 
 #&gt; </span><span style='color: #555555;'> 4</span><span> g1_1  g1_8 
 #&gt; </span><span style='color: #555555;'> 5</span><span> g1_1  g1_9 
-#&gt; </span><span style='color: #555555;'> 6</span><span> g1_1  g1_10
-#&gt; </span><span style='color: #555555;'> 7</span><span> g1_1  g2_1 
+#&gt; </span><span style='color: #555555;'> 6</span><span> g1_1  g2_1 
+#&gt; </span><span style='color: #555555;'> 7</span><span> g1_1  g2_2 
 #&gt; </span><span style='color: #555555;'> 8</span><span> g1_1  g2_3 
-#&gt; </span><span style='color: #555555;'> 9</span><span> g1_1  g2_4 
-#&gt; </span><span style='color: #555555;'>10</span><span> g1_1  g2_5 
-#&gt; </span><span style='color: #555555;'># … with 356 more rows</span><span>
+#&gt; </span><span style='color: #555555;'> 9</span><span> g1_1  g2_5 
+#&gt; </span><span style='color: #555555;'>10</span><span> g1_1  g2_7 
+#&gt; </span><span style='color: #555555;'># … with 491 more rows</span><span>
 #&gt; </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

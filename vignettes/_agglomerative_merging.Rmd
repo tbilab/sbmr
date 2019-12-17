@@ -34,11 +34,12 @@ library(tidyverse)
 ```{r}
 set.seed(42)
 
-n_groups <- 4
+n_groups <- 4    # Four total groups
+group_size <- 50 # W/ 50 nodes in each
 
 network <- sim_basic_block_network(
-  n_groups = n_groups,     # Four total groups
-  n_nodes_per_group = 30,  # W/ 30 nodes in each
+  n_groups = n_groups,     
+  n_nodes_per_group = group_size,  
   return_connection_propensities = TRUE
 )
 ```
@@ -75,24 +76,58 @@ Second is `N_CHECKS_PER_GROUP`. When `GREEDY` is set to `FALSE`, this parameter 
 First, we will perform a greedy merging. This is done with the `collapse_groups()` method. 
 
 ```{r}
+
+library(furrr)
+plan(multiprocess)
+
+collapse_to_desired_num <- function(desired_num){
+  create_sbm(network) %>% 
+  collapse_groups(desired_num_groups = desired_num, 
+                  sigma = 2,
+                  num_group_proposals = 5,
+                  num_mcmc_sweeps = 5) %>% 
+    select(-state) %>% 
+    mutate(desired_num = desired_num)
+}
+
+r_sequential <- function(){
+  purrr::map_dfr(
+    1:10,
+    collapse_to_desired_num
+  )
+}
+
+r_parallel <- function(){
+  merge_sweep <- future_map_dfr(
+    1:10,
+    collapse_to_desired_num
+  )
+}
+
+cpp_sequential <- function(){
+  create_sbm(network) %>% 
+    collapse_run()
+}
+
+plan(multiprocess)
+
+
+tic()
 merge_sweep <- purrr::map_dfr(
-  1:12,
-  function(desired_num){
-    collapse_groups(my_sbm, 
-                    desired_num_groups = desired_num, 
-                    exhaustive = FALSE, 
-                    greedy = FALSE,
-                    sigma = 1.1,
-                    num_group_proposals = 10,
-                    num_mcmc_sweeps = 15) %>% 
-      select(-state) %>% 
-      mutate(desired_num = desired_num)
-  }
+  1:10,
+  collapse_to_desired_num
 )
+toc()
+
+tic()
+merge_sweep <- future_map_dfr(
+  1:10,
+  collapse_to_desired_num
+)
+toc()
+
 
 merge_sweep %>% 
-  group_by(desired_num) %>% 
-  filter(1:n() == n()) %>% 
   ggplot(aes(x = desired_num, y = entropy)) + 
   geom_point() +
   geom_segment(aes(xend = num_groups, yend = entropy)) +

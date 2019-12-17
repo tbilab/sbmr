@@ -96,9 +96,6 @@ complete discussion of options/behavior." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
-    </li>
-    <li>
       <a href="../articles/benchmarking.html">benchmarking</a>
     </li>
     <li>
@@ -140,11 +137,12 @@ complete discussion of options/behavior.</p>
   <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>num_mcmc_sweeps</span> <span class='kw'>=</span> <span class='fl'>10</span>,
   <span class='kw'>desired_num_groups</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>exhaustive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>report_all_steps</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>beta</span> <span class='kw'>=</span> <span class='fl'>1.5</span>,
   <span class='kw'>greedy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>num_group_proposals</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>2</span>
+  <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>exhaustive</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -171,10 +169,11 @@ zero for fast but more likely incorrect structure</p></td>
 collapsing? Ignored if <code>exhaustive = TRUE</code>.</p></td>
     </tr>
     <tr>
-      <th>exhaustive</th>
-      <td><p>Should collapsing exhaust all possible number of groups?
-I.e. should network be collapsed one group at a time down to one group per
-node type?</p></td>
+      <th>report_all_steps</th>
+      <td><p>Do we want every step's information to be shared or
+just the final step? Setting to <code>TRUE</code> will slow down algorithm
+considerably but could be used if attempting to perform merge in one
+collapse step, usually combined with <code>exhaustive = TRUE</code>.</p></td>
     </tr>
     <tr>
       <th>beta</th>
@@ -195,8 +194,14 @@ should each node produce for merge options?</p></td>
       <th>sigma</th>
       <td><p>Controls how fast collapse of network happens. For instance if
 set to <code>2</code> then half (<code>1/2</code>) of the nodes will be removed at each step
-until the desired number remains. If <code>exhaustive = TRUE</code> then this parameter
-will do nothing</p></td>
+until the desired number remains. If <code>exhaustive = TRUE</code> then this
+parameter will do nothing</p></td>
+    </tr>
+    <tr>
+      <th>exhaustive</th>
+      <td><p>Should collapsing exhaust all possible number of groups?
+I.e. should network be collapsed one group at a time down to one group per
+node type?</p></td>
     </tr>
     </table>
 

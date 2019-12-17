@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Run a single MCMC sweep over nodes — mcmc_sweep • sbmR</title>
+<title>Run Agglomerative Merging to targer a range of group numbers — collapse_run • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,13 +35,8 @@
 
 
 
-<meta property="og:title" content="Run a single MCMC sweep over nodes — mcmc_sweep" />
-<meta property="og:description" content="Runs a single Metropolis Hastings MCMC sweep across all nodes at specified
-level (For algorithm details see
-Piexoto, 2018). Each node is given a
-chance to move groups or stay in current group and all nodes are processed in
-random order. Takes the level that the sweep should take place on (int) and
-if new groups groups can be proposed and empty groups removed (boolean)." />
+<meta property="og:title" content="Run Agglomerative Merging to targer a range of group numbers — collapse_run" />
+<meta property="og:description" content="Run Agglomerative Merging to targer a range of group numbers" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -120,21 +115,25 @@ if new groups groups can be proposed and empty groups removed (boolean)." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Run a single MCMC sweep over nodes</h1>
+    <h1>Run Agglomerative Merging to targer a range of group numbers</h1>
     
-    <div class="hidden name"><code>mcmc_sweep.Rd</code></div>
+    <div class="hidden name"><code>collapse_run.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Runs a single Metropolis Hastings MCMC sweep across all nodes at specified
-level (For algorithm details see
-<a href='https://arxiv.org/abs/1705.10225'>Piexoto, 2018</a>). Each node is given a
-chance to move groups or stay in current group and all nodes are processed in
-random order. Takes the level that the sweep should take place on (int) and
-if new groups groups can be proposed and empty groups removed (boolean).</p>
+    <p>Run Agglomerative Merging to targer a range of group numbers</p>
     </div>
 
-    <pre class="usage"><span class='fu'>mcmc_sweep</span>(<span class='no'>sbm</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>variable_num_groups</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>beta</span> <span class='kw'>=</span> <span class='fl'>1.5</span>)</pre>
+    <pre class="usage"><span class='fu'>collapse_run</span>(
+  <span class='no'>sbm</span>,
+  <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>start_group_num</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>end_group_num</span> <span class='kw'>=</span> <span class='fl'>10</span>,
+  <span class='kw'>num_group_proposals</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>num_mcmc_sweeps</span> <span class='kw'>=</span> <span class='fl'>10</span>,
+  <span class='kw'>beta</span> <span class='kw'>=</span> <span class='fl'>1.5</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -149,48 +148,50 @@ if new groups groups can be proposed and empty groups removed (boolean).</p>
 through MCMC proposal-accept routine.</p></td>
     </tr>
     <tr>
-      <th>variable_num_groups</th>
-      <td><p>Should the model allow new groups to be created or
-empty groups removed while sweeping or should number of groups remain
-constant?</p></td>
+      <th>sigma</th>
+      <td><p>Controls how fast collapse of network happens. For instance if
+set to <code>2</code> then half (<code>1/2</code>) of the nodes will be removed at each step
+until the desired number remains. If <code>exhaustive = TRUE</code> then this
+parameter will do nothing</p></td>
+    </tr>
+    <tr>
+      <th>start_group_num</th>
+      <td><p>Fewest number of groups to test</p></td>
+    </tr>
+    <tr>
+      <th>end_group_num</th>
+      <td><p>Highest number of groups to test</p></td>
+    </tr>
+    <tr>
+      <th>num_group_proposals</th>
+      <td><p>If <code>greedy = FALSE</code>, how many move proposals
+should each node produce for merge options?</p></td>
+    </tr>
+    <tr>
+      <th>num_mcmc_sweeps</th>
+      <td><p>Number of MCMC sweeps to run in between merge steps to
+allow model to find best partitioning with given number of groups. Set to
+zero for fast but more likely incorrect structure</p></td>
     </tr>
     <tr>
       <th>beta</th>
       <td><p>Inverse temperature parameter for determining move acceptance
-probability.</p></td>
+probability. Only applicable if <code>num_mcmc_sweeps &gt; 0</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>List with array of all nodes that were moved in the
-sweep (<code>nodes_moved</code>) and the sweeps impact on the model's entropy
-(<code>entropy_delta</code>).</p>
+    <p>Tibble with three columns with rows corresponding to the result of
+each merge step:  <code>entropy</code>, <code>num_groups</code> left in model, and a list column
+of <code>state</code> which is the state dump dataframe for model at end of merge.</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
-
-<span class='co'># Start with a random network and assign randomly to 4 groups</span>
-<span class='no'>n_groups</span> <span class='kw'>&lt;-</span> <span class='fl'>3</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>(<span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_groups</span> <span class='kw'>=</span> <span class='no'>n_groups</span>, <span class='kw'>n_nodes_per_group</span> <span class='kw'>=</span> <span class='fl'>15</span>)) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='initialize_groups.html'>initialize_groups</a></span>(<span class='kw'>num_groups</span> <span class='kw'>=</span> <span class='no'>n_groups</span>)
-
-<span class='co'># Calculate entropy with random groups</span>
-<span class='fu'><a href='compute_entropy.html'>compute_entropy</a></span>(<span class='no'>my_sbm</span>)</div><div class='output co'>#&gt; [1] 752.6645</div><div class='input'>
-<span class='co'># Run 4 MCMC sweeps</span>
-<span class='kw'>for</span>(<span class='no'>i</span> <span class='kw'>in</span> <span class='fl'>1</span>:<span class='fl'>4</span>) <span class='no'>my_sbm</span> <span class='kw'>%&gt;%</span> <span class='fu'>mcmc_sweep</span>(<span class='kw'>variable_num_groups</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-
-<span class='co'># Calculate entropy after sweeps</span>
-<span class='fu'><a href='compute_entropy.html'>compute_entropy</a></span>(<span class='no'>my_sbm</span>)</div><div class='output co'>#&gt; [1] 683.4771</div><div class='input'>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>
