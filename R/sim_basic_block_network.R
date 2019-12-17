@@ -9,10 +9,9 @@
 #'
 #' @param n_groups How many groups to simulate
 #' @param n_nodes_per_group How many nodes in each group
-#' @param prob_of_connections_dist Function that takes a single size argumenet
-#'   and returns a vector of connection propensities of specified size. Default
-#'   is drawing Bernouli probabilities from a symmetric beta distribution
-#'   centered at 0.5
+#' @param propensity_drawer Function that takes a single size argumenet and
+#'   returns a vector of connection propensities of specified size. Default
+#'   draws propensity from `n` evenly spaced values in the 0-1 range.
 #' @param return_connection_propensities If set to `TRUE` the returned list will
 #'   also include the simulated connection propensities dataframe. This can be
 #'   used for recreating draws using \code{\link{sim_sbm_network()}}.
@@ -33,7 +32,7 @@
 sim_basic_block_network <- function(
   n_groups = 2,
   n_nodes_per_group = 5,
-  prob_of_connections_dist = function(n) rbeta(n = n, shape1 = 2, shape2 = 2),
+  propensity_drawer = function(n){sample(seq(rbeta(1, 1, 5),rbeta(1, 5, 1),length.out = n))},
   edge_dist = purrr::rbernoulli,
   allow_self_connections = FALSE,
   keep_connection_counts = FALSE,
@@ -50,10 +49,12 @@ sim_basic_block_network <- function(
   # prob_of_connections_dist function.
   group_pair_inds <- get_combination_indices(n_groups, repeats = TRUE)
   n_pairs <- length(group_pair_inds$a)
+
+
   connection_propensities <- dplyr::tibble(
     group_1 = groups$group[group_pair_inds$a],
     group_2 = groups$group[group_pair_inds$b],
-    propensity = prob_of_connections_dist(n_pairs)
+    propensity = propensity_drawer(n_pairs)
   )
 
   # Pass the constructed dataframes to the main sbm simulation function and remove connections
