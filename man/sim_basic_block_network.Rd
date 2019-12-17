@@ -7,7 +7,8 @@
 sim_basic_block_network(
   n_groups = 2,
   n_nodes_per_group = 5,
-  prob_of_connections_dist = function(n) rbeta(n = n, shape1 = 2, shape2 = 2),
+  propensity_drawer = function(n) {     sample(seq(rbeta(1, 1, 5), rbeta(1, 5, 1),
+    length.out = n)) },
   edge_dist = purrr::rbernoulli,
   allow_self_connections = FALSE,
   keep_connection_counts = FALSE,
@@ -19,10 +20,9 @@ sim_basic_block_network(
 
 \item{n_nodes_per_group}{How many nodes in each group}
 
-\item{prob_of_connections_dist}{Function that takes a single size argumenet
-and returns a vector of connection propensities of specified size. Default
-is drawing Bernouli probabilities from a symmetric beta distribution
-centered at 0.5}
+\item{propensity_drawer}{Function that takes a single size argumenet and
+returns a vector of connection propensities of specified size. Default
+draws propensity from \code{n} evenly spaced values in the 0-1 range.}
 
 \item{edge_dist}{A distribution function that has two inputs: the first is
 number of samples to draw and the second the \code{propensity} value from
