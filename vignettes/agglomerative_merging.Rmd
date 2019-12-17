@@ -13,7 +13,6 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-library(bisbmsim)
 library(sbmR)
 library(tidyverse)
 ```
@@ -23,51 +22,46 @@ One technique of finding the optimal number of clusters/ best partitioning is us
 Agglomerative merging can be acomplished with the SBM class using the method `collapse_groups()`. 
 
 
-First we will setup a model using a simulated bipartite network dataset. The true number of groups in this dataset is __6__.
+First we will setup a model using a simulated network dataset built using the included `sim_basic_block_network()` function.
+
 
 ```{r, eval = FALSE}
-library(bisbmsim)
 library(sbmR)
 library(tidyverse)
 ```
 
 
 ```{r}
-N_a <- 50  # Number of nodes of the a type
-N_b <- 50  # Number of nodes of the b type
-K_a <- 3    # How many blocks of a type nodes are there
-K_b <- 3    # How many blocks of the b type nodes are there
-b_a <- assign_group_membership(N = N_a, K = K_a) # Block membership for each a node
-b_b <- assign_group_membership(N = N_b, K = K_b) # Block membership for each b node
+set.seed(42)
 
+n_groups <- 4
 
-edges <- draw_from_model(
-  b_a, b_b,
-  Lambda = generate_random_lambda(K_a = K_a, K_b = K_b)
-) %>%
-  filter(num_edges > 0) %>%
-  select(a, b) %>%
-  transmute(
-    from = paste0('a',a),
-    to = paste0('b', b)
-  )
-
-nodes <- dplyr::bind_rows(
-  tibble(
-    id = unique(edges$from),
-    type = "a"
-  ),
-  tibble(
-    id = unique(edges$to),
-    type = "b"
-  )
+network <- sim_basic_block_network(
+  n_groups = n_groups,     # Four total groups
+  n_nodes_per_group = 30,  # W/ 30 nodes in each
+  return_connection_propensities = TRUE
 )
+```
+
+We can investigate the simulated network by visualizing the connection propensities...
+```{r}
+network$connection_propensities %>% 
+  ggplot(aes(x = group_1, y = group_2)) +
+  geom_tile(aes(fill = propensity))
+```
+
+and we can visualize the network structure using the `visualize_network()` function.
+```{r}
+visualize_network(network)
+```
 
 
+Now that we have our network we can initialize an SBM model with it. 
+
+```{r}
 # Setup SBM model
-my_sbm <- create_sbm(edges, nodes)
-my_sbm %>% show() %>% head()
-
+my_sbm <- create_sbm(network)
+my_sbm %>% get_state() %>% head()
 ```
 
 ## Basic merging
@@ -79,6 +73,33 @@ First we have `GREEDY`. When this is set to `TRUE`, the at every merge step the 
 Second is `N_CHECKS_PER_GROUP`. When `GREEDY` is set to `FALSE`, this parameter controls how many possible merges the model explores for each node before choosing the best one. Higher means a longer run time. Note that these potential merges are done by a random sample of neighbor groups so even if `N_CHECKS_PER_GROUP` is set to the total number of nodes in the network we are not guarenteed to explore all options like `GREEDY` does. 
 
 First, we will perform a greedy merging. This is done with the `collapse_groups()` method. 
+
+```{r}
+merge_sweep <- purrr::map_dfr(
+  1:12,
+  function(desired_num){
+    collapse_groups(my_sbm, 
+                    desired_num_groups = desired_num, 
+                    exhaustive = FALSE, 
+                    greedy = FALSE,
+                    sigma = 1.1,
+                    num_group_proposals = 10,
+                    num_mcmc_sweeps = 15) %>% 
+      select(-state) %>% 
+      mutate(desired_num = desired_num)
+  }
+)
+
+merge_sweep %>% 
+  group_by(desired_num) %>% 
+  filter(1:n() == n()) %>% 
+  ggplot(aes(x = desired_num, y = entropy)) + 
+  geom_point() +
+  geom_segment(aes(xend = num_groups, yend = entropy)) +
+  geom_line() + 
+  geom_vline(xintercept = n_groups)
+```
+
 
 ```{r}
 # Run initialization algorithm on base level nodes
@@ -107,7 +128,7 @@ plot_merge_results <- function(merge_results, group_cutoff = 30, trim_axes = TRU
   p <- ggplot(merge_results, aes(x = num_groups, y = entropy)) +
     geom_line(alpha = 0.3) +
     geom_point(size = 0.5) +
-    geom_vline(xintercept = K_a + K_b, color = 'orangered')
+    geom_vline(xintercept = n_groups, color = 'orangered')
     
   if(trim_axes){
     p <- p +
@@ -134,7 +155,7 @@ merge_results %>% plot_merge_results()
 
 We can perform the same setup but this time not using greedy but the sampling version
 ```{r}
-create_sbm(edges, nodes) %>% 
+my_sbm %>% 
   collapse_groups(greedy = FALSE, num_group_proposals = 10) %>% 
   plot_merge_results()
 ```
@@ -149,8 +170,7 @@ merges_over_changes <- purrr::map_dfr(
   seq(5, 50, by = 5),
   ~{
     run_time <- system.time({
-      merge_results <- create_sbm(edges, nodes) %>% 
-        collapse_groups(num_group_proposals = .x)
+      merge_results <- collapse_groups(my_sbm, num_group_proposals = .x)
     })
     
     merge_results %>% 
