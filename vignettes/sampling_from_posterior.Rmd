@@ -35,31 +35,21 @@ First we will generate our simulated network. First we set a seed to make the st
 ```{r}
 set.seed(42)
 
-group_info <- dplyr::tribble(
-  ~group, ~n_nodes,
-     "a",       20,
-     "b",       22,
-     "c",       25
-)
+n_groups <- 4    # Four total groups
+group_size <- 50 # W/ 50 nodes in each
 
-connection_propensities <- dplyr::tribble(
- ~group_1, ~group_2, ~propensity,
-      "a",      "a",         0.8,
-      "a",      "b",         0.2,
-      "a",      "c",         0.3,
-      "b",      "b",         0.9,
-      "b",      "c",         0.15,
-      "c",      "c",         0.4,
+network <- sim_basic_block_network(
+  n_groups = n_groups,     
+  n_nodes_per_group = group_size,  
+  return_connection_propensities = TRUE
 )
-
-network <- sim_sbm_network(group_info, connection_propensities, edge_dist = purrr::rbernoulli)
 ```
 
 
 First we can make sure our connection propensities look reasonable 
 
 ```{r}
-connection_propensities %>% 
+network$connection_propensities %>% 
   ggplot(aes(x = group_1, y = group_2, fill = propensity)) +
   geom_tile(color = 'white') +
   theme_bw()
@@ -92,27 +82,29 @@ In an attempt to set our initial chain location to an optimal position we will a
 
 ```{r}
 collapse_results <- my_sbm %>% 
-  collapse_groups(exhaustive = TRUE, num_group_proposals = 8, num_mcmc_sweeps = 25)
+  collapse_run(num_group_proposals = 15, 
+               sigma = 6,
+               num_mcmc_sweeps = 15, 
+               start_group_num = 1, 
+               end_group_num = 15)
 ```
 
-
-Let's look at the collapse results in terms of number of groups and the size of the network...
 
 ```{r}
-ggplot(collapse_results, aes(x = num_groups, y = entropy)) +
-  geom_line() +
-  scale_x_log10() +
-  geom_vline(xintercept = 3, color = 'orangered')
+plot_collapse_results(collapse_results) +
+  geom_vline(xintercept = n_groups, color = 'orangered')
 ```
 
-So even though we know our true number of groups is `3` we see a minimum entropy at `r collapse_results$num_groups[collapse_results$entropy == min(collapse_results$entropy)]` so we will start our chain there. To do this we will use the helper function `choose_best_collapse_state()` which will scan through the results and find the optimal partitioning based upon the designated hueristic. Right now it is just choosing the lowest value. (In the future more complicated methods will be allowed.)
+
+So we can use the helper function `choose_best_collapse_state()` to scan through the results and find the optimal partitioning based upon the designated hueristic. Right now it is just choosing the the maximum deviation from rolling mean (lower plot). Any scoring function can be provided as long as it takes as an argument the entropy column and returns a vector of scores where the highest value is the break to choose. 
 
 ```{r}
-my_sbm <- my_sbm %>% choose_best_collapse_state(collapse_results, heuristic = 'lowest')
+my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, heuristic = "dev_from_rolling_mean", verbose = TRUE)
 ```
 
+### Visualizing these results. 
 
-### Visualizing these results. We can use our visualization function to look at the results of this clustering and compare that to the known structure...
+We can investigate the structure of this chosen partitioning against the true structure that we simulated using `visualize_network()`...
 
 ```{r}
 merged_state <- my_sbm %>% 
@@ -130,14 +122,24 @@ visualize_network(edges = network$edges,
                   width = '100%')
 ```
 
-It appears that our grouping is working decently well as the cluster of nodes that represent the orange group seem to be made up of the same types of shapes whereas the other groups are more mixed as we would expect. 
+The colors and shapes seem to match very well. We can check the aggreement as well.
+
+```{r}
+nodes_w_inferred_group %>% 
+  group_by(group) %>% 
+  summarise(n_unique_inferred = length(unique(inferred)))
+```
+
+So each group was mapped into by only one class, meaning we perfectly matched the structure. 
+
+
 
 ## Sampling from the posterior
 
-Now that we have our model in a decent starting place we can initiate the MCMC sampling. We will start by doing 100 sweeps to see if our model shape has stabalized at all. 
+Now that we have our model in a decent starting place we can initiate the MCMC sampling. We will start by doing 500 sweeps to see if our model shape has stabalized at all. 
 
 ```{r}
-num_sweeps <- 1000
+num_sweeps <- 500
 
 sweep_results_to_df <- function(sweep_results, label = 'results'){
   sweep_results %>% 
@@ -185,6 +187,15 @@ visualize_network(edges = network$edges,
                   node_shape_col = 'inferred',
                   width = '100%')
 ```
+
+```{r}
+nodes_w_inferred_group %>% 
+  group_by(inferred) %>% 
+  summarise(n_unique_groups = length(unique(group)))
+```
+
+So even though we have more groups than we should, we never have an infered group that spans more than a single true group. 
+
 
 We can tweak the results MCMC sweeps by adjusting two parameters. 
 
