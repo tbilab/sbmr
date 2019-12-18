@@ -14,6 +14,10 @@ public:
   std::unordered_map<string, int> type_string_to_int;
   std::unordered_map<int, string> type_int_to_string;
 
+  // Keeps track of all the edges for graph so object can be copied within r 
+  // without needing a whole new set of the generating data
+  std::list<std::string> edges_from;
+  std::list<std::string> edges_to;
 
   void add_node(const std::string id, const std::string type, const int level)
   {
@@ -68,6 +72,10 @@ public:
   {
     SBM::add_connection(find_node_by_id(node_a_id, 0),
                         find_node_by_id(node_b_id, 0));
+
+    // Add connection to the edges vector
+    edges_from.push_back(node_a_id);
+    edges_to.push_back(node_b_id);
   }
 
  // Convert the types from integers (cpp friendly) to strings (r friendly)
@@ -129,6 +137,15 @@ public:
   DataFrame get_state()
   {
     return state_to_df(SBM::get_state());
+  }
+
+  DataFrame get_edges()
+  {
+    return DataFrame::create(
+      _["from"] = edges_from,
+      _["to"] = edges_to,
+      _["stringsAsFactors"] = false
+    );
   }
 
   void set_node_parent(const std::string child_id,
@@ -213,15 +230,6 @@ public:
     const int num_steps = end_num - start_num;
     if(num_steps <= 0) stop("End number of groups for collapse run to be higher than start.");
 
-    // std::vector<double> entropies;
-    // entropies.reserve(num_steps);
-    //
-    // std::vector<int> num_groups;
-    // num_groups.reserve(num_steps);
-    //
-    // std::vector<DataFrame> states;
-    // states.reserve(num_steps);
-
     List return_to_r;
     for (int target_num = start_num; target_num <= end_num;  target_num++)
     {
@@ -235,20 +243,8 @@ public:
         )[0]
       );
 
-      // auto step = SBM::collapse_groups(node_level,
-      //                                  num_mcmc_steps,
-      //                                  target_num,
-      //                                  false)[0];
-      //
-      // entropies.push_back(step.entropy);
-      // num_groups.push_back(step.num_groups);
-      // states.push_back(state_to_df(step.state));
     }
     return return_to_r;
-    // return List::create(
-    //   _["entropy"] = entropies,
-    //   _["num_groups"] = num_groups,
-    //   _["state"] = states);
   }
 
   void load_from_state(std::vector<string> id,
@@ -321,6 +317,9 @@ RCPP_MODULE(SBM)
       .method("get_state",
               &Rcpp_SBM::get_state,
               "Exports the current state of the network as dataframe with each node as a row and columns for node id, parent id, node type, and node level.")
+      .method("get_edges",
+              &Rcpp_SBM::get_edges,
+              "Returns a from and to columned dataframe of all the edges added to class")
       .method("load_from_state",
               &Rcpp_SBM::load_from_state,
               "Takes model state export as given by SBM$get_state() and returns model to specified state. This is useful for resetting model before running various algorithms such as agglomerative merging.")
