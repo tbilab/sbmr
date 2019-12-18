@@ -4,17 +4,26 @@
 \alias{choose_best_collapse_state}
 \title{Choose and load best model state from agglomerative collapsing algorithm}
 \usage{
-choose_best_collapse_state(sbm, collapse_results, heuristic = "lowest")
+choose_best_collapse_state(
+  sbm,
+  collapse_results,
+  heuristic = "lowest",
+  verbose = FALSE
+)
 }
 \arguments{
 \item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
 
-\item{collapse_results}{Results of running agglomerative collapse algorithm on sbm with \code{\link{collapse_groups}}.}
+\item{collapse_results}{Results of running agglomerative collapse algorithm
+on sbm with \code{\link{collapse_groups}}.}
 
-\item{heuristic}{How the best partitioning is defined. Currently only \code{'lowest' }is supported which chooses the point with lowest entropy.}
+\item{heuristic}{How the best partitioning is defined. Takes either a
+function that takes an entropy vector or a string labeling algorithm.
+Currently only \code{lowest} and \code{dev_from_rolling_mean} are supported.}
 }
 \value{
-SBM model updated to match state from the merge step with 'best' partitioning.
+SBM model updated to match state from the merge step with 'best'
+partitioning.
 }
 \description{
 Choose and load best model state from agglomerative collapsing algorithm
