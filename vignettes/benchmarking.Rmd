@@ -1,5 +1,5 @@
 ---
-title: "benchmarking"
+title: "Benchmarking"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{benchmarking}
@@ -113,7 +113,7 @@ n_groups <- 4    # Four total groups
 group_size <- 40 # W/ 50 nodes in each
 low_num <- 2
 high_num <- 10
-sigma <- 2
+sigma <- 4
 num_group_proposals <- 5
 num_mcmc_sweeps <- 5
 
