@@ -1,14 +1,19 @@
+#' Visualize agglomerative collapse results
+#'
+#' @param collapse_results Dataframe of agglomerative merging based collapse
+#'   results as returned from \link{\code{collapse_run}}, or
+#'   \link{\code{collapse_groups(report_all_steps = TRUE)}}.
+#' @param rolling_window Size of rolling window used to calculate each steps deviance from the rolling mean...
+#'
+#' @return GGplot object comparing the fit results and each step's deviance from the rolling mean
+#' @export
+#'
+#' @examples
 plot_collapse_results <- function(collapse_results, rolling_window = 3){
 
   collapse_results %>%
     dplyr::mutate(
-      window_avg = purrr::map_dbl(
-        1:dplyr::n(),
-        function(ind){
-          mean(vec[((ind - window): ind) %>% subset(.>0)], na.rm=TRUE)
-        }
-      ),
-      window_avg = ifelse(is.na(window_avg), dplyr::cummean(entropy), window_avg),
+      window_avg = rolling_mean(entropy, rolling_window),
       `deviation from avg` = window_avg - entropy
     ) %>%
     dplyr::select(-state, -window_avg) %>%
