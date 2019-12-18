@@ -44,3 +44,45 @@ test_that("Copy with state works", {
   # All should be equal now
   expect_equal(get_state(copied_sbm), get_state(initial_sbm))
 })
+
+test_that("Copying an empty SBM", {
+
+  initial_sbm <- create_sbm()
+
+  # Copy initial sbm and tell it to match state as well
+  # This just tests that there is no error
+  expect_true({copy_sbm(initial_sbm); TRUE})
+})
+
+test_that("Copying SBM without edges", {
+
+  initial_sbm <- create_sbm() %>%
+    add_node('a1') %>%
+    add_node('a2')
+
+  # Copy initial sbm and tell it to match state as well
+  expect_true({copy_sbm(initial_sbm); TRUE})
+})
+
+test_that("Hyperparameters are copied over", {
+  eps <- 2
+  beta <- 4
+  sigma <- 3
+  greedy <- TRUE
+  n_checks <- 17
+
+  initial_sbm <- create_sbm(eps = eps)
+  initial_sbm$BETA <- beta
+  initial_sbm$SIGMA <- sigma
+  initial_sbm$GREEDY <- greedy
+  initial_sbm$N_CHECKS_PER_GROUP <- n_checks
+
+  # Copy initial sbm and tell it to match state as well
+  copied_sbm <- copy_sbm(initial_sbm)
+
+  expect_equal(initial_sbm$EPS, eps)
+  expect_equal(initial_sbm$BETA, beta)
+  expect_equal(initial_sbm$SIGMA, sigma)
+  expect_equal(initial_sbm$GREEDY, greedy)
+  expect_equal(initial_sbm$N_CHECKS_PER_GROUP, n_checks)
+})
