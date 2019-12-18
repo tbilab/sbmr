@@ -83,48 +83,18 @@ plan(multiprocess)
 collapse_to_desired_num <- function(desired_num){
   create_sbm(network) %>% 
   collapse_groups(desired_num_groups = desired_num, 
-                  sigma = 2,
-                  num_group_proposals = 5,
-                  num_mcmc_sweeps = 5) %>% 
+                  sigma = 4,
+                  num_group_proposals = 15,
+                  num_mcmc_sweeps = 15) %>% 
     select(-state) %>% 
     mutate(desired_num = desired_num)
 }
 
-r_sequential <- function(){
-  purrr::map_dfr(
-    1:10,
-    collapse_to_desired_num
-  )
-}
-
-r_parallel <- function(){
-  merge_sweep <- future_map_dfr(
-    1:10,
-    collapse_to_desired_num
-  )
-}
-
-cpp_sequential <- function(){
-  create_sbm(network) %>% 
-    collapse_run()
-}
-
-plan(multiprocess)
-
-
-tic()
-merge_sweep <- purrr::map_dfr(
-  1:10,
-  collapse_to_desired_num
-)
-toc()
-
-tic()
 merge_sweep <- future_map_dfr(
   1:10,
   collapse_to_desired_num
 )
-toc()
+
 
 
 merge_sweep %>% 
