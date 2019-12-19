@@ -24,7 +24,7 @@
 #' # Visualize network with shape encoding the groups
 #' visualize_network(simulated_network, node_shape_col = 'group', node_color_col = 'type')
 #'
-visualize_network <- function(edges, nodes = NULL, width = NULL, height = NULL, node_color_col = 'group', node_shape_col = 'type') {
+visualize_network <- function(edges, nodes = NULL, width = "100%", height = NULL, node_color_col = 'group', node_shape_col = 'type') {
 
   # CHeck if we were passed a list of edges and nodes or the edges and nodes seperately
   if(is_list_class(edges)){
