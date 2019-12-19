@@ -1,6 +1,9 @@
 // !preview r2d3 data=sim_basic_block_network(3, 20), options = list(color_col = 'group', shape_col = 'type'), container = 'div'
 
-div.html('').style('height', '100%');
+div.html('')
+  .style('width', `${width}px`)
+  .style('height', `${height}px`)
+  .style('position', 'relative');
 
 // Append the canvas
 const canvas = div.append('canvas')
@@ -19,6 +22,8 @@ const svg = div.append('svg')
   .html('') // wipe svg content if need be
   .style('position', 'absolute')
   .style('bottom', 0)
+  .style('width', `${width}px`)
+  .style('height', `${height}px`)
   .attr('width', width)
   .attr('height', height)
   .attr("viewBox", [0, 0, width, height]);
