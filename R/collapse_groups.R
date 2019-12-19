@@ -21,8 +21,8 @@
 #'   transfer.
 #' @param beta Inverse temperature parameter impacting the acceptance
 #'   probabilities of MCMC sweeps. A higher value means model puts more weight
-#'   on accepting moves that improve model fit. Only matters if `num_mcmc_sweeps
-#'   > 0`.
+#'   on accepting moves that improve model fit. Only matters if
+#'   `num_mcmc_sweeps` is more than zero.
 #' @param greedy Should every possible group merger be considered? If `FALSE`,
 #'   candidates for mergers are drawn by similarity in connections (just as MCMC
 #'   move proposals are). This may lead the model to local minimums by always
@@ -53,7 +53,7 @@
 #'
 #' # Investigate number of nodes at each step
 #' collapse_results %>%
-#'   select(-state)
+#'   dplyr::select(-state)
 #'
 collapse_groups <- function(
   sbm,
