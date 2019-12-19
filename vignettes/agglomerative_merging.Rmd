@@ -176,12 +176,10 @@ collapse_results <- my_sbm %>%
 head(collapse_results)
 ```
 
-The results of the collapse function are a column with entropy of the model at a given state, and the number of groups in the model at that state. We can plot these to see the pattern. 
+The results of the collapse function are a column with entropy of the model at a given state, and the number of groups in the model at that state. We can plot these using the included `visualize_collapse_results()` function to check for patterns. 
 
 ```{r plot_default_collapse}
-collapse_results %>% 
-  ggplot(aes(x = num_groups, y = entropy)) +
-  geom_line()
+visualize_collapse_results(collapse_results)
 ```
 
 We see a nice smooth line going from one group per node down to a single group for all nodes. This line will always be monotonic increasing as the number of groups goes down. This is because removing more groups _always_ result in a poorer model fit because less information is being provided by the model structure. 
@@ -199,9 +197,7 @@ collapse_mcmc10 <- my_sbm %>%
                   num_mcmc_sweeps = 10,
                   report_all_steps = TRUE)
 
-collapse_mcmc10 %>% 
-  ggplot(aes(x = num_groups, y = entropy)) +
-  geom_line() +
+visualize_collapse_results(collapse_mcmc10) +
   ggtitle("num_mcmc_sweeps = 10")
 ```
 
@@ -218,8 +214,7 @@ my_sbm %>%
                   num_mcmc_sweeps = 10,
                   desired_num_groups = 1,
                   report_all_steps = TRUE) %>% 
-  ggplot(aes(x = num_groups, y = entropy)) +
-  geom_line() +
+  visualize_collapse_results() +
   ggtitle("num_mcmc_sweeps = 10, greedy = TRUE")
 ```
 
@@ -236,8 +231,7 @@ collapse_sigma2 <- my_sbm %>%
                   desired_num_groups = 1,
                   report_all_steps = TRUE)
 
-ggplot(collapse_sigma2, aes(x = num_groups, y = entropy)) +
-  geom_line() +
+visualize_collapse_results(collapse_sigma2) +
   ggtitle("sigma = 2")
 ```
 
@@ -246,7 +240,7 @@ As expected, we get a lower-resolution line as fewer steps were taken. Let's ove
 
 ```{r compare_sigma_value_collapses}
 bind_rows(
-  collapse_mcmc10 %>% mutate(run = "sigma < 1"),
+  collapse_mcmc10 %>% mutate(sigma = "sigma < 1"),
   collapse_sigma2 %>% mutate(run = "sigma = 2")
 ) %>% 
   ggplot(aes(x = num_groups, y = entropy, color = run)) +
@@ -302,7 +296,7 @@ The included function `visualize_collapse_results()` lets you look at this metri
 
 
 ```{r visualizing_run-results}
-visualize_collapse_results(run_results)
+visualize_collapse_results(run_results, heuristic = 'dev_from_rolling_mean')
 ```
 
 The "best" point intuitively would be the point with the highest peak on the top chart. Here we see that peak occurs at __3__ groups. Which we know to be the true number of groups in this network (because we simulated it).
