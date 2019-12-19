@@ -42,6 +42,7 @@ visualize_network <- function(edges, nodes = NULL, width = "100%", height = NULL
       color_col = node_color_col,
       shape_col = node_shape_col
     ),
+    container = 'div',
     script = system.file("d3/network_viz.js", package = "sbmR"),
     width = width,
     height = height
