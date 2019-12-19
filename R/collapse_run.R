@@ -11,6 +11,23 @@
 #' @export
 #'
 #' @examples
+#' set.seed(42)
+#'
+#' # Start with a random network of two groups with 25 nodes each
+#' network <- sim_basic_block_network(n_groups = 3, n_nodes_per_group = 25)
+#'
+#' # Create SBM from simulated data
+#' my_sbm <- create_sbm(network)
+#'
+#' # Run agglomerative clustering with no intermediate MCMC steps on network
+#' collapse_results <- collapse_run(my_sbm, sigma = 3, start_group_num = 1, end_group_num = 6)
+#'
+#' # Visualize results of collapsing
+#' visualize_collapse_results(collapse_results)
+#'
+#' # Choose best result
+#' my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, verbose = TRUE)
+#'
 collapse_run <- function(
   sbm,
   level = 0,
