@@ -7,6 +7,23 @@
 #' @export
 #'
 #' @examples
+#'
+#' # Generate a random network to build initial sbm with
+#' network <- sim_random_network(n_nodes = 10)
+#'
+#' # Generate initial sbm
+#' initial_sbm <- create_sbm(network)
+#'
+#' # Copy initial sbm
+#' copied_sbm <- copy_sbm(initial_sbm)
+#'
+#' # Make sure that the state output matches (minus the parent info)
+#' remove_parent <- . %>% dplyr::select(-parent)
+#'
+#' # Two sbm states will be the same
+#' all.equal(get_state(copied_sbm),
+#'           get_state(initial_sbm))
+#'
 copy_sbm <- function(old_sbm, match_state = FALSE){
 
   old_sbm_state <- old_sbm$get_state()
