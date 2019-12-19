@@ -86,7 +86,8 @@ collapse_results <- my_sbm %>%
                sigma = 6,
                num_mcmc_sweeps = 15, 
                start_group_num = 1, 
-               end_group_num = 15)
+               end_group_num = 15,
+               parallel = TRUE)
 ```
 
 
