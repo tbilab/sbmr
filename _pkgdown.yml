@@ -30,3 +30,9 @@ reference:
   desc: Functions to generate networks using the stochastic block model. Usefull for testing etc..
   contents:
   - starts_with('sim_')
+- title: Helper Functions
+  desc: Various small functions used for internals of package
+  contents:
+  - build_score_fn
+  - rolling_mean
+  - get_combination_indices
