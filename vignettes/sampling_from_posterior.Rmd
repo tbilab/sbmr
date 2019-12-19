@@ -92,7 +92,7 @@ collapse_results <- my_sbm %>%
 
 
 ```{r}
-visualize_collapse_results(collapse_results) +
+visualize_collapse_results(collapse_results, heuristic = 'dev_from_rolling_mean') +
   geom_vline(xintercept = n_groups, color = 'orangered')
 ```
 
