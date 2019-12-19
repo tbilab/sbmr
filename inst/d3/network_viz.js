@@ -1,5 +1,27 @@
-// !preview r2d3 data=sim_basic_block_network(3, 20), options = list(color_col = 'group', shape_col = 'type')
-svg.attr("viewBox", [0, 0, width, height]);
+// !preview r2d3 data=sim_basic_block_network(3, 20), options = list(color_col = 'group', shape_col = 'type'), container = 'div'
+
+div.html('').style('height', '100%');
+
+// Append the canvas
+const canvas = div.append('canvas')
+  .style('position', 'absolute')
+  .style('bottom', 0)
+  .style('width', `${width}px`)
+  .style('height', `${height}px`)
+  .attr('width', width*2)
+  .attr('height', height*2);
+
+const context = canvas.node().getContext('2d');
+context.scale(2,2); // Makes things bigger so it looks good on retina
+
+// Append the svg and padded g element
+const svg = div.append('svg')
+  .html('') // wipe svg content if need be
+  .style('position', 'absolute')
+  .style('bottom', 0)
+  .attr('width', width)
+  .attr('height', height)
+  .attr("viewBox", [0, 0, width, height]);
 
 // Get color and shape column names from options
 const {color_col, shape_col} = options;
@@ -45,15 +67,7 @@ const simulation = d3.forceSimulation(nodes)
 
 let not_being_dragged = true;
 
-// Setup the node and link visual components
-const link = svg.append("g")
-  .attr("stroke", "#999")
-  .attr("stroke-opacity", 0.6)
-  .selectAll("line")
-  .data(links)
-  .enter().append("line")
-  .attr("stroke-width", 1);
-
+// Setup the svg node components
 const node = svg.append("g")
   .attr("stroke", "#fff")
   .selectAll("path.node")
@@ -64,6 +78,15 @@ const node = svg.append("g")
   .attr('d', draw_shape)
   .call(drag(simulation));
 
+// Canvas constants
+// Set color of edges
+context.strokeStyle = 'black';
+
+const lowest_opacity = 0.1;
+// Scale edge opacity based upon how many edges we have
+context.globalAlpha = Math.max(d3.scaleLinear().domain([0,5000]).range([0.5, lowest_opacity])(links.length), lowest_opacity);
+
+
 // Kickoff simulation
 simulation.on("tick", () => {
 
@@ -72,13 +95,19 @@ simulation.on("tick", () => {
    Y.domain(d3.extent(nodes.map(d => d.y)));
  }
 
+  // Clear canvas
+  context.clearRect(0, 0, +canvas.attr('width'), +canvas.attr('height'));
 
-  link
-    .attr("x1", d => X(d.source.x))
-    .attr("x2", d => X(d.target.x))
-    .attr("y1", d => Y(d.source.y))
-    .attr("y2", d => Y(d.target.y));
+  context.beginPath();
+  links.forEach(d => {
+    context.moveTo(X(d.source.x), Y(d.source.y));
+    context.lineTo(X(d.target.x), Y(d.target.y));
+  });
 
+  // Draw to canvas
+  context.stroke();
+
+  // Update node positions
   node.attr('transform', d => `translate(${X(d.x)}, ${Y(d.y)})`);
 });
 
