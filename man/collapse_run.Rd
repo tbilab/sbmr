@@ -42,7 +42,8 @@ will slow down runtime but can potentially lead for more stable results.}
 
 \item{beta}{Inverse temperature parameter impacting the acceptance
 probabilities of MCMC sweeps. A higher value means model puts more weight
-on accepting moves that improve model fit. Only matters if `num_mcmc_sweeps0`.}
+on accepting moves that improve model fit. Only matters if
+\code{num_mcmc_sweeps} is more than zero.}
 
 \item{parallel}{Run in parallel using \code{furrr}?}
 }
@@ -53,4 +54,23 @@ of \code{state} which is the state dump dataframe for model at end of merge.
 }
 \description{
 Run Agglomerative Merging to target a range of group numbers
+}
+\examples{
+set.seed(42)
+
+# Start with a random network of two groups with 25 nodes each
+network <- sim_basic_block_network(n_groups = 3, n_nodes_per_group = 25)
+
+# Create SBM from simulated data
+my_sbm <- create_sbm(network)
+
+# Run agglomerative clustering with no intermediate MCMC steps on network
+collapse_results <- collapse_run(my_sbm, sigma = 3, start_group_num = 1, end_group_num = 6)
+
+# Visualize results of collapsing
+visualize_collapse_results(collapse_results)
+
+# Choose best result
+my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, verbose = TRUE)
+
 }

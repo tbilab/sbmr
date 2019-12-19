@@ -18,8 +18,12 @@ choose_best_collapse_state(
 on sbm with \code{\link{collapse_groups}}.}
 
 \item{heuristic}{How the best partitioning is defined. Takes either a
-function that takes an entropy vector or a string labeling algorithm.
-Currently only \code{lowest} and \code{dev_from_rolling_mean} are supported.}
+function that takes one/two arguments: an entropy vector and an optional
+number of groups vector with each element corresponding to a given
+location, or a string labeling algorithm. Currently only \code{lowest} and
+\code{dev_from_rolling_mean} are supported.}
+
+\item{verbose}{Should model tell you what step was chosen (\code{TRUE} or \code{FALSE})?}
 }
 \value{
 SBM model updated to match state from the merge step with 'best'
@@ -29,5 +33,30 @@ partitioning.
 Choose and load best model state from agglomerative collapsing algorithm
 }
 \examples{
+set.seed(42)
+
+# Start with a random network of two groups with 25 nodes each
+network <- sim_basic_block_network(n_groups = 3, n_nodes_per_group = 25)
+
+# Create SBM from simulated data
+my_sbm <- create_sbm(network)
+
+# Run agglomerative clustering with no intermediate MCMC steps on network
+collapse_results <- collapse_run(my_sbm, sigma = 3, start_group_num = 1, end_group_num = 6)
+
+# Choose best result with default heuristic
+my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, verbose = TRUE)
+
+# Score heuristic that fits a nonlinear model to observed values and chooses by largest negative residual
+nls_score <- function(e, k){
+  entropy_model <- nls(e ~ a + b * log(k), start = list(a = max(e), b = -25))
+  -residuals(entropy_model)
+}
+
+# Choose result using custom heuristic function
+my_sbm <- choose_best_collapse_state(my_sbm,
+                                     collapse_results,
+                                     heuristic = nls_score,
+                                     verbose = TRUE)
 
 }

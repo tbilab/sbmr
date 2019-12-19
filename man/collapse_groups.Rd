@@ -39,7 +39,8 @@ transfer.}
 
 \item{beta}{Inverse temperature parameter impacting the acceptance
 probabilities of MCMC sweeps. A higher value means model puts more weight
-on accepting moves that improve model fit. Only matters if `num_mcmc_sweeps0`.}
+on accepting moves that improve model fit. Only matters if
+\code{num_mcmc_sweeps} is more than zero.}
 
 \item{greedy}{Should every possible group merger be considered? If \code{FALSE},
 candidates for mergers are drawn by similarity in connections (just as MCMC
@@ -80,6 +81,6 @@ collapse_results <- collapse_groups(my_sbm, num_mcmc_sweeps = 0)
 
 # Investigate number of nodes at each step
 collapse_results \%>\%
-  select(-state)
+  dplyr::select(-state)
 
 }

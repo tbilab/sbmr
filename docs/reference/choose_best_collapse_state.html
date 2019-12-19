@@ -146,8 +146,14 @@ on sbm with <code><a href='collapse_groups.html'>collapse_groups</a></code>.</p>
     <tr>
       <th>heuristic</th>
       <td><p>How the best partitioning is defined. Takes either a
-function that takes an entropy vector or a string labeling algorithm.
-Currently only <code>lowest</code> and <code>dev_from_rolling_mean</code> are supported.</p></td>
+function that takes one/two arguments: an entropy vector and an optional
+number of groups vector with each element corresponding to a given
+location, or a string labeling algorithm. Currently only <code>lowest</code> and
+<code>dev_from_rolling_mean</code> are supported.</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>Should model tell you what step was chosen (<code>TRUE</code> or <code>FALSE</code>)?</p></td>
     </tr>
     </table>
 
@@ -157,7 +163,30 @@ Currently only <code>lowest</code> and <code>dev_from_rolling_mean</code> are su
 partitioning.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
+
+<span class='co'># Start with a random network of two groups with 25 nodes each</span>
+<span class='no'>network</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_groups</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_group</span> <span class='kw'>=</span> <span class='fl'>25</span>)
+
+<span class='co'># Create SBM from simulated data</span>
+<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>(<span class='no'>network</span>)
+
+<span class='co'># Run agglomerative clustering with no intermediate MCMC steps on network</span>
+<span class='no'>collapse_results</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='collapse_run.html'>collapse_run</a></span>(<span class='no'>my_sbm</span>, <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>start_group_num</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>end_group_num</span> <span class='kw'>=</span> <span class='fl'>6</span>)
+
+<span class='co'># Choose best result with default heuristic</span>
+<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>my_sbm</span>, <span class='no'>collapse_results</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 groups and an entropy of 2032.81284279538.</div><div class='input'>
+<span class='co'># Score heuristic that fits a nonlinear model to observed values and chooses by largest negative residual</span>
+<span class='no'>nls_score</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>e</span>, <span class='no'>k</span>){
+  <span class='no'>entropy_model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/nls.html'>nls</a></span>(<span class='no'>e</span> ~ <span class='no'>a</span> + <span class='no'>b</span> * <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='no'>k</span>), <span class='kw'>start</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span>(<span class='no'>e</span>), <span class='kw'>b</span> <span class='kw'>=</span> -<span class='fl'>25</span>))
+  -<span class='fu'><a href='https://rdrr.io/r/stats/residuals.html'>residuals</a></span>(<span class='no'>entropy_model</span>)
+}
+
+<span class='co'># Choose result using custom heuristic function</span>
+<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>my_sbm</span>,
+                                     <span class='no'>collapse_results</span>,
+                                     <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='no'>nls_score</span>,
+                                     <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 groups and an entropy of 2032.81284279538.</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

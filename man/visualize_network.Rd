@@ -7,7 +7,7 @@
 visualize_network(
   edges,
   nodes = NULL,
-  width = NULL,
+  width = "100\%",
   height = NULL,
   node_color_col = "group",
   node_shape_col = "type"
