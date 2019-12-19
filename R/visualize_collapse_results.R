@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples
-plot_collapse_results <- function(collapse_results, rolling_window = 3){
+visualize_collapse_results <- function(collapse_results, rolling_window = 3){
 
   collapse_results %>%
     dplyr::mutate(
