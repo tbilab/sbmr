@@ -1,8 +1,9 @@
-#' Run Agglomerative Merging to targer a range of group numbers
+#' Run Agglomerative Merging to target a range of group numbers
 #'
 #' @inheritParams collapse_groups
 #' @param start_group_num Fewest number of groups to test
 #' @param end_group_num Highest number of groups to test
+#' @param parallel Run in parallel using `furrr`?
 #'
 #' @return Tibble with three columns with rows corresponding to the result of
 #'   each merge step:  `entropy`, `num_groups` left in model, and a list column
@@ -18,33 +19,47 @@ collapse_run <- function(
   end_group_num = 10,
   num_group_proposals = 5,
   num_mcmc_sweeps = 10,
-  beta = 1.5
+  beta = 1.5,
+  parallel = FALSE
 ){
+  # Gather info needed to make copy of sbm on other thread
+  model_data <- sbm$get_data()
+  model_eps <- sbm$EPS
 
-  # Set free parameters
-  sbm$BETA <- beta
-  sbm$SIGMA <- sigma
-  sbm$N_CHECKS_PER_GROUP <- num_group_proposals
-  sbm$GREEDY <- FALSE
+  if(parallel){
+    # Set up parallel processing environment. .skip will avoid re-creating a
+    # plan if one already exists (saves substantial time on subsequent runs)
+    future::plan(future::multiprocess, .skip = TRUE)
 
-  collapse_results <- sbm$collapse_run(
-    as.integer(level),
-    as.integer(num_mcmc_sweeps),
-    as.integer(start_group_num),
-    as.integer(end_group_num)
-  )
+    results <- furrr::future_map_dfr(
+      start_group_num:end_group_num,
+      function(desired_num){
+        collapse_groups(create_sbm(model_data, eps = model_eps),
+                        desired_num_groups = desired_num,
+                        sigma = sigma,
+                        beta = beta,
+                        num_group_proposals = num_group_proposals,
+                        num_mcmc_sweeps = num_mcmc_sweeps)
+      }
+    )
+  } else {
+    sbm$SIGMA <- sigma
+    sbm$BETA <- beta
+    sbm$N_CHECKS_PER_GROUP <- num_group_proposals
+    collapse_results <- sbm$collapse_run(as.integer(level),
+                                as.integer(num_mcmc_sweeps),
+                                as.integer(start_group_num),
+                                as.integer(end_group_num))
 
-  # dplyr::tibble(entropy = collapse_results$entropy,
-  #               num_groups = collapse_results$num_groups,
-  #               state = collapse_results$state)
-
-
-  purrr::map_dfr(
-    collapse_results,
-    ~dplyr::tibble(entropy = .$entropy,
-                   num_groups = .$num_groups)
-  ) %>%
+    results <- purrr::map_dfr(
+      collapse_results,
+      ~dplyr::tibble(entropy = .$entropy,
+                     num_groups = .$num_groups)
+    ) %>%
     dplyr::mutate(state = purrr::map(collapse_results, 'state'))
+  }
+
+   results
 }
 
 
