@@ -7,7 +7,7 @@
 choose_best_collapse_state(
   sbm,
   collapse_results,
-  heuristic = "lowest",
+  heuristic = "dev_from_rolling_mean",
   verbose = FALSE
 )
 }

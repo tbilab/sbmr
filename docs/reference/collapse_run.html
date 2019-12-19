@@ -92,6 +92,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
+    </li>
+    <li>
       <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
     </li>
   </ul>
@@ -147,10 +150,9 @@ through MCMC proposal-accept routine.</p></td>
     </tr>
     <tr>
       <th>sigma</th>
-      <td><p>Controls how fast collapse of network happens. For instance if
-set to <code>2</code> then half (<code>1/2</code>) of the nodes will be removed at each step
-until the desired number remains. If <code>exhaustive = TRUE</code> then this
-parameter will do nothing</p></td>
+      <td><p>Controls the rate of collapse. At each step of the collapsing
+the model will try and remove <code>current_num_nodes(1 - 1/sigma)</code> nodes from
+the model. So a larger sigma means a faster collapse rate.</p></td>
     </tr>
     <tr>
       <th>start_group_num</th>
@@ -162,19 +164,23 @@ parameter will do nothing</p></td>
     </tr>
     <tr>
       <th>num_group_proposals</th>
-      <td><p>If <code>greedy = FALSE</code>, how many move proposals
-should each node produce for merge options?</p></td>
+      <td><p>If <code>greedy = FALSE</code>, this parameter controls how
+many merger proposals are drawn for each group in the model. A larger
+number will increase the exploration of merge potentials but may lead the
+model to local minimums for the same reason greedy mode does.</p></td>
     </tr>
     <tr>
       <th>num_mcmc_sweeps</th>
-      <td><p>Number of MCMC sweeps to run in between merge steps to
-allow model to find best partitioning with given number of groups. Set to
-zero for fast but more likely incorrect structure</p></td>
+      <td><p>How many MCMC sweeps the model does at each
+agglomerative merge step. This allows the model to allow nodes to find
+their most natural resting place in a given collapsed state. Larger values
+will slow down runtime but can potentially lead for more stable results.</p></td>
     </tr>
     <tr>
       <th>beta</th>
-      <td><p>Inverse temperature parameter for determining move acceptance
-probability. Only applicable if <code>num_mcmc_sweeps &gt; 0</code>.</p></td>
+      <td><p>Inverse temperature parameter impacting the acceptance
+probabilities of MCMC sweeps. A higher value means model puts more weight
+on accepting moves that improve model fit. Only matters if `num_mcmc_sweeps0`.</p></td>
     </tr>
     <tr>
       <th>parallel</th>

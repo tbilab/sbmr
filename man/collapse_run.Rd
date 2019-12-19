@@ -22,24 +22,27 @@ collapse_run(
 \item{level}{Level of nodes who's groups will have their group membership run
 through MCMC proposal-accept routine.}
 
-\item{sigma}{Controls how fast collapse of network happens. For instance if
-set to \code{2} then half (\code{1/2}) of the nodes will be removed at each step
-until the desired number remains. If \code{exhaustive = TRUE} then this
-parameter will do nothing}
+\item{sigma}{Controls the rate of collapse. At each step of the collapsing
+the model will try and remove \code{current_num_nodes(1 - 1/sigma)} nodes from
+the model. So a larger sigma means a faster collapse rate.}
 
 \item{start_group_num}{Fewest number of groups to test}
 
 \item{end_group_num}{Highest number of groups to test}
 
-\item{num_group_proposals}{If \code{greedy = FALSE}, how many move proposals
-should each node produce for merge options?}
+\item{num_group_proposals}{If \code{greedy = FALSE}, this parameter controls how
+many merger proposals are drawn for each group in the model. A larger
+number will increase the exploration of merge potentials but may lead the
+model to local minimums for the same reason greedy mode does.}
 
-\item{num_mcmc_sweeps}{Number of MCMC sweeps to run in between merge steps to
-allow model to find best partitioning with given number of groups. Set to
-zero for fast but more likely incorrect structure}
+\item{num_mcmc_sweeps}{How many MCMC sweeps the model does at each
+agglomerative merge step. This allows the model to allow nodes to find
+their most natural resting place in a given collapsed state. Larger values
+will slow down runtime but can potentially lead for more stable results.}
 
-\item{beta}{Inverse temperature parameter for determining move acceptance
-probability. Only applicable if \code{num_mcmc_sweeps > 0}.}
+\item{beta}{Inverse temperature parameter impacting the acceptance
+probabilities of MCMC sweeps. A higher value means model puts more weight
+on accepting moves that improve model fit. Only matters if `num_mcmc_sweeps0`.}
 
 \item{parallel}{Run in parallel using \code{furrr}?}
 }
