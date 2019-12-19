@@ -14,7 +14,7 @@
 #'
 #' @examples
 #'
-choose_best_collapse_state <- function(sbm, collapse_results, heuristic = 'lowest', verbose = FALSE){
+choose_best_collapse_state <- function(sbm, collapse_results, heuristic = 'dev_from_rolling_mean', verbose = FALSE){
 
   heuristic_is_function <- 'function' %in% class(heuristic)
 
@@ -39,7 +39,7 @@ choose_best_collapse_state <- function(sbm, collapse_results, heuristic = 'lowes
   if(verbose){
     n <- best_state$num_groups[1]
     entropy <- best_state$entropy[1]
-    print(glue("Choosing collapse with {n} groups and an entropy of {entropy}."))
+    print(glue::glue("Choosing collapse with {n} groups and an entropy of {entropy}."))
   }
 
   # Load best state into model and return
