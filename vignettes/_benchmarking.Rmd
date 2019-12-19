@@ -54,6 +54,23 @@ network <- sim_sbm_network(group_info, connection_propensities, edge_dist = purr
 visualize_network(network, width = '100%')
 ```
 
+```{r}
+my_sbm <- create_sbm(network)
+
+my_sbm$EPS
+
+
+copy_sbm <- function(old_sbm){
+  new_sbm <- create_sbm(
+    nodes = my_sbm$get_state(),
+    edges = my_sbm$get_edges(),
+    eps = old_sbm$EPS
+  )
+}
+
+
+
+```
 
 Initialize SBM object from simulated network and run collapsing algorithm to find optimal initial partitioning..
 
@@ -63,6 +80,7 @@ collapse_results <- create_sbm(network) %>%
                   num_group_proposals = 8, 
                   num_mcmc_sweeps = 15)
 ```
+
 
 ## Timing
 
@@ -104,10 +122,9 @@ Median time for `r n_sweeps` sweeps is __`r median_time`__, or approximately __`
 
 ```{r}
 library(tidyverse)
-library(furrr)
+# library(furrr)
 library(sbmR)
 
-plan(multiprocess)
 
 n_groups <- 4    # Four total groups
 group_size <- 40 # W/ 50 nodes in each
@@ -124,6 +141,25 @@ network <- sim_basic_block_network(
   return_connection_propensities = TRUE
 )
 
+my_sbm <- create_sbm(network)
+```
+
+```{r}
+library(tictoc)
+tic()
+collapse_run(my_sbm, end_group_num = 10, sigma = 5)
+toc()
+
+tic()
+collapse_run(my_sbm, end_group_num = 10, sigma = 5, parallel = TRUE)
+toc()
+```
+
+
+
+```{r}
+library(furrr)
+future::plan(future::multiprocess)
 
 collapse_to_desired_num <- function(desired_num){
   create_sbm(network) %>% 
@@ -149,21 +185,32 @@ r_parallel <- function(){
   )
 }
 
-cpp_sequential <- function(){
-  collapse_run(
-    create_sbm(network),
-    start_group_num = low_num, 
-    end_group_num = high_num,
-    sigma = sigma,
-    num_group_proposals = num_group_proposals,
-    num_mcmc_sweeps = num_mcmc_sweeps
-  )
+pkg_sequential <- function(){
+  collapse_run(my_sbm, 
+               start_group_num = low_num,
+               end_group_num = high_num, 
+               sigma = sigma, 
+               num_group_proposals = num_group_proposals,
+               num_mcmc_sweeps = num_mcmc_sweeps,
+               parallel = FALSE)
 }
+
+pkg_parallel <- function(){
+  collapse_run(my_sbm, 
+               start_group_num = low_num,
+               end_group_num = high_num, 
+               sigma = sigma, 
+               num_group_proposals = num_group_proposals,
+               num_mcmc_sweeps = num_mcmc_sweeps,
+               parallel = TRUE)
+}
+
 
 timing_results <- bench::mark(
   r_sequential = r_sequential(),
   r_parallel = r_parallel(),
-  cpp_sequential = cpp_sequential(),
+  pkg_sequential = pkg_sequential(),
+  pkg_parallel = pkg_parallel(),
   check = FALSE,
   min_iterations = 5
 )
