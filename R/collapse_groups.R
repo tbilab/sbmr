@@ -58,7 +58,7 @@
 collapse_groups <- function(
   sbm,
   level = 0,
-  num_mcmc_sweeps = 10,
+  num_mcmc_sweeps = 0,
   desired_num_groups = 1,
   report_all_steps = FALSE,
   beta = 1.5,
