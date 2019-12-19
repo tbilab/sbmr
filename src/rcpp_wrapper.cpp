@@ -14,7 +14,7 @@ public:
   std::unordered_map<string, int> type_string_to_int;
   std::unordered_map<int, string> type_int_to_string;
 
-  // Keeps track of all the edges for graph so object can be copied within r 
+  // Keeps track of all the edges for graph so object can be copied within r
   // without needing a whole new set of the generating data
   std::list<std::string> edges_from;
   std::list<std::string> edges_to;
@@ -146,6 +146,36 @@ public:
       _["to"] = edges_to,
       _["stringsAsFactors"] = false
     );
+  }
+
+  List get_data()
+  {
+    // Grab level 0
+    LevelPtr level_data = get_level(0);
+
+    // Initialize vectors to hold ids and types of nodes
+    std::vector<string> node_ids;
+    std::vector<string> node_types;
+    node_ids.reserve(level_data->size());
+    node_types.reserve(level_data->size());
+    // scan through level and fill in vectors
+    for (auto node_it = level_data->begin();
+              node_it != level_data->end();
+              node_it++)
+    {
+      node_ids.push_back(node_it->first);
+      node_types.push_back(type_int_to_string[node_it->second->type]);
+    }
+
+    return List::create(
+        _["nodes"] = DataFrame::create(
+            _["id"] = node_ids,
+            _["type"] = node_types,
+            _["stringsAsFactors"] = false),
+        _["edges"] = DataFrame::create(
+            _["from"] = edges_from,
+            _["to"] = edges_to,
+            _["stringsAsFactors"] = false));
   }
 
   void set_node_parent(const std::string child_id,
@@ -320,6 +350,9 @@ RCPP_MODULE(SBM)
       .method("get_edges",
               &Rcpp_SBM::get_edges,
               "Returns a from and to columned dataframe of all the edges added to class")
+      .method("get_data",
+              &Rcpp_SBM::get_data,
+              "Returns data needed to construct sbm again from R")
       .method("load_from_state",
               &Rcpp_SBM::load_from_state,
               "Takes model state export as given by SBM$get_state() and returns model to specified state. This is useful for resetting model before running various algorithms such as agglomerative merging.")
