@@ -92,9 +92,6 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/benchmarking.html">benchmarking</a>
-    </li>
-    <li>
       <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
     </li>
   </ul>
@@ -124,7 +121,12 @@
     <p>Choose and load best model state from agglomerative collapsing algorithm</p>
     </div>
 
-    <pre class="usage"><span class='fu'>choose_best_collapse_state</span>(<span class='no'>sbm</span>, <span class='no'>collapse_results</span>, <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='st'>"lowest"</span>)</pre>
+    <pre class="usage"><span class='fu'>choose_best_collapse_state</span>(
+  <span class='no'>sbm</span>,
+  <span class='no'>collapse_results</span>,
+  <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='st'>"lowest"</span>,
+  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -135,17 +137,21 @@
     </tr>
     <tr>
       <th>collapse_results</th>
-      <td><p>Results of running agglomerative collapse algorithm on sbm with <code><a href='collapse_groups.html'>collapse_groups</a></code>.</p></td>
+      <td><p>Results of running agglomerative collapse algorithm
+on sbm with <code><a href='collapse_groups.html'>collapse_groups</a></code>.</p></td>
     </tr>
     <tr>
       <th>heuristic</th>
-      <td><p>How the best partitioning is defined. Currently only <code>'lowest' </code>is supported which chooses the point with lowest entropy.</p></td>
+      <td><p>How the best partitioning is defined. Takes either a
+function that takes an entropy vector or a string labeling algorithm.
+Currently only <code>lowest</code> and <code>dev_from_rolling_mean</code> are supported.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>SBM model updated to match state from the merge step with 'best' partitioning.</p>
+    <p>SBM model updated to match state from the merge step with 'best'
+partitioning.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>

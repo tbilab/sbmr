@@ -3,6 +3,7 @@ reference:
 - title: Model Setup
   contents:
   - create_sbm
+  - copy_sbm
 - title: Network
   desc: Functions for manipulating underlying network structure of SBM model
   contents:
@@ -17,6 +18,8 @@ reference:
   contents:
   - mcmc_sweep
   - collapse_groups
+  - collapse_run
+  - choose_best_collapse_state
   - compute_entropy
   - sample_posterior
 - title: Visualization

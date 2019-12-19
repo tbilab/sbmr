@@ -2,7 +2,7 @@
 % Please edit documentation in R/collapse_run.R
 \name{collapse_run}
 \alias{collapse_run}
-\title{Run Agglomerative Merging to targer a range of group numbers}
+\title{Run Agglomerative Merging to target a range of group numbers}
 \usage{
 collapse_run(
   sbm,
@@ -12,7 +12,8 @@ collapse_run(
   end_group_num = 10,
   num_group_proposals = 5,
   num_mcmc_sweeps = 10,
-  beta = 1.5
+  beta = 1.5,
+  parallel = FALSE
 )
 }
 \arguments{
@@ -39,6 +40,8 @@ zero for fast but more likely incorrect structure}
 
 \item{beta}{Inverse temperature parameter for determining move acceptance
 probability. Only applicable if \code{num_mcmc_sweeps > 0}.}
+
+\item{parallel}{Run in parallel using \code{furrr}?}
 }
 \value{
 Tibble with three columns with rows corresponding to the result of
@@ -46,5 +49,5 @@ each merge step:  \code{entropy}, \code{num_groups} left in model, and a list co
 of \code{state} which is the state dump dataframe for model at end of merge.
 }
 \description{
-Run Agglomerative Merging to targer a range of group numbers
+Run Agglomerative Merging to target a range of group numbers
 }

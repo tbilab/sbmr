@@ -3,6 +3,6 @@ pkgdown: 1.4.1
 pkgdown_sha: ~
 articles:
   _agglomerative_merging: _agglomerative_merging.html
-  benchmarking: benchmarking.html
+  _benchmarking: _benchmarking.html
   sampling_from_posterior: sampling_from_posterior.html
 

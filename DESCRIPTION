@@ -18,7 +18,8 @@ Imports:
     Rcpp,
     rlang,
     magrittr,
-    ggplot2
+    ggplot2,
+    future
 Suggests: 
     testthat (>= 2.1.0),
     knitr,

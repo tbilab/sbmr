@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Run Agglomerative Merging to targer a range of group numbers — collapse_run • sbmR</title>
+<title>Run Agglomerative Merging to target a range of group numbers — collapse_run • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Run Agglomerative Merging to targer a range of group numbers — collapse_run" />
-<meta property="og:description" content="Run Agglomerative Merging to targer a range of group numbers" />
+<meta property="og:title" content="Run Agglomerative Merging to target a range of group numbers — collapse_run" />
+<meta property="og:description" content="Run Agglomerative Merging to target a range of group numbers" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -92,9 +92,6 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/benchmarking.html">benchmarking</a>
-    </li>
-    <li>
       <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
     </li>
   </ul>
@@ -115,13 +112,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Run Agglomerative Merging to targer a range of group numbers</h1>
+    <h1>Run Agglomerative Merging to target a range of group numbers</h1>
     
     <div class="hidden name"><code>collapse_run.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Run Agglomerative Merging to targer a range of group numbers</p>
+    <p>Run Agglomerative Merging to target a range of group numbers</p>
     </div>
 
     <pre class="usage"><span class='fu'>collapse_run</span>(
@@ -132,7 +129,8 @@
   <span class='kw'>end_group_num</span> <span class='kw'>=</span> <span class='fl'>10</span>,
   <span class='kw'>num_group_proposals</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>num_mcmc_sweeps</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>beta</span> <span class='kw'>=</span> <span class='fl'>1.5</span>
+  <span class='kw'>beta</span> <span class='kw'>=</span> <span class='fl'>1.5</span>,
+  <span class='kw'>parallel</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -177,6 +175,10 @@ zero for fast but more likely incorrect structure</p></td>
       <th>beta</th>
       <td><p>Inverse temperature parameter for determining move acceptance
 probability. Only applicable if <code>num_mcmc_sweeps &gt; 0</code>.</p></td>
+    </tr>
+    <tr>
+      <th>parallel</th>
+      <td><p>Run in parallel using <code>furrr</code>?</p></td>
     </tr>
     </table>
 
