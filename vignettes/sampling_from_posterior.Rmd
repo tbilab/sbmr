@@ -92,7 +92,7 @@ collapse_results <- my_sbm %>%
 
 
 ```{r}
-plot_collapse_results(collapse_results) +
+visualize_collapse_results(collapse_results) +
   geom_vline(xintercept = n_groups, color = 'orangered')
 ```
 
