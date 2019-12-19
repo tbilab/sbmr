@@ -209,20 +209,8 @@ public:
   List collapse_groups(const int node_level,
                        const int num_mcmc_steps,
                        int desired_num_groups,
-                       const bool report_all_steps,
-                       const bool exhaustive)
+                       const bool report_all_steps)
   {
-    // Book keep sigma value in case we change it with exhaustive mode
-    const int old_sigma = SIGMA;
-
-    if (exhaustive)
-    {
-      // Set Sigma value below 1 to insure a single group is merged each step
-      SIGMA = 0.5;
-
-      // Perform merge with single group per node type requested.
-      desired_num_groups = node_type_counts.size();
-    }
 
     // Perform collapse
     auto collapse_results = SBM::collapse_groups(node_level,
@@ -230,10 +218,6 @@ public:
                                                  desired_num_groups,
                                                  report_all_steps);
 
-    // Reset to old sigma value if needed
-    if (exhaustive) {
-      SIGMA = old_sigma;
-    }
 
     List entropy_results;
 
@@ -268,7 +252,6 @@ public:
            node_level,
            num_mcmc_steps,
            target_num,
-           false,
            false
         )[0]
       );
