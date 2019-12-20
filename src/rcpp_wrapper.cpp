@@ -237,15 +237,14 @@ public:
 
   List collapse_run(const int node_level,
                     const int num_mcmc_steps,
-                    const int start_num,
-                    const int end_num)
+                    const std::vector<int> group_nums)
   {
 
-    const int num_steps = end_num - start_num;
-    if(num_steps <= 0) stop("End number of groups for collapse run to be higher than start.");
+    // const int num_steps = end_num - start_num;
+    // if(num_steps <= 0) stop("End number of groups for collapse run to be higher than start.");
 
     List return_to_r;
-    for (int target_num = start_num; target_num <= end_num;  target_num++)
+    for (int target_num : group_nums)
     {
       return_to_r.push_back(
         collapse_groups(

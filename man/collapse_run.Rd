@@ -8,11 +8,11 @@ collapse_run(
   sbm,
   level = 0,
   sigma = 2,
-  start_group_num = 1,
-  end_group_num = 10,
+  num_final_groups = 1:10,
   num_group_proposals = 5,
   num_mcmc_sweeps = 10,
   beta = 1.5,
+  eps = NULL,
   parallel = FALSE
 )
 }
@@ -26,9 +26,7 @@ through MCMC proposal-accept routine.}
 the model will try and remove \code{current_num_nodes(1 - 1/sigma)} nodes from
 the model. So a larger sigma means a faster collapse rate.}
 
-\item{start_group_num}{Fewest number of groups to test}
-
-\item{end_group_num}{Highest number of groups to test}
+\item{num_final_groups}{Array of integers corresponding to number of groups to check in run.}
 
 \item{num_group_proposals}{If \code{greedy = FALSE}, this parameter controls how
 many merger proposals are drawn for each group in the model. A larger
@@ -44,6 +42,10 @@ will slow down runtime but can potentially lead for more stable results.}
 probabilities of MCMC sweeps. A higher value means model puts more weight
 on accepting moves that improve model fit. Only matters if
 \code{num_mcmc_sweeps} is more than zero.}
+
+\item{eps}{Controls randomness of move proposals. Effects both the group
+merging and mcmc sweeps. If value is set to value other than null the SBMs
+current epsilon value will be overridden.}
 
 \item{parallel}{Run in parallel using \code{furrr}?}
 }

@@ -1,8 +1,7 @@
 #' Run Agglomerative Merging to target a range of group numbers
 #'
 #' @inheritParams collapse_groups
-#' @param start_group_num Fewest number of groups to test
-#' @param end_group_num Highest number of groups to test
+#' @param num_final_groups Array of integers corresponding to number of groups to check in run.
 #' @param parallel Run in parallel using `furrr`?
 #'
 #' @return Tibble with three columns with rows corresponding to the result of
@@ -32,16 +31,18 @@ collapse_run <- function(
   sbm,
   level = 0,
   sigma = 2,
-  start_group_num = 1,
-  end_group_num = 10,
+  num_final_groups = 1:10,
   num_group_proposals = 5,
   num_mcmc_sweeps = 10,
   beta = 1.5,
+  eps = NULL,
   parallel = FALSE
 ){
   # Gather info needed to make copy of sbm on other thread
   model_data <- sbm$get_data()
   model_eps <- sbm$EPS
+
+  group_range <- num_final_groups
 
   if(parallel){
     # Set up parallel processing environment. .skip will avoid re-creating a
@@ -49,7 +50,7 @@ collapse_run <- function(
     future::plan(future::multiprocess, .skip = TRUE)
 
     results <- furrr::future_map_dfr(
-      start_group_num:end_group_num,
+      group_range,
       function(desired_num){
         collapse_groups(create_sbm(model_data, eps = model_eps),
                         desired_num_groups = desired_num,
@@ -65,8 +66,7 @@ collapse_run <- function(
     sbm$N_CHECKS_PER_GROUP <- num_group_proposals
     collapse_results <- sbm$collapse_run(as.integer(level),
                                 as.integer(num_mcmc_sweeps),
-                                as.integer(start_group_num),
-                                as.integer(end_group_num))
+                                as.integer(group_range))
 
     results <- purrr::map_dfr(
       collapse_results,
