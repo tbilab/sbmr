@@ -342,7 +342,7 @@ While sigma is the most important parameter for collapse results tuning there ar
 
 We start with Beta. Beta is the inverse temperature parameter for MCMC move proposal acceptance. A higher value means that the model is more likely to select moves that fit the current structure of the SBM. This means it could potentially miss more optimal sollutions due to being stuck in a local minimum. However, it will also make the model converge faster as it wastes less time on poor moves. 
 
-```{r}
+```{r toggling_beta}
 # Select a range of beta values
 beta_vals <- seq(1, 10, length.out = 8)
 
@@ -375,7 +375,7 @@ While beta controls how conservative the model is when choosing which moves to a
 
 While beta only came into plan when we had MCMC sweeps after each merge, epsilon comes into play at all times as the merge proposals are made by the same algorithm that does mcmc move proposals. 
 
-```{r}
+```{r, toggling_epsilon}
 # Get logaritmically spaced epsilon range
 eps_vals <- exp(seq(log(0.1), log(15), length.out = 9))
 
@@ -406,7 +406,7 @@ While the results are all within error distance of eachother we do see there see
 
 By simply passing in a groups numbers to check vector with repeates in it we can acccess how stable a given collapse value is for a network. Here we will do five repeats for our network for the range of 2-8 groups. 
 
-```{r}
+```{r run_stability}
 num_repeats <- 5
 group_nums <- 2:8
 
