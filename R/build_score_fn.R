@@ -8,8 +8,8 @@
 #' @param heuristic How the best partitioning is defined. Takes either a
 #'   function that takes one/two arguments: an entropy vector and an optional
 #'   number of groups vector with each element corresponding to a given
-#'   location, or a string labeling algorithm. Currently only `lowest` and
-#'   `dev_from_rolling_mean` are supported.
+#'   location, or a string labeling algorithm. Currently only `"lowest"`,
+#'   `"dev_from_rolling_mean"`, and `"nls_residual"` are supported.
 #'
 #' @return A function that takes and entropy and number of group vector and
 #'   returns a score for partitioning (higher = better)
@@ -57,10 +57,15 @@ build_score_fn <- function(heuristic){
   } else {
     if(heuristic == 'lowest'){
       score_func <-  function(e, n) -e
-    } else if(heuristic == 'dev_from_rolling_mean'){
+    } else
+    if(heuristic == 'dev_from_rolling_mean'){
       score_func <- function(e,n) rolling_mean(e) - e
-    } else {
-      stop("Other choice heuristics not yet implemented.")
-    }
+    } else
+    if(heuristic == 'nls_residual'){
+      score_func <- function(e, k){
+         entropy_model <- nls(e ~ a + b * log(k), start = list(a = max(e), b = -25))
+         -residuals(entropy_model)
+       }
+    } else {stop("Hueristic must be either a function or one of {\"lowest\", \"dev_from_rolling_mean\", \"nls_residual\"}.")}
   }
 }
