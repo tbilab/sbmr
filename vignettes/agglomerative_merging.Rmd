@@ -401,3 +401,28 @@ eps_sweep_results %>%
 ```
 
 While the results are all within error distance of eachother we do see there seems to be a trend of higher values getting better results, especially with the notable bump in the correct value at the correct 3 groups for one of the lower epsilon runs. 
+
+## Looking at stability of collapse runs
+
+By simply passing in a groups numbers to check vector with repeates in it we can acccess how stable a given collapse value is for a network. Here we will do five repeats for our network for the range of 2-8 groups. 
+
+```{r}
+num_repeats <- 5
+group_nums <- 2:8
+
+repeated_collapse <- collapse_run(
+  my_sbm,
+  num_final_groups = rep(group_nums, each = num_repeats),
+  parallel = TRUE
+)
+
+repeated_collapse %>% 
+  ggplot(aes(x = num_groups, y = entropy)) +
+  geom_smooth(size = 0, method = 'loess', span = 0.75, fill = 'steelblue') +
+  geom_jitter(alpha = 0.5, height = 0, width = 0.2)  +
+  scale_x_continuous(breaks = group_nums)
+```
+
+We can see that the results are very stable with relatively minescule for values greater than 3 groups and no variation in the others (indicating they acheived the same partitioning every time). 
+
+
