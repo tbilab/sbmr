@@ -19,7 +19,7 @@
 #' my_sbm <- create_sbm(network)
 #'
 #' # Run agglomerative clustering with no intermediate MCMC steps on network
-#' collapse_results <- collapse_run(my_sbm, sigma = 3, start_group_num = 1, end_group_num = 6)
+#' collapse_results <- collapse_run(my_sbm, sigma = 3, num_final_groups = 1:6)
 #'
 #' # Visualize results of collapsing
 #' visualize_collapse_results(collapse_results)
