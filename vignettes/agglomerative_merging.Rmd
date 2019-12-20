@@ -240,7 +240,7 @@ As expected, we get a lower-resolution line as fewer steps were taken. Let's ove
 
 ```{r compare_sigma_value_collapses}
 bind_rows(
-  collapse_mcmc10 %>% mutate(sigma = "sigma < 1"),
+  collapse_mcmc10 %>% mutate(run = "sigma < 1"),
   collapse_sigma2 %>% mutate(run = "sigma = 2")
 ) %>% 
   ggplot(aes(x = num_groups, y = entropy, color = run)) +
@@ -259,8 +259,7 @@ The function `collapse_run()` performs multiple merge runs to different numbers 
 
 The only arguments it has that `collapse_groups()` does not are:
 
-- `start_group_num`: Lowest number of groups to reduce to
-- `end_group_num`: Highest number of groups to reduce to
+- `num_final_groups`: Array of group numbers that the agglomerative merge should target. E.g. 1:10.
 - `parallel`: Should algorithm be run in parallel to speed up?
 
 The parallel argument is particularly valuable as it exploits the fact that each run is independent of eachother and thus can be run on seperate threads for significant speedups. 
@@ -269,8 +268,7 @@ Lets try it on our model scanning from 1-10 groups.
 
 ```{r parallel_collapse_run}
 run_results <- my_sbm %>% 
-  collapse_run(start_group_num = 1, 
-               end_group_num = 10,
+  collapse_run(num_final_groups = 1:10,
                parallel = TRUE)
 ```
 
@@ -353,8 +351,7 @@ beta_sweep_results <- purrr::map_dfr(
   function(beta){
     collapse_run(
       my_sbm,
-      start_group_num = 1, 
-      end_group_num = 8,
+      num_final_groups = 1:8,
       beta = beta,
       parallel = TRUE
     ) %>% 
@@ -388,8 +385,7 @@ eps_sweep_results <- purrr::map_dfr(
     my_sbm$EPS <- eps
     collapse_run(
       my_sbm,
-      start_group_num = 1, 
-      end_group_num = 8,
+      num_final_groups = 1:8,
       parallel = TRUE
     ) %>% 
       mutate(eps = eps)

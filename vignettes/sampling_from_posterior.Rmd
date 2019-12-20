@@ -85,8 +85,7 @@ collapse_results <- my_sbm %>%
   collapse_run(num_group_proposals = 15, 
                sigma = 6,
                num_mcmc_sweeps = 15, 
-               start_group_num = 1, 
-               end_group_num = 15,
+               num_final_groups = 1:15,
                parallel = TRUE)
 ```
 
