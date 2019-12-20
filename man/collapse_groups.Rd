@@ -11,6 +11,7 @@ collapse_groups(
   desired_num_groups = 1,
   report_all_steps = FALSE,
   beta = 1.5,
+  eps = NULL,
   greedy = FALSE,
   num_group_proposals = 5,
   sigma = 2
@@ -41,6 +42,10 @@ transfer.}
 probabilities of MCMC sweeps. A higher value means model puts more weight
 on accepting moves that improve model fit. Only matters if
 \code{num_mcmc_sweeps} is more than zero.}
+
+\item{eps}{Controls randomness of move proposals. Effects both the group
+merging and mcmc sweeps. If value is set to value other than null the SBMs
+current epsilon value will be overridden.}
 
 \item{greedy}{Should every possible group merger be considered? If \code{FALSE},
 candidates for mergers are drawn by similarity in connections (just as MCMC

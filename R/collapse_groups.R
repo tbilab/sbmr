@@ -34,6 +34,9 @@
 #' @param sigma Controls the rate of collapse. At each step of the collapsing
 #'   the model will try and remove `current_num_nodes(1 - 1/sigma)` nodes from
 #'   the model. So a larger sigma means a faster collapse rate.
+#' @param eps Controls randomness of move proposals. Effects both the group
+#'   merging and mcmc sweeps. If value is set to value other than null the SBMs
+#'   current epsilon value will be overridden.
 #'
 #' @return Tibble with three columns with rows corresponding to the result of
 #'   each merge step:  `entropy`, `num_groups` left in model, and a list column
@@ -62,10 +65,17 @@ collapse_groups <- function(
   desired_num_groups = 1,
   report_all_steps = FALSE,
   beta = 1.5,
+  eps = NULL,
   greedy = FALSE,
   num_group_proposals = 5,
   sigma = 2
 ){
+
+  overide_eps <- !is.null(eps)
+  if(overide_eps){
+    old_eps <- sbm$EPS
+    sbm$EPS <- eps
+  }
 
   # Set free parameters
   sbm$BETA <- beta
@@ -79,6 +89,11 @@ collapse_groups <- function(
     as.integer(desired_num_groups),
     report_all_steps
   )
+
+  # Reset epsilon value
+  if(overide_eps){
+    sbm$EPS <- old_eps
+  }
 
   purrr::map_dfr(
     collapse_results,
