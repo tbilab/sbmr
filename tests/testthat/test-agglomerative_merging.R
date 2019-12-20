@@ -60,5 +60,22 @@ test_that("Requesting just the final merge step returns just the final merge ste
 })
 
 
+test_that("Collapse run works in sequential mode", {
+
+  # Start with a random network
+  my_sbm <- create_sbm(
+    sim_basic_block_network(n_groups = 3, n_nodes_per_group = 30)
+  )
+
+  num_expected_results <- 5
+
+  collapse_results <- my_sbm %>%
+    collapse_run(num_final_groups = 1:5,
+                 num_mcmc_sweeps = 3)
+
+  expect_equal(nrow(collapse_results), num_expected_results)
+})
+
+
 
 
