@@ -128,11 +128,11 @@
   <span class='no'>sbm</span>,
   <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>start_group_num</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>end_group_num</span> <span class='kw'>=</span> <span class='fl'>10</span>,
+  <span class='kw'>num_final_groups</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>10</span>,
   <span class='kw'>num_group_proposals</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>num_mcmc_sweeps</span> <span class='kw'>=</span> <span class='fl'>10</span>,
   <span class='kw'>beta</span> <span class='kw'>=</span> <span class='fl'>1.5</span>,
+  <span class='kw'>eps</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>parallel</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
@@ -155,12 +155,8 @@ the model will try and remove <code>current_num_nodes(1 - 1/sigma)</code> nodes 
 the model. So a larger sigma means a faster collapse rate.</p></td>
     </tr>
     <tr>
-      <th>start_group_num</th>
-      <td><p>Fewest number of groups to test</p></td>
-    </tr>
-    <tr>
-      <th>end_group_num</th>
-      <td><p>Highest number of groups to test</p></td>
+      <th>num_final_groups</th>
+      <td><p>Array of integers corresponding to number of groups to check in run.</p></td>
     </tr>
     <tr>
       <th>num_group_proposals</th>
@@ -184,6 +180,12 @@ on accepting moves that improve model fit. Only matters if
 <code>num_mcmc_sweeps</code> is more than zero.</p></td>
     </tr>
     <tr>
+      <th>eps</th>
+      <td><p>Controls randomness of move proposals. Effects both the group
+merging and mcmc sweeps. If value is set to value other than null the SBMs
+current epsilon value will be overridden.</p></td>
+    </tr>
+    <tr>
       <th>parallel</th>
       <td><p>Run in parallel using <code>furrr</code>?</p></td>
     </tr>
@@ -205,7 +207,7 @@ of <code>state</code> which is the state dump dataframe for model at end of merg
 <span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>(<span class='no'>network</span>)
 
 <span class='co'># Run agglomerative clustering with no intermediate MCMC steps on network</span>
-<span class='no'>collapse_results</span> <span class='kw'>&lt;-</span> <span class='fu'>collapse_run</span>(<span class='no'>my_sbm</span>, <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>start_group_num</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>end_group_num</span> <span class='kw'>=</span> <span class='fl'>6</span>)
+<span class='no'>collapse_results</span> <span class='kw'>&lt;-</span> <span class='fu'>collapse_run</span>(<span class='no'>my_sbm</span>, <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>num_final_groups</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>6</span>)
 
 <span class='co'># Visualize results of collapsing</span>
 <span class='fu'><a href='visualize_collapse_results.html'>visualize_collapse_results</a></span>(<span class='no'>collapse_results</span>)</div><div class='img'><img src='collapse_run-1.png' alt='' width='700' height='433' /></div><div class='input'>

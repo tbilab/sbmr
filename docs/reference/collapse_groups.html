@@ -139,6 +139,7 @@ complete discussion of options/behavior.</p>
   <span class='kw'>desired_num_groups</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>report_all_steps</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>beta</span> <span class='kw'>=</span> <span class='fl'>1.5</span>,
+  <span class='kw'>eps</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>greedy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>num_group_proposals</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>2</span>
@@ -185,6 +186,12 @@ on accepting moves that improve model fit. Only matters if
 <code>num_mcmc_sweeps</code> is more than zero.</p></td>
     </tr>
     <tr>
+      <th>eps</th>
+      <td><p>Controls randomness of move proposals. Effects both the group
+merging and mcmc sweeps. If value is set to value other than null the SBMs
+current epsilon value will be overridden.</p></td>
+    </tr>
+    <tr>
       <th>greedy</th>
       <td><p>Should every possible group merger be considered? If <code>FALSE</code>,
 candidates for mergers are drawn by similarity in connections (just as MCMC
@@ -225,10 +232,10 @@ of <code>state</code> which is the state dump dataframe for model at end of merg
 
 <span class='co'># Investigate number of nodes at each step</span>
 <span class='no'>collapse_results</span> <span class='kw'>%&gt;%</span>
-  <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span>(-<span class='no'>state</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 1 x 2</span><span>
+  <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/dplyr/man/select.html'>select</a></span>(-<span class='no'>state</span>)</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 1 x 2</span><span>
 #&gt;   entropy num_groups
-#&gt;     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>    816.          1</div><div class='input'>
+#&gt;     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span>    816.          1</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
