@@ -285,15 +285,26 @@ We see that for the overlaping portion we get better performance than the single
 
 One other property of this run result is it seems smoother than the single `collapse_groups()` result. This fact can be exploited to find the best partitioning. 
 
+## Deciding the 'best' partition
 
-## Looking at deviation from rolling average
+Finding the "elbow" in graphs for choosing cluster results is an imperfect science. The package has a few built in heuristics to do so and also allows a completely custom function that takes either the entropy value of the runs or the entropy value and the number of groups. These heuristics can be seen using the `visualize_collapse_results()` function and used to select the best value using the `choose_best_collapse_state()` function. 
 
-Finding the "elbow" in graphs for choosing cluster results is an imperfect science. One method that works well for SBM models is looking at a given collapse results difference from the rolling mean of the entropy. Doing this serves to show what points show larger than expected dips in entropy for a single group being added. 
+### Lowest
 
-The included function `visualize_collapse_results()` lets you look at this metric for a given collapse run. Here we try it on our previous run.
+The simplest and most nieve method to find the best partition would be to simply take the lowest seen entropy. This is not a great idea because we know that entropy is monotonicly increasing as the number of groups decreases. The chances that the fit was so much better than others for the optimal number of groups is low. This is a very fast method to choose though and makes the least assumptions about the behavior of the system. 
+
+```{r lowest_heuristic}
+visualize_collapse_results(run_results, heuristic = 'lowest')
+```
 
 
-```{r visualizing_run-results}
+
+## Deviation from rolling mean
+
+One method that works well for SBM models is looking at a given collapse results difference from the rolling mean of the entropy. Doing this serves to show what points show larger than expected dips in entropy for a single group being added. This is fit with `heuristic = 'dev_from_rolling_mean'`.
+
+
+```{r dev_from_rolling_mean_heuristic}
 visualize_collapse_results(run_results, heuristic = 'dev_from_rolling_mean')
 ```
 
@@ -301,11 +312,21 @@ The "best" point intuitively would be the point with the highest peak on the top
 
 The nice thing about this metric is that it can be used in real time as we scan up the number of groups meaning the algorithm can stop at the value it needs by detecting a decline in the deviance function. 
 
+
+## Non-Linear Least-Squares residuals
+
+The final included heuristic takes into account the number of groups. It fits a non-linear regression model to the entropy as predicted by the number of groups. The equation it attempts to fit is $\text{entropy} \approx \beta_0 + \beta_1 \log(\text{num_groups})$. Once this equation is fit each points residual from the fit is recorded. The point that is the farthest below the expected value according to the model is considered the 'best' fit. This is fit with `heuristic = 'nls_residual'`. 
+
+```{r nls_heuristic}
+visualize_collapse_results(run_results, heuristic = 'nls_residual')
+```
+
+
 ## Loading the best fit
 
 So far we have ignored the column `state` in our collapse results. This column is a list of dataframes, each containing the state of the model at a given collapse. This can be used to return the model to the state for the best group partitioning. 
 
-This can be done with the `load_from_state()` function after retrieving the chosen state (e.g. `my_sbm %>% load_from_state(results$state[5])`) but a helper function is included to automate this process. `choose_best_collapse_state()` takes as input the dataframe returned by `collapse_run()` (or `collapse_group(report_all_steps = TRUE)`) and the method of choosing the 'best' fit and selects the best result and loads it into the model. 
+This can be done with the `load_from_state()` function after retrieving the chosen state (e.g. `my_sbm %>% load_from_state(results$state[5])`) but a helper function is included to automate this process. `choose_best_collapse_state()` takes as input the dataframe returned by `collapse_run()` (or `collapse_group(report_all_steps = TRUE)`) and the heuristic used to find the best fit and selects the best result and loads it into the model. 
 
 We can demonstrate with our collapse run results:
 
