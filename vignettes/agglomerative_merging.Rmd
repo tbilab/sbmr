@@ -335,3 +335,73 @@ visualize_network(edges = network$edges,
 ```
 
 We see a perfect match between the color and shape, meaning that every node was perfectly placed into its corresponding latent group. 
+
+## Effects of other parameters on merge paths
+
+While sigma is the most important parameter for collapse results tuning there are others we can tune. Let's look at how they effect the results. 
+
+### Toggling Beta
+
+We start with Beta. Beta is the inverse temperature parameter for MCMC move proposal acceptance. A higher value means that the model is more likely to select moves that fit the current structure of the SBM. This means it could potentially miss more optimal sollutions due to being stuck in a local minimum. However, it will also make the model converge faster as it wastes less time on poor moves. 
+
+```{r}
+# Select a range of beta values
+beta_vals <- seq(1, 10, length.out = 8)
+
+beta_sweep_results <- purrr::map_dfr(
+  beta_vals, 
+  function(beta){
+    collapse_run(
+      my_sbm,
+      start_group_num = 1, 
+      end_group_num = 8,
+      beta = beta,
+      parallel = TRUE
+    ) %>% 
+      mutate(beta = beta)
+  }
+)
+
+beta_sweep_results %>% 
+  ggplot(aes(x = num_groups, y = entropy, color = beta)) +
+  geom_line(aes(group = beta)) +
+  geom_point() +
+  scale_y_log10() +
+  ggtitle("Collapse results by beta value")
+```
+
+So we can see that the behavior isnt changed much at all by the different betas. Most of the time the default value of `1.5` is fine. 
+
+## Epsilon values
+
+While beta controls how conservative the model is when choosing which moves to accept, epsilon controls how conservative the model is when generating those proposals. As epsilon goes to infinity the moves proposed by the model approach randomness. When epsilon is zero a node can only move to groups that nodes it is connected belong to.
+
+While beta only came into plan when we had MCMC sweeps after each merge, epsilon comes into play at all times as the merge proposals are made by the same algorithm that does mcmc move proposals. 
+
+```{r}
+# Get logaritmically spaced epsilon range
+eps_vals <- exp(seq(log(0.1), log(15), length.out = 9))
+
+eps_sweep_results <- purrr::map_dfr(
+  eps_vals, 
+  function(eps){
+    my_sbm$EPS <- eps
+    collapse_run(
+      my_sbm,
+      start_group_num = 1, 
+      end_group_num = 8,
+      parallel = TRUE
+    ) %>% 
+      mutate(eps = eps)
+  }
+)
+
+eps_sweep_results %>% 
+  ggplot(aes(x = num_groups, y = entropy, color = eps)) +
+  geom_line(aes(group = eps)) +
+  geom_point() +
+  scale_y_log10() +
+  ggtitle("Collapse results by epsilon value")
+```
+
+While the results are all within error distance of eachother we do see there seems to be a trend of higher values getting better results, especially with the notable bump in the correct value at the correct 3 groups for one of the lower epsilon runs. 
