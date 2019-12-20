@@ -1,0 +1,58 @@
+# Testing performance for large networks
+
+library(tidyverse)
+library(sbmR)
+devtools::load_all()
+
+
+num_groups <- 10
+num_group_members <- 30
+
+network <- sim_basic_block_network(
+  n_groups = num_groups,
+  n_nodes_per_group = num_group_members,
+  propensity_drawer = function(n) rbeta(n, shape1 = 0.3, shape2 = 0.85),
+  return_connection_propensities = TRUE)
+
+network$edges %>% nrow()
+
+network$connection_propensities %>%
+  mutate(
+    group_1 = factor(group_1, levels = paste0('g', 1:num_groups)),
+    group_2 = factor(group_2, levels = paste0('g', 1:num_groups)),
+  ) %>%
+  ggplot(aes(x = group_1, y = group_2)) +
+  geom_tile(aes(fill = propensity)) +
+  scale_fill_gradient(low = "white")
+
+my_sbm <- create_sbm(network)
+collapse_results <- my_sbm %>% collapse_run(
+  sigma = 4,
+  num_final_groups = 1:25,
+  num_mcmc_sweeps = 15,
+  parallel = TRUE
+)
+
+visualize_collapse_results(collapse_results, heuristic = 'nls_residual')
+
+x = seq(0,1, length.out = 20)
+range <- seq(0.01, 1, length.out = 10)
+
+expand_grid(
+  shape1 = range,
+  shape2 = range
+) %>% {
+  purrr::map2_dfr(
+    .$shape1,
+    .$shape2,
+    function(s1, s2){
+      tibble(x = x, shape1 = s1, shape2 = s2) %>%
+        mutate(d = dbeta(x, shape1 = s1, shape2 = s2))
+    }
+  )
+} %>%
+  ggplot(aes(x = x, y = d)) +
+  geom_line() +
+  facet_grid(shape1~shape2) +
+  theme_minimal()
+
