@@ -348,7 +348,7 @@ nodes_w_inferred_block <- best_partition %>%
 
 visualize_network(edges = network$edges, 
                   nodes = nodes_w_inferred_block, 
-                  node_color_col = 'group', 
+                  node_color_col = 'block', 
                   node_shape_col = 'parent',
                   width = '100%')
 ```

@@ -36,11 +36,11 @@ First we will generate our simulated network. First we set a seed to make the st
 set.seed(42)
 
 n_blocks <- 4    # Four total groups
-group_size <- 50 # W/ 50 nodes in each
+block_size <- 50 # W/ 50 nodes in each
 
 network <- sim_basic_block_network(
   n_blocks = n_blocks,     
-  n_nodes_per_block = group_size,  
+  n_nodes_per_block = block_size,  
   return_edge_propensities = TRUE
 )
 ```
@@ -50,7 +50,7 @@ First we can make sure our edge propensities look reasonable
 
 ```{r}
 network$edge_propensities %>% 
-  ggplot(aes(x = group_1, y = group_2, fill = propensity)) +
+  ggplot(aes(x = block_1, y = block_2, fill = propensity)) +
   geom_tile(color = 'white') +
   theme_bw()
 ```
@@ -117,7 +117,7 @@ nodes_w_inferred_block <- network$nodes  %>%
 
 visualize_network(edges = network$edges, 
                   nodes = nodes_w_inferred_block, 
-                  node_color_col = 'group', 
+                  node_color_col = 'block', 
                   node_shape_col = 'inferred',
                   width = '100%')
 ```
@@ -126,7 +126,7 @@ The colors and shapes seem to match very well. We can check the aggreement as we
 
 ```{r}
 nodes_w_inferred_block %>% 
-  group_by(group) %>% 
+  group_by(block) %>% 
   summarise(n_unique_inferred = length(unique(inferred)))
 ```
 
@@ -139,7 +139,7 @@ So each group was mapped into by only one class, meaning we perfectly matched th
 Now that we have our model in a decent starting place we can initiate the MCMC sampling. We will start by doing 500 sweeps to see if our model shape has stabalized at all. 
 
 ```{r}
-num_sweeps <- 500
+num_sweeps <- 50
 
 sweep_results_to_df <- function(sweep_results, label = 'results'){
   sweep_results %>% 
@@ -183,7 +183,7 @@ nodes_w_inferred_block <- my_sbm %>%
 
 visualize_network(edges = network$edges, 
                   nodes = nodes_w_inferred_block, 
-                  node_color_col = 'group', 
+                  node_color_col = 'block', 
                   node_shape_col = 'inferred',
                   width = '100%')
 ```
@@ -191,7 +191,7 @@ visualize_network(edges = network$edges,
 ```{r}
 nodes_w_inferred_block %>% 
   group_by(inferred) %>% 
-  summarise(n_unique_blocks = length(unique(group)))
+  summarise(n_unique_blocks = length(unique(block)))
 ```
 
 So even though we have more groups than we should, we never have an infered group that spans more than a single true group. 
