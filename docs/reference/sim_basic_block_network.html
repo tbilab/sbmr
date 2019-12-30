@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Simulate stochastic block model of given number of groups — sim_basic_block_network • sbmR</title>
+<title>Simulate stochastic block model of given number of blocks — sim_basic_block_network • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,9 +35,9 @@
 
 
 
-<meta property="og:title" content="Simulate stochastic block model of given number of groups — sim_basic_block_network" />
+<meta property="og:title" content="Simulate stochastic block model of given number of blocks — sim_basic_block_network" />
 <meta property="og:description" content="Simulates a simple block structured network with a desired number of constant
-sized groups. The probability of connections between given groups will be
+sized blocks. The probability of connections between given blocks will be
 drawn from a passed function that must return a numeric value that will be
 used as the propensity parameter for drawing edge counts from a node pair.
 The default values will draw propensity values for bernouli edges with an
@@ -120,14 +120,14 @@ average of a 50% chance of connection." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Simulate stochastic block model of given number of groups</h1>
+    <h1>Simulate stochastic block model of given number of blocks</h1>
     
     <div class="hidden name"><code>sim_basic_block_network.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>Simulates a simple block structured network with a desired number of constant
-sized groups. The probability of connections between given groups will be
+sized blocks. The probability of connections between given blocks will be
 drawn from a passed function that must return a numeric value that will be
 used as the propensity parameter for drawing edge counts from a node pair.
 The default values will draw propensity values for bernouli edges with an
@@ -135,11 +135,11 @@ average of a 50% chance of connection.</p>
     </div>
 
     <pre class="usage"><span class='fu'>sim_basic_block_network</span>(
-  <span class='kw'>n_groups</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>n_nodes_per_group</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>propensity_drawer</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>n</span>) {     <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span>(<span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>5</span>), <span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span>(<span class='fl'>1</span>, <span class='fl'>5</span>, <span class='fl'>1</span>),
     <span class='kw'>length.out</span> <span class='kw'>=</span> <span class='no'>n</span>)) },
-  <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='no'><a href='https://purrr.tidyverse.org/reference/rbernoulli.html'>rbernoulli</a></span>,
+  <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='no'><a href='https://rdrr.io/pkg/purrr/man/rbernoulli.html'>rbernoulli</a></span>,
   <span class='kw'>allow_self_connections</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>keep_connection_counts</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>return_connection_propensities</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
@@ -149,12 +149,12 @@ average of a 50% chance of connection.</p>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>n_groups</th>
-      <td><p>How many groups to simulate</p></td>
+      <th>n_blocks</th>
+      <td><p>How many blocks to simulate</p></td>
     </tr>
     <tr>
-      <th>n_nodes_per_group</th>
-      <td><p>How many nodes in each group</p></td>
+      <th>n_nodes_per_block</th>
+      <td><p>How many nodes in each block</p></td>
     </tr>
     <tr>
       <th>propensity_drawer</th>
@@ -170,7 +170,7 @@ number of samples to draw and the second the <code>propensity</code> value from
 takes two arguments: <code>n</code> and <code>lambda</code>. In this scenario the <code>propensity</code> of
 connections between two nodes is provided to <code>lambda</code> and thus is the
 average number of connections for each pair of nodes between two given
-groups.</p></td>
+blocks.</p></td>
     </tr>
     <tr>
       <th>allow_self_connections</th>
@@ -193,20 +193,20 @@ used for recreating draws using <code><a href='sim_sbm_network.html'>sim_sbm_net
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list with a <code>nodes</code> dataframe (containing a node's <code>id</code> and <code>group</code>
+    <p>A list with a <code>nodes</code> dataframe (containing a node's <code>id</code> and <code>block</code>
 membership), an <code>edges</code> dataframe (containing <code>from</code> and <code>to</code> nodes along
 with the total number of <code>connections</code> as drawn from <code>edge_dist</code>), and if
 <code>return_connection_propensities == TRUE</code>: <code>connection_propensities</code>
 dataframe that shows the randomly drawn connection propensities between
-groups.</p>
+blocks.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='sim_sbm_network.html'>sim_sbm_network</a></code> <code><a href='sim_random_network.html'>sim_random_network</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>sim_basic_block_network</span>(<span class='kw'>n_groups</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>n_nodes_per_group</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt; $nodes
+    <pre class="examples"><div class='input'><span class='fu'>sim_basic_block_network</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt; $nodes
 #&gt; <span style='color: #555555;'># A tibble: 40 x 2</span><span>
-#&gt;    id    group
+#&gt;    id    block
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
 #&gt; </span><span style='color: #555555;'> 1</span><span> g1_1  g1   
 #&gt; </span><span style='color: #555555;'> 2</span><span> g1_2  g1   

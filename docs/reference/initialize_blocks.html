@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Add a new node to network — add_node • sbmR</title>
+<title>Assign blocks for all nodes — initialize_blocks • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,9 +35,15 @@
 
 
 
-<meta property="og:title" content="Add a new node to network — add_node" />
-<meta property="og:description" content="Add a node to the network. Takes the node id (string), the node type
-(string), and the node level (int)." />
+<meta property="og:title" content="Assign blocks for all nodes — initialize_blocks" />
+<meta property="og:description" content="Initializes blocks for a given level of network. When num_blocks = -1 (the
+default) this will simply give every node its own block. Otherwise it will
+randomly draw each nodes block from num_block possible parent nodes for
+each node type. E.g. if network is bipartite and num_blocks == 3 a total of
+3*2 = 6 blocks will be added and assigned randomly to nodes. Because of
+random assignment of parents there may sometimes be less blocks than
+num_blocks * &amp;lt;num_types&amp;gt; due to some block nodes never being assigned to a
+child node." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -116,17 +122,23 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Add a new node to network</h1>
+    <h1>Assign blocks for all nodes</h1>
     
-    <div class="hidden name"><code>add_node.Rd</code></div>
+    <div class="hidden name"><code>initialize_blocks.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Add a node to the network. Takes the node id (string), the node type
-(string), and the node level (int).</p>
+    <p>Initializes blocks for a given level of network. When <code>num_blocks = -1</code> (the
+default) this will simply give every node its own block. Otherwise it will
+randomly draw each nodes block from <code>num_block</code> possible parent nodes for
+each node type. E.g. if network is bipartite and <code>num_blocks == 3</code> a total of
+<code>3*2 = 6</code> blocks will be added and assigned randomly to nodes. Because of
+random assignment of parents there may sometimes be less blocks than
+<code>num_blocks * &lt;num_types&gt;</code> due to some block nodes never being assigned to a
+child node.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>add_node</span>(<span class='no'>sbm</span>, <span class='no'>id</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"node"</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
+    <pre class="usage"><span class='fu'>initialize_blocks</span>(<span class='no'>sbm</span>, <span class='kw'>num_blocks</span> <span class='kw'>=</span> -<span class='fl'>1</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -136,32 +148,61 @@
       <td><p>SBM model object as created by <code><a href='create_sbm.html'>create_sbm()</a></code>.</p></td>
     </tr>
     <tr>
-      <th>id</th>
-      <td><p>Unique identifying name for node.</p></td>
-    </tr>
-    <tr>
-      <th>type</th>
-      <td><p>Type of node (string). This is used to distinguish multipartite networks. E.g. "person", or "publication", etc..</p></td>
+      <th>num_blocks</th>
+      <td><p>Total number of blocks to initialize for each unique node
+type. If set to <code>-1</code>, then a single block is made for every node.</p></td>
     </tr>
     <tr>
       <th>level</th>
-      <td><p>Level in node hierarchy. Level <code>0</code> indicates node is at the data level, levels greater than <code>0</code> are block nodes.</p></td>
+      <td><p>Level of child node. This will almost always stay at default
+value of <code>0</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>SBM model object modified with node added. <em>Note that object is modified in place as well.</em></p>
+    <p>SBM model object modified with new block nodes and node hierarchy
+modified. <em>Note that object is modified in place as well.</em></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>() <span class='kw'>%&gt;%</span>
-  <span class='fu'>add_node</span>(<span class='st'>'node_1'</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'>add_node</span>(<span class='st'>'node_2'</span>)
+    <pre class="examples"><div class='input'><span class='co'># Helper function to get number of blocks in a model</span>
+<span class='no'>get_num_blocks</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>sbm</span>){<span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='fu'><a href='get_state.html'>get_state</a></span>(<span class='no'>sbm</span>)$<span class='no'>level</span> <span class='kw'>==</span> <span class='fl'>1</span>)}
 
-<span class='fu'><a href='get_state.html'>get_state</a></span>(<span class='no'>my_sbm</span>)</div><div class='output co'>#&gt;       id parent type level
-#&gt; 1 node_1   none node     0
-#&gt; 2 node_2   none node     0</div><div class='input'>
+<span class='co'># Initialize a simple bipartite network with 6 total nodes (3 of each type)</span>
+<span class='no'>my_nodes</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/dplyr/man/reexports.html'>tibble</a></span>(
+  <span class='kw'>id</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"a1"</span>, <span class='st'>"a2"</span>, <span class='st'>"a3"</span>, <span class='st'>"b1"</span>, <span class='st'>"b2"</span>, <span class='st'>"b3"</span>),
+  <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"a"</span>, <span class='st'>"a"</span>, <span class='st'>"a"</span>, <span class='st'>"b"</span>, <span class='st'>"b"</span>, <span class='st'>"b"</span>)
+)
+<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>(<span class='kw'>nodes</span> <span class='kw'>=</span> <span class='no'>my_nodes</span>)
+
+<span class='co'># Default values of function will give every node its own block</span>
+<span class='no'>my_sbm</span> <span class='kw'>%&gt;%</span> <span class='fu'>initialize_blocks</span>()</div><div class='output co'>#&gt;       id parent type level
+#&gt; 1     a1  0-1_0    a     0
+#&gt; 2     a2  0-1_1    a     0
+#&gt; 3     a3  0-1_2    a     0
+#&gt; 4     b1  1-1_3    b     0
+#&gt; 5     b2  1-1_4    b     0
+#&gt; 6     b3  1-1_5    b     0
+#&gt; 7  0-1_0   none    a     1
+#&gt; 8  0-1_1   none    a     1
+#&gt; 9  0-1_2   none    a     1
+#&gt; 10 1-1_3   none    b     1
+#&gt; 11 1-1_4   none    b     1
+#&gt; 12 1-1_5   none    b     1</div><div class='input'><span class='fu'>get_num_blocks</span>(<span class='no'>my_sbm</span>)</div><div class='output co'>#&gt; [1] 6</div><div class='input'>
+<span class='co'># You can also decide to have a given number of blocks randomly assigned Here</span>
+<span class='co'># four blocks result because two random blocks are made for each of the two</span>
+<span class='co'># types</span>
+<span class='no'>my_sbm</span> <span class='kw'>%&gt;%</span> <span class='fu'>initialize_blocks</span>(<span class='kw'>num_blocks</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt;       id parent type level
+#&gt; 1     a1  0-1_0    a     0
+#&gt; 2     a2  0-1_0    a     0
+#&gt; 3     a3  0-1_0    a     0
+#&gt; 4     b1  1-1_3    b     0
+#&gt; 5     b2  1-1_2    b     0
+#&gt; 6     b3  1-1_3    b     0
+#&gt; 7  0-1_0   none    a     1
+#&gt; 8  0-1_1   none    a     1
+#&gt; 9  1-1_2   none    b     1
+#&gt; 10 1-1_3   none    b     1</div><div class='input'><span class='fu'>get_num_blocks</span>(<span class='no'>my_sbm</span>)</div><div class='output co'>#&gt; [1] 4</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

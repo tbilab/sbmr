@@ -39,9 +39,9 @@
 <meta property="og:description" content="Runs a single Metropolis Hastings MCMC sweep across all nodes at specified
 level (For algorithm details see
 Piexoto, 2018). Each node is given a
-chance to move groups or stay in current group and all nodes are processed in
+chance to move blocks or stay in current block and all nodes are processed in
 random order. Takes the level that the sweep should take place on (int) and
-if new groups groups can be proposed and empty groups removed (boolean)." />
+if new blocks blocks can be proposed and empty blocks removed (boolean)." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -129,12 +129,12 @@ if new groups groups can be proposed and empty groups removed (boolean)." />
     <p>Runs a single Metropolis Hastings MCMC sweep across all nodes at specified
 level (For algorithm details see
 <a href='https://arxiv.org/abs/1705.10225'>Piexoto, 2018</a>). Each node is given a
-chance to move groups or stay in current group and all nodes are processed in
+chance to move blocks or stay in current block and all nodes are processed in
 random order. Takes the level that the sweep should take place on (int) and
-if new groups groups can be proposed and empty groups removed (boolean).</p>
+if new blocks blocks can be proposed and empty blocks removed (boolean).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>mcmc_sweep</span>(<span class='no'>sbm</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>variable_num_groups</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>beta</span> <span class='kw'>=</span> <span class='fl'>1.5</span>)</pre>
+    <pre class="usage"><span class='fu'>mcmc_sweep</span>(<span class='no'>sbm</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>variable_num_blocks</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>beta</span> <span class='kw'>=</span> <span class='fl'>1.5</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -145,13 +145,13 @@ if new groups groups can be proposed and empty groups removed (boolean).</p>
     </tr>
     <tr>
       <th>level</th>
-      <td><p>Level of nodes who's groups will have their group membership run
+      <td><p>Level of nodes who's blocks will have their block membership run
 through MCMC proposal-accept routine.</p></td>
     </tr>
     <tr>
-      <th>variable_num_groups</th>
-      <td><p>Should the model allow new groups to be created or
-empty groups removed while sweeping or should number of groups remain
+      <th>variable_num_blocks</th>
+      <td><p>Should the model allow new blocks to be created or
+empty blocks removed while sweeping or should number of blocks remain
 constant?</p></td>
     </tr>
     <tr>
@@ -171,15 +171,15 @@ sweep (<code>nodes_moved</code>) and the sweeps impact on the model's entropy
     <pre class="examples"><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
 
-<span class='co'># Start with a random network and assign randomly to 4 groups</span>
-<span class='no'>n_groups</span> <span class='kw'>&lt;-</span> <span class='fl'>3</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>(<span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_groups</span> <span class='kw'>=</span> <span class='no'>n_groups</span>, <span class='kw'>n_nodes_per_group</span> <span class='kw'>=</span> <span class='fl'>15</span>)) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='initialize_groups.html'>initialize_groups</a></span>(<span class='kw'>num_groups</span> <span class='kw'>=</span> <span class='no'>n_groups</span>)
+<span class='co'># Start with a random network and assign randomly to 4 blocks</span>
+<span class='no'>n_blocks</span> <span class='kw'>&lt;-</span> <span class='fl'>3</span>
+<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>(<span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='no'>n_blocks</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>15</span>)) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='kw'>num_blocks</span> <span class='kw'>=</span> <span class='no'>n_blocks</span>)
 
-<span class='co'># Calculate entropy with random groups</span>
+<span class='co'># Calculate entropy with random blocks</span>
 <span class='fu'><a href='compute_entropy.html'>compute_entropy</a></span>(<span class='no'>my_sbm</span>)</div><div class='output co'>#&gt; [1] 752.6645</div><div class='input'>
 <span class='co'># Run 4 MCMC sweeps</span>
-<span class='kw'>for</span>(<span class='no'>i</span> <span class='kw'>in</span> <span class='fl'>1</span>:<span class='fl'>4</span>) <span class='no'>my_sbm</span> <span class='kw'>%&gt;%</span> <span class='fu'>mcmc_sweep</span>(<span class='kw'>variable_num_groups</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='kw'>for</span>(<span class='no'>i</span> <span class='kw'>in</span> <span class='fl'>1</span>:<span class='fl'>4</span>) <span class='no'>my_sbm</span> <span class='kw'>%&gt;%</span> <span class='fu'>mcmc_sweep</span>(<span class='kw'>variable_num_blocks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># Calculate entropy after sweeps</span>
 <span class='fu'><a href='compute_entropy.html'>compute_entropy</a></span>(<span class='no'>my_sbm</span>)</div><div class='output co'>#&gt; [1] 683.4771</div><div class='input'>

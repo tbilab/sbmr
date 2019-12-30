@@ -37,8 +37,8 @@
 
 <meta property="og:title" content="Build score function from heuristic — build_score_fn" />
 <meta property="og:description" content="(Internal) Takes a heuristic object and turns it into a function that takes
-two arguments, entropy and number of groups that is used to calculate the
-score for a given entropy-number of groups step for agglomerative merging
+two arguments, entropy and number of blocks that is used to calculate the
+score for a given entropy-number of blocks step for agglomerative merging
 algorithms." />
 <meta name="twitter:card" content="summary" />
 
@@ -125,8 +125,8 @@ algorithms." />
 
     <div class="ref-description">
     <p>(Internal) Takes a heuristic object and turns it into a function that takes
-two arguments, entropy and number of groups that is used to calculate the
-score for a given entropy-number of groups step for agglomerative merging
+two arguments, entropy and number of blocks that is used to calculate the
+score for a given entropy-number of blocks step for agglomerative merging
 algorithms.</p>
     </div>
 
@@ -139,22 +139,22 @@ algorithms.</p>
       <th>heuristic</th>
       <td><p>How the best partitioning is defined. Takes either a
 function that takes one/two arguments: an entropy vector and an optional
-number of groups vector with each element corresponding to a given
-location, or a string labeling algorithm. Currently only <code>lowest</code> and
-<code>dev_from_rolling_mean</code> are supported.</p></td>
+number of blocks vector with each element corresponding to a given
+location, or a string labeling algorithm. Currently only <code>"lowest"</code>,
+<code>"dev_from_rolling_mean"</code>, and <code>"nls_residual"</code> are supported.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A function that takes and entropy and number of group vector and
+    <p>A function that takes and entropy and number of block vector and
 returns a score for partitioning (higher = better)</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='co'># Setup fake entropy and number of groups vectors</span>
+<span class='co'># Setup fake entropy and number of blocks vectors</span>
 <span class='no'>entropy</span> <span class='kw'>&lt;-</span> -(<span class='fl'>10</span>:<span class='fl'>1</span>)*<span class='fl'>1000</span> + <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>10</span>, <span class='fl'>200</span>)
-<span class='no'>num_groups</span> <span class='kw'>&lt;-</span> <span class='fl'>1</span>:<span class='fl'>10</span>
+<span class='no'>num_blocks</span> <span class='kw'>&lt;-</span> <span class='fl'>1</span>:<span class='fl'>10</span>
 
 <span class='co'># Works with heuristic functions that take two arguments</span>
 <span class='no'>nls_score</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>e</span>, <span class='no'>k</span>){
@@ -162,17 +162,17 @@ returns a score for partitioning (higher = better)</p>
   -<span class='fu'><a href='https://rdrr.io/r/stats/residuals.html'>residuals</a></span>(<span class='no'>entropy_model</span>)
 }
 
-<span class='fu'>build_score_fn</span>(<span class='no'>nls_score</span>)(<span class='no'>entropy</span>, <span class='no'>num_groups</span>)</div><div class='output co'>#&gt;  [1] -1436.7564   286.4281   883.0498  1011.5289   888.1043   604.3041
+<span class='fu'>build_score_fn</span>(<span class='no'>nls_score</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1] -1436.7564   286.4281   883.0498  1011.5289   888.1043   604.3041
 #&gt;  [7]   213.2580  -263.3895  -800.3742 -1386.1516
 #&gt; attr(,"label")
 #&gt; [1] "Residuals"</div><div class='input'>
 <span class='co'># Works with functions that take one argument</span>
 <span class='no'>invert_score</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>e</span>) -<span class='no'>e</span>/<span class='fl'>2</span>
-<span class='fu'>build_score_fn</span>(<span class='no'>invert_score</span>)(<span class='no'>entropy</span>, <span class='no'>num_groups</span>)</div><div class='output co'>#&gt;  [1] 4900.7000 4399.8723 3901.2186 3400.0028 2899.6892 2399.4258 1900.9109
+<span class='fu'>build_score_fn</span>(<span class='no'>invert_score</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1] 4900.7000 4399.8723 3901.2186 3400.0028 2899.6892 2399.4258 1900.9109
 #&gt;  [8] 1400.1237  900.1221  400.1414</div><div class='input'>
 <span class='co'># Works with predefined strings</span>
-<span class='fu'>build_score_fn</span>(<span class='st'>"dev_from_rolling_mean"</span>)(<span class='no'>entropy</span>, <span class='no'>num_groups</span>)</div><div class='output co'>#&gt;  [1]     0.0000  -500.8277  -998.7567 -1500.8913 -1501.0130 -1501.3166
-#&gt;  [7] -1498.1925 -1499.8275 -1500.0470 -1500.3663</div><div class='input'><span class='fu'>build_score_fn</span>(<span class='st'>"lowest"</span>)(<span class='no'>entropy</span>, <span class='no'>num_groups</span>)</div><div class='output co'>#&gt;  [1] 9801.4000 8799.7447 7802.4373 6800.0056 5799.3784 4798.8516 3801.8218
+<span class='fu'>build_score_fn</span>(<span class='st'>"dev_from_rolling_mean"</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1]     0.0000  -500.8277  -998.7567 -1500.8913 -1501.0130 -1501.3166
+#&gt;  [7] -1498.1925 -1499.8275 -1500.0470 -1500.3663</div><div class='input'><span class='fu'>build_score_fn</span>(<span class='st'>"lowest"</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1] 9801.4000 8799.7447 7802.4373 6800.0056 5799.3784 4798.8516 3801.8218
 #&gt;  [8] 2800.2473 1800.2442  800.2827</div><div class='input'>
 </div></pre>
   </div>

@@ -137,8 +137,8 @@ level (int).</p>
     </tr>
     <tr>
       <th>level</th>
-      <td><p>Level of nodes for which group entropy is accessed. E.g. the
-default value of <code>0</code> will get entropy of model as described by the groups
+      <td><p>Level of nodes for which block entropy is accessed. E.g. the
+default value of <code>0</code> will get entropy of model as described by the blocks
 in level <code>1</code>.</p></td>
     </tr>
     </table>
@@ -149,7 +149,7 @@ in level <code>1</code>.</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='co'># Build basic network with 3 nodes and two groups</span>
+<span class='co'># Build basic network with 3 nodes and two blocks</span>
 <span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>() <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='add_node.html'>add_node</a></span>(<span class='st'>'node_1'</span>) <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='add_node.html'>add_node</a></span>(<span class='st'>'node_2'</span>) <span class='kw'>%&gt;%</span>

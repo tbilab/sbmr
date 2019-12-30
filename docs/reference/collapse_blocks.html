@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Run Agglomerative Merging to target a range of block numbers — collapse_run • sbmR</title>
+<title>Agglomeratively merge blocks — collapse_blocks • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,12 @@
 
 
 
-<meta property="og:title" content="Run Agglomerative Merging to target a range of block numbers — collapse_run" />
-<meta property="og:description" content="Run Agglomerative Merging to target a range of block numbers" />
+<meta property="og:title" content="Agglomeratively merge blocks — collapse_blocks" />
+<meta property="og:description" content="Performs agglomerative merging on network, starting with each block has a
+single node down to one block per node type. Arguments are level to perform
+merge at (int) and number of MCMC steps to peform between each collapsing to
+equilibriate block. See the agglomerative_merging.Rmd vignette for more
+complete discussion of options/behavior." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -115,25 +119,30 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Run Agglomerative Merging to target a range of block numbers</h1>
+    <h1>Agglomeratively merge blocks</h1>
     
-    <div class="hidden name"><code>collapse_run.Rd</code></div>
+    <div class="hidden name"><code>collapse_blocks.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Run Agglomerative Merging to target a range of block numbers</p>
+    <p>Performs agglomerative merging on network, starting with each block has a
+single node down to one block per node type. Arguments are level to perform
+merge at (int) and number of MCMC steps to peform between each collapsing to
+equilibriate block. See the <code>agglomerative_merging.Rmd</code> vignette for more
+complete discussion of options/behavior.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>collapse_run</span>(
+    <pre class="usage"><span class='fu'>collapse_blocks</span>(
   <span class='no'>sbm</span>,
   <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>num_final_blocks</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>10</span>,
-  <span class='kw'>num_block_proposals</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>num_mcmc_sweeps</span> <span class='kw'>=</span> <span class='fl'>10</span>,
+  <span class='kw'>num_mcmc_sweeps</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>desired_num_blocks</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>report_all_steps</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>beta</span> <span class='kw'>=</span> <span class='fl'>1.5</span>,
   <span class='kw'>eps</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>parallel</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>greedy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>num_block_proposals</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>2</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -149,28 +158,25 @@
 through MCMC proposal-accept routine.</p></td>
     </tr>
     <tr>
-      <th>sigma</th>
-      <td><p>Controls the rate of collapse. At each step of the collapsing
-the model will try and remove <code>current_num_nodes(1 - 1/sigma)</code> nodes from
-the model. So a larger sigma means a faster collapse rate.</p></td>
-    </tr>
-    <tr>
-      <th>num_final_blocks</th>
-      <td><p>Array of integers corresponding to number of blocks to check in run.</p></td>
-    </tr>
-    <tr>
-      <th>num_block_proposals</th>
-      <td><p>If <code>greedy = FALSE</code>, this parameter controls how
-many merger proposals are drawn for each block in the model. A larger
-number will increase the exploration of merge potentials but may lead the
-model to local minimums for the same reason greedy mode does.</p></td>
-    </tr>
-    <tr>
       <th>num_mcmc_sweeps</th>
       <td><p>How many MCMC sweeps the model does at each
 agglomerative merge step. This allows the model to allow nodes to find
 their most natural resting place in a given collapsed state. Larger values
 will slow down runtime but can potentially lead for more stable results.</p></td>
+    </tr>
+    <tr>
+      <th>desired_num_blocks</th>
+      <td><p>How many blocks should this given merge drop down
+to. If the network has more than one node type this number is multiplied by
+the total number of types.</p></td>
+    </tr>
+    <tr>
+      <th>report_all_steps</th>
+      <td><p>Should the model state be provided for every merge
+step or just the final one? If collapsing is being used to infer
+hierarcichal structure in data or inspection is desired this should be set
+to <code>TRUE</code>, otherwise it will slow down collapsing due to increased data
+transfer.</p></td>
     </tr>
     <tr>
       <th>beta</th>
@@ -186,8 +192,24 @@ merging and mcmc sweeps. If value is set to value other than null the SBMs
 current epsilon value will be overridden.</p></td>
     </tr>
     <tr>
-      <th>parallel</th>
-      <td><p>Run in parallel using <code>furrr</code>?</p></td>
+      <th>greedy</th>
+      <td><p>Should every possible block merger be considered? If <code>FALSE</code>,
+candidates for mergers are drawn by similarity in connections (just as MCMC
+move proposals are). This may lead the model to local minimums by always
+pursuing best possible merges.</p></td>
+    </tr>
+    <tr>
+      <th>num_block_proposals</th>
+      <td><p>If <code>greedy = FALSE</code>, this parameter controls how
+many merger proposals are drawn for each block in the model. A larger
+number will increase the exploration of merge potentials but may lead the
+model to local minimums for the same reason greedy mode does.</p></td>
+    </tr>
+    <tr>
+      <th>sigma</th>
+      <td><p>Controls the rate of collapse. At each step of the collapsing
+the model will try and remove <code>current_num_nodes(1 - 1/sigma)</code> nodes from
+the model. So a larger sigma means a faster collapse rate.</p></td>
     </tr>
     </table>
 
@@ -198,22 +220,23 @@ each merge step:  <code>entropy</code>, <code>num_blocks</code> left in model, a
 of <code>state</code> which is the state dump dataframe for model at end of merge.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
+    <pre class="examples"><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
 
 <span class='co'># Start with a random network of two blocks with 25 nodes each</span>
-<span class='no'>network</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>25</span>)
-
-<span class='co'># Create SBM from simulated data</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>(<span class='no'>network</span>)
+<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>25</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>()
 
 <span class='co'># Run agglomerative clustering with no intermediate MCMC steps on network</span>
-<span class='no'>collapse_results</span> <span class='kw'>&lt;-</span> <span class='fu'>collapse_run</span>(<span class='no'>my_sbm</span>, <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>num_final_blocks</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>6</span>)
+<span class='no'>collapse_results</span> <span class='kw'>&lt;-</span> <span class='fu'>collapse_blocks</span>(<span class='no'>my_sbm</span>, <span class='kw'>num_mcmc_sweeps</span> <span class='kw'>=</span> <span class='fl'>0</span>)
 
-<span class='co'># Visualize results of collapsing</span>
-<span class='fu'><a href='visualize_collapse_results.html'>visualize_collapse_results</a></span>(<span class='no'>collapse_results</span>)</div><div class='img'><img src='collapse_run-1.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Choose best result</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a></span>(<span class='no'>my_sbm</span>, <span class='no'>collapse_results</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 2032.81284279538.</div><div class='input'>
-</div></pre>
+<span class='co'># Investigate number of nodes at each step</span>
+<span class='no'>collapse_results</span> <span class='kw'>%&gt;%</span>
+  <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/dplyr/man/select.html'>select</a></span>(-<span class='no'>state</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 1 x 2</span><span>
+#&gt;   entropy num_blocks
+#&gt;     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>    816.          1</div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

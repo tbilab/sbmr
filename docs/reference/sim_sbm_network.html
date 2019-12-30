@@ -37,7 +37,7 @@
 
 <meta property="og:title" content="Simulate network using stochastic block model — sim_sbm_network" />
 <meta property="og:description" content="Simulates nodes and edges from a network where edge connections are derived
-from the Stochastic Block Model. A dataframe describing the different groups
+from the Stochastic Block Model. A dataframe describing the different blocks
 present and the number of nodes within them, a dataframe that provides the
 propensity of connection between two edges, and a distribution function
 who's main parameter the propensity value defines are needed." />
@@ -126,14 +126,14 @@ who's main parameter the propensity value defines are needed." />
 
     <div class="ref-description">
     <p>Simulates nodes and edges from a network where edge connections are derived
-from the Stochastic Block Model. A dataframe describing the different groups
+from the Stochastic Block Model. A dataframe describing the different blocks
 present and the number of nodes within them, a dataframe that provides the
 <code>propensity</code> of connection between two edges, and a distribution function
 who's main parameter the <code>propensity</code> value defines are needed.</p>
     </div>
 
     <pre class="usage"><span class='fu'>sim_sbm_network</span>(
-  <span class='no'>group_info</span>,
+  <span class='no'>block_info</span>,
   <span class='no'>connection_propensities</span>,
   <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='no'>rpois</span>,
   <span class='kw'>allow_self_connections</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
@@ -144,16 +144,16 @@ who's main parameter the <code>propensity</code> value defines are needed.</p>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>group_info</th>
-      <td><p>A dataframe/tibble with two columns: <code>group</code>: the id of the
-group, and <code>n_nodes</code>: the number of nodes to simulate from that group.</p></td>
+      <th>block_info</th>
+      <td><p>A dataframe/tibble with two columns: <code>block</code>: the id of the
+block, and <code>n_nodes</code>: the number of nodes to simulate from that block.</p></td>
     </tr>
     <tr>
       <th>connection_propensities</th>
-      <td><p>A dataframe with 3 columns: <code>group_1</code>: the id
-of the from group, <code>group_2</code>: the id of the to group, and <code>propensity</code>: the
+      <td><p>A dataframe with 3 columns: <code>block_1</code>: the id
+of the from block, <code>block_2</code>: the id of the to block, and <code>propensity</code>: the
 parameter for <code>edge_dist</code> that controls if and or how many edges should
-occur between the pair of groups on average.</p></td>
+occur between the pair of blocks on average.</p></td>
     </tr>
     <tr>
       <th>edge_dist</th>
@@ -163,7 +163,7 @@ number of samples to draw and the second the <code>propensity</code> value from
 takes two arguments: <code>n</code> and <code>lambda</code>. In this scenario the <code>propensity</code> of
 connections between two nodes is provided to <code>lambda</code> and thus is the
 average number of connections for each pair of nodes between two given
-groups.</p></td>
+blocks.</p></td>
     </tr>
     <tr>
       <th>allow_self_connections</th>
@@ -180,20 +180,20 @@ want to set this to <code>TRUE</code>.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list with a <code>nodes</code> dataframe (containing a node's <code>id</code> and <code>group</code>
+    <p>A list with a <code>nodes</code> dataframe (containing a node's <code>id</code> and <code>block</code>
 membership) and a <code>edges</code> dataframe (containing <code>from</code> and <code>to</code> nodes along
 with the total number of <code>connections</code> as drawn from <code>edge_dist</code>.)</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>group_info</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>tribble</a></span>(
-  ~<span class='no'>group</span>, ~<span class='no'>n_nodes</span>,
+    <pre class="examples"><div class='input'><span class='no'>block_info</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/dplyr/man/reexports.html'>tribble</a></span>(
+  ~<span class='no'>block</span>, ~<span class='no'>n_nodes</span>,
      <span class='st'>"a"</span>,       <span class='fl'>10</span>,
      <span class='st'>"b"</span>,       <span class='fl'>12</span>,
      <span class='st'>"c"</span>,       <span class='fl'>15</span>
 )
 
-<span class='no'>connection_propensities</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>tribble</a></span>(
- ~<span class='no'>group_1</span>, ~<span class='no'>group_2</span>, ~<span class='no'>propensity</span>,
+<span class='no'>connection_propensities</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/dplyr/man/reexports.html'>tribble</a></span>(
+ ~<span class='no'>block_1</span>, ~<span class='no'>block_2</span>, ~<span class='no'>propensity</span>,
       <span class='st'>"a"</span>,      <span class='st'>"a"</span>,         <span class='fl'>0.7</span>,
       <span class='st'>"a"</span>,      <span class='st'>"b"</span>,         <span class='fl'>0.2</span>,
       <span class='st'>"a"</span>,      <span class='st'>"c"</span>,         <span class='fl'>0.1</span>,
@@ -202,9 +202,9 @@ with the total number of <code>connections</code> as drawn from <code>edge_dist<
       <span class='st'>"c"</span>,      <span class='st'>"c"</span>,         <span class='fl'>0.4</span>,
 )
 
-<span class='fu'>sim_sbm_network</span>(<span class='no'>group_info</span>, <span class='no'>connection_propensities</span>, <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='no'><a href='https://purrr.tidyverse.org/reference/rbernoulli.html'>rbernoulli</a></span>)</div><div class='output co'>#&gt; $nodes
+<span class='fu'>sim_sbm_network</span>(<span class='no'>block_info</span>, <span class='no'>connection_propensities</span>, <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='no'><a href='https://rdrr.io/pkg/purrr/man/rbernoulli.html'>rbernoulli</a></span>)</div><div class='output co'>#&gt; $nodes
 #&gt; <span style='color: #555555;'># A tibble: 37 x 2</span><span>
-#&gt;    id    group
+#&gt;    id    block
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
 #&gt; </span><span style='color: #555555;'> 1</span><span> a_1   a    
 #&gt; </span><span style='color: #555555;'> 2</span><span> a_2   a    
@@ -219,20 +219,20 @@ with the total number of <code>connections</code> as drawn from <code>edge_dist<
 #&gt; </span><span style='color: #555555;'># … with 27 more rows</span><span>
 #&gt; 
 #&gt; $edges
-#&gt; </span><span style='color: #555555;'># A tibble: 259 x 3</span><span>
+#&gt; </span><span style='color: #555555;'># A tibble: 267 x 3</span><span>
 #&gt;    from  to    connections
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'> 1</span><span> a_1   a_2             1
 #&gt; </span><span style='color: #555555;'> 2</span><span> a_1   a_3             1
 #&gt; </span><span style='color: #555555;'> 3</span><span> a_1   a_4             1
-#&gt; </span><span style='color: #555555;'> 4</span><span> a_1   a_6             1
-#&gt; </span><span style='color: #555555;'> 5</span><span> a_1   a_7             1
-#&gt; </span><span style='color: #555555;'> 6</span><span> a_1   a_8             1
-#&gt; </span><span style='color: #555555;'> 7</span><span> a_1   a_10            1
-#&gt; </span><span style='color: #555555;'> 8</span><span> a_1   b_3             1
-#&gt; </span><span style='color: #555555;'> 9</span><span> a_1   b_10            1
-#&gt; </span><span style='color: #555555;'>10</span><span> a_2   a_4             1
-#&gt; </span><span style='color: #555555;'># … with 249 more rows</span><span>
+#&gt; </span><span style='color: #555555;'> 4</span><span> a_1   a_5             1
+#&gt; </span><span style='color: #555555;'> 5</span><span> a_1   a_6             1
+#&gt; </span><span style='color: #555555;'> 6</span><span> a_1   a_7             1
+#&gt; </span><span style='color: #555555;'> 7</span><span> a_1   a_8             1
+#&gt; </span><span style='color: #555555;'> 8</span><span> a_1   a_9             1
+#&gt; </span><span style='color: #555555;'> 9</span><span> a_1   a_10            1
+#&gt; </span><span style='color: #555555;'>10</span><span> a_1   b_4             1
+#&gt; </span><span style='color: #555555;'># … with 257 more rows</span><span>
 #&gt; </div><div class='input'>
 </div></span></pre>
   </div>

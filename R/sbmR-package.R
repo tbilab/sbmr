@@ -1,4 +1,4 @@
-#' sbmR
+#' Package reference
 #'
 #' Inference and visualization of network data using the Stochastic Block Model.
 #'
@@ -7,6 +7,7 @@
 #' @export SBM
 #' @importFrom Rcpp loadModule
 "_PACKAGE"
+
 
 Rcpp::loadModule("SBM", TRUE)
 
