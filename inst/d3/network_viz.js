@@ -1,4 +1,4 @@
-// !preview r2d3 data=sim_basic_block_network(3, 20), options = list(color_col = 'group', shape_col = 'type'), container = 'div'
+// !preview r2d3 data=sim_basic_block_network(3, 20), options = list(color_col = 'block', shape_col = 'type'), container = 'div'
 
 div.html('')
   .style('width', `${width}px`)
@@ -45,7 +45,7 @@ if(!nodes[0][shape_col]){
   nodes.forEach(function(node){node[shape_col] = shape_col});
 }
 
-// Color encodes the node's group
+// Color encodes the node's block
 const Color = d3.scaleOrdinal(d3.schemeCategory10, unique(nodes.map(d => d[color_col])));
 const color_node = node => Color(node[color_col]);
 

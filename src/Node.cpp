@@ -10,31 +10,31 @@ inline NodePtr Node::this_ptr()
 }
 
 // =============================================================================
-// Add connection to another node
+// Add edge to another node
 // =============================================================================
-inline void Node::add_connection(const NodePtr node)
+inline void Node::add_edge(const NodePtr node)
 {
   //PROFILE_FUNCTION();
 
-  // propigate new connection upwards to all parents
+  // propigate new edge upwards to all parents
   NodePtr current_node = this_ptr();
   while (current_node)
   {
-    (current_node->connections).push_back(node);
+    (current_node->edges).push_back(node);
     current_node->degree++;
     current_node = current_node->parent;
   }
 }
 
 // =============================================================================
-// Add or remove connections from nodes connection list
+// Add or remove edges from nodes edge list
 // =============================================================================
-void Node::update_connections_from_node(const NodePtr node, const bool remove)
+void Node::update_edges_from_node(const NodePtr node, const bool remove)
 {
   // PROFILE_FUNCTION();
 
   // Grab list of nodes from node being removed or added we are updating
-  auto connections_being_updated = node->connections;
+  auto edges_being_updated = node->edges;
 
   // Keep track of which node in the hierarchy is being updated. 
   // Starts with this node
@@ -43,37 +43,37 @@ void Node::update_connections_from_node(const NodePtr node, const bool remove)
   // While we still have a node to continue to in the hierarchy...
   while (node_being_updated)
   {
-    // Loop through all the connections that are being updated...
-    for (auto & connection_to_update : connections_being_updated)
+    // Loop through all the edges that are being updated...
+    for (auto & edge_to_update : edges_being_updated)
     {
-      // Grab reference to the current nodes connections list
-      std::list<NodePtr>& curr_connections = node_being_updated->connections;
+      // Grab reference to the current nodes edges list
+      std::list<NodePtr>& curr_edges = node_being_updated->edges;
 
       if (remove)
       {
-        // Scan through this nodes connections untill we find the first instance
+        // Scan through this nodes edges untill we find the first instance
         // of the connected node we want to remove
-        auto last_place = curr_connections.end();
-        for (auto con_it = curr_connections.begin();
+        auto last_place = curr_edges.end();
+        for (auto con_it = curr_edges.begin();
              con_it != last_place;
              con_it++)
         {
-          if (*con_it == connection_to_update)
+          if (*con_it == edge_to_update)
           {
-            curr_connections.erase(con_it);
+            curr_edges.erase(con_it);
             break;
           }
         }
       }
       else
       {
-        // Just add this connection to nodes connections
-        curr_connections.push_back(connection_to_update);
+        // Just add this edge to nodes edges
+        curr_edges.push_back(edge_to_update);
       }
     }
 
     // Update degree of current node
-    node_being_updated->degree = node_being_updated->connections.size();
+    node_being_updated->degree = node_being_updated->edges.size();
 
     // Update current node to nodes parent
     node_being_updated = node_being_updated->parent;
@@ -96,7 +96,7 @@ void Node::set_parent(NodePtr parent_node_ptr)
   if (parent)
   {
     // Remove this node's edges contribution from parent's
-    parent->update_connections_from_node(this_ptr(), true);
+    parent->update_edges_from_node(this_ptr(), true);
 
     // Remove self from previous children
     parent->remove_child(this_ptr());
@@ -106,7 +106,7 @@ void Node::set_parent(NodePtr parent_node_ptr)
   parent = parent_node_ptr;
 
   // Add this node's edges to parent's degree count
-  parent->update_connections_from_node(this_ptr(), false);
+  parent->update_edges_from_node(this_ptr(), false);
 
   // Add this node to new parent's children list
   parent_node_ptr->add_child(this_ptr());
@@ -170,46 +170,46 @@ inline NodePtr Node::get_parent_at_level(const int level_of_parent)
 // We return a vector because we need random access to elements in this array
 // and that isn't provided to us with the list format.
 // =============================================================================
-std::vector<NodePtr> Node::get_connections_to_level(const int desired_level)
+std::vector<NodePtr> Node::get_edges_to_level(const int desired_level)
 {
   //PROFILE_FUNCTION();
-  // Vector to return containing parents at desired level for connections
+  // Vector to return containing parents at desired level for edges
   std::vector<NodePtr> level_cons;
-  level_cons.reserve(connections.size());
+  level_cons.reserve(edges.size());
 
-  // Go through every child node's connections list, find parent at
+  // Go through every child node's edges list, find parent at
   // desired level and place in connected nodes vector
-  for (auto connection : connections)
+  for (auto edge : edges)
   {
-    level_cons.push_back(connection->get_parent_at_level(desired_level));
+    level_cons.push_back(edge->get_parent_at_level(desired_level));
   }
 
   return level_cons;
 }
 
 // =============================================================================
-// Collapse a nodes connection to a given level into a map of
+// Collapse a nodes edge to a given level into a map of
 // connected block id->count
 // =============================================================================
-std::map<NodePtr, int> Node::gather_connections_to_level(const int level)
+std::map<NodePtr, int> Node::gather_edges_to_level(const int level)
 {
   //PROFILE_FUNCTION();
-  // Gather all connections from the moved node to the level of the blocks we're
+  // Gather all edges from the moved node to the level of the blocks we're
   // working with
-  std::vector<NodePtr> all_connections = get_connections_to_level(level);
+  std::vector<NodePtr> all_edges = get_edges_to_level(level);
 
   // Setup an edge count map for node
-  std::map<NodePtr, int> connections_counts;
+  std::map<NodePtr, int> edges_counts;
 
   // Fill out edge count map
-  for (auto curr_connection = all_connections.begin();
-       curr_connection != all_connections.end();
-       ++curr_connection)
+  for (auto curr_edge = all_edges.begin();
+       curr_edge != all_edges.end();
+       ++curr_edge)
   {
-    connections_counts[*curr_connection]++;
+    edges_counts[*curr_edge]++;
   }
 
-  return connections_counts;
+  return edges_counts;
 }
 
 // =============================================================================
@@ -218,6 +218,6 @@ std::map<NodePtr, int> Node::gather_connections_to_level(const int level)
 void Node::connect_nodes(NodePtr node1_ptr, NodePtr node2_ptr)
 {
   //PROFILE_FUNCTION();
-  node1_ptr->add_connection(node2_ptr);
-  node2_ptr->add_connection(node1_ptr);
+  node1_ptr->add_edge(node2_ptr);
+  node2_ptr->add_edge(node1_ptr);
 }

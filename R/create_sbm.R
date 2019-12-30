@@ -140,7 +140,7 @@ create_sbm <- function(
   # Connect all the nodes if we have edges to do so
   if(!no_edges){
     for(i in 1:nrow(edges)){
-      sbm$add_connection(
+      sbm$add_edge(
         edges_from[i],
         edges_to[i]
       )

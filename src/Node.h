@@ -54,7 +54,7 @@ public:
   // Unique integer id for node
   string id;
   // Nodes that are connected to this node
-  std::list<NodePtr> connections;
+  std::list<NodePtr> edges;
   // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
   int level;
   // What node contains this node (aka its cluster)
@@ -63,7 +63,7 @@ public:
   ChildSet children;
   // What type of node is this?
   int type;
-  // How many connections/ edges does this node have?
+  // How many edges/ edges does this node have?
   int degree;
 
 
@@ -81,21 +81,21 @@ public:
   // Remove a child node
   void remove_child(NodePtr child);
 
-  // Add connection to another node
-  void add_connection(NodePtr node);
+  // Add edge to another node
+  void add_edge(NodePtr node);
 
-  // Add or remove connections from nodes connection list
-  void update_connections_from_node(NodePtr node, bool remove);
+  // Add or remove edges from nodes edge list
+  void update_edges_from_node(NodePtr node, bool remove);
  
   // Get parent of node at a given level
   NodePtr get_parent_at_level(int level);
 
   // Get all nodes connected to Node at a given level
-  std::vector<NodePtr> get_connections_to_level(int level);
+  std::vector<NodePtr> get_edges_to_level(int level);
 
-  // Get a map keyed by node with value of number of connections for all of
-  // a nodes connections to a level
-  std::map<NodePtr, int> gather_connections_to_level(int level);
+  // Get a map keyed by node with value of number of edges for all of
+  // a nodes edges to a level
+  std::map<NodePtr, int> gather_edges_to_level(int level);
 
   // Static method to connect two nodes to each other with edge
   static void connect_nodes(NodePtr node_a, NodePtr node_b);

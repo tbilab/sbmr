@@ -4,30 +4,30 @@
 #' between two nodes with a uniform common probability.
 #'
 #' @param n_nodes Total number of unique nodes to simulate
-#' @param prob_of_connection Probability of any given edges between two nodes
+#' @param prob_of_edge Probability of any given edges between two nodes
 #'   occuring
 #' @inheritParams sim_sbm_network
 #'
-#' @return An edge dataframe with node ids for connections in the `from` and
+#' @return An edge dataframe with node ids for edges in the `from` and
 #'   `to` columns
 #' @export
 #'
 #' @examples
-#' sim_random_network(n_nodes = 4, prob_of_connection = 0.9)
-sim_random_network <- function(n_nodes = 5, prob_of_connection = 0.7, allow_self_connections = FALSE){
+#' sim_random_network(n_nodes = 4, prob_of_edge = 0.9)
+sim_random_network <- function(n_nodes = 5, prob_of_edge = 0.7, allow_self_edges = FALSE){
 
   sim_sbm_network(
     block_info = dplyr::tibble(
       block = "node",
       n_nodes = n_nodes
     ),
-    connection_propensities = dplyr::tibble(
+    edge_propensities = dplyr::tibble(
       block_1 = "node",
       block_2 = "node",
-      propensity = prob_of_connection
+      propensity = prob_of_edge
     ),
     edge_dist = purrr::rbernoulli,
-    allow_self_connections = allow_self_connections
+    allow_self_edges = allow_self_edges
   )$edges %>%
-    dplyr::select(-connections)
+    dplyr::select(-edges)
 }

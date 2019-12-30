@@ -2,13 +2,12 @@ destination: docs
 reference:
 - title: Model Setup
   contents:
-  - create_sbm
-  - copy_sbm
+  - ends_with('sbm')
 - title: Network
   desc: Functions for manipulating underlying network structure of SBM model
   contents:
   - add_node
-  - add_connection
+  - add_edge
   - set_node_parent
   - initialize_blocks
   - get_state

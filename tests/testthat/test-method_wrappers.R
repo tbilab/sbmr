@@ -51,7 +51,7 @@ test_that("Assignment and mutation keep pointing to same object", {
 
 test_that("Add Node", {
   # Start with network with 5 nodes.
-  my_sbm <- create_sbm(edges = sim_random_network(n_nodes = 5, prob_of_connection = 1))
+  my_sbm <- create_sbm(edges = sim_random_network(n_nodes = 5, prob_of_edge = 1))
   expect_equal(my_sbm %>% get_state() %>% nrow(), 5)
 
   # Add a node using piped in place testing
@@ -72,7 +72,7 @@ test_that("Add Node", {
 })
 
 
-test_that("Add connection", {
+test_that("Add edge", {
   # Start with network with couple nodes
   my_sbm <- create_sbm() %>%
     add_node('node_1') %>%
@@ -80,12 +80,12 @@ test_that("Add connection", {
 
   expect_equal(my_sbm %>% get_state() %>% nrow(), 2)
 
-  # Add connection between those two nodes
-  my_sbm %>% add_connection('node_1', 'node_2')
+  # Add edge between those two nodes
+  my_sbm %>% add_edge('node_1', 'node_2')
 
   # This should thrown a nice helpful error message, but it doesn't.
   expect_error(
-    add_connection(my_sbm, 'node_4', 'node_2'),
+    add_edge(my_sbm, 'node_4', 'node_2'),
     "Can't find node node_4 at level 0",
     fixed = TRUE
   )
@@ -219,13 +219,13 @@ test_that("computing entropy", {
     add_node('node_11', level = 1) %>%
     add_node('node_12', level = 1) %>%
     add_node('node_13', level = 1) %>%
-    add_connection('node_1', 'node_2') %>%
-    add_connection('node_1', 'node_3') %>%
-    add_connection('node_1', 'node_4') %>%
-    add_connection('node_2', 'node_3') %>%
-    add_connection('node_2', 'node_4') %>%
-    add_connection('node_3', 'node_4') %>%
-    add_connection('node_4', 'node_1') %>%
+    add_edge('node_1', 'node_2') %>%
+    add_edge('node_1', 'node_3') %>%
+    add_edge('node_1', 'node_4') %>%
+    add_edge('node_2', 'node_3') %>%
+    add_edge('node_2', 'node_4') %>%
+    add_edge('node_3', 'node_4') %>%
+    add_edge('node_4', 'node_1') %>%
     set_node_parent(child_id = 'node_1', parent_id = 'node_11') %>%
     set_node_parent(child_id = 'node_2', parent_id = 'node_11') %>%
     set_node_parent(child_id = 'node_3', parent_id = 'node_12') %>%

@@ -10,9 +10,9 @@ sim_basic_block_network(
   propensity_drawer = function(n) {     sample(seq(rbeta(1, 1, 5), rbeta(1, 5, 1),
     length.out = n)) },
   edge_dist = purrr::rbernoulli,
-  allow_self_connections = FALSE,
-  keep_connection_counts = FALSE,
-  return_connection_propensities = FALSE
+  allow_self_edges = FALSE,
+  keep_edge_counts = FALSE,
+  return_edge_propensities = FALSE
 )
 }
 \arguments{
@@ -21,43 +21,43 @@ sim_basic_block_network(
 \item{n_nodes_per_block}{How many nodes in each block}
 
 \item{propensity_drawer}{Function that takes a single size argumenet and
-returns a vector of connection propensities of specified size. Default
+returns a vector of edge propensities of specified size. Default
 draws propensity from \code{n} evenly spaced values in the 0-1 range.}
 
 \item{edge_dist}{A distribution function that has two inputs: the first is
 number of samples to draw and the second the \code{propensity} value from
-\code{connection_propensities}. For instance, the default value is \code{rpois} which
+\code{edge_propensities}. For instance, the default value is \code{rpois} which
 takes two arguments: \code{n} and \code{lambda}. In this scenario the \code{propensity} of
-connections between two nodes is provided to \code{lambda} and thus is the
-average number of connections for each pair of nodes between two given
+edges between two nodes is provided to \code{lambda} and thus is the
+average number of edges for each pair of nodes between two given
 blocks.}
 
-\item{allow_self_connections}{Should nodes be allowed to have connections to
+\item{allow_self_edges}{Should nodes be allowed to have edges to
 themselves?}
 
-\item{keep_connection_counts}{Should the connection counts stay on returned
+\item{keep_edge_counts}{Should the edge counts stay on returned
 edges? If edges distribution is a binary yes or no then you will likely
 want to set this to \code{TRUE}.}
 
-\item{return_connection_propensities}{If set to \code{TRUE} the returned list will
-also include the simulated connection propensities dataframe. This can be
+\item{return_edge_propensities}{If set to \code{TRUE} the returned list will
+also include the simulated edge propensities dataframe. This can be
 used for recreating draws using \code{\link{sim_sbm_network()}}.}
 }
 \value{
 A list with a \code{nodes} dataframe (containing a node's \code{id} and \code{block}
 membership), an \code{edges} dataframe (containing \code{from} and \code{to} nodes along
-with the total number of \code{connections} as drawn from \code{edge_dist}), and if
-\code{return_connection_propensities == TRUE}: \code{connection_propensities}
-dataframe that shows the randomly drawn connection propensities between
+with the total number of \code{edges} as drawn from \code{edge_dist}), and if
+\code{return_edge_propensities == TRUE}: \code{edge_propensities}
+dataframe that shows the randomly drawn edge propensities between
 blocks.
 }
 \description{
 Simulates a simple block structured network with a desired number of constant
-sized blocks. The probability of connections between given blocks will be
+sized blocks. The probability of edges between given blocks will be
 drawn from a passed function that must return a numeric value that will be
 used as the propensity parameter for drawing edge counts from a node pair.
 The default values will draw propensity values for bernouli edges with an
-average of a 50\% chance of connection.
+average of a 50\% chance of edge.
 }
 \examples{
 sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 10)

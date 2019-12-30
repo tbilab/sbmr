@@ -187,9 +187,9 @@ std::vector<NodePtr> Network::get_nodes_not_of_type_at_level(const int type, con
 
 
 // =============================================================================
-// Adds a connection between two nodes based on their ids
+// Adds a edge between two nodes based on their ids
 // =============================================================================
-void Network::add_connection(const string node1_id, const string node2_id) 
+void Network::add_edge(const string node1_id, const string node2_id) 
 {
   PROFILE_FUNCTION();
   
@@ -202,9 +202,9 @@ void Network::add_connection(const string node1_id, const string node2_id)
 
 
 // =============================================================================
-// Adds a connection between two nodes based on their references
+// Adds a edge between two nodes based on their references
 // =============================================================================
-void Network::add_connection(const NodePtr node1, const NodePtr node2) 
+void Network::add_edge(const NodePtr node1, const NodePtr node2) 
 {
   PROFILE_FUNCTION();
   Node::connect_nodes(

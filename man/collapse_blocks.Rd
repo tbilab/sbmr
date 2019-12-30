@@ -48,7 +48,7 @@ merging and mcmc sweeps. If value is set to value other than null the SBMs
 current epsilon value will be overridden.}
 
 \item{greedy}{Should every possible block merger be considered? If \code{FALSE},
-candidates for mergers are drawn by similarity in connections (just as MCMC
+candidates for mergers are drawn by similarity in edges (just as MCMC
 move proposals are). This may lead the model to local minimums by always
 pursuing best possible merges.}
 

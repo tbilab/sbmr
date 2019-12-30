@@ -29,9 +29,9 @@ my_sbm <- create_sbm() \%>\%
   add_node('node_3') \%>\%
   add_node('node_11', level = 1) \%>\%
   add_node('node_12', level = 1) \%>\%
-  add_connection('node_1', 'node_2') \%>\%
-  add_connection('node_1', 'node_3') \%>\%
-  add_connection('node_2', 'node_3') \%>\%
+  add_edge('node_1', 'node_2') \%>\%
+  add_edge('node_1', 'node_3') \%>\%
+  add_edge('node_2', 'node_3') \%>\%
   set_node_parent(child_id = 'node_1', parent_id = 'node_11') \%>\%
   set_node_parent(child_id = 'node_2', parent_id = 'node_11') \%>\%
   set_node_parent(child_id = 'node_3', parent_id = 'node_12')

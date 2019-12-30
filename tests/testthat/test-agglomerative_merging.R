@@ -6,7 +6,7 @@ test_that("Agglomerative merging with MCMC works", {
 
   simulated_network <- sim_basic_block_network(n_blocks = n_blocks,
                                                n_nodes_per_block = n_nodes_per_block,
-                                               return_connection_propensities = TRUE)
+                                               return_edge_propensities = TRUE)
 
   # Start with a random network
   my_sbm <- create_sbm(simulated_network)
@@ -28,7 +28,7 @@ test_that("Agglomerative merging without MCMC works", {
 
   simulated_network <- sim_basic_block_network(n_blocks = n_blocks,
                                                n_nodes_per_block = n_nodes_per_block,
-                                               return_connection_propensities = TRUE)
+                                               return_edge_propensities = TRUE)
 
   # Start with a random network
   my_sbm <- create_sbm(simulated_network)

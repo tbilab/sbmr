@@ -37,11 +37,11 @@
 
 <meta property="og:title" content="Simulate stochastic block model of given number of blocks — sim_basic_block_network" />
 <meta property="og:description" content="Simulates a simple block structured network with a desired number of constant
-sized blocks. The probability of connections between given blocks will be
+sized blocks. The probability of edges between given blocks will be
 drawn from a passed function that must return a numeric value that will be
 used as the propensity parameter for drawing edge counts from a node pair.
 The default values will draw propensity values for bernouli edges with an
-average of a 50% chance of connection." />
+average of a 50% chance of edge." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -127,11 +127,11 @@ average of a 50% chance of connection." />
 
     <div class="ref-description">
     <p>Simulates a simple block structured network with a desired number of constant
-sized blocks. The probability of connections between given blocks will be
+sized blocks. The probability of edges between given blocks will be
 drawn from a passed function that must return a numeric value that will be
 used as the propensity parameter for drawing edge counts from a node pair.
 The default values will draw propensity values for bernouli edges with an
-average of a 50% chance of connection.</p>
+average of a 50% chance of edge.</p>
     </div>
 
     <pre class="usage"><span class='fu'>sim_basic_block_network</span>(
@@ -140,9 +140,9 @@ average of a 50% chance of connection.</p>
   <span class='kw'>propensity_drawer</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>n</span>) {     <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span>(<span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>5</span>), <span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span>(<span class='fl'>1</span>, <span class='fl'>5</span>, <span class='fl'>1</span>),
     <span class='kw'>length.out</span> <span class='kw'>=</span> <span class='no'>n</span>)) },
   <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='no'><a href='https://rdrr.io/pkg/purrr/man/rbernoulli.html'>rbernoulli</a></span>,
-  <span class='kw'>allow_self_connections</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>keep_connection_counts</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>return_connection_propensities</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>allow_self_edges</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>keep_edge_counts</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>return_edge_propensities</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -159,34 +159,34 @@ average of a 50% chance of connection.</p>
     <tr>
       <th>propensity_drawer</th>
       <td><p>Function that takes a single size argumenet and
-returns a vector of connection propensities of specified size. Default
+returns a vector of edge propensities of specified size. Default
 draws propensity from <code>n</code> evenly spaced values in the 0-1 range.</p></td>
     </tr>
     <tr>
       <th>edge_dist</th>
       <td><p>A distribution function that has two inputs: the first is
 number of samples to draw and the second the <code>propensity</code> value from
-<code>connection_propensities</code>. For instance, the default value is <code>rpois</code> which
+<code>edge_propensities</code>. For instance, the default value is <code>rpois</code> which
 takes two arguments: <code>n</code> and <code>lambda</code>. In this scenario the <code>propensity</code> of
-connections between two nodes is provided to <code>lambda</code> and thus is the
-average number of connections for each pair of nodes between two given
+edges between two nodes is provided to <code>lambda</code> and thus is the
+average number of edges for each pair of nodes between two given
 blocks.</p></td>
     </tr>
     <tr>
-      <th>allow_self_connections</th>
-      <td><p>Should nodes be allowed to have connections to
+      <th>allow_self_edges</th>
+      <td><p>Should nodes be allowed to have edges to
 themselves?</p></td>
     </tr>
     <tr>
-      <th>keep_connection_counts</th>
-      <td><p>Should the connection counts stay on returned
+      <th>keep_edge_counts</th>
+      <td><p>Should the edge counts stay on returned
 edges? If edges distribution is a binary yes or no then you will likely
 want to set this to <code>TRUE</code>.</p></td>
     </tr>
     <tr>
-      <th>return_connection_propensities</th>
+      <th>return_edge_propensities</th>
       <td><p>If set to <code>TRUE</code> the returned list will
-also include the simulated connection propensities dataframe. This can be
+also include the simulated edge propensities dataframe. This can be
 used for recreating draws using <code><a href='sim_sbm_network.html'>sim_sbm_network()</a></code>.</p></td>
     </tr>
     </table>
@@ -195,9 +195,9 @@ used for recreating draws using <code><a href='sim_sbm_network.html'>sim_sbm_net
 
     <p>A list with a <code>nodes</code> dataframe (containing a node's <code>id</code> and <code>block</code>
 membership), an <code>edges</code> dataframe (containing <code>from</code> and <code>to</code> nodes along
-with the total number of <code>connections</code> as drawn from <code>edge_dist</code>), and if
-<code>return_connection_propensities == TRUE</code>: <code>connection_propensities</code>
-dataframe that shows the randomly drawn connection propensities between
+with the total number of <code>edges</code> as drawn from <code>edge_dist</code>), and if
+<code>return_edge_propensities == TRUE</code>: <code>edge_propensities</code>
+dataframe that shows the randomly drawn edge propensities between
 blocks.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
@@ -221,20 +221,20 @@ blocks.</p>
 #&gt; </span><span style='color: #555555;'># … with 30 more rows</span><span>
 #&gt; 
 #&gt; $edges
-#&gt; </span><span style='color: #555555;'># A tibble: 501 x 2</span><span>
+#&gt; </span><span style='color: #555555;'># A tibble: 355 x 2</span><span>
 #&gt;    from  to   
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> g1_1  g1_5 
-#&gt; </span><span style='color: #555555;'> 2</span><span> g1_1  g1_6 
+#&gt; </span><span style='color: #555555;'> 1</span><span> g1_1  g1_2 
+#&gt; </span><span style='color: #555555;'> 2</span><span> g1_1  g1_4 
 #&gt; </span><span style='color: #555555;'> 3</span><span> g1_1  g1_7 
 #&gt; </span><span style='color: #555555;'> 4</span><span> g1_1  g1_8 
 #&gt; </span><span style='color: #555555;'> 5</span><span> g1_1  g1_9 
-#&gt; </span><span style='color: #555555;'> 6</span><span> g1_1  g2_1 
-#&gt; </span><span style='color: #555555;'> 7</span><span> g1_1  g2_2 
-#&gt; </span><span style='color: #555555;'> 8</span><span> g1_1  g2_3 
-#&gt; </span><span style='color: #555555;'> 9</span><span> g1_1  g2_5 
-#&gt; </span><span style='color: #555555;'>10</span><span> g1_1  g2_7 
-#&gt; </span><span style='color: #555555;'># … with 491 more rows</span><span>
+#&gt; </span><span style='color: #555555;'> 6</span><span> g1_1  g1_10
+#&gt; </span><span style='color: #555555;'> 7</span><span> g1_1  g2_4 
+#&gt; </span><span style='color: #555555;'> 8</span><span> g1_1  g2_6 
+#&gt; </span><span style='color: #555555;'> 9</span><span> g1_1  g3_2 
+#&gt; </span><span style='color: #555555;'>10</span><span> g1_1  g3_3 
+#&gt; </span><span style='color: #555555;'># … with 345 more rows</span><span>
 #&gt; </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

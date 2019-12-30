@@ -27,11 +27,11 @@ int main(int argc, char **argv)
   NodePtr b12 = my_SBM.add_node("b12", 1, 1);
 
 
-  my_SBM.add_connection(a1, b1);
-  my_SBM.add_connection(a1, b2);
-  my_SBM.add_connection(a1, b3);
-  my_SBM.add_connection(a2, b3);
-  my_SBM.add_connection(a3, b2);
+  my_SBM.add_edge(a1, b1);
+  my_SBM.add_edge(a1, b2);
+  my_SBM.add_edge(a1, b3);
+  my_SBM.add_edge(a2, b3);
+  my_SBM.add_edge(a3, b2);
 
 
   a2->set_parent(a11);

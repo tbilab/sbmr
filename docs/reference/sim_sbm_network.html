@@ -36,10 +36,10 @@
 
 
 <meta property="og:title" content="Simulate network using stochastic block model — sim_sbm_network" />
-<meta property="og:description" content="Simulates nodes and edges from a network where edge connections are derived
+<meta property="og:description" content="Simulates nodes and edges from a network where edge edges are derived
 from the Stochastic Block Model. A dataframe describing the different blocks
 present and the number of nodes within them, a dataframe that provides the
-propensity of connection between two edges, and a distribution function
+propensity of edge between two edges, and a distribution function
 who's main parameter the propensity value defines are needed." />
 <meta name="twitter:card" content="summary" />
 
@@ -125,19 +125,19 @@ who's main parameter the propensity value defines are needed." />
     </div>
 
     <div class="ref-description">
-    <p>Simulates nodes and edges from a network where edge connections are derived
+    <p>Simulates nodes and edges from a network where edge edges are derived
 from the Stochastic Block Model. A dataframe describing the different blocks
 present and the number of nodes within them, a dataframe that provides the
-<code>propensity</code> of connection between two edges, and a distribution function
+<code>propensity</code> of edge between two edges, and a distribution function
 who's main parameter the <code>propensity</code> value defines are needed.</p>
     </div>
 
     <pre class="usage"><span class='fu'>sim_sbm_network</span>(
   <span class='no'>block_info</span>,
-  <span class='no'>connection_propensities</span>,
+  <span class='no'>edge_propensities</span>,
   <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='no'>rpois</span>,
-  <span class='kw'>allow_self_connections</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>keep_connection_counts</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+  <span class='kw'>allow_self_edges</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>keep_edge_counts</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -149,7 +149,7 @@ who's main parameter the <code>propensity</code> value defines are needed.</p>
 block, and <code>n_nodes</code>: the number of nodes to simulate from that block.</p></td>
     </tr>
     <tr>
-      <th>connection_propensities</th>
+      <th>edge_propensities</th>
       <td><p>A dataframe with 3 columns: <code>block_1</code>: the id
 of the from block, <code>block_2</code>: the id of the to block, and <code>propensity</code>: the
 parameter for <code>edge_dist</code> that controls if and or how many edges should
@@ -159,20 +159,20 @@ occur between the pair of blocks on average.</p></td>
       <th>edge_dist</th>
       <td><p>A distribution function that has two inputs: the first is
 number of samples to draw and the second the <code>propensity</code> value from
-<code>connection_propensities</code>. For instance, the default value is <code>rpois</code> which
+<code>edge_propensities</code>. For instance, the default value is <code>rpois</code> which
 takes two arguments: <code>n</code> and <code>lambda</code>. In this scenario the <code>propensity</code> of
-connections between two nodes is provided to <code>lambda</code> and thus is the
-average number of connections for each pair of nodes between two given
+edges between two nodes is provided to <code>lambda</code> and thus is the
+average number of edges for each pair of nodes between two given
 blocks.</p></td>
     </tr>
     <tr>
-      <th>allow_self_connections</th>
-      <td><p>Should nodes be allowed to have connections to
+      <th>allow_self_edges</th>
+      <td><p>Should nodes be allowed to have edges to
 themselves?</p></td>
     </tr>
     <tr>
-      <th>keep_connection_counts</th>
-      <td><p>Should the connection counts stay on returned
+      <th>keep_edge_counts</th>
+      <td><p>Should the edge counts stay on returned
 edges? If edges distribution is a binary yes or no then you will likely
 want to set this to <code>TRUE</code>.</p></td>
     </tr>
@@ -182,7 +182,7 @@ want to set this to <code>TRUE</code>.</p></td>
 
     <p>A list with a <code>nodes</code> dataframe (containing a node's <code>id</code> and <code>block</code>
 membership) and a <code>edges</code> dataframe (containing <code>from</code> and <code>to</code> nodes along
-with the total number of <code>connections</code> as drawn from <code>edge_dist</code>.)</p>
+with the total number of <code>edges</code> as drawn from <code>edge_dist</code>.)</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>block_info</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/dplyr/man/reexports.html'>tribble</a></span>(
@@ -192,7 +192,7 @@ with the total number of <code>connections</code> as drawn from <code>edge_dist<
      <span class='st'>"c"</span>,       <span class='fl'>15</span>
 )
 
-<span class='no'>connection_propensities</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/dplyr/man/reexports.html'>tribble</a></span>(
+<span class='no'>edge_propensities</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/dplyr/man/reexports.html'>tribble</a></span>(
  ~<span class='no'>block_1</span>, ~<span class='no'>block_2</span>, ~<span class='no'>propensity</span>,
       <span class='st'>"a"</span>,      <span class='st'>"a"</span>,         <span class='fl'>0.7</span>,
       <span class='st'>"a"</span>,      <span class='st'>"b"</span>,         <span class='fl'>0.2</span>,
@@ -202,7 +202,7 @@ with the total number of <code>connections</code> as drawn from <code>edge_dist<
       <span class='st'>"c"</span>,      <span class='st'>"c"</span>,         <span class='fl'>0.4</span>,
 )
 
-<span class='fu'>sim_sbm_network</span>(<span class='no'>block_info</span>, <span class='no'>connection_propensities</span>, <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='no'><a href='https://rdrr.io/pkg/purrr/man/rbernoulli.html'>rbernoulli</a></span>)</div><div class='output co'>#&gt; $nodes
+<span class='fu'>sim_sbm_network</span>(<span class='no'>block_info</span>, <span class='no'>edge_propensities</span>, <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='no'><a href='https://rdrr.io/pkg/purrr/man/rbernoulli.html'>rbernoulli</a></span>)</div><div class='output co'>#&gt; $nodes
 #&gt; <span style='color: #555555;'># A tibble: 37 x 2</span><span>
 #&gt;    id    block
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
@@ -219,20 +219,20 @@ with the total number of <code>connections</code> as drawn from <code>edge_dist<
 #&gt; </span><span style='color: #555555;'># … with 27 more rows</span><span>
 #&gt; 
 #&gt; $edges
-#&gt; </span><span style='color: #555555;'># A tibble: 267 x 3</span><span>
-#&gt;    from  to    connections
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> a_1   a_2             1
-#&gt; </span><span style='color: #555555;'> 2</span><span> a_1   a_3             1
-#&gt; </span><span style='color: #555555;'> 3</span><span> a_1   a_4             1
-#&gt; </span><span style='color: #555555;'> 4</span><span> a_1   a_5             1
-#&gt; </span><span style='color: #555555;'> 5</span><span> a_1   a_6             1
-#&gt; </span><span style='color: #555555;'> 6</span><span> a_1   a_7             1
-#&gt; </span><span style='color: #555555;'> 7</span><span> a_1   a_8             1
-#&gt; </span><span style='color: #555555;'> 8</span><span> a_1   a_9             1
-#&gt; </span><span style='color: #555555;'> 9</span><span> a_1   a_10            1
-#&gt; </span><span style='color: #555555;'>10</span><span> a_1   b_4             1
-#&gt; </span><span style='color: #555555;'># … with 257 more rows</span><span>
+#&gt; </span><span style='color: #555555;'># A tibble: 245 x 3</span><span>
+#&gt;    from  to    edges
+#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 1</span><span> a_1   a_2       1
+#&gt; </span><span style='color: #555555;'> 2</span><span> a_1   a_4       1
+#&gt; </span><span style='color: #555555;'> 3</span><span> a_1   a_5       1
+#&gt; </span><span style='color: #555555;'> 4</span><span> a_1   a_6       1
+#&gt; </span><span style='color: #555555;'> 5</span><span> a_1   a_7       1
+#&gt; </span><span style='color: #555555;'> 6</span><span> a_1   a_8       1
+#&gt; </span><span style='color: #555555;'> 7</span><span> a_1   a_10      1
+#&gt; </span><span style='color: #555555;'> 8</span><span> a_1   c_12      1
+#&gt; </span><span style='color: #555555;'> 9</span><span> a_2   a_4       1
+#&gt; </span><span style='color: #555555;'>10</span><span> a_2   a_6       1
+#&gt; </span><span style='color: #555555;'># … with 235 more rows</span><span>
 #&gt; </div><div class='input'>
 </div></span></pre>
   </div>

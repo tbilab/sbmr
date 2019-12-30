@@ -89,11 +89,11 @@ public:
   // Return all nodes not of a specified type from level
   std::vector<NodePtr> get_nodes_not_of_type_at_level(int type, int level);
 
-  // Adds a connection between two nodes based on their references
-  void add_connection(NodePtr node_a, NodePtr node_b);
+  // Adds a edge between two nodes based on their references
+  void add_edge(NodePtr node_a, NodePtr node_b);
 
-  // Adds a connection between two nodes based on their ids
-  void add_connection(string id_a, string id_b);
+  // Adds a edge between two nodes based on their ids
+  void add_edge(string id_a, string id_b);
 
   // Builds and assigns a block node for every node in a given level
   void give_every_node_at_level_own_block(int level);

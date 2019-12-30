@@ -2,7 +2,7 @@
 
 export("%>%")
 export(SBM)
-export(add_connection)
+export(add_edge)
 export(add_node)
 export(build_score_fn)
 export(choose_best_collapse_state)

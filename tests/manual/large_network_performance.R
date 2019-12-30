@@ -12,11 +12,11 @@ network <- sim_basic_block_network(
   n_blocks = num_blocks,
   n_nodes_per_block = num_block_members,
   propensity_drawer = function(n) rbeta(n, shape1 = 0.3, shape2 = 0.85),
-  return_connection_propensities = TRUE)
+  return_edge_propensities = TRUE)
 
 network$edges %>% nrow()
 
-network$connection_propensities %>%
+network$edge_propensities %>%
   mutate(
     block_1 = factor(block_1, levels = paste0('g', 1:num_blocks)),
     block_2 = factor(block_2, levels = paste0('g', 1:num_blocks)),

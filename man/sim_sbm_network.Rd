@@ -6,46 +6,46 @@
 \usage{
 sim_sbm_network(
   block_info,
-  connection_propensities,
+  edge_propensities,
   edge_dist = rpois,
-  allow_self_connections = FALSE,
-  keep_connection_counts = TRUE
+  allow_self_edges = FALSE,
+  keep_edge_counts = TRUE
 )
 }
 \arguments{
 \item{block_info}{A dataframe/tibble with two columns: \code{block}: the id of the
 block, and \code{n_nodes}: the number of nodes to simulate from that block.}
 
-\item{connection_propensities}{A dataframe with 3 columns: \code{block_1}: the id
+\item{edge_propensities}{A dataframe with 3 columns: \code{block_1}: the id
 of the from block, \code{block_2}: the id of the to block, and \code{propensity}: the
 parameter for \code{edge_dist} that controls if and or how many edges should
 occur between the pair of blocks on average.}
 
 \item{edge_dist}{A distribution function that has two inputs: the first is
 number of samples to draw and the second the \code{propensity} value from
-\code{connection_propensities}. For instance, the default value is \code{rpois} which
+\code{edge_propensities}. For instance, the default value is \code{rpois} which
 takes two arguments: \code{n} and \code{lambda}. In this scenario the \code{propensity} of
-connections between two nodes is provided to \code{lambda} and thus is the
-average number of connections for each pair of nodes between two given
+edges between two nodes is provided to \code{lambda} and thus is the
+average number of edges for each pair of nodes between two given
 blocks.}
 
-\item{allow_self_connections}{Should nodes be allowed to have connections to
+\item{allow_self_edges}{Should nodes be allowed to have edges to
 themselves?}
 
-\item{keep_connection_counts}{Should the connection counts stay on returned
+\item{keep_edge_counts}{Should the edge counts stay on returned
 edges? If edges distribution is a binary yes or no then you will likely
 want to set this to \code{TRUE}.}
 }
 \value{
 A list with a \code{nodes} dataframe (containing a node's \code{id} and \code{block}
 membership) and a \code{edges} dataframe (containing \code{from} and \code{to} nodes along
-with the total number of \code{connections} as drawn from \code{edge_dist}.)
+with the total number of \code{edges} as drawn from \code{edge_dist}.)
 }
 \description{
-Simulates nodes and edges from a network where edge connections are derived
+Simulates nodes and edges from a network where edge edges are derived
 from the Stochastic Block Model. A dataframe describing the different blocks
 present and the number of nodes within them, a dataframe that provides the
-\code{propensity} of connection between two edges, and a distribution function
+\code{propensity} of edge between two edges, and a distribution function
 who's main parameter the \code{propensity} value defines are needed.
 }
 \examples{
@@ -56,7 +56,7 @@ block_info <- dplyr::tribble(
      "c",       15
 )
 
-connection_propensities <- dplyr::tribble(
+edge_propensities <- dplyr::tribble(
  ~block_1, ~block_2, ~propensity,
       "a",      "a",         0.7,
       "a",      "b",         0.2,
@@ -66,6 +66,6 @@ connection_propensities <- dplyr::tribble(
       "c",      "c",         0.4,
 )
 
-sim_sbm_network(block_info, connection_propensities, edge_dist = purrr::rbernoulli)
+sim_sbm_network(block_info, edge_propensities, edge_dist = purrr::rbernoulli)
 
 }

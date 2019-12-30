@@ -4,23 +4,19 @@
 \alias{sim_random_network}
 \title{Simulate completely random network}
 \usage{
-sim_random_network(
-  n_nodes = 5,
-  prob_of_connection = 0.7,
-  allow_self_connections = FALSE
-)
+sim_random_network(n_nodes = 5, prob_of_edge = 0.7, allow_self_edges = FALSE)
 }
 \arguments{
 \item{n_nodes}{Total number of unique nodes to simulate}
 
-\item{prob_of_connection}{Probability of any given edges between two nodes
+\item{prob_of_edge}{Probability of any given edges between two nodes
 occuring}
 
-\item{allow_self_connections}{Should nodes be allowed to have connections to
+\item{allow_self_edges}{Should nodes be allowed to have edges to
 themselves?}
 }
 \value{
-An edge dataframe with node ids for connections in the \code{from} and
+An edge dataframe with node ids for edges in the \code{from} and
 \code{to} columns
 }
 \description{
@@ -28,5 +24,5 @@ Generate an edge dataframe from an \href{https://en.wikipedia.org/wiki/Erd\%C5\%
 between two nodes with a uniform common probability.
 }
 \examples{
-sim_random_network(n_nodes = 4, prob_of_connection = 0.9)
+sim_random_network(n_nodes = 4, prob_of_edge = 0.9)
 }

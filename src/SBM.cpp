@@ -16,10 +16,10 @@ NodePtr SBM::propose_move(const NodePtr node)
 
   // Sample a random neighbor of the current node
   NodePtr rand_neighbor = sampler.sample(
-    node->get_connections_to_level(node->level)
+    node->get_edges_to_level(node->level)
   );
 
-  // Get number total number connections for neighbor's block
+  // Get number total number edges for neighbor's block
   int neighbor_block_degree = rand_neighbor->parent->degree;
 
   // Decide if we are going to choose a random block for our node
@@ -29,7 +29,7 @@ NodePtr SBM::propose_move(const NodePtr node)
   // Decide where we will get new block from and draw from potential candidates
   return sampler.draw_unif() < prob_of_random_block ?
     sampler.sample(potential_blocks):
-    sampler.sample(rand_neighbor->get_connections_to_level(block_level));
+    sampler.sample(rand_neighbor->get_edges_to_level(block_level));
 }
 
 
@@ -92,13 +92,13 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   double entropy_pre = 0;
   double entropy_post = 0;
 
-  // Gather connection maps for the node and its moved blocks as these will have
+  // Gather edge maps for the node and its moved blocks as these will have
   // changes in their entropy contribution
-  std::map<NodePtr, int> node_edges = node->gather_connections_to_level(block_level);
+  std::map<NodePtr, int> node_edges = node->gather_edges_to_level(block_level);
 
-  std::map<NodePtr, int> new_block_edges = new_block->gather_connections_to_level(block_level);
+  std::map<NodePtr, int> new_block_edges = new_block->gather_edges_to_level(block_level);
 
-  std::map<NodePtr, int> old_block_edges = old_block->gather_connections_to_level(block_level);
+  std::map<NodePtr, int> old_block_edges = old_block->gather_edges_to_level(block_level);
 
   for (auto con_block_it = old_block_edges.begin();
        con_block_it != old_block_edges.end();
@@ -130,7 +130,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   double pre_move_prob = 0.0;
   double post_move_prob = 0.0;
 
-  // Loop over all the node's connections to neighbor blocks
+  // Loop over all the node's edges to neighbor blocks
   for (auto con_block_it = node_edges.begin();
        con_block_it != node_edges.end();
        con_block_it++)
@@ -278,7 +278,7 @@ double SBM::compute_entropy(const int level)
 
   //============================================================================
   // Last, we calculate the summation of e_rs*ln(e_rs/e_r*e_s)/2 where e_rs is
-  // number of connections between blocks r and s and e_r is the total number of
+  // number of edges between blocks r and s and e_r is the total number of
   // edges for block r.
 
   // Grab all block nodes
@@ -292,15 +292,15 @@ double SBM::compute_entropy(const int level)
        block_r_it++)
   {
     NodePtr block_r = block_r_it->second;
-    // Gather all of block r's connections to our level
-    auto block_r_edge_counts = block_r->gather_connections_to_level(level + 1);
+    // Gather all of block r's edges to our level
+    auto block_r_edge_counts = block_r->gather_edges_to_level(level + 1);
 
     // Now loop over all the nodes connected to block r
     for (auto block_s_it = block_r_edge_counts.begin();
          block_s_it != block_r_edge_counts.end();
          block_s_it++)
     {
-      // Grab total number of connections between r and s
+      // Grab total number of edges between r and s
       double e_rs = block_s_it->second;
 
       // Compute this iteration's controbution to sum

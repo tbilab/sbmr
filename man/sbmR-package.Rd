@@ -4,7 +4,7 @@
 \name{sbmR-package}
 \alias{sbmR}
 \alias{sbmR-package}
-\title{sbmR}
+\title{Package reference}
 \description{
 Inference and visualization of network data using the Stochastic Block Model.
 }

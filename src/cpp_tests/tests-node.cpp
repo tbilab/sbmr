@@ -38,18 +38,18 @@ TEST_CASE("Basic Initialization", "[Node]")
   REQUIRE(n1->id == "n1");
   REQUIRE(n1->get_parent_at_level(1)->id == n1->parent->id);
  
-  // Make sure the connection propigate properly.
+  // Make sure the edge propigate properly.
   REQUIRE(
-    "m1, m3" == print_node_ids(n1->get_connections_to_level(0))
+    "m1, m3" == print_node_ids(n1->get_edges_to_level(0))
   );
   REQUIRE(
-    "d1, d2" == print_node_ids(n1->get_connections_to_level(1))
+    "d1, d2" == print_node_ids(n1->get_edges_to_level(1))
   );
   REQUIRE(
-    "d1, d1, d2" == print_node_ids(c1->get_connections_to_level(1))
+    "d1, d1, d2" == print_node_ids(c1->get_edges_to_level(1))
   );
   REQUIRE(
-    "d2, d2" == print_node_ids(c2->get_connections_to_level(1))
+    "d2, d2" == print_node_ids(c2->get_edges_to_level(1))
   );
 }
 
@@ -96,7 +96,7 @@ TEST_CASE("Gathering edge counts to a level", "[Node]")
   Node::connect_nodes(a3, b3);
   
   // Gather all the edges from node a1 to level 1
-  std::map<NodePtr, int> a1_to_l1 = a1->gather_connections_to_level(1);
+  std::map<NodePtr, int> a1_to_l1 = a1->gather_edges_to_level(1);
   
   REQUIRE(
     a1_to_l1[b11] == 2
@@ -107,7 +107,7 @@ TEST_CASE("Gathering edge counts to a level", "[Node]")
   );
   
   // now a3 to l1
-  std::map<NodePtr, int> a3_to_l1 = a3->gather_connections_to_level(1);
+  std::map<NodePtr, int> a3_to_l1 = a3->gather_edges_to_level(1);
   
   REQUIRE(
     a3_to_l1[b11] == 1
@@ -118,7 +118,7 @@ TEST_CASE("Gathering edge counts to a level", "[Node]")
   );
   
   // now b2 to l1
-  std::map<NodePtr, int> b2_to_l1 = b2->gather_connections_to_level(1);
+  std::map<NodePtr, int> b2_to_l1 = b2->gather_edges_to_level(1);
   
   REQUIRE(
     b2_to_l1[a11] == 
@@ -131,7 +131,7 @@ TEST_CASE("Gathering edge counts to a level", "[Node]")
   );
   
   // Last b11 to a21
-  std::map<NodePtr, int> b11_to_l2 = b11->gather_connections_to_level(2);
+  std::map<NodePtr, int> b11_to_l2 = b11->gather_edges_to_level(2);
   
   REQUIRE(
     b11_to_l2[a21] == 
@@ -188,9 +188,9 @@ TEST_CASE("Tracking node degrees", "[Node]")
   REQUIRE(a2->degree == 2);
   REQUIRE(a3->degree == 2);
   
-  REQUIRE(a1->degree == (a1->connections).size());
-  REQUIRE(a2->degree == (a2->connections).size());
-  REQUIRE(a3->degree == (a3->connections).size());
+  REQUIRE(a1->degree == (a1->edges).size());
+  REQUIRE(a2->degree == (a2->edges).size());
+  REQUIRE(a3->degree == (a3->edges).size());
   
   REQUIRE(b1->degree == 2);
   REQUIRE(b2->degree == 3);
@@ -203,12 +203,12 @@ TEST_CASE("Tracking node degrees", "[Node]")
   REQUIRE(a21->degree == 6);
   REQUIRE(b21->degree == 6);
 
-  REQUIRE(a11->degree == (a11->connections).size());
-  REQUIRE(a12->degree == (a12->connections).size());
-  REQUIRE(b11->degree == (b11->connections).size());
-  REQUIRE(b12->degree == (b12->connections).size());
-  REQUIRE(a21->degree == (a21->connections).size());
-  REQUIRE(b21->degree == (b21->connections).size());
+  REQUIRE(a11->degree == (a11->edges).size());
+  REQUIRE(a12->degree == (a12->edges).size());
+  REQUIRE(b11->degree == (b11->edges).size());
+  REQUIRE(b12->degree == (b12->edges).size());
+  REQUIRE(a21->degree == (a21->edges).size());
+  REQUIRE(b21->degree == (b21->edges).size());
   
   
   // Swap parents of a2 and b2 nodes
@@ -231,10 +231,10 @@ TEST_CASE("Tracking node degrees", "[Node]")
   REQUIRE(a21->degree == 6);
   REQUIRE(b21->degree == 6);
 
-  REQUIRE(a11->degree == (a11->connections).size());
-  REQUIRE(a12->degree == (a12->connections).size());
-  REQUIRE(b11->degree == (b11->connections).size());
-  REQUIRE(b12->degree == (b12->connections).size());
-  REQUIRE(a21->degree == (a21->connections).size());
-  REQUIRE(b21->degree == (b21->connections).size());
+  REQUIRE(a11->degree == (a11->edges).size());
+  REQUIRE(a12->degree == (a12->edges).size());
+  REQUIRE(b11->degree == (b11->edges).size());
+  REQUIRE(b12->degree == (b12->edges).size());
+  REQUIRE(a21->degree == (a21->edges).size());
+  REQUIRE(b21->degree == (b21->edges).size());
 }

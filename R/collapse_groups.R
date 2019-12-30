@@ -24,7 +24,7 @@
 #'   on accepting moves that improve model fit. Only matters if
 #'   `num_mcmc_sweeps` is more than zero.
 #' @param greedy Should every possible block merger be considered? If `FALSE`,
-#'   candidates for mergers are drawn by similarity in connections (just as MCMC
+#'   candidates for mergers are drawn by similarity in edges (just as MCMC
 #'   move proposals are). This may lead the model to local minimums by always
 #'   pursuing best possible merges.
 #' @param num_block_proposals If `greedy = FALSE`, this parameter controls how

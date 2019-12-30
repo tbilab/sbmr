@@ -68,12 +68,12 @@ public:
     }
   }
 
-  void add_connection(const std::string node_a_id, const std::string node_b_id)
+  void add_edge(const std::string node_a_id, const std::string node_b_id)
   {
-    SBM::add_connection(find_node_by_id(node_a_id, 0),
+    SBM::add_edge(find_node_by_id(node_a_id, 0),
                         find_node_by_id(node_b_id, 0));
 
-    // Add connection to the edges vector
+    // Add edge to the edges vector
     edges_from.push_back(node_a_id);
     edges_to.push_back(node_b_id);
   }
@@ -317,8 +317,8 @@ RCPP_MODULE(SBM)
               &Rcpp_SBM::add_node,
               "Add a node to the network. Takes the node id (string), the node type (string), and the node level (int). Use level = 0 for data-level nodes."
               )
-      .method("add_connection",
-              &Rcpp_SBM::add_connection,
+      .method("add_edge",
+              &Rcpp_SBM::add_edge,
               "Connects two nodes in network (at level 0) by their ids (string).")
       .method("set_node_parent",
               &Rcpp_SBM::set_node_parent,
@@ -369,11 +369,11 @@ sbm$add_node("a12", "a", 1L)
 sbm$add_node("b11", "b", 1L)
 sbm$add_node("b12", "b", 1L)
 
-sbm$add_connection("a1", "b1")
-sbm$add_connection("a1", "b2")
-sbm$add_connection("a1", "b3")
-sbm$add_connection("a2", "b3")
-sbm$add_connection("a3", "b2")
+sbm$add_edge("a1", "b1")
+sbm$add_edge("a1", "b2")
+sbm$add_edge("a1", "b3")
+sbm$add_edge("a2", "b3")
+sbm$add_edge("a3", "b2")
 
 
 sbm$set_node_parent("a1", "a11", 0)

@@ -13,7 +13,7 @@ my_edges <- dplyr::tribble(
   "a2", "b1"
 )
 
-test_that("Warning given when adding a node that has no connections", {
+test_that("Warning given when adding a node that has no edges", {
 
  node_too_many <- dplyr::bind_rows(my_nodes, c(id = "c1", type = "c"))
 
@@ -78,8 +78,8 @@ test_that("Creates empty object when passed nothing", {
   expect_equal(nrow(get_state(my_sbm)), 0)
 })
 
-test_that("Creates network with zero connections when passed just nodes...", {
-  # Model never keeps track of all the connections in a single place so this is a hard one to test...
+test_that("Creates network with zero edges when passed just nodes...", {
+  # Model never keeps track of all the edges in a single place so this is a hard one to test...
 
   my_sbm <- create_sbm(nodes = my_nodes)
 
