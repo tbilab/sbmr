@@ -1,7 +1,7 @@
 requireNamespace("lobstr", quietly = TRUE)
 
-# Helper to get number of groups from a given state
-get_num_groups <- function(sbm){
+# Helper to get number of blocks from a given state
+get_num_blocks <- function(sbm){
   sbm %>%
     get_state() %>%
     dplyr::filter(level == 1) %>%
@@ -62,11 +62,11 @@ test_that("Add Node", {
   my_sbm2 <- my_sbm %>% add_node('node_7', type = 'test_node')
   expect_equal(my_sbm2 %>% get_state() %>% nrow(), 7)
 
-  # Add a node at a group level
+  # Add a node at a block level
   my_sbm %>% add_node('node_11', level = 1, type = 'test_node')
   expect_equal(sum(get_state(my_sbm)$level), 1)
 
-  # Add another node at the metagroup level
+  # Add another node at the metablock level
   my_sbm %>% add_node('node_21', level = 2, type = 'test_node')
   expect_equal(sum(get_state(my_sbm)$level), 3)
 })
@@ -93,7 +93,7 @@ test_that("Add connection", {
 
 
 test_that("Set node parent", {
-  # Start with network with couple nodes, one at group level
+  # Start with network with couple nodes, one at block level
   my_sbm <- create_sbm() %>%
     add_node('node_1') %>%
     add_node('node_11', level = 1) %>%
@@ -128,35 +128,35 @@ test_that("Set node parent", {
 })
 
 
-test_that("Initializing a single group per node", {
-  # Default parameters should create a single group per node
+test_that("Initializing a single block per node", {
+  # Default parameters should create a single block per node
   my_sbm <- create_sbm() %>%
     add_node('node_1') %>%
     add_node('node_2') %>%
     add_node('node_3') %>%
-    initialize_groups()
+    initialize_blocks()
 
-  expect_equal(get_num_groups(my_sbm),3)
+  expect_equal(get_num_blocks(my_sbm),3)
 
 })
 
 
-test_that("Randomly assigning initial groups", {
+test_that("Randomly assigning initial blocks", {
   n_samples <- 10 # due to stochastic sampling need to try a few times and make sure average works as expected
-  n_groups <- 3;
+  n_blocks <- 3;
   n_nodes_each_type <- 10;
   max_n_types <- 5
 
-  get_num_initialized_groups <- function(my_nodes){
-    # Default parameters should create a single group per node
+  get_num_initialized_blocks <- function(my_nodes){
+    # Default parameters should create a single block per node
     create_sbm(nodes = my_nodes) %>%
-      initialize_groups(num_groups = n_groups) %>%
+      initialize_blocks(num_blocks = n_blocks) %>%
       get_state() %>%
       dplyr::filter(level == 1) %>%
       nrow()
   }
 
-  # Loop over a range of number of types and make sure desired number of groups is made
+  # Loop over a range of number of types and make sure desired number of blocks is made
   1:max_n_types %>%
     purrr::walk(function(n_types){
       types <- letters[1:n_types]
@@ -167,17 +167,17 @@ test_that("Randomly assigning initial groups", {
         id = paste0(type, 1:(n_nodes_each_type*n_types))
       )
 
-      num_groups_per_sample <- 1:n_samples %>%
-        purrr::map_int(~get_num_initialized_groups(my_nodes))
+      num_blocks_per_sample <- 1:n_samples %>%
+        purrr::map_int(~get_num_initialized_blocks(my_nodes))
 
-      expect_true(any(num_groups_per_sample == n_groups*n_types))
+      expect_true(any(num_blocks_per_sample == n_blocks*n_types))
     })
 })
 
 
 test_that("Loading from state dump", {
 
-  # Start with nodes 3 nodes attached to 2 groups
+  # Start with nodes 3 nodes attached to 2 blocks
   my_sbm <- create_sbm() %>%
     add_node('node_1') %>%
     add_node('node_2') %>%
@@ -191,7 +191,7 @@ test_that("Loading from state dump", {
   # Grab state
   initial_state <- my_sbm %>% get_state()
 
-  # Modify state by adding a new group and attaching node 3 to it
+  # Modify state by adding a new block and attaching node 3 to it
   my_sbm %>%
     add_node('node_13', level = 1) %>%
     set_node_parent('node_3', parent_id = 'node_13')
@@ -210,7 +210,7 @@ test_that("Loading from state dump", {
 
 
 test_that("computing entropy", {
-  # Start with nodes 3 nodes attached to 2 groups
+  # Start with nodes 3 nodes attached to 2 blocks
   my_sbm <- create_sbm() %>%
     add_node('node_1') %>%
     add_node('node_2') %>%
@@ -246,41 +246,41 @@ test_that("computing entropy", {
 
 test_that("MCMC Sweeps function as expected", {
   n_nodes <- 10
-  n_groups <- 5
+  n_blocks <- 5
   n_sweeps <- 10
 
   # Start with a random network
   my_sbm <- create_sbm(sim_random_network(n_nodes = n_nodes)) %>%
-    initialize_groups(num_groups = n_groups)
+    initialize_blocks(num_blocks = n_blocks)
 
-  original_num_groups <- get_num_groups(my_sbm)
+  original_num_blocks <- get_num_blocks(my_sbm)
 
-  sweep_and_check_n_groups <- function(i, variable_num_groups, sbm){
-    sweep <- mcmc_sweep(sbm, variable_num_groups = variable_num_groups)
-    sweep$total_num_groups <- get_num_groups(sbm)
+  sweep_and_check_n_blocks <- function(i, variable_num_blocks, sbm){
+    sweep <- mcmc_sweep(sbm, variable_num_blocks = variable_num_blocks)
+    sweep$total_num_blocks <- get_num_blocks(sbm)
     sweep
   }
 
-  # Run MCMC sweeps that do not allow group numbers to change
-  n_groups_stays_same_results <- 1:n_sweeps %>%
-    purrr::map(sweep_and_check_n_groups, variable_num_groups = FALSE, sbm = my_sbm)
+  # Run MCMC sweeps that do not allow block numbers to change
+  n_blocks_stays_same_results <- 1:n_sweeps %>%
+    purrr::map(sweep_and_check_n_blocks, variable_num_blocks = FALSE, sbm = my_sbm)
 
-  # Every step should result in the same number of groups in model
-  n_groups_stays_same_results %>%
-    purrr::map_int('total_num_groups') %>%
-    magrittr::equals(original_num_groups) %>%
+  # Every step should result in the same number of blocks in model
+  n_blocks_stays_same_results %>%
+    purrr::map_int('total_num_blocks') %>%
+    magrittr::equals(original_num_blocks) %>%
     all() %>%
     expect_true()
 
 
-  # Now let the model change number of groups and see if it ever does
-  n_groups_changes <- 1:n_sweeps %>%
-    purrr::map(sweep_and_check_n_groups, variable_num_groups = TRUE, sbm = my_sbm)
+  # Now let the model change number of blocks and see if it ever does
+  n_blocks_changes <- 1:n_sweeps %>%
+    purrr::map(sweep_and_check_n_blocks, variable_num_blocks = TRUE, sbm = my_sbm)
 
-  # Expect at least one group change
-  n_groups_changes %>%
-    purrr::map_int('total_num_groups') %>%
-    magrittr::equals(original_num_groups) %>%
+  # Expect at least one block change
+  n_blocks_changes %>%
+    purrr::map_int('total_num_blocks') %>%
+    magrittr::equals(original_num_blocks) %>%
     magrittr::not() %>%
     any() %>%
     expect_true()

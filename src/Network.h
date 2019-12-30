@@ -62,7 +62,7 @@ public:
   // Export current state of nodes in model
   State_Dump get_state();
 
-  // Load a level grouping from a state dump
+  // Load a level blocking from a state dump
   void load_from_state(State_Dump state);
 
   // Setup a new Node level
@@ -74,8 +74,8 @@ public:
   // Adds a node of specified id of a type at desired level. 
   NodePtr add_node(string id, int type, int level = 0);
 
-  // Creates a new group node and adds it to its neccesary level
-  NodePtr create_group_node(int type, int level);
+  // Creates a new block node and adds it to its neccesary level
+  NodePtr create_block_node(int type, int level);
 
   // Grabs and returns node of specified id, at desired level. 
   NodePtr get_node_by_id(string id, int level = 0);
@@ -95,20 +95,20 @@ public:
   // Adds a connection between two nodes based on their ids
   void add_connection(string id_a, string id_b);
 
-  // Builds and assigns a group node for every node in a given level
-  void give_every_node_at_level_own_group(int level);
+  // Builds and assigns a block node for every node in a given level
+  void give_every_node_at_level_own_block(int level);
   
-  // Adds a desired number of groups and randomly assigns them for a given level
-  // num_groups = -1 means every node gets their own group
-  void initialize_groups(int num_groups, int level);
+  // Adds a desired number of blocks and randomly assigns them for a given level
+  // num_blocks = -1 means every node gets their own block
+  void initialize_blocks(int num_blocks, int level);
 
-  // Scan through levels and remove all group nodes that have no children.
-  // Returns number of groups removed
-  std::vector<NodePtr> clean_empty_groups();
+  // Scan through levels and remove all block nodes that have no children.
+  // Returns number of blocks removed
+  std::vector<NodePtr> clean_empty_blocks();
 
 
-  // Builds a group id from a scaffold for generated new groups
-  static string build_group_id(int type, int level, int index);
+  // Builds a block id from a scaffold for generated new blocks
+  static string build_block_id(int type, int level, int index);
 };
 
 #endif

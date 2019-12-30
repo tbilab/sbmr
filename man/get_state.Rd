@@ -23,7 +23,7 @@ and columns for node id, parent id, node type, and node level.
 }
 \examples{
 
-# Build a bipartite network with 1 node and one group for each type
+# Build a bipartite network with 1 node and one block for each type
 my_sbm <- create_sbm() \%>\%
   add_node('a1', type = 'a') \%>\%
   add_node('a11', type = 'a', level = 1) \%>\%

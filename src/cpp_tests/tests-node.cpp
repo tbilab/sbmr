@@ -63,13 +63,13 @@ TEST_CASE("Gathering edge counts to a level", "[Node]")
   NodePtr b2 = std::make_shared<Node>("b2", 0, 2);
   NodePtr b3 = std::make_shared<Node>("b3", 0, 2);
   
-  // First level / groups
+  // First level / blocks
   NodePtr a11 = std::make_shared<Node>("a11", 1, 1);
   NodePtr a12 = std::make_shared<Node>("a12", 1, 1);
   NodePtr b11 = std::make_shared<Node>("b11", 1, 2);
   NodePtr b12 = std::make_shared<Node>("b12", 1, 2);
   
-  // Second level / super groups
+  // Second level / super blocks
   NodePtr a21 = std::make_shared<Node>("a21", 2, 1);
   NodePtr b21 = std::make_shared<Node>("b21", 2, 2);
   
@@ -151,13 +151,13 @@ TEST_CASE("Tracking node degrees", "[Node]")
   NodePtr b2 = std::make_shared<Node>("b2", 0, 2);
   NodePtr b3 = std::make_shared<Node>("b3", 0, 2);
   
-  // First level / groups
+  // First level / blocks
   NodePtr a11 = std::make_shared<Node>("a11", 1, 1);
   NodePtr a12 = std::make_shared<Node>("a12", 1, 1);
   NodePtr b11 = std::make_shared<Node>("b11", 1, 2);
   NodePtr b12 = std::make_shared<Node>("b12", 1, 2);
   
-  // Second level / super groups
+  // Second level / super blocks
   NodePtr a21 = std::make_shared<Node>("a21", 2, 1);
   NodePtr b21 = std::make_shared<Node>("b21", 2, 2);
   

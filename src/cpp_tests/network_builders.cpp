@@ -110,7 +110,7 @@ SBM build_simple_SBM()
   my_SBM.add_connection(a3, b4);
   my_SBM.add_connection(a4, b3);
 
-  // Make 2 type 0/a groups
+  // Make 2 type 0/a blocks
   NodePtr a11 = my_SBM.add_node("a11", 0, 1);
   NodePtr a12 = my_SBM.add_node("a12", 0, 1);
   NodePtr a13 = my_SBM.add_node("a13", 0, 1);
@@ -118,7 +118,7 @@ SBM build_simple_SBM()
   NodePtr b12 = my_SBM.add_node("b12", 1, 1);
   NodePtr b13 = my_SBM.add_node("b13", 1, 1);
 
-  // Assign nodes to their groups
+  // Assign nodes to their blocks
   a1->set_parent(a11);
   a2->set_parent(a12);
   a3->set_parent(a12);

@@ -59,7 +59,7 @@ NodePtr Sampler::sample(std::list<NodePtr> node_list)
   int random_index = sample(node_list.size()-1);
   
   // Start an iterator at begining of list
-  auto group_it = node_list.begin();
+  auto block_it = node_list.begin();
   
   // Step through list till we've walked the desired number of steps to the
   // chosen index
@@ -67,10 +67,10 @@ NodePtr Sampler::sample(std::list<NodePtr> node_list)
   while (step != random_index) 
   {
     step++;
-    group_it++;
+    block_it++;
   }
   
-  return *group_it;
+  return *block_it;
 }
 
 

@@ -15,7 +15,7 @@ test_that("Proper number of connections happens", {
 
 
   # Calculate the expected number of edges. This is divided by two because we
-  # only draw unique combos of groups so if we have edges for nodes a->b we wont
+  # only draw unique combos of blocks so if we have edges for nodes a->b we wont
   # also have b->a.
   expected_num_edges_w_self_cons <- choose(n_nodes + 1, 2) * prob_of_connection
   edges_per_w_self_cons <- sim_avg_con_count(TRUE)

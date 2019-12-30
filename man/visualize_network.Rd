@@ -9,7 +9,7 @@ visualize_network(
   nodes = NULL,
   width = "100\%",
   height = NULL,
-  node_color_col = "group",
+  node_color_col = "block",
   node_shape_col = "type"
 )
 }
@@ -38,13 +38,13 @@ Creates a simple interactive network visualization that visually encodes node me
 
 set.seed(42)
 
-# Simulate a 3 group/cluster network with 15 nodes per group
-simulated_network <- sim_basic_block_network(n_groups = 3, n_nodes_per_group = 15)
+# Simulate a 3 block/cluster network with 15 nodes per block
+simulated_network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 15)
 
-# Visualize network with color encoding the groups
+# Visualize network with color encoding the blocks
 visualize_network(simulated_network)
 
-# Visualize network with shape encoding the groups
-visualize_network(simulated_network, node_shape_col = 'group', node_color_col = 'type')
+# Visualize network with shape encoding the blocks
+visualize_network(simulated_network, node_shape_col = 'block', node_color_col = 'type')
 
 }

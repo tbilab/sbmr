@@ -1,25 +1,25 @@
-#' Assign groups for all nodes
+#' Assign blocks for all nodes
 #'
-#' Initializes groups for a given level of network. When `num_groups = -1` (the
-#' default) this will simply give every node its own group. Otherwise it will
-#' randomly draw each nodes group from `num_group` possible parent nodes for
-#' each node type. E.g. if network is bipartite and `num_groups == 3` a total of
-#' `3*2 = 6` groups will be added and assigned randomly to nodes. Because of
-#' random assignment of parents there may sometimes be less groups than
-#' `num_groups * <num_types>` due to some group nodes never being assigned to a
+#' Initializes blocks for a given level of network. When `num_blocks = -1` (the
+#' default) this will simply give every node its own block. Otherwise it will
+#' randomly draw each nodes block from `num_block` possible parent nodes for
+#' each node type. E.g. if network is bipartite and `num_blocks == 3` a total of
+#' `3*2 = 6` blocks will be added and assigned randomly to nodes. Because of
+#' random assignment of parents there may sometimes be less blocks than
+#' `num_blocks * <num_types>` due to some block nodes never being assigned to a
 #' child node.
 #'
 #' @inheritParams set_node_parent
-#' @param num_groups Total number of groups to initialize for each unique node
-#'   type. If set to `-1`, then a single group is made for every node.
+#' @param num_blocks Total number of blocks to initialize for each unique node
+#'   type. If set to `-1`, then a single block is made for every node.
 #'
-#' @return SBM model object modified with new group nodes and node hierarchy
+#' @return SBM model object modified with new block nodes and node hierarchy
 #'   modified. \emph{Note that object is modified in place as well.}
 #' @export
 #'
 #' @examples
-#' # Helper function to get number of groups in a model
-#' get_num_groups <- function(sbm){sum(get_state(sbm)$level == 1)}
+#' # Helper function to get number of blocks in a model
+#' get_num_blocks <- function(sbm){sum(get_state(sbm)$level == 1)}
 #'
 #' # Initialize a simple bipartite network with 6 total nodes (3 of each type)
 #' my_nodes <- dplyr::tibble(
@@ -28,18 +28,18 @@
 #' )
 #' my_sbm <- create_sbm(nodes = my_nodes)
 #'
-#' # Default values of function will give every node its own group
-#' my_sbm %>% initialize_groups()
-#' get_num_groups(my_sbm)
+#' # Default values of function will give every node its own block
+#' my_sbm %>% initialize_blocks()
+#' get_num_blocks(my_sbm)
 #'
-#' # You can also decide to have a given number of groups randomly assigned Here
-#' # four groups result because two random groups are made for each of the two
+#' # You can also decide to have a given number of blocks randomly assigned Here
+#' # four blocks result because two random blocks are made for each of the two
 #' # types
-#' my_sbm %>% initialize_groups(num_groups = 2)
-#' get_num_groups(my_sbm)
+#' my_sbm %>% initialize_blocks(num_blocks = 2)
+#' get_num_blocks(my_sbm)
 #'
-initialize_groups <- function(sbm, num_groups = -1, level = 0){
-  if(num_groups < -1) stop(paste("Can't initialize", num_groups, "groups."))
-  sbm$initialize_groups(as.integer(num_groups), as.integer(level))
+initialize_blocks <- function(sbm, num_blocks = -1, level = 0){
+  if(num_blocks < -1) stop(paste("Can't initialize", num_blocks, "blocks."))
+  sbm$initialize_blocks(as.integer(num_blocks), as.integer(level))
   sbm
 }

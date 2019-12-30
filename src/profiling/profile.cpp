@@ -17,7 +17,7 @@ int main(int argc, char **argv)
   // Setup simple SBM model
   SBM my_SBM = build_simulated_SBM();
 
-  auto results = my_SBM.collapse_groups(0, 30);
+  auto results = my_SBM.collapse_blocks(0, 30);
 
   Instrumentor::Get().EndSession();
   return 0;

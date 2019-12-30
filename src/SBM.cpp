@@ -1,40 +1,40 @@
 #include "SBM.h"
 
 // =============================================================================
-// Propose a potential group move for a node.
+// Propose a potential block move for a node.
 // =============================================================================
 NodePtr SBM::propose_move(const NodePtr node)
 {
   PROFILE_FUNCTION();
 
-  int group_level = node->level + 1;
+  int block_level = node->level + 1;
 
-  // Grab a list of all the groups that the node could join
-  std::vector<NodePtr> potential_groups = get_nodes_of_type_at_level(
+  // Grab a list of all the blocks that the node could join
+  std::vector<NodePtr> potential_blocks = get_nodes_of_type_at_level(
     node->type,
-    group_level);
+    block_level);
 
   // Sample a random neighbor of the current node
   NodePtr rand_neighbor = sampler.sample(
     node->get_connections_to_level(node->level)
   );
 
-  // Get number total number connections for neighbor's group
-  int neighbor_group_degree = rand_neighbor->parent->degree;
+  // Get number total number connections for neighbor's block
+  int neighbor_block_degree = rand_neighbor->parent->degree;
 
-  // Decide if we are going to choose a random group for our node
-  double ergo_amnt = EPS*potential_groups.size();
-  double prob_of_random_group = ergo_amnt/(neighbor_group_degree + ergo_amnt);
+  // Decide if we are going to choose a random block for our node
+  double ergo_amnt = EPS*potential_blocks.size();
+  double prob_of_random_block = ergo_amnt/(neighbor_block_degree + ergo_amnt);
 
-  // Decide where we will get new group from and draw from potential candidates
-  return sampler.draw_unif() < prob_of_random_group ?
-    sampler.sample(potential_groups):
-    sampler.sample(rand_neighbor->get_connections_to_level(group_level));
+  // Decide where we will get new block from and draw from potential candidates
+  return sampler.draw_unif() < prob_of_random_block ?
+    sampler.sample(potential_blocks):
+    sampler.sample(rand_neighbor->get_connections_to_level(block_level));
 }
 
 
-inline static void process_group_pair(
-    const std::map<NodePtr, int>::iterator con_group_it,
+inline static void process_block_pair(
+    const std::map<NodePtr, int>::iterator con_block_it,
     const double edges_from_node,
     const double moved_degree_pre,
     const double moved_degree_post,
@@ -42,11 +42,11 @@ inline static void process_group_pair(
     double * entropy_post)
 {
 
-  const double neighbor_deg = con_group_it->first->degree;
-  const double edge_count_pre = con_group_it->second;
+  const double neighbor_deg = con_block_it->first->degree;
+  const double edge_count_pre = con_block_it->second;
 
   // The old and new edge counts we need to compute entropy
-  // If we're looking at the neighbor groups for the old group we need to
+  // If we're looking at the neighbor blocks for the old block we need to
   // subtract the edges the node contributed, otherwise we need to add.
   double edge_count_post = edge_count_pre + edges_from_node;
 
@@ -65,62 +65,62 @@ inline static void process_group_pair(
 }
 
 // =============================================================================
-// Make a decision on the proposed new group for node
+// Make a decision on the proposed new block for node
 // =============================================================================
 Proposal_Res SBM::make_proposal_decision(const NodePtr node,
-                                         const NodePtr new_group)
+                                         const NodePtr new_block)
 {
   PROFILE_FUNCTION();
   // The level that this proposal is taking place on
-  int group_level = node->level + 1;
+  int block_level = node->level + 1;
 
-  // Reference to old group that would be swapped for new_group
-  NodePtr old_group = node->parent;
+  // Reference to old block that would be swapped for new_block
+  NodePtr old_block = node->parent;
 
   // Grab degree of the node to move
   double node_degree = node->degree;
 
-  // Get degrees of the two groups pre-move
-  double old_group_degree_pre = old_group->degree;
-  double new_group_degree_pre = new_group->degree;
+  // Get degrees of the two blocks pre-move
+  double old_block_degree_pre = old_block->degree;
+  double new_block_degree_pre = new_block->degree;
 
-  // Get degrees of the two groups post-move
-  double old_group_degree_post = old_group_degree_pre - node_degree;
-  double new_group_degree_post = new_group_degree_pre + node_degree;
+  // Get degrees of the two blocks post-move
+  double old_block_degree_post = old_block_degree_pre - node_degree;
+  double new_block_degree_post = new_block_degree_pre + node_degree;
 
   // Initialize the partial edge entropy sum holders
   double entropy_pre = 0;
   double entropy_post = 0;
 
-  // Gather connection maps for the node and its moved groups as these will have
+  // Gather connection maps for the node and its moved blocks as these will have
   // changes in their entropy contribution
-  std::map<NodePtr, int> node_edges = node->gather_connections_to_level(group_level);
+  std::map<NodePtr, int> node_edges = node->gather_connections_to_level(block_level);
 
-  std::map<NodePtr, int> new_group_edges = new_group->gather_connections_to_level(group_level);
+  std::map<NodePtr, int> new_block_edges = new_block->gather_connections_to_level(block_level);
 
-  std::map<NodePtr, int> old_group_edges = old_group->gather_connections_to_level(group_level);
+  std::map<NodePtr, int> old_block_edges = old_block->gather_connections_to_level(block_level);
 
-  for (auto con_group_it = old_group_edges.begin();
-       con_group_it != old_group_edges.end();
-       con_group_it++)
+  for (auto con_block_it = old_block_edges.begin();
+       con_block_it != old_block_edges.end();
+       con_block_it++)
   {
-    process_group_pair(con_group_it,
-                       -node_edges[con_group_it->first],
-                       old_group_degree_pre,
-                       old_group_degree_post,
+    process_block_pair(con_block_it,
+                       -node_edges[con_block_it->first],
+                       old_block_degree_pre,
+                       old_block_degree_post,
                        &entropy_pre,
                        &entropy_post);
   }
 
-  // Do the same for the new group - neighbor
-  for (auto con_group_it = new_group_edges.begin();
-       con_group_it != new_group_edges.end();
-       con_group_it++)
+  // Do the same for the new block - neighbor
+  for (auto con_block_it = new_block_edges.begin();
+       con_block_it != new_block_edges.end();
+       con_block_it++)
   {
-    process_group_pair(con_group_it,
-                       node_edges[con_group_it->first],
-                       new_group_degree_pre,
-                       new_group_degree_post,
+    process_block_pair(con_block_it,
+                       node_edges[con_block_it->first],
+                       new_block_degree_pre,
+                       new_block_degree_post,
                        &entropy_pre,
                        &entropy_post);
   }
@@ -130,16 +130,16 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   double pre_move_prob = 0.0;
   double post_move_prob = 0.0;
 
-  // Loop over all the node's connections to neighbor groups
-  for (auto con_group_it = node_edges.begin();
-       con_group_it != node_edges.end();
-       con_group_it++)
+  // Loop over all the node's connections to neighbor blocks
+  for (auto con_block_it = node_edges.begin();
+       con_block_it != node_edges.end();
+       con_block_it++)
   {
-    // Edges from new group to t pre move...
-    pre_move_prob += old_group_edges[con_group_it->first] + EPS;
+    // Edges from new block to t pre move...
+    pre_move_prob += old_block_edges[con_block_it->first] + EPS;
 
-    // Edges from old group to t post move...
-    post_move_prob += new_group_edges[con_group_it->first] + EPS;
+    // Edges from old block to t post move...
+    post_move_prob += new_block_edges[con_block_it->first] + EPS;
   }
 
   // Now we can clean up all the calculations into to entropy delta and the
@@ -158,10 +158,10 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_groups)
+Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_blocks)
 {
   PROFILE_FUNCTION();
-  const int group_level = level + 1;
+  const int block_level = level + 1;
 
   // Initialize the results holder
   Sweep_Res results;
@@ -191,16 +191,16 @@ Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_groups)
     NodePtr curr_node = *node_it;
 
     // Get a move proposal
-    NodePtr proposed_new_group = propose_move(curr_node);
+    NodePtr proposed_new_block = propose_move(curr_node);
 
-    // If the propsosed group is the nodes current group, we don't need to waste
+    // If the propsosed block is the nodes current block, we don't need to waste
     // time checking because decision will always result in same state.
-    if(curr_node->parent->id == proposed_new_group->id) continue;
+    if(curr_node->parent->id == proposed_new_block->id) continue;
 
     // Calculate acceptance probability based on posterior changes
     Proposal_Res proposal_results = make_proposal_decision(
       curr_node,
-      proposed_new_group
+      proposed_new_block
     );
 
     bool move_accepted = sampler.draw_unif() < proposal_results.prob_of_accept;
@@ -208,23 +208,23 @@ Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_groups)
     if (move_accepted)
     {
       // Move the node
-      curr_node->set_parent(proposed_new_group);
+      curr_node->set_parent(proposed_new_block);
 
       // Update results
       results.nodes_moved.push_back(curr_node->id);
       results.entropy_delta += proposal_results.entropy_delta;
     }
 
-    // Check if we're running sweep with variable group numbers. If we are, we
-    // need to remove empty groups and add a new group as a potential for the
+    // Check if we're running sweep with variable block numbers. If we are, we
+    // need to remove empty blocks and add a new block as a potential for the
     // node to enter
-    if (variable_num_groups)
+    if (variable_num_blocks)
     {
-      // Clean up empty groups
-      clean_empty_groups();
+      // Clean up empty blocks
+      clean_empty_blocks();
 
-      // Add a new group node for the current node type
-      create_group_node(curr_node->type, group_level);
+      // Add a new block node for the current node type
+      create_block_node(curr_node->type, block_level);
     }
   } // End loop over all nodes
 
@@ -278,60 +278,60 @@ double SBM::compute_entropy(const int level)
 
   //============================================================================
   // Last, we calculate the summation of e_rs*ln(e_rs/e_r*e_s)/2 where e_rs is
-  // number of connections between groups r and s and e_r is the total number of
-  // edges for group r.
+  // number of connections between blocks r and s and e_r is the total number of
+  // edges for block r.
 
-  // Grab all group nodes
-  auto group_level = get_level(level + 1);
+  // Grab all block nodes
+  auto block_level = get_level(level + 1);
 
   double edge_entropy = 0.0;
 
-  // Full loop over all group nodes
-  for (auto group_r_it = group_level->begin();
-       group_r_it != group_level->end();
-       group_r_it++)
+  // Full loop over all block nodes
+  for (auto block_r_it = block_level->begin();
+       block_r_it != block_level->end();
+       block_r_it++)
   {
-    NodePtr group_r = group_r_it->second;
-    // Gather all of group r's connections to our level
-    auto group_r_edge_counts = group_r->gather_connections_to_level(level + 1);
+    NodePtr block_r = block_r_it->second;
+    // Gather all of block r's connections to our level
+    auto block_r_edge_counts = block_r->gather_connections_to_level(level + 1);
 
-    // Now loop over all the nodes connected to group r
-    for (auto group_s_it = group_r_edge_counts.begin();
-         group_s_it != group_r_edge_counts.end();
-         group_s_it++)
+    // Now loop over all the nodes connected to block r
+    for (auto block_s_it = block_r_edge_counts.begin();
+         block_s_it != block_r_edge_counts.end();
+         block_s_it++)
     {
       // Grab total number of connections between r and s
-      double e_rs = group_s_it->second;
+      double e_rs = block_s_it->second;
 
       // Compute this iteration's controbution to sum
-      edge_entropy += e_rs * log(e_rs / double(group_r->degree * group_s_it->first->degree));
-    } // end group s loop
-  }   // end group r loop
+      edge_entropy += e_rs * log(e_rs / double(block_r->degree * block_s_it->first->degree));
+    } // end block s loop
+  }   // end block r loop
 
   // Add three components together to return
   return -1 * (n_total_edges + degree_summation + edge_entropy / 2);
 }
 
 // =============================================================================
-// Merge two groups, placing all nodes that were under group_b under group_a and
-// deleting group_a from model.
+// Merge two blocks, placing all nodes that were under block_b under block_a and
+// deleting block_a from model.
 // =============================================================================
-void SBM::merge_groups(NodePtr group_a, NodePtr group_b)
+void SBM::merge_blocks(NodePtr block_a, NodePtr block_b)
 {
   PROFILE_FUNCTION();
-  // Place all the members of group b under group a
-  auto children_to_move = group_b->children;
+  // Place all the members of block b under block a
+  auto children_to_move = block_b->children;
 
   for (NodePtr member_node : children_to_move)
   {
-    member_node->set_parent(group_a);
+    member_node->set_parent(block_a);
   }
 }
 
 // =============================================================================
-// Merge groups at a given level based on the best probability of doing so
+// Merge blocks at a given level based on the best probability of doing so
 // =============================================================================
-Merge_Step SBM::agglomerative_merge(const int group_level,
+Merge_Step SBM::agglomerative_merge(const int block_level,
                                     const int num_merges_to_make)
 {
   PROFILE_FUNCTION();
@@ -340,83 +340,83 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
     throw "Zero merges requested.";
   }
 
-  // Level that the group metagroups will sit at
-  int meta_level = group_level + 1;
+  // Level that the block metablocks will sit at
+  int meta_level = block_level + 1;
 
-  // Build a single meta-group for each node at desired level
-  give_every_node_at_level_own_group(group_level);
+  // Build a single meta-block for each node at desired level
+  give_every_node_at_level_own_block(block_level);
 
-  // Grab all the groups we're looking to merge
-  LevelPtr all_groups = get_level(group_level);
+  // Grab all the blocks we're looking to merge
+  LevelPtr all_blocks = get_level(block_level);
 
 
   // Build vectors for recording merges
-  std::vector<NodePtr> from_groups;
-  std::vector<NodePtr> to_groups;
+  std::vector<NodePtr> from_blocks;
+  std::vector<NodePtr> to_blocks;
   std::vector<double> move_delta;
 
-  const int size_to_return = N_CHECKS_PER_GROUP * all_groups->size();
-  from_groups.reserve(size_to_return);
-  to_groups.reserve(size_to_return);
+  const int size_to_return = N_CHECKS_PER_block * all_blocks->size();
+  from_blocks.reserve(size_to_return);
+  to_blocks.reserve(size_to_return);
   move_delta.reserve(size_to_return);
 
-  // Make sure doing a merge makes sense by checking we have enough groups
+  // Make sure doing a merge makes sense by checking we have enough blocks
   // of every type
   for (int i = 0; i < node_type_counts.size(); i++)
   {
-    if (node_type_counts[i][group_level] < 2)
+    if (node_type_counts[i][block_level] < 2)
     {
-      throw "To few groups to perform merge.";
+      throw "To few blocks to perform merge.";
     }
   }
 
-  // Loop over each group and find best merge option
-  for (auto group_it = all_groups->begin();
-            group_it != all_groups->end();
-            group_it++)
+  // Loop over each block and find best merge option
+  for (auto block_it = all_blocks->begin();
+            block_it != all_blocks->end();
+            block_it++)
   {
-    NodePtr curr_group = group_it->second;
+    NodePtr curr_block = block_it->second;
 
-    std::vector<NodePtr> metagroups_to_search;
+    std::vector<NodePtr> metablocks_to_search;
 
     // If we're running algorithm in greedy mode we should just
-    // add every possible group to the groups-to-search list
+    // add every possible block to the blocks-to-search list
     if (GREEDY)
     {
-      // Get a list of all the potential merges for group
-      metagroups_to_search =
-          get_nodes_of_type_at_level(curr_group->type, meta_level);
+      // Get a list of all the potential merges for block
+      metablocks_to_search =
+          get_nodes_of_type_at_level(curr_block->type, meta_level);
     }
     else
     {
-      metagroups_to_search.reserve(N_CHECKS_PER_GROUP);
-      // Otherwise, we should sample a given number of groups to check
-      for (int i = 0; i < N_CHECKS_PER_GROUP; i++)
+      metablocks_to_search.reserve(N_CHECKS_PER_block);
+      // Otherwise, we should sample a given number of blocks to check
+      for (int i = 0; i < N_CHECKS_PER_block; i++)
       {
-        // Sample a group from potential groups
-        metagroups_to_search.push_back(propose_move(curr_group));
+        // Sample a block from potential blocks
+        metablocks_to_search.push_back(propose_move(curr_block));
       }
     }
 
     // Now that we have gathered all the merges to check, we can loop
     // through them and check entropy changes
-    for (NodePtr metagroup : metagroups_to_search)
+    for (NodePtr metablock : metablocks_to_search)
     {
-      // Get group that the metagroup belongs to
-      NodePtr merge_group = *((metagroup->children).begin());
+      // Get block that the metablock belongs to
+      NodePtr merge_block = *((metablock->children).begin());
 
-      // Skip group if it is the current group for this node
-      if (merge_group->id == curr_group->id)
+      // Skip block if it is the current block for this node
+      if (merge_block->id == curr_block->id)
         continue;
 
       // Calculate entropy delta for move
       double entropy_delta = make_proposal_decision(
-                                 curr_group,
-                                 metagroup)
+                                 curr_block,
+                                 metablock)
                                  .entropy_delta;
 
-      from_groups.push_back(curr_group);
-      to_groups.push_back(merge_group);
+      from_blocks.push_back(curr_block);
+      to_blocks.push_back(merge_block);
       move_delta.push_back(entropy_delta);
     }
   }
@@ -447,29 +447,29 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
     // Extract index of best remaining merge
     int merge_index = best_moves.top().second;
 
-    // Get groups that are being merged (culled)
-    NodePtr from_group = from_groups[merge_index];
-    NodePtr to_group = to_groups[merge_index];
+    // Get blocks that are being merged (culled)
+    NodePtr from_block = from_blocks[merge_index];
+    NodePtr to_block = to_blocks[merge_index];
 
-    // Make sure we haven't already merged the culled group
+    // Make sure we haven't already merged the culled block
     bool from_still_exists =
-        merges_made.find(from_group->id) == merges_made.end();
+        merges_made.find(from_block->id) == merges_made.end();
 
-    // Also make sure that we haven't removed the group we're trying to
+    // Also make sure that we haven't removed the block we're trying to
     // merge into
-    bool to_still_exists = merges_made.find(to_group->id) == merges_made.end();
+    bool to_still_exists = merges_made.find(to_block->id) == merges_made.end();
 
     if (from_still_exists & to_still_exists)
     {
-      // Insert new culled group into set
-      merges_made.insert(from_group->id);
+      // Insert new culled block into set
+      merges_made.insert(from_block->id);
 
-      // Merge the best group pair
-      merge_groups(to_group, from_group);
+      // Merge the best block pair
+      merge_blocks(to_block, from_block);
 
       // Record pair for results
-      results.from_node.push_back(from_group->id);
-      results.to_node.push_back(to_group->id);
+      results.from_node.push_back(from_block->id);
+      results.to_node.push_back(to_block->id);
     }
 
     // Remove the last index from our queue and go again
@@ -480,58 +480,58 @@ Merge_Step SBM::agglomerative_merge(const int group_level,
     queue_not_empty = best_moves.size() != 0;
   }
 
-  // Erase the empty groups and metagroups
-  auto removed_groups = clean_empty_groups();
+  // Erase the empty blocks and metablocks
+  auto removed_blocks = clean_empty_blocks();
 
   // Return the entropy for new model and merges done
-  results.entropy = compute_entropy(group_level - 1);
+  results.entropy = compute_entropy(block_level - 1);
 
   return results;
 }
 
 // =============================================================================
 // Run mcmc chain initialization by finding best organization
-// of B' groups for all B from B = N to B = 1.
+// of B' blocks for all B from B = N to B = 1.
 // =============================================================================
-std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
+std::vector<Merge_Step> SBM::collapse_blocks(const int node_level,
                                              const int num_mcmc_steps,
-                                             const int desired_num_groups,
+                                             const int desired_num_blocks,
                                              const bool report_all_steps)
 {
   PROFILE_FUNCTION();
-  const int group_level = node_level + 1;
+  const int block_level = node_level + 1;
 
-  // Start by giving every node at the desired level its own group
-  give_every_node_at_level_own_group(node_level);
+  // Start by giving every node at the desired level its own block
+  give_every_node_at_level_own_block(node_level);
 
-  // Grab reference to the group nodes container
-  auto group_level_ptr = get_level(group_level);
+  // Grab reference to the block nodes container
+  auto block_level_ptr = get_level(block_level);
 
   // A conservative estimate of how many steps collapsing will take as
   // anytime we're not doing an exhaustive search we will use less than
   // B_start - B_end moves.
-  const int num_steps = group_level_ptr->size() - desired_num_groups;
+  const int num_steps = block_level_ptr->size() - desired_num_blocks;
 
   // Setup vector to hold all merge step results.
   std::vector<Merge_Step> step_results;
   step_results.reserve(report_all_steps ? num_steps: 1);
 
-  // Get the current number of groups we have
-  int curr_num_groups = group_level_ptr->size();
+  // Get the current number of blocks we have
+  int curr_num_blocks = block_level_ptr->size();
 
-  while (curr_num_groups > desired_num_groups)
+  while (curr_num_blocks > desired_num_blocks)
   {
     // Decide how many merges we should do.
-    int num_merges = int(curr_num_groups - (curr_num_groups / SIGMA));
+    int num_merges = int(curr_num_blocks - (curr_num_blocks / SIGMA));
 
-    // Need to remove at least 1 group
+    // Need to remove at least 1 block
     if (num_merges < 1) num_merges = 1;
 
-    // Make sure we don't overstep the goal number of groups
-    const int num_groups_after_merge = curr_num_groups - num_merges;
-    if (num_groups_after_merge < desired_num_groups)
+    // Make sure we don't overstep the goal number of blocks
+    const int num_blocks_after_merge = curr_num_blocks - num_merges;
+    if (num_blocks_after_merge < desired_num_blocks)
     {
-      num_merges = curr_num_groups - desired_num_groups;
+      num_merges = curr_num_blocks - desired_num_blocks;
     }
 
     Merge_Step merge_results;
@@ -541,13 +541,13 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
     {
       // Perform next best merge and record results
       merge_results = agglomerative_merge(
-          group_level,
+          block_level,
           num_merges);
     }
     catch (...)
     {
       std::cerr << "Collapsibility limit of network reached so we break early\n"
-                << "There are currently " << curr_num_groups << " groups left.\n";
+                << "There are currently " << curr_num_blocks << " blocks left.\n";
 
       // We reached the collapsibility limit of our network so we break early
       break;
@@ -555,26 +555,26 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
 
     if (num_mcmc_steps != 0)
     {
-      // Let model equilibriate with new group layout...
+      // Let model equilibriate with new block layout...
       for (int j = 0; j < num_mcmc_steps; j++)
       {
         mcmc_sweep(node_level, false);
       }
-      clean_empty_groups();
+      clean_empty_blocks();
       // Update the step entropy results with new equilibriated model
       if (report_all_steps) merge_results.entropy = compute_entropy(node_level);
     }
 
-    // Update current number of groups
-    curr_num_groups = group_level_ptr->size();
+    // Update current number of blocks
+    curr_num_blocks = block_level_ptr->size();
 
     if (report_all_steps) 
     {
       // Dump state into step results
       merge_results.state = get_state();
 
-      // Record how many groups we have after this step
-      merge_results.num_groups = curr_num_groups;
+      // Record how many blocks we have after this step
+      merge_results.num_blocks = curr_num_blocks;
 
       // Gather info for return
       step_results.push_back(merge_results);
@@ -588,7 +588,7 @@ std::vector<Merge_Step> SBM::collapse_groups(const int node_level,
       step_results.push_back(Merge_Step(
         compute_entropy(node_level),
         get_state(),
-        curr_num_groups
+        curr_num_blocks
       ));
     }
 

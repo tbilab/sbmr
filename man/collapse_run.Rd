@@ -2,14 +2,14 @@
 % Please edit documentation in R/collapse_run.R
 \name{collapse_run}
 \alias{collapse_run}
-\title{Run Agglomerative Merging to target a range of group numbers}
+\title{Run Agglomerative Merging to target a range of block numbers}
 \usage{
 collapse_run(
   sbm,
   level = 0,
   sigma = 2,
-  num_final_groups = 1:10,
-  num_group_proposals = 5,
+  num_final_blocks = 1:10,
+  num_block_proposals = 5,
   num_mcmc_sweeps = 10,
   beta = 1.5,
   eps = NULL,
@@ -19,17 +19,17 @@ collapse_run(
 \arguments{
 \item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
 
-\item{level}{Level of nodes who's groups will have their group membership run
+\item{level}{Level of nodes who's blocks will have their block membership run
 through MCMC proposal-accept routine.}
 
 \item{sigma}{Controls the rate of collapse. At each step of the collapsing
 the model will try and remove \code{current_num_nodes(1 - 1/sigma)} nodes from
 the model. So a larger sigma means a faster collapse rate.}
 
-\item{num_final_groups}{Array of integers corresponding to number of groups to check in run.}
+\item{num_final_blocks}{Array of integers corresponding to number of blocks to check in run.}
 
-\item{num_group_proposals}{If \code{greedy = FALSE}, this parameter controls how
-many merger proposals are drawn for each group in the model. A larger
+\item{num_block_proposals}{If \code{greedy = FALSE}, this parameter controls how
+many merger proposals are drawn for each block in the model. A larger
 number will increase the exploration of merge potentials but may lead the
 model to local minimums for the same reason greedy mode does.}
 
@@ -43,7 +43,7 @@ probabilities of MCMC sweeps. A higher value means model puts more weight
 on accepting moves that improve model fit. Only matters if
 \code{num_mcmc_sweeps} is more than zero.}
 
-\item{eps}{Controls randomness of move proposals. Effects both the group
+\item{eps}{Controls randomness of move proposals. Effects both the block
 merging and mcmc sweeps. If value is set to value other than null the SBMs
 current epsilon value will be overridden.}
 
@@ -51,23 +51,23 @@ current epsilon value will be overridden.}
 }
 \value{
 Tibble with three columns with rows corresponding to the result of
-each merge step:  \code{entropy}, \code{num_groups} left in model, and a list column
+each merge step:  \code{entropy}, \code{num_blocks} left in model, and a list column
 of \code{state} which is the state dump dataframe for model at end of merge.
 }
 \description{
-Run Agglomerative Merging to target a range of group numbers
+Run Agglomerative Merging to target a range of block numbers
 }
 \examples{
 set.seed(42)
 
-# Start with a random network of two groups with 25 nodes each
-network <- sim_basic_block_network(n_groups = 3, n_nodes_per_group = 25)
+# Start with a random network of two blocks with 25 nodes each
+network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25)
 
 # Create SBM from simulated data
 my_sbm <- create_sbm(network)
 
 # Run agglomerative clustering with no intermediate MCMC steps on network
-collapse_results <- collapse_run(my_sbm, sigma = 3, num_final_groups = 1:6)
+collapse_results <- collapse_run(my_sbm, sigma = 3, num_final_blocks = 1:6)
 
 # Visualize results of collapsing
 visualize_collapse_results(collapse_results)

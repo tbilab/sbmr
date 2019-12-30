@@ -5,12 +5,12 @@ library(sbmR)
 devtools::load_all()
 
 
-num_groups <- 10
-num_group_members <- 30
+num_blocks <- 10
+num_block_members <- 30
 
 network <- sim_basic_block_network(
-  n_groups = num_groups,
-  n_nodes_per_group = num_group_members,
+  n_blocks = num_blocks,
+  n_nodes_per_block = num_block_members,
   propensity_drawer = function(n) rbeta(n, shape1 = 0.3, shape2 = 0.85),
   return_connection_propensities = TRUE)
 
@@ -18,17 +18,17 @@ network$edges %>% nrow()
 
 network$connection_propensities %>%
   mutate(
-    group_1 = factor(group_1, levels = paste0('g', 1:num_groups)),
-    group_2 = factor(group_2, levels = paste0('g', 1:num_groups)),
+    block_1 = factor(block_1, levels = paste0('g', 1:num_blocks)),
+    block_2 = factor(block_2, levels = paste0('g', 1:num_blocks)),
   ) %>%
-  ggplot(aes(x = group_1, y = group_2)) +
+  ggplot(aes(x = block_1, y = block_2)) +
   geom_tile(aes(fill = propensity)) +
   scale_fill_gradient(low = "white")
 
 my_sbm <- create_sbm(network)
 collapse_results <- my_sbm %>% collapse_run(
   sigma = 4,
-  num_final_groups = 1:25,
+  num_final_blocks = 1:25,
   num_mcmc_sweeps = 15,
   parallel = TRUE
 )

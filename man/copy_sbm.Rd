@@ -9,7 +9,7 @@ copy_sbm(old_sbm, match_state = FALSE)
 \arguments{
 \item{old_sbm}{Old SBM created with \link{\code{create_sbm}}}
 
-\item{match_state}{Should copy also match the current grouping state of old model?}
+\item{match_state}{Should copy also match the current blocking state of old model?}
 }
 \value{
 A new deep copy of the original SBM with parameters preserved.

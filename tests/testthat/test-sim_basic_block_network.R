@@ -1,8 +1,8 @@
-# Helper function to collapse groups into order-independent form and remove group from generated node name
-sorted_group_collapse <- function(group_1, group_2){
+# Helper function to collapse blocks into order-independent form and remove block from generated node name
+sorted_block_collapse <- function(block_1, block_2){
   purrr::map2_chr(
-    group_1,
-    group_2,
+    block_1,
+    block_2,
     ~paste(sort(c(.x, .y)), collapse = "-")
   )
 }
@@ -10,20 +10,20 @@ sorted_group_collapse <- function(group_1, group_2){
 test_that("Mean of propensity distribution is reflected in draws", {
 
 
-  simulated <- sim_basic_block_network(n_groups = 4, n_nodes_per_group = 10)
+  simulated <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 10)
   sim_nodes <- simulated$nodes
   sim_edges <- simulated$edges
   n_total_nodes <- 4*10
 
   sim_edges %>%
-    dplyr::mutate(node_pair = sorted_group_collapse(from, to)) %>%
+    dplyr::mutate(node_pair = sorted_block_collapse(from, to)) %>%
     dplyr::count(node_pair)
 
-  # Helper function to extract group from generated node name
-  get_group <- . %>% stringr::str_remove("_[0-9]+")
+  # Helper function to extract block from generated node name
+  get_block <- . %>% stringr::str_remove("_[0-9]+")
 
   sim_edges %>%
-    dplyr::mutate(from_group = get_group(from))
+    dplyr::mutate(from_block = get_block(from))
 
   expect_equal(2 * 2, 4)
 })

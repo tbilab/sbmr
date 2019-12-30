@@ -3,7 +3,7 @@
 #' @inheritParams mcmc_sweep
 #' @inheritParams build_score_fn
 #' @param collapse_results Results of running agglomerative collapse algorithm
-#'   on sbm with \code{\link{collapse_groups}}.
+#'   on sbm with \code{\link{collapse_blocks}}.
 #' @param verbose Should model tell you what step was chosen (`TRUE` or `FALSE`)?
 #'
 #' @return SBM model updated to match state from the merge step with 'best'
@@ -13,14 +13,14 @@
 #' @examples
 #' set.seed(42)
 #'
-#' # Start with a random network of two groups with 25 nodes each
-#' network <- sim_basic_block_network(n_groups = 3, n_nodes_per_group = 25)
+#' # Start with a random network of two blocks with 25 nodes each
+#' network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25)
 #'
 #' # Create SBM from simulated data
 #' my_sbm <- create_sbm(network)
 #'
 #' # Run agglomerative clustering with no intermediate MCMC steps on network
-#' collapse_results <- collapse_run(my_sbm, sigma = 3, start_group_num = 1, end_group_num = 6)
+#' collapse_results <- collapse_run(my_sbm, sigma = 3, start_block_num = 1, end_block_num = 6)
 #'
 #' # Choose best result with default heuristic
 #' my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, verbose = TRUE)
@@ -41,13 +41,13 @@ choose_best_collapse_state <- function(sbm, collapse_results, heuristic = 'dev_f
 
   # Apply the heuristic on the entropy column and choose the higheset value
   best_state <- collapse_results %>%
-    dplyr::mutate(score = build_score_fn(heuristic)(entropy, num_groups)) %>%
+    dplyr::mutate(score = build_score_fn(heuristic)(entropy, num_blocks)) %>%
     dplyr::filter(score == max(score))
 
   if(verbose){
-    n <- best_state$num_groups[1]
+    n <- best_state$num_blocks[1]
     entropy <- best_state$entropy[1]
-    print(glue::glue("Choosing collapse with {n} groups and an entropy of {entropy}."))
+    print(glue::glue("Choosing collapse with {n} blocks and an entropy of {entropy}."))
   }
 
   # Load best state into model and return

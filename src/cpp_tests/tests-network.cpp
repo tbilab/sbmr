@@ -19,9 +19,9 @@ TEST_CASE("Basic initialization of network", "[Network]")
     my_net.add_node("m3", 1);
     my_net.add_node("m4", 1);
 
-    // Create a group node
-    my_net.create_group_node(0, 1);
-    my_net.create_group_node(1, 1);
+    // Create a block node
+    my_net.create_block_node(0, 1);
+    my_net.create_block_node(1, 1);
 
     // How many nodes at the 'data' level do we have?
     REQUIRE(my_net.nodes.at(0)->size() == 7);
@@ -92,7 +92,7 @@ TEST_CASE("Tracking node types", "[Network]")
 }
 
 
-TEST_CASE("Initializing a group for every node", "[Network]")
+TEST_CASE("Initializing a block for every node", "[Network]")
 {
     Network my_net;
 
@@ -118,11 +118,11 @@ TEST_CASE("Initializing a group for every node", "[Network]")
     // There should be a total of 18 nodes at base level
     REQUIRE(18 == my_net.get_level(0)->size());
 
-    // And zero nodes at the group level
+    // And zero nodes at the block level
     REQUIRE(0 == my_net.get_level(1)->size());
 
-    // Now assignin every node their own parent group
-    my_net.give_every_node_at_level_own_group(0);
+    // Now assignin every node their own parent block
+    my_net.give_every_node_at_level_own_block(0);
 
     // There should now be a total of 18 nodes at level 1
     REQUIRE(18 == my_net.get_level(1)->size());
@@ -131,7 +131,7 @@ TEST_CASE("Initializing a group for every node", "[Network]")
     REQUIRE(1 == my_net.get_node_from_level(1)->children.size());
 }
 
-TEST_CASE("Randomly assigning a given number of groups", "[Network]")
+TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
 {
     Network my_net;
 
@@ -158,15 +158,15 @@ TEST_CASE("Randomly assigning a given number of groups", "[Network]")
     my_net.add_node("b10", 0);
 
    
-    // Distribute 3 total groups for each type across nodes randomly
-    my_net.initialize_groups(3, 0);
+    // Distribute 3 total blocks for each type across nodes randomly
+    my_net.initialize_blocks(3, 0);
 
     // There should now be a total of 6 nodes at level 1
     REQUIRE(6 == my_net.get_level(1)->size());
 }
 
 
-TEST_CASE("Cleaning up empty groups", "[Network]")
+TEST_CASE("Cleaning up empty blocks", "[Network]")
 {
     Network my_net;
 
@@ -176,23 +176,23 @@ TEST_CASE("Cleaning up empty groups", "[Network]")
     NodePtr n3 = my_net.add_node("n3", 0);
     NodePtr n4 = my_net.add_node("n4", 0);
 
-    // Create a few group nodes at first level
-    NodePtr g1_1 = my_net.create_group_node(0, 1);
-    NodePtr g1_2 = my_net.create_group_node(0, 1);
-    NodePtr g1_3 = my_net.create_group_node(0, 1);
-    NodePtr g1_4 = my_net.create_group_node(0, 1);
+    // Create a few block nodes at first level
+    NodePtr g1_1 = my_net.create_block_node(0, 1);
+    NodePtr g1_2 = my_net.create_block_node(0, 1);
+    NodePtr g1_3 = my_net.create_block_node(0, 1);
+    NodePtr g1_4 = my_net.create_block_node(0, 1);
 
-    // Create two groups for second level
-    NodePtr g2_1 = my_net.create_group_node(0, 2);  
-    NodePtr g2_2 = my_net.create_group_node(0, 2);
+    // Create two blocks for second level
+    NodePtr g2_1 = my_net.create_block_node(0, 2);  
+    NodePtr g2_2 = my_net.create_block_node(0, 2);
 
-    // Add children to groups 1 and two at first level
+    // Add children to blocks 1 and two at first level
     n1->set_parent(g1_1);
     n2->set_parent(g1_1);
     n3->set_parent(g1_2);
     n4->set_parent(g1_2);
 
-    // Add children to both level two groups
+    // Add children to both level two blocks
     g1_1->set_parent(g2_1);
     g1_2->set_parent(g2_1);
     g1_3->set_parent(g2_1);
@@ -206,22 +206,22 @@ TEST_CASE("Cleaning up empty groups", "[Network]")
     REQUIRE(2 == my_net.nodes.at(2)->size());
 
 
-    // Run group cleanup
-    int num_culled = my_net.clean_empty_groups().size();
+    // Run block cleanup
+    int num_culled = my_net.clean_empty_blocks().size();
 
-    // Three groups should have been cleaned
+    // Three blocks should have been cleaned
     REQUIRE(3 == num_culled);
 
-    // Two should have been taken from the first group level
+    // Two should have been taken from the first block level
     REQUIRE(2 == my_net.nodes.at(1)->size());
 
-    // And 1 should have been taken from the second group level
+    // And 1 should have been taken from the second block level
     REQUIRE(1 == my_net.nodes.at(2)->size());
 
-    // Run group cleanup again
-    int num_culled_clean = my_net.clean_empty_groups().size();
+    // Run block cleanup again
+    int num_culled_clean = my_net.clean_empty_blocks().size();
 
-    // No groups should have been culled
+    // No blocks should have been culled
     REQUIRE(0 == num_culled_clean);
 }
 
@@ -244,7 +244,7 @@ TEST_CASE("Counting edges", "[Network]")
     NodePtr b4 = my_net.add_node("b4", 1);
     NodePtr b5 = my_net.add_node("b5", 1);
 
-    // level one groups
+    // level one blocks
     NodePtr a11 = my_net.add_node("a11", 0, 1);
     NodePtr a12 = my_net.add_node("a12", 0, 1);
     NodePtr a13 = my_net.add_node("a13", 0, 1);
@@ -252,7 +252,7 @@ TEST_CASE("Counting edges", "[Network]")
     NodePtr b12 = my_net.add_node("b12", 1, 1);
     NodePtr b13 = my_net.add_node("b13", 1, 1);
 
-    // level two groups
+    // level two blocks
     NodePtr a21 = my_net.add_node("a21", 0, 2);
     NodePtr a22 = my_net.add_node("a22", 0, 2);
     NodePtr b21 = my_net.add_node("b21", 1, 2);
@@ -329,7 +329,7 @@ TEST_CASE("Counting edges", "[Network]")
     REQUIRE(b22->degree == 3);
 
 
-    // Check num edges between groups
+    // Check num edges between blocks
     auto a11_edges = a11->gather_connections_to_level(1);
     REQUIRE(a11_edges[b11] == 2);
     REQUIRE(a11_edges[b12] == 0);
@@ -363,7 +363,7 @@ TEST_CASE("Counting edges", "[Network]")
     REQUIRE(a22_edges[b22] == 2);
   
   
-    // Now we will change the group for a node and make sure the changes are properly detected
+    // Now we will change the block for a node and make sure the changes are properly detected
 
     // Update the level 1 edge counts
     a3->set_parent(a13);
@@ -381,7 +381,7 @@ TEST_CASE("Counting edges", "[Network]")
     REQUIRE(b21->degree == 6);
     REQUIRE(b22->degree == 3);
 
-        // Check num edges between groups
+        // Check num edges between blocks
     auto a11_edges_new = a11->gather_connections_to_level(1);
     REQUIRE(a11_edges_new[b11] == 2);
     REQUIRE(a11_edges_new[b12] == 0);
@@ -429,7 +429,7 @@ TEST_CASE("State dumping and restoring", "[Network")
   NodePtr b12 = my_net.add_node("b12", 1, 1);
   NodePtr b13 = my_net.add_node("b13", 1, 1);
 
-  // Assign simple group structure
+  // Assign simple block structure
   a1->set_parent(a11);
   a2->set_parent(a12);
   a3->set_parent(a13);

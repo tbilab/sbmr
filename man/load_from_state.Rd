@@ -31,7 +31,7 @@ desired_state <- dplyr::tribble(
  "b11",  "none",   "b",      1
 )
 
-# Create simple network with no group nodes
+# Create simple network with no block nodes
 my_sbm <- create_sbm() \%>\%
   add_node('a1', type = 'a') \%>\%
   add_node('b1', type = 'b')

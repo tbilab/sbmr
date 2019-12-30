@@ -20,11 +20,11 @@
 #'   more random.
 #' @param greedy If using agglomerative initialization should algorithm search
 #'   every possible merge?
-#' @param n_checks_per_group If not using agglomerative initialization, how many
-#'   options for merging should be explored per group?
+#' @param n_checks_per_block If not using agglomerative initialization, how many
+#'   options for merging should be explored per block?
 #' @param initialization_mcmc_steps If using agglomerative initialization, how
-#'   many steps of MCMC should be run after merging groups to allow model to
-#'   find optimal layout in new group partition?
+#'   many steps of MCMC should be run after merging blocks to allow model to
+#'   find optimal layout in new block partition?
 #' @param ... Additional arguments to \code{\link{create_sbm}}
 #'
 #' @return
@@ -44,7 +44,7 @@ sample_posterior <- function(
   beta = 1.5,
   epsilon = 0.1,
   greedy = TRUE,
-  n_checks_per_group = 5,
+  n_checks_per_block = 5,
   initialization_mcmc_steps = 15,
   verbose = c("initialization"),
   ...
@@ -53,15 +53,15 @@ sample_posterior <- function(
 
   #
   # # Run initialization algorithm on base level nodes
-  # sbm %>% collapse_groups(
+  # sbm %>% collapse_blocks(
   #   greedy = greedy,
   #   num_mcmc_sweeps = initialization_mcmc_steps,
   #   beta = beta,
   # )
-  # sbm$collapse_groups(0, as.integer(initialization_mcmc_steps))
+  # sbm$collapse_blocks(0, as.integer(initialization_mcmc_steps))
   #
   # tibble(
-  #   n_groups =  merge_results %>%
+  #   n_blocks =  merge_results %>%
   #     purrr::map('state') %>%
   #     purrr::map_int(~{
   #       .x %>%
@@ -71,15 +71,15 @@ sample_posterior <- function(
   #     }),
   #   entropy = merge_results %>% purrr::map_dbl('entropy')
   # ) %>%
-  #   ggplot(aes(x = n_groups, y = entropy)) +
+  #   ggplot(aes(x = n_blocks, y = entropy)) +
   #   geom_line()
   #
 
 
   # for(i in 1:10){
   #   entro_pre <- sbm$compute_entropy(0L)
-  #   groups_moved <- sbm$mcmc_sweep(0L,FALSE)
-  #   print(paste("started with entropy of", entro_pre, "and moved", groups_moved))
+  #   blocks_moved <- sbm$mcmc_sweep(0L,FALSE)
+  #   print(paste("started with entropy of", entro_pre, "and moved", blocks_moved))
   # }
 
 

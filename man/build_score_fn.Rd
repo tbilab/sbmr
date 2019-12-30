@@ -9,25 +9,25 @@ build_score_fn(heuristic)
 \arguments{
 \item{heuristic}{How the best partitioning is defined. Takes either a
 function that takes one/two arguments: an entropy vector and an optional
-number of groups vector with each element corresponding to a given
-location, or a string labeling algorithm. Currently only \code{lowest} and
-\code{dev_from_rolling_mean} are supported.}
+number of blocks vector with each element corresponding to a given
+location, or a string labeling algorithm. Currently only \code{"lowest"},
+\code{"dev_from_rolling_mean"}, and \code{"nls_residual"} are supported.}
 }
 \value{
-A function that takes and entropy and number of group vector and
+A function that takes and entropy and number of block vector and
 returns a score for partitioning (higher = better)
 }
 \description{
 (Internal) Takes a heuristic object and turns it into a function that takes
-two arguments, entropy and number of groups that is used to calculate the
-score for a given entropy-number of groups step for agglomerative merging
+two arguments, entropy and number of blocks that is used to calculate the
+score for a given entropy-number of blocks step for agglomerative merging
 algorithms.
 }
 \examples{
 
-# Setup fake entropy and number of groups vectors
+# Setup fake entropy and number of blocks vectors
 entropy <- -(10:1)*1000 + rnorm(10, 200)
-num_groups <- 1:10
+num_blocks <- 1:10
 
 # Works with heuristic functions that take two arguments
 nls_score <- function(e, k){
@@ -35,14 +35,14 @@ nls_score <- function(e, k){
   -residuals(entropy_model)
 }
 
-build_score_fn(nls_score)(entropy, num_groups)
+build_score_fn(nls_score)(entropy, num_blocks)
 
 # Works with functions that take one argument
 invert_score <- function(e) -e/2
-build_score_fn(invert_score)(entropy, num_groups)
+build_score_fn(invert_score)(entropy, num_blocks)
 
 # Works with predefined strings
-build_score_fn("dev_from_rolling_mean")(entropy, num_groups)
-build_score_fn("lowest")(entropy, num_groups)
+build_score_fn("dev_from_rolling_mean")(entropy, num_blocks)
+build_score_fn("lowest")(entropy, num_blocks)
 
 }

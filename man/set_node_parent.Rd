@@ -20,12 +20,12 @@ value of \code{0}.}
 SBM model object modified with node hierarchy modified. \emph{Note that object is modified in place as well.}
 }
 \description{
-Sets the parent node (or group) for a given node. Takes child node's id
+Sets the parent node (or block) for a given node. Takes child node's id
 (string), parent node's id (string), and the level of child node (int).
 }
 \examples{
 
-# Create a model with two nodes, one at the group level (1)
+# Create a model with two nodes, one at the block level (1)
 my_sbm <- create_sbm() \%>\%
   add_node('node_1') \%>\%
   add_node('node_11', level = 1)

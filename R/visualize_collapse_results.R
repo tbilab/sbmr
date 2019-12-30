@@ -1,12 +1,12 @@
 #' Visualize agglomerative collapse results
 #'
-#' Plots entropy against number of groups left for a collapse run. If
+#' Plots entropy against number of blocks left for a collapse run. If
 #' `heuristic` is set to value other than `NULL` a second plot of the score for
 #' each merger step according to the heuristic provided is also shown.
 #'
 #' @param collapse_results Dataframe of agglomerative merging based collapse
 #'   results as returned from \link{\code{collapse_run}}, or
-#'   \link{\code{collapse_groups(report_all_steps = TRUE)}}.
+#'   \link{\code{collapse_blocks(report_all_steps = TRUE)}}.
 #' @inheritParams build_score_fn
 #'
 #' @return GGplot object comparing the fit results and each step's deviance from
@@ -16,12 +16,12 @@
 #' @examples
 #' set.seed(42)
 #'
-#' # Start with a random network of two groups with 25 nodes each
-#' network <- sim_basic_block_network(n_groups = 3, n_nodes_per_group = 25)
+#' # Start with a random network of two blocks with 25 nodes each
+#' network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25)
 #'
 #' # Run agglomerative clustering with no intermediate MCMC steps on sbm of simulated data
 #' collapse_results <- create_sbm(network) %>%
-#'   collapse_run(sigma = 3, start_group_num = 1, end_group_num = 8)
+#'   collapse_run(sigma = 3, start_block_num = 1, end_block_num = 8)
 #'
 #' # =============================================================================
 #' # Visualize using no heuristic
@@ -48,14 +48,14 @@ visualize_collapse_results <- function(collapse_results, heuristic = NULL){
   if(!is.null(heuristic)){
     collapse_results <- collapse_results %>%
       dplyr::mutate(
-        score = build_score_fn(heuristic)(entropy, num_groups),
+        score = build_score_fn(heuristic)(entropy, num_blocks),
       )
   }
 
   collapse_results %>%
     dplyr::select(-state) %>%
-    tidyr::pivot_longer(-num_groups) %>%
-    ggplot2::ggplot(ggplot2::aes(x = num_groups, y = value)) +
+    tidyr::pivot_longer(-num_blocks) %>%
+    ggplot2::ggplot(ggplot2::aes(x = num_blocks, y = value)) +
     ggplot2::geom_point() +
     ggplot2::geom_line() +
     ggplot2::facet_grid(name~., scales = 'free_y')

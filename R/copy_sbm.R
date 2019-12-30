@@ -1,7 +1,7 @@
 #' Copy existing SBM object
 #'
 #' @param old_sbm Old SBM created with \link{\code{create_sbm}}
-#' @param match_state Should copy also match the current grouping state of old model?
+#' @param match_state Should copy also match the current blocking state of old model?
 #'
 #' @return A new deep copy of the original SBM with parameters preserved.
 #' @export
@@ -43,7 +43,7 @@ copy_sbm <- function(old_sbm, match_state = FALSE){
   # Set free parameters
   new_sbm$BETA <- old_sbm$BETA
   new_sbm$SIGMA <- old_sbm$SIGMA
-  new_sbm$N_CHECKS_PER_GROUP <- old_sbm$N_CHECKS_PER_GROUP
+  new_sbm$N_CHECKS_PER_block <- old_sbm$N_CHECKS_PER_block
   new_sbm$GREEDY <- old_sbm$GREEDY
 
   # Update state of new model if needed

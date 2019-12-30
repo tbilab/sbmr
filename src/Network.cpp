@@ -22,21 +22,21 @@ void Network::add_level(const int level)
 LevelPtr Network::get_level(const int level) 
 {
   PROFILE_FUNCTION();
-  // Grab level for group node
-  LevelMap::iterator group_level = nodes.find(level);
+  // Grab level for block node
+  LevelMap::iterator block_level = nodes.find(level);
 
   // Is this a new level?
-  bool level_doesnt_exist = group_level == nodes.end();
+  bool level_doesnt_exist = block_level == nodes.end();
 
   if (level_doesnt_exist) {
     // Add a new node level
     add_level(level);
 
     // 'find' that new level
-    group_level = nodes.find(level);
+    block_level = nodes.find(level);
   }
   
-  return group_level->second;
+  return block_level->second;
 }
 
 
@@ -59,9 +59,9 @@ NodePtr Network::get_node_by_id(const string desired_id, const int level)
 
 
 // =============================================================================
-// Builds a group id from a scaffold for generated new groups
+// Builds a block id from a scaffold for generated new blocks
 // =============================================================================
-string Network::build_group_id(const int type,
+string Network::build_block_id(const int type,
                                const int level,
                                const int index)
 {
@@ -84,8 +84,8 @@ NodePtr Network::add_node(const string id,
   LevelPtr node_level = get_level(level);
 
   // Check if we need to make the id or not
-  string node_id = id == "new group" ?
-    build_group_id(type, level, node_level->size()):
+  string node_id = id == "new block" ?
+    build_block_id(type, level, node_level->size()):
     id;
   
   // Create node
@@ -102,20 +102,20 @@ NodePtr Network::add_node(const string id,
 
 
 // =============================================================================
-// Creates a new group node and add it to its neccesary level
+// Creates a new block node and add it to its neccesary level
 // =============================================================================
-NodePtr Network::create_group_node(const int type, const int level) 
+NodePtr Network::create_block_node(const int type, const int level) 
 {
   PROFILE_FUNCTION();
 
   // Make sure requested level is not 0
   if(level == 0) {
-    std::cerr << "Can't create group node at first level" << std::endl;
-    throw "Can't create group node at first level";
+    std::cerr << "Can't create block node at first level" << std::endl;
+    throw "Can't create block node at first level";
   }
   
   // Initialize new node
-  return add_node("new group", type, level);
+  return add_node("new block", type, level);
 };
 
 
@@ -216,25 +216,25 @@ void Network::add_connection(const NodePtr node1, const NodePtr node2)
 
 
 // =============================================================================
-// Builds and assigns a group node for every node in a given level
+// Builds and assigns a block node for every node in a given level
 // =============================================================================
-void Network::give_every_node_at_level_own_group(const int level) 
+void Network::give_every_node_at_level_own_block(const int level) 
 { 
-  initialize_groups(-1, level);
+  initialize_blocks(-1, level);
 }    
 
 // =============================================================================
-// Adds a desired number of groups and randomly assigns them for a given level
-// num_groups = -1 means every node gets their own group
+// Adds a desired number of blocks and randomly assigns them for a given level
+// num_blocks = -1 means every node gets their own block
 // =============================================================================
-void Network::initialize_groups(const int num_groups, const int level)
+void Network::initialize_blocks(const int num_blocks, const int level)
 {
   PROFILE_FUNCTION();
 
-  const int group_level = level + 1;
+  const int block_level = level + 1;
 
-  // Clear all previous nodes in group level out
-  get_level(group_level)->clear();
+  // Clear all previous nodes in block level out
+  get_level(block_level)->clear();
 
   // Grab all the nodes for the desired level
   LevelPtr node_level = nodes.at(level);
@@ -242,38 +242,38 @@ void Network::initialize_groups(const int num_groups, const int level)
   const int num_nodes_in_level = node_level->size();
 
   // Setup a sampler
-  Sampler group_sampler;
+  Sampler block_sampler;
 
   // Make sure level has nodes before looping through it
   if (num_nodes_in_level == 0) 
   {
-    std::cerr << "Requested level is empty. (initialize_groups())" << std::endl;
+    std::cerr << "Requested level is empty. (initialize_blocks())" << std::endl;
     throw "Requested level is empty.";
   }
 
-  // Figure out how we're making groups, is it one group per node or a set number
-  // of groups total?
-  bool one_group_per_node = num_groups == -1;
+  // Figure out how we're making blocks, is it one block per node or a set number
+  // of blocks total?
+  bool one_block_per_node = num_blocks == -1;
 
-  // Make a map that gives us type -> array of new groups
-  std::map<int, std::vector<NodePtr>> type_to_groups;
+  // Make a map that gives us type -> array of new blocks
+  std::map<int, std::vector<NodePtr>> type_to_blocks;
 
   // If we're randomly distributing nodes, we'll use this map to sample a random
-  // group for a given node by its type
-  if (!one_group_per_node) 
+  // block for a given node by its type
+  if (!one_block_per_node) 
   {
     for (auto type_it = node_type_counts.begin();
               type_it != node_type_counts.end();
               type_it++)
     {
-      // Reserve proper number of slots for new groups
-      type_to_groups[type_it->first].reserve(num_groups);
+      // Reserve proper number of slots for new blocks
+      type_to_blocks[type_it->first].reserve(num_blocks);
 
-      // Buid new groups to fill those slots
-      for (int i = 0; i < num_groups; i++)
+      // Buid new blocks to fill those slots
+      for (int i = 0; i < num_blocks; i++)
       {
-        // build a group node at the next level
-        type_to_groups[type_it->first].push_back(create_group_node(type_it->first, level + 1));
+        // build a block node at the next level
+        type_to_blocks[type_it->first].push_back(create_block_node(type_it->first, level + 1));
       }
     }
   }
@@ -286,15 +286,15 @@ void Network::initialize_groups(const int num_groups, const int level)
   {
     const int node_type = node_it->second->type;
 
-    // build a group node at the next level
-    // We either build a new group for node if we're giving each node a group
-    // or sample new group from available list of groups for this type
-    NodePtr new_group = one_group_per_node ?
-      create_group_node(node_type, level + 1):
-      group_sampler.sample(type_to_groups[node_type]);
+    // build a block node at the next level
+    // We either build a new block for node if we're giving each node a block
+    // or sample new block from available list of blocks for this type
+    NodePtr new_block = one_block_per_node ?
+      create_block_node(node_type, level + 1):
+      block_sampler.sample(type_to_blocks[node_type]);
       
-    // assign that group node to the node
-    node_it->second->set_parent(new_group);
+    // assign that block node to the node
+    node_it->second->set_parent(new_block);
   }
 }
 
@@ -312,67 +312,67 @@ NodePtr Network::get_node_from_level(const int level)
 
 
 // =============================================================================
-// Scan through entire Network and remove all group nodes that have no children. 
+// Scan through entire Network and remove all block nodes that have no children. 
 // Returns the number removed
 // =============================================================================
-std::vector<NodePtr> Network::clean_empty_groups()
+std::vector<NodePtr> Network::clean_empty_blocks()
 {
   PROFILE_FUNCTION();
   int num_levels = nodes.size();
   int total_deleted = 0;
   
-  std::vector<NodePtr> groups_removed;
+  std::vector<NodePtr> blocks_removed;
 
   
   // Scan through all levels up to final
   for (int level = 1; level < num_levels; ++level) 
   {
     // Grab desired level
-    LevelPtr group_level = nodes.at(level);
+    LevelPtr block_level = nodes.at(level);
     
-    // Create a vector to store group ids that we want to delete
-    std::queue<string> groups_to_delete;
+    // Create a vector to store block ids that we want to delete
+    std::queue<string> blocks_to_delete;
     
     // Loop through every node at level
-    for (auto group_it = group_level->begin(); 
-              group_it != group_level->end(); 
-              ++group_it)
+    for (auto block_it = block_level->begin(); 
+              block_it != block_level->end(); 
+              ++block_it)
     {
-      NodePtr current_group = group_it->second;
+      NodePtr current_block = block_it->second;
       
-      // If there are no children for the current group
-      if (current_group->children.size() == 0) 
+      // If there are no children for the current block
+      if (current_block->children.size() == 0) 
       {
-        // Remove group from children of its parent (if it has one)
-        if (current_group->parent) 
+        // Remove block from children of its parent (if it has one)
+        if (current_block->parent) 
         {
-          current_group->parent->remove_child(current_group);
+          current_block->parent->remove_child(current_block);
         }
 
-        groups_removed.push_back(current_group);
+        blocks_removed.push_back(current_block);
 
-        // Add current group to the removal list
-        groups_to_delete.push(current_group->id);
+        // Add current block to the removal list
+        blocks_to_delete.push(current_block->id);
 
         // Remove nodes contribution to node counts map
-        node_type_counts[current_group->type][level]--;
+        node_type_counts[current_block->type][level]--;
       }
     }
 
-    // Remove all the groups in the removal list
-    while (!groups_to_delete.empty())
+    // Remove all the blocks in the removal list
+    while (!blocks_to_delete.empty())
     {
-      group_level->erase(groups_to_delete.front());
+      block_level->erase(blocks_to_delete.front());
       
       // Remove reference from queue
-      groups_to_delete.pop();
+      blocks_to_delete.pop();
 
-      // Increment total groups deleted counter
+      // Increment total blocks deleted counter
       total_deleted++;
     }
   }
   
-  return groups_removed;
+  return blocks_removed;
 }                     
 
 
@@ -482,5 +482,5 @@ void Network::load_from_state(const State_Dump state)
 
   // Now clean up any potentially childless nodes that got kicked
   // out by this process
-  clean_empty_groups();
+  clean_empty_blocks();
 }

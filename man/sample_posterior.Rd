@@ -15,7 +15,7 @@ sample_posterior(
   beta = 1.5,
   epsilon = 0.1,
   greedy = TRUE,
-  n_checks_per_group = 5,
+  n_checks_per_block = 5,
   initialization_mcmc_steps = 15,
   verbose = c("initialization"),
   ...
@@ -52,12 +52,12 @@ more random.}
 \item{greedy}{If using agglomerative initialization should algorithm search
 every possible merge?}
 
-\item{n_checks_per_group}{If not using agglomerative initialization, how many
-options for merging should be explored per group?}
+\item{n_checks_per_block}{If not using agglomerative initialization, how many
+options for merging should be explored per block?}
 
 \item{initialization_mcmc_steps}{If using agglomerative initialization, how
-many steps of MCMC should be run after merging groups to allow model to
-find optimal layout in new group partition?}
+many steps of MCMC should be run after merging blocks to allow model to
+find optimal layout in new block partition?}
 
 \item{verbose}{Array of what info should be printed as model runs. Default
 shows \code{"initialization"} info of model. Other options are \verb{"silent} to

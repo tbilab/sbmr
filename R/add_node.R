@@ -6,7 +6,7 @@
 #' @param sbm SBM model object as created by \code{\link{create_sbm()}}.
 #' @param id Unique identifying name for node.
 #' @param type Type of node (string). This is used to distinguish multipartite networks. E.g. "person", or "publication", etc..
-#' @param level Level in node hierarchy. Level `0` indicates node is at the data level, levels greater than `0` are group nodes.
+#' @param level Level in node hierarchy. Level `0` indicates node is at the data level, levels greater than `0` are block nodes.
 #'
 #' @return SBM model object modified with node added. \emph{Note that object is modified in place as well.}
 #' @export

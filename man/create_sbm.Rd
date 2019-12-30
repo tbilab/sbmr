@@ -34,7 +34,7 @@ can be provided to give information about node type.
 my_sbm <- create_sbm(eps = 0.4)
 
 # Create model from simple simulated data
-my_sbm <- create_sbm(sim_basic_block_network(n_groups = 2, n_nodes_per_group = 25))
+my_sbm <- create_sbm(sim_basic_block_network(n_blocks = 2, n_nodes_per_block = 25))
 
 
 }

@@ -16,20 +16,20 @@ TEST_CASE("Generate Node move proposals", "[SBM]")
 
   NodePtr a1 = my_SBM.get_node_by_id("a1");
 
-  // Initialize a sampler to choose group
+  // Initialize a sampler to choose block
   Sampler my_sampler;
 
   int num_trials = 5000;
   int num_times_no_move = 0;
-  NodePtr old_group = a1->parent;
+  NodePtr old_block = a1->parent;
 
   // Run multiple trials and of move and see how often a given node is moved
   for (int i = 0; i < num_trials; ++i)
   {
     // Do move attempt (dry run)
-    NodePtr new_group = my_SBM.propose_move(a1);
+    NodePtr new_block = my_SBM.propose_move(a1);
 
-    if (new_group->id == old_group->id)
+    if (new_block->id == old_block->id)
       num_times_no_move++;
   }
 
@@ -62,21 +62,21 @@ TEST_CASE("Calculate Model entropy", "[SBM]")
 
   // Calculate entropy delta caused by moving a node
   NodePtr node_to_move = my_SBM.get_node_by_id("a1");
-  NodePtr from_group = node_to_move->parent;
-  NodePtr to_group = my_SBM.get_node_by_id("a12", 1);
+  NodePtr from_block = node_to_move->parent;
+  NodePtr to_block = my_SBM.get_node_by_id("a12", 1);
 
 
   my_SBM.BETA = 0.1;
   // Calculate the entropy delta along with acceptance prob
   Proposal_Res proposal_results = my_SBM.make_proposal_decision(
       node_to_move,
-      to_group);
+      to_block);
 
   double entropy_delta = proposal_results.entropy_delta;
 
   // Now we will actually move the desired node and test to see if entropy has changed
   // Move node
-  node_to_move->set_parent(to_group);
+  node_to_move->set_parent(to_block);
 
   // Recalculate entropy
   double new_entropy = my_SBM.compute_entropy(0);
@@ -133,17 +133,17 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
   // Setup simple SBM model
   SBM my_SBM = build_simple_SBM();
 
-  int num_initial_groups = my_SBM.get_level(1)->size();
+  int num_initial_blocks = my_SBM.get_level(1)->size();
   double initial_entropy = my_SBM.compute_entropy(0);
 
 
   // Run greedy aglomerative merge with best single merge done
   Merge_Step single_merge = my_SBM.agglomerative_merge(1, 1);
 
-  // Make sure that we now have one less group than before for each type
-  int new_group_num = my_SBM.get_level(1)->size();
-  int change_in_groups = num_initial_groups - new_group_num;
-  REQUIRE(change_in_groups == 1);
+  // Make sure that we now have one less block than before for each type
+  int new_block_num = my_SBM.get_level(1)->size();
+  int change_in_blocks = num_initial_blocks - new_block_num;
+  REQUIRE(change_in_blocks == 1);
 
   // Make sure entropy has gone down as we would expect
   REQUIRE(initial_entropy < single_merge.entropy);
@@ -155,10 +155,10 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
   // Run greedy aglomerative merge with best single merge done
   Merge_Step double_merge = new_SBM.agglomerative_merge(1, 2);
 
-  // Make sure that we now have two fewer groups per type than before
+  // Make sure that we now have two fewer blocks per type than before
   REQUIRE(
       2 ==
-      num_initial_groups - new_SBM.get_level(1)->size());
+      num_initial_blocks - new_SBM.get_level(1)->size());
 
   // Entropy should go down even more with two merges
   REQUIRE(single_merge.entropy < double_merge.entropy);
@@ -169,21 +169,21 @@ TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
   // Setup simple SBM model
   SBM my_SBM = build_simple_SBM();
 
-  int num_initial_groups = my_SBM.get_level(1)->size();
+  int num_initial_blocks = my_SBM.get_level(1)->size();
   double initial_entropy = my_SBM.compute_entropy(0);
 
   my_SBM.SIGMA = 2;
   // my_SBM.EPS = 0.01;
 
-  // Run full agglomerative merging algorithm till we have just 3 groups left
-  auto run_results = my_SBM.collapse_groups(
+  // Run full agglomerative merging algorithm till we have just 3 blocks left
+  auto run_results = my_SBM.collapse_blocks(
     0,
     0,
     3, 
     false
   );
 
-  // Make sure that we now have just 3 groups left
+  // Make sure that we now have just 3 blocks left
   REQUIRE(my_SBM.get_level(1)->size() == 3);
 }
 
@@ -193,23 +193,23 @@ TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]"
   // Setup simple SBM model
   SBM my_SBM = build_simulated_SBM();
 
-  int desired_num_groups = 6;
+  int desired_num_blocks = 6;
 
   my_SBM.SIGMA = 0.5;
   my_SBM.EPS = 2;
 
   // Run full agglomerative merging algorithm 
-  auto run_results = my_SBM.collapse_groups(
+  auto run_results = my_SBM.collapse_blocks(
     0,
     0,
-    desired_num_groups,
+    desired_num_blocks,
     true
   );
 
-  int num_groups_removed = my_SBM.get_level(0)->size() - my_SBM.get_level(1)->size();
+  int num_blocks_removed = my_SBM.get_level(0)->size() - my_SBM.get_level(1)->size();
 
-  // Make sure we have a single step for each group removed.
-  REQUIRE(num_groups_removed == run_results.size());
+  // Make sure we have a single step for each block removed.
+  REQUIRE(num_blocks_removed == run_results.size());
 
 }
 
@@ -218,17 +218,17 @@ TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]")
   // Setup simple SBM model
   SBM my_SBM = build_simulated_SBM();
 
-  int desired_num_groups = 4;
+  int desired_num_blocks = 4;
 
   my_SBM.GREEDY = false;
-  // Run full agglomerative merging algorithm till we have just 3 groups left
-  auto run_results = my_SBM.collapse_groups(
+  // Run full agglomerative merging algorithm till we have just 3 blocks left
+  auto run_results = my_SBM.collapse_blocks(
     0,
     0,
-    desired_num_groups,
+    desired_num_blocks,
     false
   );
 
-  // Make sure that we have lumped together at least some groups
+  // Make sure that we have lumped together at least some blocks
   REQUIRE(my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size());
 }

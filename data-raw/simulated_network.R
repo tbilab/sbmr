@@ -9,8 +9,8 @@ N_a <- 25  # Number of nodes of the a type
 N_b <- 25  # Number of nodes of the b type
 K_a <- 3    # How many blocks of a type nodes are there
 K_b <- 3    # How many blocks of the b type nodes are there
-b_a <- assign_group_membership(N = N_a, K = K_a) # Block membership for each a node
-b_b <- assign_group_membership(N = N_b, K = K_b) # Block membership for each b node
+b_a <- assign_block_membership(N = N_a, K = K_a) # Block membership for each a node
+b_b <- assign_block_membership(N = N_b, K = K_b) # Block membership for each b node
 
 
 edges <- draw_from_model(

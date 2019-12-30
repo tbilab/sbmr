@@ -34,9 +34,9 @@ test_that("Copy with state works", {
   # Generate a random network to build initial sbm with
   network <- sim_random_network(n_nodes = 15)
 
-  # Generate initial sbm and randomly assign nodes to 3 groups
+  # Generate initial sbm and randomly assign nodes to 3 blocks
   initial_sbm <- create_sbm(network) %>%
-    initialize_groups(num_groups = 3)
+    initialize_blocks(num_blocks = 3)
 
   # Copy initial sbm and tell it to match state as well
   copied_sbm <- copy_sbm(initial_sbm, match_state = TRUE)
@@ -75,7 +75,7 @@ test_that("Hyperparameters are copied over", {
   initial_sbm$BETA <- beta
   initial_sbm$SIGMA <- sigma
   initial_sbm$GREEDY <- greedy
-  initial_sbm$N_CHECKS_PER_GROUP <- n_checks
+  initial_sbm$N_CHECKS_PER_block <- n_checks
 
   # Copy initial sbm and tell it to match state as well
   copied_sbm <- copy_sbm(initial_sbm)
@@ -84,5 +84,5 @@ test_that("Hyperparameters are copied over", {
   expect_equal(initial_sbm$BETA, beta)
   expect_equal(initial_sbm$SIGMA, sigma)
   expect_equal(initial_sbm$GREEDY, greedy)
-  expect_equal(initial_sbm$N_CHECKS_PER_GROUP, n_checks)
+  expect_equal(initial_sbm$N_CHECKS_PER_block, n_checks)
 })

@@ -9,8 +9,8 @@ compute_entropy(sbm, level = 0)
 \arguments{
 \item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
 
-\item{level}{Level of nodes for which group entropy is accessed. E.g. the
-default value of \code{0} will get entropy of model as described by the groups
+\item{level}{Level of nodes for which block entropy is accessed. E.g. the
+default value of \code{0} will get entropy of model as described by the blocks
 in level \code{1}.}
 }
 \value{
@@ -22,7 +22,7 @@ level (int).
 }
 \examples{
 
-# Build basic network with 3 nodes and two groups
+# Build basic network with 3 nodes and two blocks
 my_sbm <- create_sbm() \%>\%
   add_node('node_1') \%>\%
   add_node('node_2') \%>\%

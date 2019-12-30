@@ -2,11 +2,11 @@
 % Please edit documentation in R/sim_basic_block_network.R
 \name{sim_basic_block_network}
 \alias{sim_basic_block_network}
-\title{Simulate stochastic block model of given number of groups}
+\title{Simulate stochastic block model of given number of blocks}
 \usage{
 sim_basic_block_network(
-  n_groups = 2,
-  n_nodes_per_group = 5,
+  n_blocks = 2,
+  n_nodes_per_block = 5,
   propensity_drawer = function(n) {     sample(seq(rbeta(1, 1, 5), rbeta(1, 5, 1),
     length.out = n)) },
   edge_dist = purrr::rbernoulli,
@@ -16,9 +16,9 @@ sim_basic_block_network(
 )
 }
 \arguments{
-\item{n_groups}{How many groups to simulate}
+\item{n_blocks}{How many blocks to simulate}
 
-\item{n_nodes_per_group}{How many nodes in each group}
+\item{n_nodes_per_block}{How many nodes in each block}
 
 \item{propensity_drawer}{Function that takes a single size argumenet and
 returns a vector of connection propensities of specified size. Default
@@ -30,7 +30,7 @@ number of samples to draw and the second the \code{propensity} value from
 takes two arguments: \code{n} and \code{lambda}. In this scenario the \code{propensity} of
 connections between two nodes is provided to \code{lambda} and thus is the
 average number of connections for each pair of nodes between two given
-groups.}
+blocks.}
 
 \item{allow_self_connections}{Should nodes be allowed to have connections to
 themselves?}
@@ -44,23 +44,23 @@ also include the simulated connection propensities dataframe. This can be
 used for recreating draws using \code{\link{sim_sbm_network()}}.}
 }
 \value{
-A list with a \code{nodes} dataframe (containing a node's \code{id} and \code{group}
+A list with a \code{nodes} dataframe (containing a node's \code{id} and \code{block}
 membership), an \code{edges} dataframe (containing \code{from} and \code{to} nodes along
 with the total number of \code{connections} as drawn from \code{edge_dist}), and if
 \code{return_connection_propensities == TRUE}: \code{connection_propensities}
 dataframe that shows the randomly drawn connection propensities between
-groups.
+blocks.
 }
 \description{
 Simulates a simple block structured network with a desired number of constant
-sized groups. The probability of connections between given groups will be
+sized blocks. The probability of connections between given blocks will be
 drawn from a passed function that must return a numeric value that will be
 used as the propensity parameter for drawing edge counts from a node pair.
 The default values will draw propensity values for bernouli edges with an
 average of a 50\% chance of connection.
 }
 \examples{
-sim_basic_block_network(n_groups = 4, n_nodes_per_group = 10)
+sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 10)
 }
 \seealso{
 \code{\link{sim_sbm_network}} \code{\link{sim_random_network}}

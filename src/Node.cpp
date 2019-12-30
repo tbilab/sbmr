@@ -189,12 +189,12 @@ std::vector<NodePtr> Node::get_connections_to_level(const int desired_level)
 
 // =============================================================================
 // Collapse a nodes connection to a given level into a map of
-// connected group id->count
+// connected block id->count
 // =============================================================================
 std::map<NodePtr, int> Node::gather_connections_to_level(const int level)
 {
   //PROFILE_FUNCTION();
-  // Gather all connections from the moved node to the level of the groups we're
+  // Gather all connections from the moved node to the level of the blocks we're
   // working with
   std::vector<NodePtr> all_connections = get_connections_to_level(level);
 

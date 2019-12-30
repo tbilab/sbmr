@@ -15,13 +15,13 @@ choose_best_collapse_state(
 \item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
 
 \item{collapse_results}{Results of running agglomerative collapse algorithm
-on sbm with \code{\link{collapse_groups}}.}
+on sbm with \code{\link{collapse_blocks}}.}
 
 \item{heuristic}{How the best partitioning is defined. Takes either a
 function that takes one/two arguments: an entropy vector and an optional
-number of groups vector with each element corresponding to a given
-location, or a string labeling algorithm. Currently only \code{lowest} and
-\code{dev_from_rolling_mean} are supported.}
+number of blocks vector with each element corresponding to a given
+location, or a string labeling algorithm. Currently only \code{"lowest"},
+\code{"dev_from_rolling_mean"}, and \code{"nls_residual"} are supported.}
 
 \item{verbose}{Should model tell you what step was chosen (\code{TRUE} or \code{FALSE})?}
 }
@@ -35,14 +35,14 @@ Choose and load best model state from agglomerative collapsing algorithm
 \examples{
 set.seed(42)
 
-# Start with a random network of two groups with 25 nodes each
-network <- sim_basic_block_network(n_groups = 3, n_nodes_per_group = 25)
+# Start with a random network of two blocks with 25 nodes each
+network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25)
 
 # Create SBM from simulated data
 my_sbm <- create_sbm(network)
 
 # Run agglomerative clustering with no intermediate MCMC steps on network
-collapse_results <- collapse_run(my_sbm, sigma = 3, start_group_num = 1, end_group_num = 6)
+collapse_results <- collapse_run(my_sbm, sigma = 3, start_block_num = 1, end_block_num = 6)
 
 # Choose best result with default heuristic
 my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, verbose = TRUE)

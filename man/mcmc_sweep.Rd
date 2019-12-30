@@ -4,16 +4,16 @@
 \alias{mcmc_sweep}
 \title{Run a single MCMC sweep over nodes}
 \usage{
-mcmc_sweep(sbm, level = 0, variable_num_groups = TRUE, beta = 1.5)
+mcmc_sweep(sbm, level = 0, variable_num_blocks = TRUE, beta = 1.5)
 }
 \arguments{
 \item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
 
-\item{level}{Level of nodes who's groups will have their group membership run
+\item{level}{Level of nodes who's blocks will have their block membership run
 through MCMC proposal-accept routine.}
 
-\item{variable_num_groups}{Should the model allow new groups to be created or
-empty groups removed while sweeping or should number of groups remain
+\item{variable_num_blocks}{Should the model allow new blocks to be created or
+empty blocks removed while sweeping or should number of blocks remain
 constant?}
 
 \item{beta}{Inverse temperature parameter for determining move acceptance
@@ -28,24 +28,24 @@ sweep (\code{nodes_moved}) and the sweeps impact on the model's entropy
 Runs a single Metropolis Hastings MCMC sweep across all nodes at specified
 level (For algorithm details see
 \href{https://arxiv.org/abs/1705.10225}{Piexoto, 2018}). Each node is given a
-chance to move groups or stay in current group and all nodes are processed in
+chance to move blocks or stay in current block and all nodes are processed in
 random order. Takes the level that the sweep should take place on (int) and
-if new groups groups can be proposed and empty groups removed (boolean).
+if new blocks blocks can be proposed and empty blocks removed (boolean).
 }
 \examples{
 
 set.seed(42)
 
-# Start with a random network and assign randomly to 4 groups
-n_groups <- 3
-my_sbm <- create_sbm(sim_basic_block_network(n_groups = n_groups, n_nodes_per_group = 15)) \%>\%
-  initialize_groups(num_groups = n_groups)
+# Start with a random network and assign randomly to 4 blocks
+n_blocks <- 3
+my_sbm <- create_sbm(sim_basic_block_network(n_blocks = n_blocks, n_nodes_per_block = 15)) \%>\%
+  initialize_blocks(num_blocks = n_blocks)
 
-# Calculate entropy with random groups
+# Calculate entropy with random blocks
 compute_entropy(my_sbm)
 
 # Run 4 MCMC sweeps
-for(i in 1:4) my_sbm \%>\% mcmc_sweep(variable_num_groups = FALSE)
+for(i in 1:4) my_sbm \%>\% mcmc_sweep(variable_num_blocks = FALSE)
 
 # Calculate entropy after sweeps
 compute_entropy(my_sbm)

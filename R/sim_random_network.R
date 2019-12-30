@@ -17,13 +17,13 @@
 sim_random_network <- function(n_nodes = 5, prob_of_connection = 0.7, allow_self_connections = FALSE){
 
   sim_sbm_network(
-    group_info = dplyr::tibble(
-      group = "node",
+    block_info = dplyr::tibble(
+      block = "node",
       n_nodes = n_nodes
     ),
     connection_propensities = dplyr::tibble(
-      group_1 = "node",
-      group_2 = "node",
+      block_1 = "node",
+      block_2 = "node",
       propensity = prob_of_connection
     ),
     edge_dist = purrr::rbernoulli,

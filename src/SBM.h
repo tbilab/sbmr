@@ -14,13 +14,13 @@ struct Merge_Step
 {
   double entropy;
   State_Dump state;
-  int num_groups;
+  int num_blocks;
   std::vector<string> from_node;
   std::vector<string> to_node;
   Merge_Step() {}
   Merge_Step(const double e, const State_Dump s, const int n) : entropy(e),
                                               state(s),
-                                              num_groups(n) {}
+                                              num_blocks(n) {}
 };
 
 struct Proposal_Res
@@ -61,7 +61,7 @@ public:
   double SIGMA = 0.5;
   double BETA = 1.5;
   bool GREEDY = true;
-  int N_CHECKS_PER_GROUP = 5; // When not greedy
+  int N_CHECKS_PER_block = 5; // When not greedy
 
 
   // Methods
@@ -70,28 +70,28 @@ public:
   // Compute microcononical entropy of current model state at a level
   double compute_entropy(int level);
 
-  // Merge two groups, placing all nodes that were under group_b under
-  // group_a and deleting from model.
-  void merge_groups(NodePtr group_a, NodePtr group_b);
+  // Merge two blocks, placing all nodes that were under block_b under
+  // block_a and deleting from model.
+  void merge_blocks(NodePtr block_a, NodePtr block_b);
 
-  // Use model state to propose a potential group move for a node.
+  // Use model state to propose a potential block move for a node.
   NodePtr propose_move(NodePtr node);
 
-  // Make a decision on the proposed new group for node
-  Proposal_Res make_proposal_decision(NodePtr node, NodePtr new_group);
+  // Make a decision on the proposed new block for node
+  Proposal_Res make_proposal_decision(NodePtr node, NodePtr new_block);
 
   // Runs efficient MCMC sweep algorithm on desired node level
-  Sweep_Res mcmc_sweep(int level, bool variable_num_groups);
+  Sweep_Res mcmc_sweep(int level, bool variable_num_blocks);
 
-  // Merge two groups at a given level based on the probability of doing so
-  Merge_Step agglomerative_merge( int level_of_groups, int n_merges);
+  // Merge two blocks at a given level based on the probability of doing so
+  Merge_Step agglomerative_merge( int level_of_blocks, int n_merges);
 
   // Run mcmc chain initialization by finding best organization
-  // of B' groups for all B from B = N to B = 1.
-  std::vector<Merge_Step> collapse_groups(
+  // of B' blocks for all B from B = N to B = 1.
+  std::vector<Merge_Step> collapse_blocks(
       int node_level,
       int num_mcmc_steps,
-      int desired_num_groups, // Default value which lets model drop to 1 group per type.
+      int desired_num_blocks, // Default value which lets model drop to 1 block per type.
       bool report_all_steps);
 
 }; // End SBM class declaration

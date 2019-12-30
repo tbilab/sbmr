@@ -185,9 +185,9 @@ public:
     find_node_by_id(child_id, level)->set_parent(find_node_by_id(parent_id, level + 1));
   }
 
-  void initialize_groups(const int num_groups, const int level)
+  void initialize_blocks(const int num_blocks, const int level)
   {
-   Network::initialize_groups(num_groups, level);
+   Network::initialize_blocks(num_blocks, level);
   }
 
   double compute_entropy(const int level)
@@ -195,10 +195,10 @@ public:
     return SBM::compute_entropy(level);
   }
 
-  List mcmc_sweep(int level, bool variable_num_groups)
+  List mcmc_sweep(int level, bool variable_num_blocks)
   {
     // Run sweep method
-    Sweep_Res result = SBM::mcmc_sweep(level, variable_num_groups);
+    Sweep_Res result = SBM::mcmc_sweep(level, variable_num_blocks);
 
     // Package result struct into a list
     return List::create(
@@ -206,16 +206,16 @@ public:
         _["entropy_delta"] = result.entropy_delta);
   }
 
-  List collapse_groups(const int node_level,
+  List collapse_blocks(const int node_level,
                        const int num_mcmc_steps,
-                       int desired_num_groups,
+                       int desired_num_blocks,
                        const bool report_all_steps)
   {
 
     // Perform collapse
-    auto collapse_results = SBM::collapse_groups(node_level,
+    auto collapse_results = SBM::collapse_blocks(node_level,
                                                  num_mcmc_steps,
-                                                 desired_num_groups,
+                                                 desired_num_blocks,
                                                  report_all_steps);
 
 
@@ -229,7 +229,7 @@ public:
           List::create(
               _["entropy"] = step->entropy,
               _["state"] = state_to_df(step->state),
-              _["num_groups"] = step->num_groups));
+              _["num_blocks"] = step->num_blocks));
     }
 
     return entropy_results;
@@ -237,17 +237,17 @@ public:
 
   List collapse_run(const int node_level,
                     const int num_mcmc_steps,
-                    const std::vector<int> group_nums)
+                    const std::vector<int> block_nums)
   {
 
     // const int num_steps = end_num - start_num;
-    // if(num_steps <= 0) stop("End number of groups for collapse run to be higher than start.");
+    // if(num_steps <= 0) stop("End number of blocks for collapse run to be higher than start.");
 
     List return_to_r;
-    for (int target_num : group_nums)
+    for (int target_num : block_nums)
     {
       return_to_r.push_back(
-        collapse_groups(
+        collapse_blocks(
            node_level,
            num_mcmc_steps,
            target_num,
@@ -283,8 +283,8 @@ public:
   void set_greedy(const bool greedy) { GREEDY = greedy; }
   bool get_greedy() { return GREEDY; }
 
-  void set_n_checks_per_group(const int n) { N_CHECKS_PER_GROUP = n; }
-  int get_n_checks_per_group() { return N_CHECKS_PER_GROUP; }
+  void set_n_checks_per_block(const int n) { N_CHECKS_PER_block = n; }
+  int get_n_checks_per_block() { return N_CHECKS_PER_block; }
 };
 
 RCPP_MODULE(SBM)
@@ -309,8 +309,8 @@ RCPP_MODULE(SBM)
                 &Rcpp_SBM::get_sigma, &Rcpp_SBM::set_sigma,
                 "Sigma value for determining rate of agglomerative merging")
 
-      .property("N_CHECKS_PER_GROUP",
-                &Rcpp_SBM::get_n_checks_per_group, &Rcpp_SBM::set_n_checks_per_group,
+      .property("N_CHECKS_PER_block",
+                &Rcpp_SBM::get_n_checks_per_block, &Rcpp_SBM::set_n_checks_per_block,
                 "If not in greedy mode, how many options do we check per node for moves in agglomerative merging?")
 
       .method("add_node",
@@ -322,10 +322,10 @@ RCPP_MODULE(SBM)
               "Connects two nodes in network (at level 0) by their ids (string).")
       .method("set_node_parent",
               &Rcpp_SBM::set_node_parent,
-              "Sets the parent node (or group) for a given node. Takes child node's id (string), parent node's id (string), and the level of child node (int).")
-      .method("initialize_groups",
-             &Rcpp_SBM::initialize_groups,
-             "Adds a desired number of groups and randomly assigns them for a given level. num_groups = -1 means every node gets their own group")
+              "Sets the parent node (or block) for a given node. Takes child node's id (string), parent node's id (string), and the level of child node (int).")
+      .method("initialize_blocks",
+             &Rcpp_SBM::initialize_blocks,
+             "Adds a desired number of blocks and randomly assigns them for a given level. num_blocks = -1 means every node gets their own block")
       .method("get_state",
               &Rcpp_SBM::get_state,
               "Exports the current state of the network as dataframe with each node as a row and columns for node id, parent id, node type, and node level.")
@@ -343,13 +343,13 @@ RCPP_MODULE(SBM)
               "Computes the (degree-corrected) entropy for the network at the specified level (int).")
       .method("mcmc_sweep",
               &Rcpp_SBM::mcmc_sweep,
-              "Runs a single MCMC sweep across all nodes at specified level. Each node is given a chance to move groups or stay in current group and all nodes are processed in random order. Takes the level that the sweep should take place on (int) and if new groups groups can be proposed and empty groups removed (boolean).")
-      .method("collapse_groups",
-              &Rcpp_SBM::collapse_groups,
-              "Performs agglomerative merging on network, starting with each group has a single node down to one group per node type. Arguments are level to perform merge at (int) and number of MCMC steps to peform between each collapsing to equilibriate group. Returns list with entropy and model state at each merge.")
+              "Runs a single MCMC sweep across all nodes at specified level. Each node is given a chance to move blocks or stay in current block and all nodes are processed in random order. Takes the level that the sweep should take place on (int) and if new blocks blocks can be proposed and empty blocks removed (boolean).")
+      .method("collapse_blocks",
+              &Rcpp_SBM::collapse_blocks,
+              "Performs agglomerative merging on network, starting with each block has a single node down to one block per node type. Arguments are level to perform merge at (int) and number of MCMC steps to peform between each collapsing to equilibriate block. Returns list with entropy and model state at each merge.")
       .method("collapse_run",
               &Rcpp_SBM::collapse_run,
-              "Performs a sequence of group collapse steps on network. Targets a range of final groups numbers and collapses to them and returns final result form each collapse.");
+              "Performs a sequence of block collapse steps on network. Targets a range of final blocks numbers and collapses to them and returns final result form each collapse.");
 }
 /*** R
 sbm <- new(SBM)
@@ -388,14 +388,14 @@ sbm$set_node_parent("b3", "b12", 0)
 sbm$GREEDY <- TRUE
 sbm$BETA <- 1.5
 sbm$EPS <- 0.1
-sbm$N_CHECKS_PER_GROUP <- 5
+sbm$N_CHECKS_PER_block <- 5
 
 original_state <- sbm$get_state()
 
 for(i in 1:10){
   entro_pre <- sbm$compute_entropy(0L)
-  groups_moved <- sbm$mcmc_sweep(0L,FALSE)
-  print(paste("started with entropy of", entro_pre, "and moved", groups_moved))
+  blocks_moved <- sbm$mcmc_sweep(0L,FALSE)
+  print(paste("started with entropy of", entro_pre, "and moved", blocks_moved))
 }
 
 new_state <- sbm$get_state()
@@ -407,7 +407,7 @@ load_state(sbm, original_state)
 # load_state(sbm, original_state)
 #
 # library(tidyverse)
-# merge_results <- sbm$collapse_groups(0, 15)
+# merge_results <- sbm$collapse_blocks(0, 15)
 # load_state(sbm, original_state)
 # new_state <- sbm$get_state()
 #

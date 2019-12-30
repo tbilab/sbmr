@@ -13,7 +13,7 @@ add_node(sbm, id, type = "node", level = 0)
 
 \item{type}{Type of node (string). This is used to distinguish multipartite networks. E.g. "person", or "publication", etc..}
 
-\item{level}{Level in node hierarchy. Level \code{0} indicates node is at the data level, levels greater than \code{0} are group nodes.}
+\item{level}{Level in node hierarchy. Level \code{0} indicates node is at the data level, levels greater than \code{0} are block nodes.}
 }
 \value{
 SBM model object modified with node added. \emph{Note that object is modified in place as well.}
