@@ -35,21 +35,21 @@ First we will generate our simulated network. First we set a seed to make the st
 ```{r}
 set.seed(42)
 
-n_groups <- 4    # Four total groups
+n_blocks <- 4    # Four total groups
 group_size <- 50 # W/ 50 nodes in each
 
 network <- sim_basic_block_network(
-  n_groups = n_groups,     
-  n_nodes_per_group = group_size,  
-  return_connection_propensities = TRUE
+  n_blocks = n_blocks,     
+  n_nodes_per_block = group_size,  
+  return_edge_propensities = TRUE
 )
 ```
 
 
-First we can make sure our connection propensities look reasonable 
+First we can make sure our edge propensities look reasonable 
 
 ```{r}
-network$connection_propensities %>% 
+network$edge_propensities %>% 
   ggplot(aes(x = group_1, y = group_2, fill = propensity)) +
   geom_tile(color = 'white') +
   theme_bw()
@@ -82,17 +82,17 @@ In an attempt to set our initial chain location to an optimal position we will a
 
 ```{r}
 collapse_results <- my_sbm %>% 
-  collapse_run(num_group_proposals = 15, 
+  collapse_run(num_block_proposals = 15, 
                sigma = 6,
                num_mcmc_sweeps = 15, 
-               num_final_groups = 1:15,
+               num_final_blocks = 1:15,
                parallel = TRUE)
 ```
 
 
 ```{r}
 visualize_collapse_results(collapse_results, heuristic = 'dev_from_rolling_mean') +
-  geom_vline(xintercept = n_groups, color = 'orangered')
+  geom_vline(xintercept = n_blocks, color = 'orangered')
 ```
 
 
@@ -111,12 +111,12 @@ merged_state <- my_sbm %>%
   get_state() %>% 
   select(id, parent)
 
-nodes_w_inferred_group <- network$nodes  %>%
+nodes_w_inferred_block <- network$nodes  %>%
   left_join(merged_state, by = 'id') %>% 
   rename(inferred = parent)
 
 visualize_network(edges = network$edges, 
-                  nodes = nodes_w_inferred_group, 
+                  nodes = nodes_w_inferred_block, 
                   node_color_col = 'group', 
                   node_shape_col = 'inferred',
                   width = '100%')
@@ -125,7 +125,7 @@ visualize_network(edges = network$edges,
 The colors and shapes seem to match very well. We can check the aggreement as well.
 
 ```{r}
-nodes_w_inferred_group %>% 
+nodes_w_inferred_block %>% 
   group_by(group) %>% 
   summarise(n_unique_inferred = length(unique(inferred)))
 ```
@@ -175,23 +175,23 @@ sweep_results %>%
 
 
 ```{r}
-nodes_w_inferred_group <- my_sbm %>% 
+nodes_w_inferred_block <- my_sbm %>% 
   get_state() %>% 
   select(id, parent) %>% 
   right_join(network$nodes, by = 'id') %>% 
   rename(inferred = parent)
 
 visualize_network(edges = network$edges, 
-                  nodes = nodes_w_inferred_group, 
+                  nodes = nodes_w_inferred_block, 
                   node_color_col = 'group', 
                   node_shape_col = 'inferred',
                   width = '100%')
 ```
 
 ```{r}
-nodes_w_inferred_group %>% 
+nodes_w_inferred_block %>% 
   group_by(inferred) %>% 
-  summarise(n_unique_groups = length(unique(group)))
+  summarise(n_unique_blocks = length(unique(group)))
 ```
 
 So even though we have more groups than we should, we never have an infered group that spans more than a single true group. 

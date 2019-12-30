@@ -32,14 +32,14 @@ Before we can run benchmarks we need to simulate some data and get a chain start
 set.seed(42)
 
 group_info <- dplyr::tribble(
-  ~group, ~n_nodes,
+  ~block, ~n_nodes,
      "a",       20,
      "b",       22,
      "c",       25
 )
 
-connection_propensities <- dplyr::tribble(
- ~group_1, ~group_2, ~propensity,
+edge_propensities <- dplyr::tribble(
+ ~block_1, ~block_2, ~propensity,
       "a",      "a",         0.8,
       "a",      "b",         0.2,
       "a",      "c",         0.3,
@@ -49,7 +49,7 @@ connection_propensities <- dplyr::tribble(
 )
 
 # Simulate network
-network <- sim_sbm_network(group_info, connection_propensities, edge_dist = purrr::rbernoulli)
+network <- sim_sbm_network(group_info, edge_propensities, edge_dist = purrr::rbernoulli)
 
 visualize_network(network, width = '100%')
 ```
@@ -76,8 +76,8 @@ Initialize SBM object from simulated network and run collapsing algorithm to fin
 
 ```{r}
 collapse_results <- create_sbm(network) %>% 
-  collapse_groups(exhaustive = TRUE, 
-                  num_group_proposals = 8, 
+  collapse_blocks(exhaustive = TRUE, 
+                  num_block_proposals = 8, 
                   num_mcmc_sweeps = 15)
 ```
 
@@ -126,19 +126,19 @@ library(tidyverse)
 library(sbmR)
 
 
-n_groups <- 4    # Four total groups
+n_blocks <- 4    # Four total groups
 group_size <- 40 # W/ 50 nodes in each
 low_num <- 2
 high_num <- 10
 sigma <- 4
-num_group_proposals <- 5
+num_block_proposals <- 5
 num_mcmc_sweeps <- 5
 
 set.seed(42)
 network <- sim_basic_block_network(
-  n_groups = n_groups,     
-  n_nodes_per_group = group_size,  
-  return_connection_propensities = TRUE
+  n_blocks = n_blocks,     
+  n_nodes_per_block = group_size,  
+  return_edge_propensities = TRUE
 )
 
 my_sbm <- create_sbm(network)
@@ -147,11 +147,11 @@ my_sbm <- create_sbm(network)
 ```{r}
 library(tictoc)
 tic()
-collapse_run(my_sbm, end_group_num = 10, sigma = 5)
+collapse_run(my_sbm, end_block_num = 10, sigma = 5)
 toc()
 
 tic()
-collapse_run(my_sbm, end_group_num = 10, sigma = 5, parallel = TRUE)
+collapse_run(my_sbm, end_block_num = 10, sigma = 5, parallel = TRUE)
 toc()
 ```
 
@@ -163,9 +163,9 @@ future::plan(future::multiprocess)
 
 collapse_to_desired_num <- function(desired_num){
   create_sbm(network) %>% 
-  collapse_groups(desired_num_groups = desired_num, 
+  collapse_blocks(desired_num_blocks = desired_num, 
                   sigma = sigma,
-                  num_group_proposals = num_group_proposals,
+                  num_block_proposals = num_block_proposals,
                   num_mcmc_sweeps = num_mcmc_sweeps) %>% 
     select(-state) %>% 
     mutate(desired_num = desired_num)
@@ -187,20 +187,20 @@ r_parallel <- function(){
 
 pkg_sequential <- function(){
   collapse_run(my_sbm, 
-               start_group_num = low_num,
-               end_group_num = high_num, 
+               start_block_num = low_num,
+               end_block_num = high_num, 
                sigma = sigma, 
-               num_group_proposals = num_group_proposals,
+               num_block_proposals = num_block_proposals,
                num_mcmc_sweeps = num_mcmc_sweeps,
                parallel = FALSE)
 }
 
 pkg_parallel <- function(){
   collapse_run(my_sbm, 
-               start_group_num = low_num,
-               end_group_num = high_num, 
+               start_block_num = low_num,
+               end_block_num = high_num, 
                sigma = sigma, 
-               num_group_proposals = num_group_proposals,
+               num_block_proposals = num_block_proposals,
                num_mcmc_sweeps = num_mcmc_sweeps,
                parallel = TRUE)
 }
