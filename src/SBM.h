@@ -59,7 +59,6 @@ public:
   // Parameters that control the mcmc and merging stuffs
   double EPS = 0.1;
   double SIGMA = 0.5;
-  double BETA = 1.5;
   bool GREEDY = true;
   int N_CHECKS_PER_block = 5; // When not greedy
 

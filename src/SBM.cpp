@@ -146,8 +146,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   // probability ratio for the moves and use those to calculate the acceptance
   // probability for the proposed move.
   double entropy_delta = entropy_post - entropy_pre;
-  double acceptance_prob = exp(BETA*entropy_delta) *
-                          (pre_move_prob/post_move_prob);
+  double acceptance_prob = exp(entropy_delta) * (pre_move_prob/post_move_prob);
 
   return Proposal_Res(
     entropy_delta,

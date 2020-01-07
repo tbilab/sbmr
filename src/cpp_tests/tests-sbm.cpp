@@ -66,7 +66,6 @@ TEST_CASE("Calculate Model entropy", "[SBM]")
   NodePtr to_block = my_SBM.get_node_by_id("a12", 1);
 
 
-  my_SBM.BETA = 0.1;
   // Calculate the entropy delta along with acceptance prob
   Proposal_Res proposal_results = my_SBM.make_proposal_decision(
       node_to_move,

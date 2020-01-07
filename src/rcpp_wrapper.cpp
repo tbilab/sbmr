@@ -270,10 +270,6 @@ public:
     SBM::load_from_state(State_Dump(id, parent, level, type_to_int(string_types)));
   }
 
-  // Getters and setters for inhereted fields
-  void set_beta(const double beta) { BETA = beta; }
-  double get_beta() { return BETA; }
-
   void set_epsilon(const double eps) { EPS = eps; }
   double get_epsilon() { return EPS; }
 
@@ -297,9 +293,6 @@ RCPP_MODULE(SBM)
                 &Rcpp_SBM::get_epsilon, &Rcpp_SBM::set_epsilon,
                 "Epsilon value for ergodicity")
 
-      .property("BETA",
-                &Rcpp_SBM::get_beta, &Rcpp_SBM::set_beta,
-                "Beta value for MCMC acceptance probability")
 
       .property("GREEDY",
                 &Rcpp_SBM::get_greedy, &Rcpp_SBM::set_greedy,
@@ -386,7 +379,6 @@ sbm$set_node_parent("b3", "b12", 0)
 
 # Set some model parameters
 sbm$GREEDY <- TRUE
-sbm$BETA <- 1.5
 sbm$EPS <- 0.1
 sbm$N_CHECKS_PER_block <- 5
 
