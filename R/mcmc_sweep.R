@@ -13,8 +13,6 @@
 #' @param variable_num_blocks Should the model allow new blocks to be created or
 #'   empty blocks removed while sweeping or should number of blocks remain
 #'   constant?
-#' @param beta Inverse temperature parameter for determining move acceptance
-#'   probability.
 #'
 #' @return List with array of all nodes that were moved in the
 #'   sweep (`nodes_moved`) and the sweeps impact on the model's entropy
@@ -39,7 +37,6 @@
 #' # Calculate entropy after sweeps
 #' compute_entropy(my_sbm)
 #'
-mcmc_sweep <- function(sbm, level = 0, variable_num_blocks = TRUE, beta = 1.5){
-  sbm$BETA <- beta
+mcmc_sweep <- function(sbm, level = 0, variable_num_blocks = TRUE){
   sbm$mcmc_sweep(as.integer(level), variable_num_blocks)
 }

@@ -19,10 +19,6 @@
 #'   hierarcichal structure in data or inspection is desired this should be set
 #'   to `TRUE`, otherwise it will slow down collapsing due to increased data
 #'   transfer.
-#' @param beta Inverse temperature parameter impacting the acceptance
-#'   probabilities of MCMC sweeps. A higher value means model puts more weight
-#'   on accepting moves that improve model fit. Only matters if
-#'   `num_mcmc_sweeps` is more than zero.
 #' @param greedy Should every possible block merger be considered? If `FALSE`,
 #'   candidates for mergers are drawn by similarity in edges (just as MCMC
 #'   move proposals are). This may lead the model to local minimums by always
@@ -64,7 +60,6 @@ collapse_blocks <- function(
   num_mcmc_sweeps = 0,
   desired_num_blocks = 1,
   report_all_steps = FALSE,
-  beta = 1.5,
   eps = NULL,
   greedy = FALSE,
   num_block_proposals = 5,
@@ -78,7 +73,6 @@ collapse_blocks <- function(
   }
 
   # Set free parameters
-  sbm$BETA <- beta
   sbm$GREEDY <- greedy
   sbm$N_CHECKS_PER_block <- num_block_proposals
   sbm$SIGMA <- sigma

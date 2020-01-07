@@ -14,7 +14,6 @@
 #'   shows `"initialization"` info of model. Other options are `"silent` to
 #'   print nothing, or `"iteration progress"` which prints out results of each
 #'   mcmc iteration as it happens.
-#' @param beta Inverse temperature parameter for MCMC acceptance probability
 #' @param epsilon Parameter to inforce ergodicity of markov chain. Setting to
 #'   zero will remove ergodicity from model, setting high will make model moves
 #'   more random.
@@ -41,7 +40,6 @@ sample_posterior <- function(
   burnin_sweeps = 10,
   return_sweep_info = TRUE, # separate df of entropy by sweep
   starting_partition = "agglomerative",
-  beta = 1.5,
   epsilon = 0.1,
   greedy = TRUE,
   n_checks_per_block = 5,
@@ -55,8 +53,7 @@ sample_posterior <- function(
   # # Run initialization algorithm on base level nodes
   # sbm %>% collapse_blocks(
   #   greedy = greedy,
-  #   num_mcmc_sweeps = initialization_mcmc_steps,
-  #   beta = beta,
+  #   num_mcmc_sweeps = initialization_mcmc_steps
   # )
   # sbm$collapse_blocks(0, as.integer(initialization_mcmc_steps))
   #
