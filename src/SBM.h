@@ -33,8 +33,15 @@ struct Proposal_Res
 
 struct Sweep_Res
 {
-  std::list<std::string> nodes_moved;
+  // std::list<std::string> nodes_moved;
+  std::list<std::pair<std::string, std::string>> nodes_moved;
   double entropy_delta = 0;
+};
+
+struct Mutli_Sweep_Res 
+{
+  std::list<std::pair<std::string, std::string>> nodes_moved;
+  std::vector<double> sweep_entropy_delta;
 };
 
 // =============================================================================
@@ -81,6 +88,9 @@ public:
 
   // Runs efficient MCMC sweep algorithm on desired node level
   Sweep_Res mcmc_sweep(int level, bool variable_num_blocks);
+
+  // Runs multiple MCMC sweeps and keeps track of the results efficiently
+  Mutli_Sweep_Res mcmc_run(int level, int num_sweeps, bool variable_num_blocks);
 
   // Merge two blocks at a given level based on the probability of doing so
   Merge_Step agglomerative_merge( int level_of_blocks, int n_merges);

@@ -189,6 +189,14 @@ Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_blocks)
   {
     NodePtr curr_node = *node_it;
 
+    // Check if we're running sweep with variable block numbers. If we are, we
+    // need to add a new block as a potential for the node to enter
+    if (variable_num_blocks)
+    {
+      // Add a new block node for the current node type
+      create_block_node(curr_node->type, block_level);
+    }
+
     // Get a move proposal
     NodePtr proposed_new_block = propose_move(curr_node);
 
@@ -210,24 +218,46 @@ Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_blocks)
       curr_node->set_parent(proposed_new_block);
 
       // Update results
-      results.nodes_moved.push_back(curr_node->id);
+      results.nodes_moved.push_back(std::make_pair(curr_node->id, proposed_new_block->id));
       results.entropy_delta += proposal_results.entropy_delta;
+      
+      // If we are varying number of blocks and we made a move we should clean
+      // up the now potentially empty blocks for the next node proposal. 
+      if (variable_num_blocks)
+      {
+        clean_empty_blocks();
+      }
     }
 
-    // Check if we're running sweep with variable block numbers. If we are, we
-    // need to remove empty blocks and add a new block as a potential for the
-    // node to enter
-    if (variable_num_blocks)
-    {
-      // Clean up empty blocks
-      clean_empty_blocks();
-
-      // Add a new block node for the current node type
-      create_block_node(curr_node->type, block_level);
-    }
   } // End loop over all nodes
 
   return results;
+}
+
+// =============================================================================
+// Runs multiple MCMC sweeps and keeps track of the results efficiently
+// =============================================================================
+Mutli_Sweep_Res SBM::mcmc_run(const int level, const int num_sweeps, const bool variable_num_blocks)
+{
+  // Setup the returning structure by preallocating entropy vector
+  Mutli_Sweep_Res run_results;
+  run_results.sweep_entropy_delta.reserve(num_sweeps);
+
+  Sweep_Res current_sweep;
+  // Let model equilibriate with new block layout...
+  for (int j = 0; j < num_sweeps; j++)
+  {
+    current_sweep = mcmc_sweep(level, variable_num_blocks);
+
+    run_results.sweep_entropy_delta.push_back(current_sweep.entropy_delta);
+
+    // Append the current sweep results into the main run node moves 
+    run_results.nodes_moved.splice(run_results.nodes_moved.end(),
+                                   current_sweep.nodes_moved);
+  }
+
+
+  return run_results;
 }
 
 
