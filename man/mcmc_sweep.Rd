@@ -4,7 +4,7 @@
 \alias{mcmc_sweep}
 \title{Run a single MCMC sweep over nodes}
 \usage{
-mcmc_sweep(sbm, level = 0, variable_num_blocks = TRUE, beta = 1.5)
+mcmc_sweep(sbm, level = 0, variable_num_blocks = TRUE)
 }
 \arguments{
 \item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
@@ -15,9 +15,6 @@ through MCMC proposal-accept routine.}
 \item{variable_num_blocks}{Should the model allow new blocks to be created or
 empty blocks removed while sweeping or should number of blocks remain
 constant?}
-
-\item{beta}{Inverse temperature parameter for determining move acceptance
-probability.}
 }
 \value{
 List with array of all nodes that were moved in the

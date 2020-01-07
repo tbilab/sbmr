@@ -11,7 +11,6 @@ collapse_run(
   num_final_blocks = 1:10,
   num_block_proposals = 5,
   num_mcmc_sweeps = 10,
-  beta = 1.5,
   eps = NULL,
   parallel = FALSE
 )
@@ -37,11 +36,6 @@ model to local minimums for the same reason greedy mode does.}
 agglomerative merge step. This allows the model to allow nodes to find
 their most natural resting place in a given collapsed state. Larger values
 will slow down runtime but can potentially lead for more stable results.}
-
-\item{beta}{Inverse temperature parameter impacting the acceptance
-probabilities of MCMC sweeps. A higher value means model puts more weight
-on accepting moves that improve model fit. Only matters if
-\code{num_mcmc_sweeps} is more than zero.}
 
 \item{eps}{Controls randomness of move proposals. Effects both the block
 merging and mcmc sweeps. If value is set to value other than null the SBMs
