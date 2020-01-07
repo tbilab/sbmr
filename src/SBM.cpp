@@ -247,11 +247,13 @@ Mutli_Sweep_Res SBM::mcmc_run(const int level, const int num_sweeps, const bool 
   // Let model equilibriate with new block layout...
   for (int j = 0; j < num_sweeps; j++)
   {
+    // Run single sweep
     current_sweep = mcmc_sweep(level, variable_num_blocks);
 
+    // Add this sweep's entropy delta to record
     run_results.sweep_entropy_delta.push_back(current_sweep.entropy_delta);
 
-    // Append the current sweep results into the main run node moves 
+    // Append the move results into the main run results
     run_results.nodes_moved.splice(run_results.nodes_moved.end(),
                                    current_sweep.nodes_moved);
   }
