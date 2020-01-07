@@ -88,7 +88,6 @@ There are a few important input parameters we need to consider:
 - `greedy`: Should every possible group merger be considered? If `FALSE`, candidates for mergers are drawn by similarity in edges (just as MCMC move proposals are). This may lead the model to local minimums by always pursuing best possible merges.
 - `num_block_proposals`: If `greedy = FALSE`, this parameter controls how many merger proposals are drawn for each group in the model. A larger number will increase the exploration of merge potentials but may lead the model to local minimums for the same reason greedy mode does. 
 - `num_mcmc_sweeps`: How many MCMC sweeps the model does at each agglomerative merge step. This allows the model to allow nodes to find their most natural resting place in a given collapsed state. Larger values will slow down runtime but can potentially lead for more stable results. 
-- `beta`: Inverse temperature parameter impacting the acceptance probabilities of MCMC sweeps. A higher value means model puts more weight on accepting moves that improve model fit. Only matters if `num_mcmc_sweeps > 0`.
 
 
 ### Role of sigma...
@@ -361,9 +360,8 @@ While sigma is the most important parameter for collapse results tuning there ar
 
 ## Epsilon values
 
-While beta controls how conservative the model is when choosing which moves to accept, epsilon controls how conservative the model is when generating those proposals. As epsilon goes to infinity the moves proposed by the model approach randomness. When epsilon is zero a node can only move to groups that nodes it is connected belong to.
+Epsilon controls how conservative the model is when generating those proposals. As epsilon goes to infinity the moves proposed by the model approach randomness. When epsilon is zero a node can only move to groups that nodes it is connected belong to.
 
-While beta only came into plan when we had MCMC sweeps after each merge, epsilon comes into play at all times as the merge proposals are made by the same algorithm that does mcmc move proposals. 
 
 ```{r, toggling_epsilon}
 # Get logaritmically spaced epsilon range
