@@ -197,11 +197,9 @@ nodes_w_inferred_block %>%
 So even though we have more groups than we should, we never have an infered group that spans more than a single true group. 
 
 
-We can tweak the results MCMC sweeps by adjusting two parameters. 
+We can tweak the results MCMC sweeps by adjusting the `EPS` or 'epsilon' parameter.
 
-1. `EPS` or 'epsilon' - This controls how random the moves proposed are. The higher epsilon the more random the moves will be. It's like adding a constant to all the nodes probability of being chosen as a proposed move. As the constant gets higher it starts to overpower the data. This value can be set when initializing the network with `create_sbm(eps = ...)` or modified post creation by targeting the sbm class value of `EPS`.
-2. `beta` - This is an 'inverse temperature parameter' that effects the probability of accepting a move. The lower this value the less important the move's impact on model entropy is to its being chosen. This value is passed to the `mcmc_sweep()` function.
-
+This controls how random the moves proposed are. The higher epsilon the more random the moves will be. It's like adding a constant to all the nodes probability of being chosen as a proposed move. As the constant gets higher it starts to overpower the data. This value can be set when initializing the network with `create_sbm(eps = ...)` or modified post creation by targeting the sbm class value of `EPS`.
 
 Let's first repeat another `r num_sweeps` sweeps with a lower epsilon. We will recreate our model from the data and then reinitialize it to the collapsed state choice. 
 
