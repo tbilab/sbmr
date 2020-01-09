@@ -8,16 +8,18 @@
 #' if new blocks blocks can be proposed and empty blocks removed (boolean).
 #'
 #' @inheritParams add_node
-#' @param num_sweeps Number of times all nodes are passed through for move proposals.
+#' @param num_sweeps Number of times all nodes are passed through for move
+#'   proposals.
 #' @param level Level of nodes who's blocks will have their block membership run
 #'   through MCMC proposal-accept routine.
 #' @param variable_num_blocks Should the model allow new blocks to be created or
 #'   empty blocks removed while sweeping or should number of blocks remain
 #'   constant?
 #'
-#' @return List with array of all nodes that were moved in the
-#'   sweep (`nodes_moved`) and the sweeps impact on the model's entropy
-#'   (`entropy_delta`).
+#' @return List with two dataframes. The first telling for all sweeps everytime
+#'   a node was moved and what group it was moved to. The second telling for
+#'   each sweep the entropy delta and total number of nodes that were moved to
+#'   new groups in that sweep.
 #' @export
 #'
 #' @examples
@@ -35,8 +37,8 @@
 #' # Run 4 MCMC sweeps
 #' sweep_results <- my_sbm %>% mcmc_sweep(num_sweeps = 4, variable_num_blocks = FALSE)
 #'
-#' # Look at entropy moves per sweep
-#' sweep_results$entropy_deltas
+#' # Look at the per-sweep level information
+#' sweep_results$sweep_info
 #'
 mcmc_sweep <- function(sbm, num_sweeps = 1, level = 0, variable_num_blocks = TRUE){
   sbm$mcmc_sweep(as.integer(level), as.integer(num_sweeps), variable_num_blocks)
