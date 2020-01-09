@@ -33,10 +33,10 @@
 #' compute_entropy(my_sbm)
 #'
 #' # Run 4 MCMC sweeps
-#' for(i in 1:4) my_sbm %>% mcmc_sweep(variable_num_blocks = FALSE)
+#' sweep_results <- my_sbm %>% mcmc_sweep(num_sweeps = 4, variable_num_blocks = FALSE)
 #'
-#' # Calculate entropy after sweeps
-#' compute_entropy(my_sbm)
+#' # Look at entropy moves per sweep
+#' sweep_results$entropy_deltas
 #'
 mcmc_sweep <- function(sbm, num_sweeps = 1, level = 0, variable_num_blocks = TRUE){
   sbm$mcmc_sweep(as.integer(level), as.integer(num_sweeps), variable_num_blocks)
