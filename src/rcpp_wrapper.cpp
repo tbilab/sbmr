@@ -195,66 +195,56 @@ public:
     return SBM::compute_entropy(level);
   }
 
-  // List mcmc_sweep(const int level, const int num_sweeps, const bool variable_num_blocks)
-  // {
-  //   // Run sweep method
-  //   Sweep_Res result = SBM::mcmc_sweep(level, variable_num_blocks);
-  //
-  //   // Package result struct into a list
-  //   return List::create(
-  //       _["nodes_moved"] = result.nodes_moved,
-  //       _["entropy_delta"] = result.entropy_delta);
-  // }
 
   // =============================================================================
-// Runs multiple MCMC sweeps and keeps track of the results efficiently
-// =============================================================================
-List mcmc_sweep(const int level, const int num_sweeps, const bool variable_num_blocks)
-{
-  // Setup the returning structure by preallocating entropy vector
-  Mutli_Sweep_Res run_results;
-  run_results.sweep_entropy_delta.reserve(num_sweeps);
-
-  Sweep_Res current_sweep;
-  // Let model equilibriate with new block layout...
-  for (int j = 0; j < num_sweeps; j++)
+  // Runs multiple MCMC sweeps and keeps track of the results efficiently
+  // =============================================================================
+  List mcmc_sweep(const int level, const int num_sweeps, const bool variable_num_blocks)
   {
-    // Run single sweep
-    current_sweep = SBM::mcmc_sweep(level, variable_num_blocks);
+    // Setup the returning structure by preallocating entropy vector
+    Mutli_Sweep_Res run_results;
+    run_results.sweep_entropy_delta.reserve(num_sweeps);
 
-    // Add this sweep's entropy delta to record
-    run_results.sweep_entropy_delta.push_back(current_sweep.entropy_delta);
+    Sweep_Res current_sweep;
+    // Let model equilibriate with new block layout...
+    for (int j = 0; j < num_sweeps; j++)
+    {
+      // Run single sweep
+      current_sweep = SBM::mcmc_sweep(level, variable_num_blocks);
 
-    // Append the move results into the main run results
-    run_results.nodes_moved.splice(run_results.nodes_moved.end(),
-                                   current_sweep.nodes_moved);
+      // Add this sweep's entropy delta to record
+      run_results.sweep_entropy_delta.push_back(current_sweep.entropy_delta);
+
+      // Append the move results into the main run results
+      run_results.nodes_moved.splice(run_results.nodes_moved.end(),
+                                     current_sweep.nodes_moved);
+    }
+
+    // Build and fillup vectors for node moves
+    const int num_moves = run_results.nodes_moved.size();
+    std::vector<std::string> node_moved;
+    std::vector<std::string> move_destination;
+    node_moved.reserve(num_moves);
+    move_destination.reserve(num_moves);
+
+    for (auto move_it = (run_results.nodes_moved).begin();
+         move_it != (run_results.nodes_moved).end();
+         move_it++)
+    {
+      node_moved.push_back(move_it->first);
+      move_destination.push_back(move_it->second);
+    }
+
+    // package up results into a list
+    return List::create(
+        _["nodes_moved"] = DataFrame::create(
+            _["node"] = node_moved,
+            _["destination"] = move_destination,
+            _["stringsAsFactors"] = false)
+      ,
+        _["entropy_deltas"] = run_results.sweep_entropy_delta
+      );
   }
-
-  // Build and fillup vectors for node moves
-  const int num_moves = run_results.nodes_moved.size();
-  std::vector<std::string> node_moved;
-  std::vector<std::string> move_destination;
-  node_moved.reserve(num_moves);
-  move_destination.reserve(num_moves);
-  
-  for (auto move_it = (run_results.nodes_moved).begin();
-       move_it != (run_results.nodes_moved).end();
-       move_it++)
-  {
-    node_moved.push_back(move_it->first);
-    move_destination.push_back(move_it->second);
-  }
-
-  // package up results into a list
-  return List::create(
-      _["nodes_moved"] = DataFrame::create(
-          _["node"] = node_moved,
-          _["destination"] = move_destination,
-          _["stringsAsFactors"] = false)
-    ,
-      _["entropy_deltas"] = run_results.sweep_entropy_delta
-    );
-}
 
   List collapse_blocks(const int node_level,
                        const int num_mcmc_steps,
