@@ -127,25 +127,6 @@ TEST_CASE("Basic MCMC sweeps", "[SBM]")
       avg_num_moves.at(0) < avg_num_moves.at(epsilons.size() - 1));
 }
 
-TEST_CASE("MCMC run function", "[SBM]")
-{
-  // Setup simple SBM model
-  SBM my_SBM = build_simple_SBM();
-
-  State_Dump pre_sweep = my_SBM.get_state();
-
-  // Run a few rounds of sweeps of the MCMC algorithm on network
-  const int num_sweeps = 1000;
-
-  // Run with variable group numbers
-  Mutli_Sweep_Res run_results = my_SBM.mcmc_run(0, num_sweeps, true);
- 
-  // Make sure entropy vector has the right number of elements
-  REQUIRE(run_results.sweep_entropy_delta.size() == num_sweeps);
-  
-  // Some nodes must have been moved
-  REQUIRE(run_results.nodes_moved.size() != 0);
-}
 
 TEST_CASE("Agglomerative merge steps", "[SBM]")
 {
