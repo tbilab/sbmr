@@ -141,31 +141,19 @@ Now that we have our model in a decent starting place we can initiate the MCMC s
 ```{r}
 num_sweeps <- 50
 
-sweep_results_to_df <- function(sweep_results, label = 'results'){
-  sweep_results %>% 
-    map_dfr(~tibble(
-      n_moved = length(.$nodes_moved),
-      entropy_delta = .$entropy_delta
-    )) %>% 
-    mutate(sweep = 1:n()) %>% 
-    pivot_longer(-sweep, names_to = 'stat') %>% 
-    mutate(label = label)
-}
+sweep_results <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps)
 
-sweep_results <- 1:num_sweeps %>% 
-  purrr::map(~mcmc_sweep(my_sbm)) %>% 
-  sweep_results_to_df(label = 'eps = 0.1')
-
+sweep_df <- tibble(entropy_delta = sweep_results$entropy_deltas) %>% 
+  mutate(sweep = 1:n(),
+         label = 'eps = 0.1')
 
 plot_sweep_results <- function(sweep_results_df){
    sweep_results_df %>% 
-    ggplot(aes(x = sweep, y = value)) +
-    geom_line() +
-    facet_grid(stat~., scales = 'free_y')
+    ggplot(aes(x = sweep, y = entropy_delta)) +
+    geom_line()
 }
 
-sweep_results %>% 
-  plot_sweep_results() +
+plot_sweep_results(sweep_df) +
   labs(
     title = glue::glue('Result of {num_sweeps} MCMC sweeps'),
     subtitle = "Entropy Delta of sweep and number of nodes moved for sweep"
@@ -210,13 +198,15 @@ lower_eps <- 0.005
 my_sbm <- create_sbm(network, eps = lower_eps) %>% 
   choose_best_collapse_state(collapse_results, heuristic = 'lowest')
 
-# Run our mcmc sweeps again
-sweep_results_lower_eps <- 1:num_sweeps %>% 
-  purrr::map(~mcmc_sweep(my_sbm)) %>% 
-  sweep_results_to_df(label = glue('eps = {lower_eps}'))
 
-sweep_results_lower_eps %>% 
-  plot_sweep_results() +
+# Run our mcmc sweeps again
+sweep_df_lower_eps <- tibble(
+    entropy_delta = mcmc_sweep(my_sbm, num_sweeps = num_sweeps)$entropy_deltas
+  ) %>% 
+  mutate(sweep = 1:n(),
+         label = glue::glue('eps = {lower_eps}'))
+
+plot_sweep_results(sweep_df_lower_eps) +
   labs(title = glue::glue('Result of {num_sweeps} MCMC sweeps w/ eps = {lower_eps}'))
 ```
 
@@ -226,10 +216,10 @@ Now we can put the two sweep runs side-by-side to see how they compare. We see t
 
 ```{r}
 bind_rows(
-  sweep_results,
-  sweep_results_lower_eps
+  sweep_df,
+  sweep_df_lower_eps
 ) %>% 
   plot_sweep_results() +
-  facet_grid(stat~label, scales = 'free_y')
+  facet_grid(.~label)
 ```
 
