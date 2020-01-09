@@ -8,6 +8,7 @@
 #' if new blocks blocks can be proposed and empty blocks removed (boolean).
 #'
 #' @inheritParams add_node
+#' @param num_sweeps Number of times all nodes are passed through for move proposals.
 #' @param level Level of nodes who's blocks will have their block membership run
 #'   through MCMC proposal-accept routine.
 #' @param variable_num_blocks Should the model allow new blocks to be created or
@@ -37,6 +38,6 @@
 #' # Calculate entropy after sweeps
 #' compute_entropy(my_sbm)
 #'
-mcmc_sweep <- function(sbm, level = 0, variable_num_blocks = TRUE){
-  sbm$mcmc_sweep(as.integer(level), variable_num_blocks)
+mcmc_sweep <- function(sbm, num_sweeps = 1, level = 0, variable_num_blocks = TRUE){
+  sbm$mcmc_sweep(as.integer(level), as.integer(num_sweeps), variable_num_blocks)
 }
