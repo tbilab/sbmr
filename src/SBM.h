@@ -33,16 +33,11 @@ struct Proposal_Res
 
 struct Sweep_Res
 {
-  // std::list<std::string> nodes_moved;
-  std::list<std::pair<std::string, std::string>> nodes_moved;
+  std::list<std::string> nodes_moved;
+  std::list<std::string> new_groups;
   double entropy_delta = 0;
 };
 
-struct Mutli_Sweep_Res 
-{
-  std::list<std::pair<std::string, std::string>> nodes_moved;
-  std::vector<double> sweep_entropy_delta;
-};
 
 // =============================================================================
 // Main node class declaration

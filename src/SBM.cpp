@@ -218,7 +218,8 @@ Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_blocks)
       curr_node->set_parent(proposed_new_block);
 
       // Update results
-      results.nodes_moved.push_back(std::make_pair(curr_node->id, proposed_new_block->id));
+      results.nodes_moved.push_back(curr_node->id);
+      results.new_groups.push_back(proposed_new_block->id);
       results.entropy_delta += proposal_results.entropy_delta;
       
       // If we are varying number of blocks and we made a move we should clean

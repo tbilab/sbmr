@@ -201,49 +201,46 @@ public:
   // =============================================================================
   List mcmc_sweep(const int level, const int num_sweeps, const bool variable_num_blocks)
   {
-    // Setup the returning structure by preallocating entropy vector
-    Mutli_Sweep_Res run_results;
-    run_results.sweep_entropy_delta.reserve(num_sweeps);
 
+    // Setup the node-to-new-group lists
+    std::list<std::string> nodes_moved;
+    std::list<std::string> new_groups;
+
+    // Setup the entropy change and num groups moved in sweep vectors and preallocate
+    std::vector<double> sweep_entropy_delta;
+    std::vector<int> sweep_num_nodes_moved;
+    sweep_entropy_delta.reserve(num_sweeps);
+    sweep_num_nodes_moved.reserve(num_sweeps);
+
+    // Holder for a given sweep's results
     Sweep_Res current_sweep;
-    // Let model equilibriate with new block layout...
+
     for (int j = 0; j < num_sweeps; j++)
     {
       // Run single sweep
       current_sweep = SBM::mcmc_sweep(level, variable_num_blocks);
 
       // Add this sweep's entropy delta to record
-      run_results.sweep_entropy_delta.push_back(current_sweep.entropy_delta);
+      sweep_entropy_delta.push_back(current_sweep.entropy_delta);
+
+      // Add number of nodes moved
+      sweep_num_nodes_moved.push_back(current_sweep.nodes_moved.size());
 
       // Append the move results into the main run results
-      run_results.nodes_moved.splice(run_results.nodes_moved.end(),
-                                     current_sweep.nodes_moved);
-    }
-
-    // Build and fillup vectors for node moves
-    const int num_moves = run_results.nodes_moved.size();
-    std::vector<std::string> node_moved;
-    std::vector<std::string> move_destination;
-    node_moved.reserve(num_moves);
-    move_destination.reserve(num_moves);
-
-    for (auto move_it = (run_results.nodes_moved).begin();
-         move_it != (run_results.nodes_moved).end();
-         move_it++)
-    {
-      node_moved.push_back(move_it->first);
-      move_destination.push_back(move_it->second);
+      nodes_moved.splice(nodes_moved.end(), current_sweep.nodes_moved);
+      new_groups.splice(new_groups.end(), current_sweep.new_groups);
     }
 
     // package up results into a list
     return List::create(
         _["nodes_moved"] = DataFrame::create(
-            _["node"] = node_moved,
-            _["destination"] = move_destination,
-            _["stringsAsFactors"] = false)
-      ,
-        _["entropy_deltas"] = run_results.sweep_entropy_delta
-      );
+            _["node"] = nodes_moved,
+            _["destination"] = new_groups,
+            _["stringsAsFactors"] = false),
+        _["sweep_info"] = DataFrame::create(
+            _["entropy_delta"] = sweep_entropy_delta,
+            _["num_nodes_moved"] = sweep_num_nodes_moved,
+            _["stringsAsFactors"] = false));
   }
 
   List collapse_blocks(const int node_level,
