@@ -29,9 +29,3 @@ std::string make_pair_key(std::string, std::string);
 void shuffle_nodes(std::vector<NodePtr> &node_vec,
                    const std::shared_ptr<std::map<std::string, NodePtr>> &node_map,
                    std::mt19937 &sampler);
-
-// Update the set of pairs that need to be updated for a given sweep.
-void update_changed_pairs(NodePtr curr_node,
-                          ChildSet &old_connections,
-                          ChildSet &new_connections,
-                          std::unordered_set<std::string> &pair_moves);
