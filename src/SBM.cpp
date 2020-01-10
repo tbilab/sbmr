@@ -206,7 +206,7 @@ inline void update_pair_tracking_map(std::unordered_map<std::string, Pair_Status
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-MCMC_Sweep SBM::mcmc_sweep(const int level,
+MCMC_Sweeps SBM::mcmc_sweep(const int level,
                           const int num_sweeps,
                           const bool variable_num_blocks,
                           const bool track_pairs)
@@ -215,13 +215,11 @@ MCMC_Sweep SBM::mcmc_sweep(const int level,
 
   const int block_level = level + 1;
 
-  // Setup containers to track progress of sweeps etc
-  
-  // Wwhat pairs need to be updated for a given sweep
+  // Setup container to track what pairs need to be updated for a given sweep
   std::unordered_set<std::string> pair_moves;
 
   // Initialize structure that contains the returned values for this/these sweeps
-  MCMC_Sweep results(num_sweeps);
+  MCMC_Sweeps results(num_sweeps);
 
   // Initialize pair tracking map if needed
   if (track_pairs)
@@ -241,7 +239,7 @@ MCMC_Sweep SBM::mcmc_sweep(const int level,
     // Generate a random order of nodes to be run through for sweep
     shuffle_nodes(node_vec, node_map, sampler.int_gen);
     
-    // Clear the single sweep containers for new results
+    // Clear the set of updated pairs for new sweep
     pair_moves.clear();
 
     // Loop through each node
