@@ -200,7 +200,8 @@ public:
   // Runs multiple MCMC sweeps and keeps track of the results efficiently
   // =============================================================================
   List mcmc_sweep(const int level, const int num_sweeps, const bool variable_num_blocks)
-  {
+  { 
+    bool track_pairs(true);
 
     // Setup the node-to-new-group lists
     std::list<std::string> nodes_moved;
@@ -219,6 +220,7 @@ public:
     // Initialize pair tracking map if needed
     if (track_pairs)
     {
+      auto node_map = get_level(level);
       for (auto node_a_it = node_map->begin();
            node_a_it != node_map->end();
            node_a_it++)
@@ -237,6 +239,7 @@ public:
         }
       }
     }
+
     // Holder for a given sweep's results
     Sweep_Res current_sweep;
 
@@ -254,6 +257,51 @@ public:
       // Append the move results into the main run results
       nodes_moved.splice(nodes_moved.end(), current_sweep.nodes_moved);
       new_groups.splice(new_groups.end(), current_sweep.new_groups);
+
+      // Update the concensus pairs map with results if needed.
+      if (track_pairs)
+      {
+        for (auto pair_it = concensus_pairs.begin();
+                  pair_it != concensus_pairs.end();
+                  pair_it++)
+        {
+          // Check if this pair was updated on last sweep
+          auto sweep_change_loc = current_sweep.pair_moves.find(pair_it->first);
+          bool updated_last_sweep = sweep_change_loc != current_sweep.pair_moves.end();
+
+          if (updated_last_sweep)
+          {
+            // Update the pair connection status
+            (pair_it->second).connected = !(pair_it->second).connected;
+          }
+
+          // Increment the counts if needed
+          if ((pair_it->second).connected)
+          {
+            (pair_it->second).times_connected++;
+          }
+          
+        }
+      }
+    }
+
+    // Initialze vectors to hold pair tracking results, if needed.
+    std::vector<std::string> node_pair;
+    std::vector<int> times_connected;
+
+    if (track_pairs)
+    {
+      // Fill out pair tracking vectors with map internals
+      node_pair.reserve(num_sweeps);
+      times_connected.reserve(num_sweeps);
+
+      for (auto pair_it = concensus_pairs.begin();
+           pair_it != concensus_pairs.end();
+           pair_it++)
+      {
+        node_pair.push_back(pair_it->first);
+        times_connected.push_back((pair_it->second).times_connected);
+      }
     }
 
     // package up results into a list
@@ -265,7 +313,12 @@ public:
         _["sweep_info"] = DataFrame::create(
             _["entropy_delta"] = sweep_entropy_delta,
             _["num_nodes_moved"] = sweep_num_nodes_moved,
-            _["stringsAsFactors"] = false));
+            _["stringsAsFactors"] = false),
+        _["pairing_counts"] = track_pairs ? DataFrame::create(
+                                                _["node_pair"] = node_pair,
+                                                _["times_connected"] = times_connected,
+                                                _["stringsAsFactors"] = false)
+                                          : "NA");
   }
 
   List collapse_blocks(const int node_level,
