@@ -154,12 +154,22 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   );
 }
 
+// Helper to build alphabetically string pair of two node ids for pair maps
+inline std::string make_pair_key(const std::string a_node, const std::string b_node)
+{
+  return a_node > b_node
+             ? a_node + b_node
+             : b_node + a_node;
+}
+
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
 Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_blocks)
 {
   PROFILE_FUNCTION();
+  // Eventually passed to function directly, controls if pair info is tracked
+  bool track_pairs = true; 
   const int block_level = level + 1;
 
   // Initialize the results holder
@@ -167,6 +177,7 @@ Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_blocks)
 
   // Grab level map
   LevelPtr node_map = get_level(level);
+
 
   // Get all the nodes at the given level in a shuffleable vector format
   // Initialize vector to hold nodes
@@ -214,6 +225,8 @@ Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_blocks)
 
     if (move_accepted)
     {
+      NodePtr old_block = curr_node->parent;
+
       // Move the node
       curr_node->set_parent(proposed_new_block);
 
@@ -228,13 +241,39 @@ Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_blocks)
       {
         clean_empty_blocks();
       }
+
+      if (track_pairs)
+      {
+        // Loop through all the nodes in the previous group and set pair move status to false
+        for (auto lost_pair_it = (old_block->children).begin();
+             lost_pair_it != (old_block->children).end();
+             lost_pair_it++)
+        {
+          results.pair_moves.emplace(make_pair_key(curr_node->id,
+                                                   (*lost_pair_it)->id),
+                                     false);
+        }
+
+        // Repeat for the new groups children and set status to true
+        for (auto new_pair_it = (proposed_new_block->children).begin();
+             new_pair_it != (proposed_new_block->children).end();
+             new_pair_it++)
+        {
+          // Make sure we don't add this node to itself.
+          if ((*new_pair_it)->id != curr_node->id)
+          {
+            results.pair_moves.emplace(make_pair_key(curr_node->id,
+                                                     (*new_pair_it)->id),
+                                       false);
+          }
+        }
+      }
     }
 
   } // End loop over all nodes
 
   return results;
 }
-
 
 // =============================================================================
 // Compute microcononical entropy of current model state

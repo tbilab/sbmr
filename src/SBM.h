@@ -31,11 +31,20 @@ struct Proposal_Res
                                      prob_of_accept(p){};
 };
 
+struct Pair_Status 
+{
+  bool connected;
+  int times_connected;
+  Pair_Status(bool c): connected(c),
+                       times_connected(c ? 1: 0){};
+};
+
 struct Sweep_Res
 {
   std::list<std::string> nodes_moved;
   std::list<std::string> new_groups;
   double entropy_delta = 0;
+  std::unordered_map<std::string, double> pair_moves;
 };
 
 
