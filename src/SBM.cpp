@@ -217,10 +217,6 @@ MCMC_Sweep SBM::mcmc_sweep(const int level,
 
   // Setup containers to track progress of sweeps etc
   
-  // Contains info on what nodes were moved in a given sweep
-  std::list<std::string> nodes_moved;
-  // What groups those nodes were moved to
-  std::list<std::string> new_groups;
   // Wwhat pairs need to be updated for a given sweep
   std::unordered_set<std::string> pair_moves;
 
@@ -246,8 +242,6 @@ MCMC_Sweep SBM::mcmc_sweep(const int level,
     shuffle_nodes(node_vec, node_map, sampler.int_gen);
     
     // Clear the single sweep containers for new results
-    nodes_moved.clear();
-    new_groups.clear();
     pair_moves.clear();
 
     // Loop through each node
@@ -285,8 +279,7 @@ MCMC_Sweep SBM::mcmc_sweep(const int level,
         curr_node->set_parent(proposed_new_block);
 
         // Update results
-        nodes_moved.push_back(curr_node->id);
-        new_groups.push_back(proposed_new_block->id);
+        results.nodes_moved.push_back(curr_node->id);
         results.sweep_num_nodes_moved[i]++;
         results.sweep_entropy_delta[i] += proposal_results.entropy_delta;
 

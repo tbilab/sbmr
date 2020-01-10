@@ -52,6 +52,7 @@ struct MCMC_Sweep
   std::vector<double> sweep_entropy_delta;
   std::vector<int> sweep_num_nodes_moved;
   std::unordered_map<std::string, Pair_Status> concensus_pairs;
+  std::list<std::string> nodes_moved;
   MCMC_Sweep(const int n)
   {
     // Preallocate the entropy change and num groups moved in sweep vectors and
