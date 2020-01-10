@@ -15,11 +15,14 @@
 #' @param variable_num_blocks Should the model allow new blocks to be created or
 #'   empty blocks removed while sweeping or should number of blocks remain
 #'   constant?
+#' @param track_pairs Return a dataframe with all pairs of nodes along with the
+#'   number of sweeps they shared the same group?
 #'
 #' @return List with two dataframes. The first telling for all sweeps everytime
 #'   a node was moved and what group it was moved to. The second telling for
 #'   each sweep the entropy delta and total number of nodes that were moved to
-#'   new groups in that sweep.
+#'   new groups in that sweep. If `track_pairs = TRUE`, then an additional
+#'   `pairing_counts` dataframe is added to output.
 #' @export
 #'
 #' @examples
@@ -40,6 +43,17 @@
 #' # Look at the per-sweep level information
 #' sweep_results$sweep_info
 #'
-mcmc_sweep <- function(sbm, num_sweeps = 1, level = 0, variable_num_blocks = TRUE){
-  sbm$mcmc_sweep(as.integer(level), as.integer(num_sweeps), variable_num_blocks)
+mcmc_sweep <- function(sbm, num_sweeps = 1, variable_num_blocks = TRUE, track_pairs = FALSE, level = 0){
+
+  results <- sbm$mcmc_sweep(as.integer(level),
+                 as.integer(num_sweeps),
+                 variable_num_blocks,
+                 track_pairs)
+
+  if (!track_pairs) {
+    # Remove the empty pair counts results
+    results['pairing_counts'] <- NULL
+  }
+
+  results
 }
