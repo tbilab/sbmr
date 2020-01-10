@@ -50,7 +50,12 @@ mcmc_sweep <- function(sbm, num_sweeps = 1, variable_num_blocks = TRUE, track_pa
                  variable_num_blocks,
                  track_pairs)
 
-  if (!track_pairs) {
+  if (track_pairs) {
+    # Clean up pair connections results
+    results$pairing_counts <-  results$pairing_counts %>%
+      tidyr::separate(node_pair, into = c("node_a", "node_b"), sep = "--") %>%
+      dplyr::mutate(proportion_connected = times_connected/num_sweeps)
+  } else {
     # Remove the empty pair counts results
     results['pairing_counts'] <- NULL
   }
