@@ -131,7 +131,6 @@
   <span class='kw'>num_final_blocks</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>10</span>,
   <span class='kw'>num_block_proposals</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>num_mcmc_sweeps</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>beta</span> <span class='kw'>=</span> <span class='fl'>1.5</span>,
   <span class='kw'>eps</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>parallel</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
@@ -173,13 +172,6 @@ their most natural resting place in a given collapsed state. Larger values
 will slow down runtime but can potentially lead for more stable results.</p></td>
     </tr>
     <tr>
-      <th>beta</th>
-      <td><p>Inverse temperature parameter impacting the acceptance
-probabilities of MCMC sweeps. A higher value means model puts more weight
-on accepting moves that improve model fit. Only matters if
-<code>num_mcmc_sweeps</code> is more than zero.</p></td>
-    </tr>
-    <tr>
       <th>eps</th>
       <td><p>Controls randomness of move proposals. Effects both the block
 merging and mcmc sweeps. If value is set to value other than null the SBMs
@@ -212,7 +204,7 @@ of <code>state</code> which is the state dump dataframe for model at end of merg
 <span class='co'># Visualize results of collapsing</span>
 <span class='fu'><a href='visualize_collapse_results.html'>visualize_collapse_results</a></span>(<span class='no'>collapse_results</span>)</div><div class='img'><img src='collapse_run-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># Choose best result</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a></span>(<span class='no'>my_sbm</span>, <span class='no'>collapse_results</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 2032.81284279538.</div><div class='input'>
+<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a></span>(<span class='no'>my_sbm</span>, <span class='no'>collapse_results</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 2034.52072186423.</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
