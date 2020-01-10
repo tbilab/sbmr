@@ -228,27 +228,10 @@ Sweep_Res SBM::mcmc_sweep(const int level,
 
       if (track_pairs)
       {
-        // Loop through all the nodes in the previous group node changes
-        for (auto lost_pair_it = (old_block->children).begin();
-             lost_pair_it != (old_block->children).end();
-             lost_pair_it++)
-        {
-          results.pair_moves.insert(make_pair_key(curr_node->id,
-                                                  (*lost_pair_it)->id));
-        }
-
-        // Repeat for the new groups children
-        for (auto new_pair_it = (proposed_new_block->children).begin();
-             new_pair_it != (proposed_new_block->children).end();
-             new_pair_it++)
-        {
-          // Make sure we don't add this node to itself.
-          if ((*new_pair_it)->id != curr_node->id)
-          {
-            results.pair_moves.insert(make_pair_key(curr_node->id,
-                                                    (*new_pair_it)->id));
-          }
-        }
+        update_changed_pairs(curr_node,
+                             old_block->children,
+                             proposed_new_block->children,
+                             results.pair_moves);
       }
     }
 

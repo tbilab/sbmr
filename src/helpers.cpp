@@ -137,3 +137,31 @@ void shuffle_nodes(std::vector<NodePtr> & node_vec,
   // Shuffle node order
   std::shuffle(node_vec.begin(), node_vec.end(), sampler);
 }
+
+
+// Update the set of pairs that need to be updated for a given sweep.
+void update_changed_pairs(NodePtr curr_node,
+                          ChildSet &old_connections,
+                          ChildSet &new_connections,
+                          std::unordered_set<std::string> &pair_moves)
+{
+  // Loop through all the nodes in the previous group node changes
+  for (auto lost_pair_it = old_connections.begin();
+       lost_pair_it != old_connections.end();
+       lost_pair_it++)
+  {
+    pair_moves.insert(make_pair_key(curr_node->id, (*lost_pair_it)->id));
+  }
+
+  // Repeat for the new groups children
+  for (auto new_pair_it = new_connections.begin();
+       new_pair_it != new_connections.end();
+       new_pair_it++)
+  {
+    // Make sure we don't add this node to itself.
+    if ((*new_pair_it)->id != curr_node->id)
+    {
+      pair_moves.insert(make_pair_key(curr_node->id, (*new_pair_it)->id));
+    }
+  }
+}
