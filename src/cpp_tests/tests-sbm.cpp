@@ -113,7 +113,7 @@ TEST_CASE("Basic MCMC sweeps", "[SBM]")
     for (int i = 0; i < num_sweeps; i++)
     {
       my_SBM.EPS = eps;
-      int n_changes = my_SBM.mcmc_sweep(0, 1, false, false).nodes_moved.size();
+      int n_changes = my_SBM.mcmc_sweep(0, 1, false, false).sweep_num_nodes_moved[0];
       total_num_changes += n_changes;
     }
 

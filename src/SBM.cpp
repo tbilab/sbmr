@@ -154,12 +154,59 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   );
 }
 
+// Sets up all the initial values for the node pair tracking structure
+inline void initialize_pair_tracking_map(std::unordered_map<std::string, Pair_Status> &concensus_pairs,
+                                         const LevelPtr node_map)
+{
+  for (auto node_a_it = node_map->begin();
+       node_a_it != node_map->end();
+       node_a_it++)
+  {
+    for (auto node_b_it = std::next(node_a_it);
+         node_b_it != node_map->end();
+         node_b_it++)
+    {
+      bool in_same_group = node_a_it->second->parent ==
+                           node_b_it->second->parent;
 
+      // Initialize pair info for group
+      concensus_pairs.emplace(
+          make_pair_key(node_a_it->first, node_b_it->first),
+          Pair_Status(in_same_group));
+    }
+  }
+}
+
+// Update the concensus pair struct with a single sweep's results
+inline void update_pair_tracking_map(std::unordered_map<std::string, Pair_Status> &concensus_pairs,
+                                     const std::unordered_set<std::string> &updated_pairs)
+{
+  for (auto pair_it = concensus_pairs.begin();
+       pair_it != concensus_pairs.end();
+       pair_it++)
+  {
+    // Check if this pair was updated on last sweep
+    auto sweep_change_loc = updated_pairs.find(pair_it->first);
+    bool updated_last_sweep = sweep_change_loc != updated_pairs.end();
+
+    if (updated_last_sweep)
+    {
+      // Update the pair connection status
+      (pair_it->second).connected = !(pair_it->second).connected;
+    }
+
+    // Increment the counts if needed
+    if ((pair_it->second).connected)
+    {
+      (pair_it->second).times_connected++;
+    }
+  }
+}
 
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-Sweep_Res SBM::mcmc_sweep(const int level,
+MCMC_Sweep SBM::mcmc_sweep(const int level,
                           const int num_sweeps,
                           const bool variable_num_blocks,
                           const bool track_pairs)
@@ -168,74 +215,98 @@ Sweep_Res SBM::mcmc_sweep(const int level,
 
   const int block_level = level + 1;
 
-  // Initialize the results holder
-  Sweep_Res results;
+  // Setup containers to track progress of sweeps etc
+  
+  // Contains info on what nodes were moved in a given sweep
+  std::list<std::string> nodes_moved;
+  // What groups those nodes were moved to
+  std::list<std::string> new_groups;
+  // Wwhat pairs need to be updated for a given sweep
+  std::unordered_set<std::string> pair_moves;
+
+  // Initialize structure that contains the returned values for this/these sweeps
+  MCMC_Sweep results(num_sweeps);
+
+  // Initialize pair tracking map if needed
+  if (track_pairs)
+  {
+    initialize_pair_tracking_map(results.concensus_pairs, get_level(level));
+  }
 
   // Grab level map
   LevelPtr node_map = get_level(level);
 
-  // Get all the nodes at the given level in a shuffleable vector format
-  // Initialize vector to hold nodes
+  // Initialize vector to hold nodes in order of pass through for a sweep.
   std::vector<NodePtr> node_vec;
-  shuffle_nodes(node_vec, node_map, sampler.int_gen);
+  node_vec.reserve(node_map->size());
 
-  // Loop through each node
-  for (auto node_it = node_vec.begin(); node_it != node_vec.end(); ++node_it)
-  {
-    NodePtr curr_node = *node_it;
+  for (int i = 0; i < num_sweeps; i++)
+  {    
+    // Generate a random order of nodes to be run through for sweep
+    shuffle_nodes(node_vec, node_map, sampler.int_gen);
+    
+    // Clear the single sweep containers for new results
+    nodes_moved.clear();
+    new_groups.clear();
+    pair_moves.clear();
 
-    // Check if we're running sweep with variable block numbers. If we are, we
-    // need to add a new block as a potential for the node to enter
-    if (variable_num_blocks)
+    // Loop through each node
+    for (auto node_it = node_vec.begin(); node_it != node_vec.end(); ++node_it)
     {
-      // Add a new block node for the current node type
-      create_block_node(curr_node->type, block_level);
-    }
+      NodePtr curr_node = *node_it;
 
-    // Get a move proposal
-    NodePtr proposed_new_block = propose_move(curr_node);
-
-    // If the propsosed block is the nodes current block, we don't need to waste
-    // time checking because decision will always result in same state.
-    if(curr_node->parent->id == proposed_new_block->id) continue;
-
-    // Calculate acceptance probability based on posterior changes
-    Proposal_Res proposal_results = make_proposal_decision(
-      curr_node,
-      proposed_new_block
-    );
-
-    bool move_accepted = sampler.draw_unif() < proposal_results.prob_of_accept;
-
-    if (move_accepted)
-    {
-      NodePtr old_block = curr_node->parent;
-
-      // Move the node
-      curr_node->set_parent(proposed_new_block);
-
-      // Update results
-      results.nodes_moved.push_back(curr_node->id);
-      results.new_groups.push_back(proposed_new_block->id);
-      results.entropy_delta += proposal_results.entropy_delta;
-      
-      // If we are varying number of blocks and we made a move we should clean
-      // up the now potentially empty blocks for the next node proposal. 
+      // Check if we're running sweep with variable block numbers. If we are, we
+      // need to add a new block as a potential for the node to enter
       if (variable_num_blocks)
       {
-        clean_empty_blocks();
+        // Add a new block node for the current node type
+        create_block_node(curr_node->type, block_level);
       }
 
-      if (track_pairs)
+      // Get a move proposal
+      NodePtr proposed_new_block = propose_move(curr_node);
+
+      // If the propsosed block is the nodes current block, we don't need to waste
+      // time checking because decision will always result in same state.
+      if (curr_node->parent->id == proposed_new_block->id)
+        continue;
+
+      // Calculate acceptance probability based on posterior changes
+      Proposal_Res proposal_results = make_proposal_decision(
+          curr_node,
+          proposed_new_block);
+
+      // Is the move accepted?
+      if (sampler.draw_unif() < proposal_results.prob_of_accept)
       {
-        update_changed_pairs(curr_node,
-                             old_block->children,
-                             proposed_new_block->children,
-                             results.pair_moves);
-      }
-    }
+        NodePtr old_block = curr_node->parent;
 
-  } // End loop over all nodes
+        // Move the node
+        curr_node->set_parent(proposed_new_block);
+
+        // Update results
+        nodes_moved.push_back(curr_node->id);
+        new_groups.push_back(proposed_new_block->id);
+        results.sweep_num_nodes_moved[i]++;
+        results.sweep_entropy_delta[i] += proposal_results.entropy_delta;
+
+        // If we are varying number of blocks and we made a move we should clean
+        // up the now potentially empty blocks for the next node proposal.
+        if (variable_num_blocks)
+        {
+          clean_empty_blocks();
+        }
+
+        if (track_pairs)
+        {
+          update_changed_pairs(curr_node,
+                               old_block->children,
+                               proposed_new_block->children,
+                               pair_moves);
+        }
+      } // End accepted if statement
+    } // End loop over all nodes
+  } // End multi-sweep loop
 
   return results;
 }

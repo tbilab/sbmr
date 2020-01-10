@@ -124,7 +124,7 @@ void shuffle_nodes(std::vector<NodePtr> & node_vec,
                    std::mt19937 & sampler)
 {
   // Initialize vector size to hold nodes
-  node_vec.reserve(node_map->size());
+  node_vec.clear();
 
   // Fill in vector with map elements
   for (auto node_it = node_map->begin();

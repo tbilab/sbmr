@@ -47,6 +47,18 @@ struct Sweep_Res
   std::unordered_set<std::string> pair_moves;
 };
 
+struct MCMC_Sweep
+{
+  std::vector<double> sweep_entropy_delta;
+  std::vector<int> sweep_num_nodes_moved;
+  std::unordered_map<std::string, Pair_Status> concensus_pairs;
+  MCMC_Sweep(const int n)
+  {
+    // Preallocate the entropy change and num groups moved in sweep vectors and
+    sweep_entropy_delta.reserve(n);
+    sweep_num_nodes_moved.reserve(n);
+  }
+};
 
 // =============================================================================
 // Main node class declaration
@@ -91,7 +103,7 @@ public:
   Proposal_Res make_proposal_decision(NodePtr node, NodePtr new_block);
 
   // Runs efficient MCMC sweep algorithm on desired node level
-  Sweep_Res mcmc_sweep(int level,
+  MCMC_Sweep mcmc_sweep(int level,
                        int num_sweeps,
                        bool variable_num_blocks,
                        bool track_pairs);
