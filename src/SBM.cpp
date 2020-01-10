@@ -159,11 +159,12 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_blocks)
+Sweep_Res SBM::mcmc_sweep(const int level,
+                          const bool variable_num_blocks,
+                          const bool track_pairs)
 {
   PROFILE_FUNCTION();
-  // Eventually passed to function directly, controls if pair info is tracked
-  bool track_pairs = true; 
+
   const int block_level = level + 1;
 
   // Initialize the results holder
@@ -171,7 +172,6 @@ Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_blocks)
 
   // Grab level map
   LevelPtr node_map = get_level(level);
-
 
   // Get all the nodes at the given level in a shuffleable vector format
   // Initialize vector to hold nodes
@@ -593,7 +593,7 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int node_level,
       // Let model equilibriate with new block layout...
       for (int j = 0; j < num_mcmc_steps; j++)
       {
-        mcmc_sweep(node_level, false);
+        mcmc_sweep(node_level, false, false);
       }
       clean_empty_blocks();
       // Update the step entropy results with new equilibriated model

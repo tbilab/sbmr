@@ -91,8 +91,7 @@ public:
   Proposal_Res make_proposal_decision(NodePtr node, NodePtr new_block);
 
   // Runs efficient MCMC sweep algorithm on desired node level
-  Sweep_Res mcmc_sweep(int level, bool variable_num_blocks);
-
+  Sweep_Res mcmc_sweep(int level, bool variable_num_blocks, bool track_pairs);
 
   // Merge two blocks at a given level based on the probability of doing so
   Merge_Step agglomerative_merge( int level_of_blocks, int n_merges);
