@@ -252,50 +252,53 @@ public:
                   const bool variable_num_blocks,
                   const bool track_pairs)
   {
-    // Setup the node-to-new-group lists
-    std::list<std::string> nodes_moved;
-    std::list<std::string> new_groups;
 
-    // Setup the entropy change and num groups moved in sweep vectors and preallocate
-    std::vector<double> sweep_entropy_delta;
-    std::vector<int> sweep_num_nodes_moved;
-    sweep_entropy_delta.reserve(num_sweeps);
-    sweep_num_nodes_moved.reserve(num_sweeps);
+    MCMC_Sweep results = SBM::mcmc_sweep(level, num_sweeps, variable_num_blocks, track_pairs);
 
-    // Map that keeps track of all pairs of nodes and if they are connected
-    // and their total number of times connected over the all the sweeps
-    std::unordered_map<std::string, Pair_Status> concensus_pairs;
+    // // Setup the node-to-new-group lists
+    // std::list<std::string> nodes_moved;
+    // std::list<std::string> new_groups;
 
-    // Initialize pair tracking map if needed
-    if (track_pairs)
-    {
-      initialize_pair_tracking_map(concensus_pairs, get_level(level));
-    }
+    // // Setup the entropy change and num groups moved in sweep vectors and preallocate
+    // std::vector<double> sweep_entropy_delta;
+    // std::vector<int> sweep_num_nodes_moved;
+    // sweep_entropy_delta.reserve(num_sweeps);
+    // sweep_num_nodes_moved.reserve(num_sweeps);
 
-    // Holder for a given sweep's results
-    Sweep_Res current_sweep;
+    // // Map that keeps track of all pairs of nodes and if they are connected
+    // // and their total number of times connected over the all the sweeps
+    // std::unordered_map<std::string, Pair_Status> concensus_pairs;
 
-    for (int j = 0; j < num_sweeps; j++)
-    {
-      // Run single sweep
-      current_sweep = SBM::mcmc_sweep(level, variable_num_blocks, track_pairs);
+    // // Initialize pair tracking map if needed
+    // if (track_pairs)
+    // {
+    //   initialize_pair_tracking_map(concensus_pairs, get_level(level));
+    // }
 
-      // Add this sweep's entropy delta to record
-      sweep_entropy_delta.push_back(current_sweep.entropy_delta);
+    // // Holder for a given sweep's results
+    // Sweep_Res current_sweep;
 
-      // Add number of nodes moved
-      sweep_num_nodes_moved.push_back(current_sweep.nodes_moved.size());
+    // for (int j = 0; j < num_sweeps; j++)
+    // {
+    //   // Run single sweep
+    //   current_sweep = SBM::mcmc_sweep(level, variable_num_blocks, track_pairs);
 
-      // Append the move results into the main run results
-      nodes_moved.splice(nodes_moved.end(), current_sweep.nodes_moved);
-      new_groups.splice(new_groups.end(), current_sweep.new_groups);
+    //   // Add this sweep's entropy delta to record
+    //   sweep_entropy_delta.push_back(current_sweep.entropy_delta);
 
-      // Update the concensus pairs map with results if needed.
-      if (track_pairs)
-      {
-        update_pair_tracking_map(concensus_pairs, current_sweep.pair_moves);
-      }
-    }
+    //   // Add number of nodes moved
+    //   sweep_num_nodes_moved.push_back(current_sweep.nodes_moved.size());
+
+    //   // Append the move results into the main run results
+    //   nodes_moved.splice(nodes_moved.end(), current_sweep.nodes_moved);
+    //   new_groups.splice(new_groups.end(), current_sweep.new_groups);
+
+    //   // Update the concensus pairs map with results if needed.
+    //   if (track_pairs)
+    //   {
+    //     update_pair_tracking_map(concensus_pairs, current_sweep.pair_moves);
+    //   }
+    // }
 
     // Initialze vectors to hold pair tracking results, if needed.
     std::vector<std::string> node_pair;
@@ -307,8 +310,8 @@ public:
       node_pair.reserve(num_sweeps);
       times_connected.reserve(num_sweeps);
 
-      for (auto pair_it = concensus_pairs.begin();
-           pair_it != concensus_pairs.end();
+      for (auto pair_it = results.concensus_pairs.begin();
+           pair_it != results.concensus_pairs.end();
            pair_it++)
       {
         node_pair.push_back(pair_it->first);
@@ -318,13 +321,10 @@ public:
 
     // package up results into a list
     return List::create(
-        _["nodes_moved"] = DataFrame::create(
-            _["node"] = nodes_moved,
-            _["destination"] = new_groups,
-            _["stringsAsFactors"] = false),
+        _["nodes_moved"] = results.nodes_moved,
         _["sweep_info"] = DataFrame::create(
-            _["entropy_delta"] = sweep_entropy_delta,
-            _["num_nodes_moved"] = sweep_num_nodes_moved,
+            _["entropy_delta"] = results.sweep_entropy_delta,
+            _["num_nodes_moved"] = results.sweep_num_nodes_moved,
             _["stringsAsFactors"] = false),
         _["pairing_counts"] = track_pairs ? DataFrame::create(
                                                 _["node_pair"] = node_pair,
