@@ -261,7 +261,7 @@ The only arguments it has that `collapse_blocks()` does not are:
 - `num_final_blocks`: Array of group numbers that the agglomerative merge should target. E.g. 1:10.
 - `parallel`: Should algorithm be run in parallel to speed up?
 
-The parallel argument is particularly valuable as it exploits the fact that each run is independent of eachother and thus can be run on seperate threads for significant speedups. 
+The parallel argument is particularly valuable as it exploits the fact that each run is independent of the others and thus can be run on seperate threads for significant speedups. 
 
 Lets try it on our model scanning from 1-10 groups. 
 
