@@ -71,3 +71,26 @@ test_that("Pair tracking can be enabled and disabled",{
 
 })
 
+test_that("No nodes should have pairs for more steps than number of sweeps",{
+  num_sweeps <- 5
+  num_trails <- 20
+
+  # Start with a random network
+  my_sbm <- create_sbm(sim_random_network(n_nodes = 30))
+
+  for(i in num_trails){
+
+    # Run a few sweeps where pair tracking is enabled
+    pair_connections <-  mcmc_sweep(initialize_blocks(my_sbm, num_blocks = 5),
+                                  num_sweeps = num_sweeps,
+                                  track_pairs = TRUE)$pairing_counts
+
+
+    # Make sure that none of the times connected exceeds the number of sweeps requested
+    expect_false(
+      any(pair_connections$times_connected > num_sweeps)
+    )
+  }
+
+})
+
