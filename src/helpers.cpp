@@ -117,3 +117,23 @@ std::string make_pair_key(const std::string a_node, const std::string b_node)
              ? a_node + "--" + b_node
              : b_node + "--" + a_node;
 }
+
+// Build shuffled node vector
+void shuffle_nodes(std::vector<NodePtr> & node_vec,
+                   const std::shared_ptr<std::map<string, NodePtr>> & node_map,
+                   std::mt19937 & sampler)
+{
+  // Initialize vector size to hold nodes
+  node_vec.reserve(node_map->size());
+
+  // Fill in vector with map elements
+  for (auto node_it = node_map->begin();
+       node_it != node_map->end();
+       node_it++)
+  {
+    node_vec.push_back(node_it->second);
+  }
+
+  // Shuffle node order
+  std::shuffle(node_vec.begin(), node_vec.end(), sampler);
+}
