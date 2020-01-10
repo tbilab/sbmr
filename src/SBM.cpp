@@ -154,13 +154,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   );
 }
 
-// Helper to build alphabetically string pair of two node ids for pair maps
-inline std::string make_pair_key(const std::string a_node, const std::string b_node)
-{
-  return a_node > b_node
-             ? a_node + b_node
-             : b_node + a_node;
-}
+
 
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
@@ -244,17 +238,16 @@ Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_blocks)
 
       if (track_pairs)
       {
-        // Loop through all the nodes in the previous group and set pair move status to false
+        // Loop through all the nodes in the previous group node changes
         for (auto lost_pair_it = (old_block->children).begin();
              lost_pair_it != (old_block->children).end();
              lost_pair_it++)
         {
-          results.pair_moves.emplace(make_pair_key(curr_node->id,
-                                                   (*lost_pair_it)->id),
-                                     false);
+          results.pair_moves.insert(make_pair_key(curr_node->id,
+                                                  (*lost_pair_it)->id));
         }
 
-        // Repeat for the new groups children and set status to true
+        // Repeat for the new groups children
         for (auto new_pair_it = (proposed_new_block->children).begin();
              new_pair_it != (proposed_new_block->children).end();
              new_pair_it++)
@@ -262,9 +255,8 @@ Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_blocks)
           // Make sure we don't add this node to itself.
           if ((*new_pair_it)->id != curr_node->id)
           {
-            results.pair_moves.emplace(make_pair_key(curr_node->id,
-                                                     (*new_pair_it)->id),
-                                       false);
+            results.pair_moves.insert(make_pair_key(curr_node->id,
+                                                    (*new_pair_it)->id));
           }
         }
       }

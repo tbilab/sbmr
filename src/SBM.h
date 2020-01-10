@@ -44,7 +44,7 @@ struct Sweep_Res
   std::list<std::string> nodes_moved;
   std::list<std::string> new_groups;
   double entropy_delta = 0;
-  std::unordered_map<std::string, double> pair_moves;
+  std::unordered_set<std::string> pair_moves;
 };
 
 
