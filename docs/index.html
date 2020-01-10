@@ -77,19 +77,89 @@
 <div id="sbmr" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#sbmr" class="anchor"></a>SBMR</h1></div>
+<p>An R package for fitting and exploring the results of Stochastic Block Models for network data.</p>
+<div id="what-are-sbms" class="section level2">
+<h2 class="hasAnchor">
+<a href="#what-are-sbms" class="anchor"></a>What are SBMs?</h2>
+<p>SBM Stands for “Stochastic Block Model.” These models are used to describe the generating process for graph data where nodes are arranged into ‘blocks’ (or ‘clusters’ or ‘groups’).</p>
+<div id="block" class="section level3">
+<h3 class="hasAnchor">
+<a href="#block" class="anchor"></a>“Block”</h3>
+<p>A given block of nodes can be characterized by the propensity for a node within it to be connected to all the other blocks in the network. For instance, in a network of three blocks - a, b, and c - any node from block a may have an average number of connections to other nodes in block a of 5, an average of 10 connections to nodes in block b, and 1 to nodes in block c.</p>
+</div>
+<div id="stochastic" class="section level3">
+<h3 class="hasAnchor">
+<a href="#stochastic" class="anchor"></a>“Stochastic”</h3>
+<p>Stochastic (a fancy word for “with randomness”) just means that while that node from block a may have on average 5, 10, and 1 connections to blocks a, b, and c respectively, the actual observed values may be different, perhaps 4, 8, and 3. In this standard case the random model that is used to ‘draw’ these random counts is the poisson model. Other distributions can be used (such as bernouli for binary connection or no connection edges), but the package currently only supports <em>inference</em> with the poisson model.</p>
+</div>
+<div id="fitting-a-model" class="section level3">
+<h3 class="hasAnchor">
+<a href="#fitting-a-model" class="anchor"></a>Fitting a “Model”</h3>
+<p>Up to now the model has been described as one to generate data, but that’s not particularly interesting. When you fit an SBM to some data what you are doing is trying to find the underlying model that is most likely to have generated your observed data.</p>
+<p>This package does that using Markov Chain Monte Carlo (MCMC) where the underlying model that may have generated your data is shuffled around to likely layouts and how well that layout fits your data is recorded. This results in many possible models where the frequency of a model layout occuring is proportional to how well supported that layout is by your data.</p>
+</div>
+</div>
+<div id="are-my-data-appropriate-for-an-sbm" class="section level2">
+<h2 class="hasAnchor">
+<a href="#are-my-data-appropriate-for-an-sbm" class="anchor"></a>Are my data appropriate for an SBM?</h2>
+<p>Like any good statistical model many assumptions about your data and its generating process need to be made for the model results to have any meaning. In the case of the SBM these assumptions are relatively minimal.</p>
+<div id="data-can-be-represented-as-a-graph-with-edges-counts-between-nodes" class="section level3">
+<h3 class="hasAnchor">
+<a href="#data-can-be-represented-as-a-graph-with-edges-counts-between-nodes" class="anchor"></a>Data can be represented as a graph with edges counts between nodes</h3>
+<p>The classic data that fits this is social network data. A node may represent an individual and edges represent the existance of a connection (friendship, interaction, etc) with an other node. Multipartite graph data is also supported. The work that this package was developed for is bipartite data (meaning two-node-types) of an individual and disease diagnoses, an “individual node” is connected to a “disease-node” if the person was diagnosed with that disease.</p>
+<p>Examples of data that are not appropriate are anything where the connections are continuous. Perhaps nodes are cities and the edges are number of miles between them (with a fractional miles). While you could round these continuous values to integers it is highly likely that it is innapropriate for the model and you are better served finding a more parsimonius model.</p>
+</div>
+<div id="the-underlying-phenomena-generating-your-data-should-result-in-sets-of-nodes-that-have-similar-connection-patterns" class="section level3">
+<h3 class="hasAnchor">
+<a href="#the-underlying-phenomena-generating-your-data-should-result-in-sets-of-nodes-that-have-similar-connection-patterns" class="anchor"></a>The underlying phenomena generating your data should result in sets of nodes that have similar connection patterns</h3>
+<p>The SBM attempts to partition the nodes in your data into groups that are, in the eyes of the model, identical in terms of there probability of connection the node partitioning. If this is unreasonable for the data, the model will not return valid results. For instance, in many data with people, socioeconomic information can be highly predictive of a large number of outcomes. In this case the SBM will be more likely do differntiate different socioeconomic classes rather than a more interesting separation. In addition, the socioeconomic confounding in this case is continuous and therefor breaks the assumption of clean groups of nodes.</p>
+</div>
+</div>
+<div id="package-goals" class="section level2">
+<h2 class="hasAnchor">
+<a href="#package-goals" class="anchor"></a>Package Goals</h2>
+<p>This package has a limited scope it aims to do the following things well:</p>
+<ul>
+<li>Fit SBM models using Bayesian MCMC</li>
+<li>Heavy focus on model uncertainty</li>
+<li>Easily work with multi-partite (bi, tri, etc) graph data</li>
+<li>Produce meaningful and high-quality visualizations of model results</li>
+</ul>
+<p>For more powerful (but larger and harder-to-install) libraries for working with graph data check out <code>graph-tool</code> for Python (heavy SBM focus with many more features than <code>sbmR</code>) and <code>iGraph</code> (a giant in graph data manipulation and exploration.)</p>
+<p>If there is a feature that you feel would be very beneficial to the package that would save you needing to go to another package for a small graph-data/SBM related function, please let me know in <a href="https://github.com/tbilab/sbmR/issues">github issues</a> or if you have the time/desire a PR (I am willing to help out implementation details for those not fully comfortable with PRs into open source yet).</p>
+</div>
+<div id="usage" class="section level2">
+<h2 class="hasAnchor">
+<a href="#usage" class="anchor"></a>Usage</h2>
+<p>Please see the <a href="">articles on package usage on the package website.</a></p>
+</div>
+<div id="development" class="section level2">
+<h2 class="hasAnchor">
+<a href="#development" class="anchor"></a>Development</h2>
+<p>This package is currently under active development. Commits to the master branch pass all included R and C++ tests but are not guarenteed to be bug free. If you discover a bug in use please report using the <a href="https://github.com/tbilab/sbmR/issues">issue tracker for the github repo.</a></p>
+</div>
 <div id="running-tests" class="section level2">
 <h2 class="hasAnchor">
 <a href="#running-tests" class="anchor"></a>Running Tests</h2>
-<p>The tests are implemented using a precompiled header test library so testing is as simple as cloning this repo and then running the shell script <code>run_tests.sh</code>.</p>
+<p>Tests for the package fall under two categories: tests for the underlying c++ code and the R package code.</p>
+<div id="c-tests" class="section level3">
+<h3 class="hasAnchor">
+<a href="#c-tests" class="anchor"></a>C++ tests</h3>
+<p>Tests for c++ code are implemented using a precompiled header test library so testing is as simple as cloning this repo and then running the shell script <code>src/cpp_tests/run_tests.sh</code>.</p>
 <p>E.g.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="fu">sh</span> cpp_tests/run_tests.sh</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="fu">sh</span> src/cpp_tests/run_tests.sh</a></code></pre></div>
 <p>The results should be output with timings etc.</p>
+<div id="profiling" class="section level4">
+<h4 class="hasAnchor">
+<a href="#profiling" class="anchor"></a>Profiling</h4>
+<p>As the C++ code is should be as fast as possible, a profiling workflow for detecting slow areas of code is also included. Like with testing the script <code>src/profiling/run_profiling.sh</code> will compile a <code>profile.cpp</code> script, run it, and return the output to json file for investigation in your favorite flame-graph viewer such as <code>chrome://tracing</code>.</p>
 </div>
-<div id="profiling-code" class="section level2">
-<h2 class="hasAnchor">
-<a href="#profiling-code" class="anchor"></a>Profiling code</h2>
-<p>Code profiling is done in much the same way, just using the script <code>profiling/run_profiling.sh</code>.</p>
-<p>The script outputs <code>profiling/results.json</code> which can then be loaded into <code>chrome://tracing</code> to view the flamegraph of the code execution for a agglomerative merging.</p>
+</div>
+<div id="r-tests" class="section level3">
+<h3 class="hasAnchor">
+<a href="#r-tests" class="anchor"></a>R tests</h3>
+<p>Tests for the R package code that wraps the underlying c++ heavy lifting are done using the standard testthat workflow. To run them either use the built in build pane in RStudio or run <code><a href="https://rdrr.io/pkg/devtools/man/test.html">devtools::test()</a></code>.</p>
+</div>
 </div>
 </div>
   </div>

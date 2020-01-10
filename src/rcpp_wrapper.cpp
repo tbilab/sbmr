@@ -195,15 +195,89 @@ public:
     return SBM::compute_entropy(level);
   }
 
-  List mcmc_sweep(int level, bool variable_num_blocks)
+  // Sets up all the initial values for the node pair tracking structure
+  inline void initialize_pair_tracking_map(std::unordered_map<std::string, Pair_Status> & concensus_pairs,
+                                    const LevelPtr node_map)
   {
-    // Run sweep method
-    Sweep_Res result = SBM::mcmc_sweep(level, variable_num_blocks);
+    for (auto node_a_it = node_map->begin();
+         node_a_it != node_map->end();
+         node_a_it++)
+    {
+      for (auto node_b_it = std::next(node_a_it);
+           node_b_it != node_map->end();
+           node_b_it++)
+      {
+        bool in_same_group = node_a_it->second->parent ==
+                             node_b_it->second->parent;
 
-    // Package result struct into a list
+        // Initialize pair info for group
+        concensus_pairs.emplace(
+            make_pair_key(node_a_it->first, node_b_it->first),
+            Pair_Status(in_same_group));
+      }
+    }
+  }
+
+  // Update the concensus pair struct with a single sweep's results
+  inline void update_pair_tracking_map(std::unordered_map<std::string, Pair_Status> &concensus_pairs,
+                                       const std::unordered_set<std::string> &updated_pairs)
+  {
+    for (auto pair_it = concensus_pairs.begin();
+         pair_it != concensus_pairs.end();
+         pair_it++)
+    {
+      // Check if this pair was updated on last sweep
+      auto sweep_change_loc = updated_pairs.find(pair_it->first);
+      bool updated_last_sweep = sweep_change_loc != updated_pairs.end();
+
+      if (updated_last_sweep)
+      {
+        // Update the pair connection status
+        (pair_it->second).connected = !(pair_it->second).connected;
+      }
+
+      // Increment the counts if needed
+      if ((pair_it->second).connected)
+      {
+        (pair_it->second).times_connected++;
+      }
+    }
+  }
+
+  // =============================================================================
+  // Runs multiple MCMC sweeps and keeps track of the results efficiently
+  // =============================================================================
+  List mcmc_sweep(const int level,
+                  const int num_sweeps,
+                  const bool variable_num_blocks,
+                  const bool track_pairs)
+  {
+
+    MCMC_Sweeps results = SBM::mcmc_sweep(level,
+                                         num_sweeps,
+                                         variable_num_blocks,
+                                         track_pairs);
+
+    // Initialize vectors to hold pair tracking results, if needed.
+    std::vector<std::string> node_pair;
+    std::vector<int> times_connected;
+    if (track_pairs)
+    {
+      results.block_consensus.dump_results(node_pair, times_connected);
+    }
+
+    // package up results into a list
     return List::create(
-        _["nodes_moved"] = result.nodes_moved,
-        _["entropy_delta"] = result.entropy_delta);
+        _["nodes_moved"] = results.nodes_moved,
+        _["sweep_info"] = DataFrame::create(
+            _["entropy_delta"] = results.sweep_entropy_delta,
+            _["num_nodes_moved"] = results.sweep_num_nodes_moved,
+            _["stringsAsFactors"] = false),
+        _["pairing_counts"] = track_pairs ? DataFrame::create(
+                                                _["node_pair"] = node_pair,
+                                                _["times_connected"] = times_connected,
+                                                _["stringsAsFactors"] = false)
+                                          : "NA");
   }
 
   List collapse_blocks(const int node_level,
@@ -217,7 +291,6 @@ public:
                                                  num_mcmc_steps,
                                                  desired_num_blocks,
                                                  report_all_steps);
-
 
     List entropy_results;
 
@@ -270,10 +343,6 @@ public:
     SBM::load_from_state(State_Dump(id, parent, level, type_to_int(string_types)));
   }
 
-  // Getters and setters for inhereted fields
-  void set_beta(const double beta) { BETA = beta; }
-  double get_beta() { return BETA; }
-
   void set_epsilon(const double eps) { EPS = eps; }
   double get_epsilon() { return EPS; }
 
@@ -297,9 +366,6 @@ RCPP_MODULE(SBM)
                 &Rcpp_SBM::get_epsilon, &Rcpp_SBM::set_epsilon,
                 "Epsilon value for ergodicity")
 
-      .property("BETA",
-                &Rcpp_SBM::get_beta, &Rcpp_SBM::set_beta,
-                "Beta value for MCMC acceptance probability")
 
       .property("GREEDY",
                 &Rcpp_SBM::get_greedy, &Rcpp_SBM::set_greedy,
@@ -386,7 +452,6 @@ sbm$set_node_parent("b3", "b12", 0)
 
 # Set some model parameters
 sbm$GREEDY <- TRUE
-sbm$BETA <- 1.5
 sbm$EPS <- 0.1
 sbm$N_CHECKS_PER_block <- 5
 

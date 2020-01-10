@@ -66,13 +66,11 @@ test_that("Copying SBM without edges", {
 
 test_that("Hyperparameters are copied over", {
   eps <- 2
-  beta <- 4
   sigma <- 3
   greedy <- TRUE
   n_checks <- 17
 
   initial_sbm <- create_sbm(eps = eps)
-  initial_sbm$BETA <- beta
   initial_sbm$SIGMA <- sigma
   initial_sbm$GREEDY <- greedy
   initial_sbm$N_CHECKS_PER_block <- n_checks
@@ -81,7 +79,6 @@ test_that("Hyperparameters are copied over", {
   copied_sbm <- copy_sbm(initial_sbm)
 
   expect_equal(initial_sbm$EPS, eps)
-  expect_equal(initial_sbm$BETA, beta)
   expect_equal(initial_sbm$SIGMA, sigma)
   expect_equal(initial_sbm$GREEDY, greedy)
   expect_equal(initial_sbm$N_CHECKS_PER_block, n_checks)

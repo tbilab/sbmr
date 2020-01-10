@@ -34,7 +34,6 @@ collapse_run <- function(
   num_final_blocks = 1:10,
   num_block_proposals = 5,
   num_mcmc_sweeps = 10,
-  beta = 1.5,
   eps = NULL,
   parallel = FALSE
 ){
@@ -55,14 +54,12 @@ collapse_run <- function(
         collapse_blocks(create_sbm(model_data, eps = model_eps),
                         desired_num_blocks = desired_num,
                         sigma = sigma,
-                        beta = beta,
                         num_block_proposals = num_block_proposals,
                         num_mcmc_sweeps = num_mcmc_sweeps)
       }
     )
   } else {
     sbm$SIGMA <- sigma
-    sbm$BETA <- beta
     sbm$N_CHECKS_PER_block <- num_block_proposals
     collapse_results <- sbm$collapse_run(as.integer(level),
                                 as.integer(num_mcmc_sweeps),

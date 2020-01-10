@@ -3,6 +3,7 @@
 
 #include "Network.h"
 #include "Sampler.h"
+#include "Block_Consensus.h"
 #include <math.h>
 
 // =============================================================================
@@ -31,10 +32,34 @@ struct Proposal_Res
                                      prob_of_accept(p){};
 };
 
+// struct Pair_Status 
+// {
+//   bool connected;
+//   int times_connected;
+//   Pair_Status(bool c): connected(c),
+//                        times_connected(0){};
+// };
+
 struct Sweep_Res
 {
   std::list<std::string> nodes_moved;
+  std::list<std::string> new_groups;
   double entropy_delta = 0;
+  std::unordered_set<std::string> pair_moves;
+};
+
+struct MCMC_Sweeps
+{
+  std::vector<double> sweep_entropy_delta;
+  std::vector<int> sweep_num_nodes_moved;
+  Block_Consensus block_consensus;
+  std::list<std::string> nodes_moved;
+  MCMC_Sweeps(const int n)
+  {
+    // Preallocate the entropy change and num groups moved in sweep vectors and
+    sweep_entropy_delta.reserve(n);
+    sweep_num_nodes_moved.reserve(n);
+  }
 };
 
 // =============================================================================
@@ -59,7 +84,6 @@ public:
   // Parameters that control the mcmc and merging stuffs
   double EPS = 0.1;
   double SIGMA = 0.5;
-  double BETA = 1.5;
   bool GREEDY = true;
   int N_CHECKS_PER_block = 5; // When not greedy
 
@@ -81,7 +105,10 @@ public:
   Proposal_Res make_proposal_decision(NodePtr node, NodePtr new_block);
 
   // Runs efficient MCMC sweep algorithm on desired node level
-  Sweep_Res mcmc_sweep(int level, bool variable_num_blocks);
+  MCMC_Sweeps mcmc_sweep(int level,
+                       int num_sweeps,
+                       bool variable_num_blocks,
+                       bool track_pairs);
 
   // Merge two blocks at a given level based on the probability of doing so
   Merge_Step agglomerative_merge( int level_of_blocks, int n_merges);

@@ -108,3 +108,26 @@ std::string print_node_ids(std::map<std::string, NodePtr> nodes) {
   return print_ids_to_string(node_ids);
 }
 
+
+
+
+// Build shuffled node vector
+void shuffle_nodes(std::vector<NodePtr> & node_vec,
+                   const std::shared_ptr<std::map<string, NodePtr>> & node_map,
+                   std::mt19937 & sampler)
+{
+  // Initialize vector size to hold nodes
+  node_vec.clear();
+
+  // Fill in vector with map elements
+  for (auto node_it = node_map->begin();
+       node_it != node_map->end();
+       node_it++)
+  {
+    node_vec.push_back(node_it->second);
+  }
+
+  // Shuffle node order
+  std::shuffle(node_vec.begin(), node_vec.end(), sampler);
+}
+

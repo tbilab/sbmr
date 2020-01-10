@@ -4,25 +4,36 @@
 \alias{mcmc_sweep}
 \title{Run a single MCMC sweep over nodes}
 \usage{
-mcmc_sweep(sbm, level = 0, variable_num_blocks = TRUE, beta = 1.5)
+mcmc_sweep(
+  sbm,
+  num_sweeps = 1,
+  variable_num_blocks = TRUE,
+  track_pairs = FALSE,
+  level = 0
+)
 }
 \arguments{
 \item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
 
-\item{level}{Level of nodes who's blocks will have their block membership run
-through MCMC proposal-accept routine.}
+\item{num_sweeps}{Number of times all nodes are passed through for move
+proposals.}
 
 \item{variable_num_blocks}{Should the model allow new blocks to be created or
 empty blocks removed while sweeping or should number of blocks remain
 constant?}
 
-\item{beta}{Inverse temperature parameter for determining move acceptance
-probability.}
+\item{track_pairs}{Return a dataframe with all pairs of nodes along with the
+number of sweeps they shared the same group?}
+
+\item{level}{Level of nodes who's blocks will have their block membership run
+through MCMC proposal-accept routine.}
 }
 \value{
-List with array of all nodes that were moved in the
-sweep (\code{nodes_moved}) and the sweeps impact on the model's entropy
-(\code{entropy_delta}).
+List with two dataframes. The first telling for all sweeps everytime
+a node was moved and what group it was moved to. The second telling for
+each sweep the entropy delta and total number of nodes that were moved to
+new groups in that sweep. If \code{track_pairs = TRUE}, then an additional
+\code{pairing_counts} dataframe is added to output.
 }
 \description{
 Runs a single Metropolis Hastings MCMC sweep across all nodes at specified
@@ -45,9 +56,12 @@ my_sbm <- create_sbm(sim_basic_block_network(n_blocks = n_blocks, n_nodes_per_bl
 compute_entropy(my_sbm)
 
 # Run 4 MCMC sweeps
-for(i in 1:4) my_sbm \%>\% mcmc_sweep(variable_num_blocks = FALSE)
+sweep_results <- my_sbm \%>\% mcmc_sweep(num_sweeps = 4, variable_num_blocks = FALSE)
 
-# Calculate entropy after sweeps
-compute_entropy(my_sbm)
+# Look at the per-sweep level information
+sweep_results$sweep_info
+
+# Get idea of node-pair similarity by looking at how often every pair of nodes is connected over sweeps
+my_sbm \%>\% mcmc_sweep(num_sweeps = 4, track_pairs = TRUE)
 
 }

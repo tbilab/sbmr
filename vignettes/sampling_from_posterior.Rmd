@@ -106,7 +106,7 @@ my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, heuristic = "dev_
 
 We can investigate the structure of this chosen partitioning against the true structure that we simulated using `visualize_network()`...
 
-```{r}
+```{r extract_infered_blocks}
 merged_state <- my_sbm %>% 
   get_state() %>% 
   select(id, parent)
@@ -114,7 +114,9 @@ merged_state <- my_sbm %>%
 nodes_w_inferred_block <- network$nodes  %>%
   left_join(merged_state, by = 'id') %>% 
   rename(inferred = parent)
+```
 
+```{r visualize_inferred_blocks}
 visualize_network(edges = network$edges, 
                   nodes = nodes_w_inferred_block, 
                   node_color_col = 'block', 
@@ -124,7 +126,7 @@ visualize_network(edges = network$edges,
 
 The colors and shapes seem to match very well. We can check the aggreement as well.
 
-```{r}
+```{r check_inferred_accuracy}
 nodes_w_inferred_block %>% 
   group_by(block) %>% 
   summarise(n_unique_inferred = length(unique(inferred)))
@@ -141,31 +143,21 @@ Now that we have our model in a decent starting place we can initiate the MCMC s
 ```{r}
 num_sweeps <- 50
 
-sweep_results_to_df <- function(sweep_results, label = 'results'){
-  sweep_results %>% 
-    map_dfr(~tibble(
-      n_moved = length(.$nodes_moved),
-      entropy_delta = .$entropy_delta
-    )) %>% 
-    mutate(sweep = 1:n()) %>% 
-    pivot_longer(-sweep, names_to = 'stat') %>% 
-    mutate(label = label)
-}
+sweep_results <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps, track_pairs = TRUE)
 
-sweep_results <- 1:num_sweeps %>% 
-  purrr::map(~mcmc_sweep(my_sbm)) %>% 
-  sweep_results_to_df(label = 'eps = 0.1')
-
+sweep_df <- sweep_results$sweep_info %>% 
+  mutate(sweep = 1:n(),
+         label = 'eps = 0.1') %>% 
+  pivot_longer(entropy_delta:num_nodes_moved)
 
 plot_sweep_results <- function(sweep_results_df){
    sweep_results_df %>% 
     ggplot(aes(x = sweep, y = value)) +
     geom_line() +
-    facet_grid(stat~., scales = 'free_y')
+    facet_grid(name~., scales = "free_y")
 }
 
-sweep_results %>% 
-  plot_sweep_results() +
+plot_sweep_results(sweep_df) +
   labs(
     title = glue::glue('Result of {num_sweeps} MCMC sweeps'),
     subtitle = "Entropy Delta of sweep and number of nodes moved for sweep"
@@ -197,11 +189,9 @@ nodes_w_inferred_block %>%
 So even though we have more groups than we should, we never have an infered group that spans more than a single true group. 
 
 
-We can tweak the results MCMC sweeps by adjusting two parameters. 
+We can tweak the results MCMC sweeps by adjusting the `EPS` or 'epsilon' parameter.
 
-1. `EPS` or 'epsilon' - This controls how random the moves proposed are. The higher epsilon the more random the moves will be. It's like adding a constant to all the nodes probability of being chosen as a proposed move. As the constant gets higher it starts to overpower the data. This value can be set when initializing the network with `create_sbm(eps = ...)` or modified post creation by targeting the sbm class value of `EPS`.
-2. `beta` - This is an 'inverse temperature parameter' that effects the probability of accepting a move. The lower this value the less important the move's impact on model entropy is to its being chosen. This value is passed to the `mcmc_sweep()` function.
-
+This controls how random the moves proposed are. The higher epsilon the more random the moves will be. It's like adding a constant to all the nodes probability of being chosen as a proposed move. As the constant gets higher it starts to overpower the data. This value can be set when initializing the network with `create_sbm(eps = ...)` or modified post creation by targeting the sbm class value of `EPS`.
 
 Let's first repeat another `r num_sweeps` sweeps with a lower epsilon. We will recreate our model from the data and then reinitialize it to the collapsed state choice. 
 
@@ -212,13 +202,15 @@ lower_eps <- 0.005
 my_sbm <- create_sbm(network, eps = lower_eps) %>% 
   choose_best_collapse_state(collapse_results, heuristic = 'lowest')
 
-# Run our mcmc sweeps again
-sweep_results_lower_eps <- 1:num_sweeps %>% 
-  purrr::map(~mcmc_sweep(my_sbm)) %>% 
-  sweep_results_to_df(label = glue('eps = {lower_eps}'))
 
-sweep_results_lower_eps %>% 
-  plot_sweep_results() +
+# Run our mcmc sweeps again
+sweep_df_lower_eps <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps)$sweep_info %>% 
+  mutate(sweep = 1:n(),
+         label = glue::glue('eps = {lower_eps}')) %>% 
+  pivot_longer(entropy_delta:num_nodes_moved)
+
+
+plot_sweep_results(sweep_df_lower_eps) +
   labs(title = glue::glue('Result of {num_sweeps} MCMC sweeps w/ eps = {lower_eps}'))
 ```
 
@@ -228,10 +220,30 @@ Now we can put the two sweep runs side-by-side to see how they compare. We see t
 
 ```{r}
 bind_rows(
-  sweep_results,
-  sweep_results_lower_eps
+  sweep_df,
+  sweep_df_lower_eps
 ) %>% 
   plot_sweep_results() +
-  facet_grid(stat~label, scales = 'free_y')
+  facet_grid(name~label, scales = "free_y")
+```
+
+## Pairwise block consensus
+
+The `mcmc_sweep()` method has an option to keep track of how connected each node is with all other nodes. The idea being that the more frequently that two nodes are in the same block together, the more confident the model is that they are truly connected. We can visualize this by accessing the `pairing_counts` dataframe attached to the outputs of `mcmc_sweep()` with `track_pairs = TRUE` (as we did in the first sweeps of `eps = 0.1`).
+
+
+```{r}
+sweep_results$pairing_counts %>% 
+  ggplot(aes(x = node_a, y = node_b, fill = proportion_connected)) +
+  geom_raster() +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  labs(x = "node a", 
+       y = "node b",
+       fill = "Proportion of sweeps\nin same block",
+       title = "Node block consensus matrix",
+       subtitle = glue::glue("True number of blocks: {n_blocks}"))
 ```
 

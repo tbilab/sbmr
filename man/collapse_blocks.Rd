@@ -10,7 +10,6 @@ collapse_blocks(
   num_mcmc_sweeps = 0,
   desired_num_blocks = 1,
   report_all_steps = FALSE,
-  beta = 1.5,
   eps = NULL,
   greedy = FALSE,
   num_block_proposals = 5,
@@ -37,11 +36,6 @@ step or just the final one? If collapsing is being used to infer
 hierarcichal structure in data or inspection is desired this should be set
 to \code{TRUE}, otherwise it will slow down collapsing due to increased data
 transfer.}
-
-\item{beta}{Inverse temperature parameter impacting the acceptance
-probabilities of MCMC sweeps. A higher value means model puts more weight
-on accepting moves that improve model fit. Only matters if
-\code{num_mcmc_sweeps} is more than zero.}
 
 \item{eps}{Controls randomness of move proposals. Effects both the block
 merging and mcmc sweeps. If value is set to value other than null the SBMs

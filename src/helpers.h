@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Node.h"
+#include <random>
 
 
 // ============================================================================
@@ -21,3 +22,10 @@ std::string print_node_ids(std::vector<NodePtr>);
 // Map version
 std::string print_node_ids(std::map<std::string, NodePtr>);
 
+// Make alphabetical pair of node ids for maps
+std::string make_pair_key(std::string, std::string);
+
+// Build shuffled node vector
+void shuffle_nodes(std::vector<NodePtr> &node_vec,
+                   const std::shared_ptr<std::map<std::string, NodePtr>> &node_map,
+                   std::mt19937 &sampler);

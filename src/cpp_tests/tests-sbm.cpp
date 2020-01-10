@@ -66,7 +66,6 @@ TEST_CASE("Calculate Model entropy", "[SBM]")
   NodePtr to_block = my_SBM.get_node_by_id("a12", 1);
 
 
-  my_SBM.BETA = 0.1;
   // Calculate the entropy delta along with acceptance prob
   Proposal_Res proposal_results = my_SBM.make_proposal_decision(
       node_to_move,
@@ -114,7 +113,7 @@ TEST_CASE("Basic MCMC sweeps", "[SBM]")
     for (int i = 0; i < num_sweeps; i++)
     {
       my_SBM.EPS = eps;
-      int n_changes = my_SBM.mcmc_sweep(0, false).nodes_moved.size();
+      int n_changes = my_SBM.mcmc_sweep(0, 1, false, false).sweep_num_nodes_moved[0];
       total_num_changes += n_changes;
     }
 
@@ -127,6 +126,7 @@ TEST_CASE("Basic MCMC sweeps", "[SBM]")
   REQUIRE(
       avg_num_moves.at(0) < avg_num_moves.at(epsilons.size() - 1));
 }
+
 
 TEST_CASE("Agglomerative merge steps", "[SBM]")
 {

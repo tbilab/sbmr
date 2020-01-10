@@ -8,17 +8,21 @@
 #' if new blocks blocks can be proposed and empty blocks removed (boolean).
 #'
 #' @inheritParams add_node
+#' @param num_sweeps Number of times all nodes are passed through for move
+#'   proposals.
 #' @param level Level of nodes who's blocks will have their block membership run
 #'   through MCMC proposal-accept routine.
 #' @param variable_num_blocks Should the model allow new blocks to be created or
 #'   empty blocks removed while sweeping or should number of blocks remain
 #'   constant?
-#' @param beta Inverse temperature parameter for determining move acceptance
-#'   probability.
+#' @param track_pairs Return a dataframe with all pairs of nodes along with the
+#'   number of sweeps they shared the same group?
 #'
-#' @return List with array of all nodes that were moved in the
-#'   sweep (`nodes_moved`) and the sweeps impact on the model's entropy
-#'   (`entropy_delta`).
+#' @return List with two dataframes. The first telling for all sweeps everytime
+#'   a node was moved and what group it was moved to. The second telling for
+#'   each sweep the entropy delta and total number of nodes that were moved to
+#'   new groups in that sweep. If `track_pairs = TRUE`, then an additional
+#'   `pairing_counts` dataframe is added to output.
 #' @export
 #'
 #' @examples
@@ -34,12 +38,30 @@
 #' compute_entropy(my_sbm)
 #'
 #' # Run 4 MCMC sweeps
-#' for(i in 1:4) my_sbm %>% mcmc_sweep(variable_num_blocks = FALSE)
+#' sweep_results <- my_sbm %>% mcmc_sweep(num_sweeps = 4, variable_num_blocks = FALSE)
 #'
-#' # Calculate entropy after sweeps
-#' compute_entropy(my_sbm)
+#' # Look at the per-sweep level information
+#' sweep_results$sweep_info
 #'
-mcmc_sweep <- function(sbm, level = 0, variable_num_blocks = TRUE, beta = 1.5){
-  sbm$BETA <- beta
-  sbm$mcmc_sweep(as.integer(level), variable_num_blocks)
+#' # Get idea of node-pair similarity by looking at how often every pair of nodes is connected over sweeps
+#' my_sbm %>% mcmc_sweep(num_sweeps = 4, track_pairs = TRUE)
+#'
+mcmc_sweep <- function(sbm, num_sweeps = 1, variable_num_blocks = TRUE, track_pairs = FALSE, level = 0){
+
+  results <- sbm$mcmc_sweep(as.integer(level),
+                 as.integer(num_sweeps),
+                 variable_num_blocks,
+                 track_pairs)
+
+  if (track_pairs) {
+    # Clean up pair connections results
+    results$pairing_counts <-  results$pairing_counts %>%
+      tidyr::separate(node_pair, into = c("node_a", "node_b"), sep = "--") %>%
+      dplyr::mutate(proportion_connected = times_connected/num_sweeps)
+  } else {
+    # Remove the empty pair counts results
+    results['pairing_counts'] <- NULL
+  }
+
+  results
 }

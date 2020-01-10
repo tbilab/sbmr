@@ -146,8 +146,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   // probability ratio for the moves and use those to calculate the acceptance
   // probability for the proposed move.
   double entropy_delta = entropy_post - entropy_pre;
-  double acceptance_prob = exp(BETA*entropy_delta) *
-                          (pre_move_prob/post_move_prob);
+  double acceptance_prob = exp(entropy_delta) * (pre_move_prob/post_move_prob);
 
   return Proposal_Res(
     entropy_delta,
@@ -158,79 +157,115 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-Sweep_Res SBM::mcmc_sweep(const int level, const bool variable_num_blocks)
+MCMC_Sweeps SBM::mcmc_sweep(const int level,
+                            const int num_sweeps,
+                            const bool variable_num_blocks,
+                            const bool track_pairs)
 {
   PROFILE_FUNCTION();
+
   const int block_level = level + 1;
 
-  // Initialize the results holder
-  Sweep_Res results;
+  // Setup container to track what pairs need to be updated for a given sweep
+  std::unordered_set<std::string> pair_moves;
+
+  // Initialize structure that contains the returned values for this/these sweeps
+  MCMC_Sweeps results(num_sweeps);
+
+  // Initialize pair tracking map if needed
+  if (track_pairs)
+  {
+    results.block_consensus.initialize(get_level(level));
+  }
 
   // Grab level map
   LevelPtr node_map = get_level(level);
 
-  // Get all the nodes at the given level in a shuffleable vector format
-  // Initialize vector to hold nodes
+  // Initialize vector to hold nodes in order of pass through for a sweep.
   std::vector<NodePtr> node_vec;
   node_vec.reserve(node_map->size());
 
-  // Fill in vector with map elements
-  for (auto node_it = node_map->begin();
-            node_it != node_map->end();
-            node_it++)
-  {
-    node_vec.push_back(node_it->second);
-  }
+  for (int i = 0; i < num_sweeps; i++)
+  {    
+    // Book keeper variables for this sweeps stats
+    int num_nodes_moved = 0;
+    double entropy_delta = 0;
 
-  // Shuffle node order
-  std::shuffle(node_vec.begin(), node_vec.end(), sampler.int_gen);
+    // Generate a random order of nodes to be run through for sweep
+    shuffle_nodes(node_vec, node_map, sampler.int_gen);
+    
+    // Clear the set of updated pairs for new sweep
+    pair_moves.clear();
 
-  // Loop through each node
-  for (auto node_it = node_vec.begin(); node_it != node_vec.end(); ++node_it)
-  {
-    NodePtr curr_node = *node_it;
-
-    // Get a move proposal
-    NodePtr proposed_new_block = propose_move(curr_node);
-
-    // If the propsosed block is the nodes current block, we don't need to waste
-    // time checking because decision will always result in same state.
-    if(curr_node->parent->id == proposed_new_block->id) continue;
-
-    // Calculate acceptance probability based on posterior changes
-    Proposal_Res proposal_results = make_proposal_decision(
-      curr_node,
-      proposed_new_block
-    );
-
-    bool move_accepted = sampler.draw_unif() < proposal_results.prob_of_accept;
-
-    if (move_accepted)
+    // Loop through each node
+    for (auto node_it = node_vec.begin(); node_it != node_vec.end(); ++node_it)
     {
-      // Move the node
-      curr_node->set_parent(proposed_new_block);
+      NodePtr curr_node = *node_it;
 
-      // Update results
-      results.nodes_moved.push_back(curr_node->id);
-      results.entropy_delta += proposal_results.entropy_delta;
-    }
+      // Check if we're running sweep with variable block numbers. If we are, we
+      // need to add a new block as a potential for the node to enter
+      if (variable_num_blocks)
+      {
+        // Add a new block node for the current node type
+        create_block_node(curr_node->type, block_level);
+      }
 
-    // Check if we're running sweep with variable block numbers. If we are, we
-    // need to remove empty blocks and add a new block as a potential for the
-    // node to enter
-    if (variable_num_blocks)
+      // Get a move proposal
+      NodePtr proposed_new_block = propose_move(curr_node);
+
+      // If the propsosed block is the nodes current block, we don't need to waste
+      // time checking because decision will always result in same state.
+      if (curr_node->parent->id == proposed_new_block->id)
+        continue;
+
+      // Calculate acceptance probability based on posterior changes
+      Proposal_Res proposal_results = make_proposal_decision(
+          curr_node,
+          proposed_new_block);
+
+      // Is the move accepted?
+      if (sampler.draw_unif() < proposal_results.prob_of_accept)
+      {
+        NodePtr old_block = curr_node->parent;
+
+        // Move the node
+        curr_node->set_parent(proposed_new_block);
+
+        // Update results
+        results.nodes_moved.push_back(curr_node->id);
+        num_nodes_moved++;
+        entropy_delta += proposal_results.entropy_delta;
+
+        // If we are varying number of blocks and we made a move we should clean
+        // up the now potentially empty blocks for the next node proposal.
+        if (variable_num_blocks)
+        {
+          clean_empty_blocks();
+        }
+
+        if (track_pairs)
+        {
+          Block_Consensus::update_changed_pairs(curr_node,
+                                                old_block->children,
+                                                proposed_new_block->children,
+                                                pair_moves);
+        }
+      } // End accepted if statement
+    }   // End current sweep
+    
+    // Update results for this sweep
+    results.sweep_num_nodes_moved.push_back(num_nodes_moved);
+    results.sweep_entropy_delta.push_back(entropy_delta);
+
+    // Update the concensus pairs map with results if needed.
+    if (track_pairs)
     {
-      // Clean up empty blocks
-      clean_empty_blocks();
-
-      // Add a new block node for the current node type
-      create_block_node(curr_node->type, block_level);
+      results.block_consensus.update_pair_tracking_map(pair_moves);
     }
-  } // End loop over all nodes
+  } // End multi-sweep loop
 
   return results;
 }
-
 
 // =============================================================================
 // Compute microcononical entropy of current model state
@@ -556,10 +591,8 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int node_level,
     if (num_mcmc_steps != 0)
     {
       // Let model equilibriate with new block layout...
-      for (int j = 0; j < num_mcmc_steps; j++)
-      {
-        mcmc_sweep(node_level, false);
-      }
+      mcmc_sweep(node_level, num_mcmc_steps, false, false);
+ 
       clean_empty_blocks();
       // Update the step entropy results with new equilibriated model
       if (report_all_steps) merge_results.entropy = compute_entropy(node_level);

@@ -138,7 +138,6 @@ complete discussion of options/behavior.</p>
   <span class='kw'>num_mcmc_sweeps</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>desired_num_blocks</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>report_all_steps</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>beta</span> <span class='kw'>=</span> <span class='fl'>1.5</span>,
   <span class='kw'>eps</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>greedy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>num_block_proposals</span> <span class='kw'>=</span> <span class='fl'>5</span>,
@@ -177,13 +176,6 @@ step or just the final one? If collapsing is being used to infer
 hierarcichal structure in data or inspection is desired this should be set
 to <code>TRUE</code>, otherwise it will slow down collapsing due to increased data
 transfer.</p></td>
-    </tr>
-    <tr>
-      <th>beta</th>
-      <td><p>Inverse temperature parameter impacting the acceptance
-probabilities of MCMC sweeps. A higher value means model puts more weight
-on accepting moves that improve model fit. Only matters if
-<code>num_mcmc_sweeps</code> is more than zero.</p></td>
     </tr>
     <tr>
       <th>eps</th>
@@ -232,7 +224,7 @@ of <code>state</code> which is the state dump dataframe for model at end of merg
 
 <span class='co'># Investigate number of nodes at each step</span>
 <span class='no'>collapse_results</span> <span class='kw'>%&gt;%</span>
-  <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/dplyr/man/select.html'>select</a></span>(-<span class='no'>state</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 1 x 2</span><span>
+  <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span>(-<span class='no'>state</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 1 x 2</span><span>
 #&gt;   entropy num_blocks
 #&gt;     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span>    816.          1</div><div class='input'>

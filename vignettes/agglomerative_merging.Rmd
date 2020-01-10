@@ -88,7 +88,6 @@ There are a few important input parameters we need to consider:
 - `greedy`: Should every possible group merger be considered? If `FALSE`, candidates for mergers are drawn by similarity in edges (just as MCMC move proposals are). This may lead the model to local minimums by always pursuing best possible merges.
 - `num_block_proposals`: If `greedy = FALSE`, this parameter controls how many merger proposals are drawn for each group in the model. A larger number will increase the exploration of merge potentials but may lead the model to local minimums for the same reason greedy mode does. 
 - `num_mcmc_sweeps`: How many MCMC sweeps the model does at each agglomerative merge step. This allows the model to allow nodes to find their most natural resting place in a given collapsed state. Larger values will slow down runtime but can potentially lead for more stable results. 
-- `beta`: Inverse temperature parameter impacting the acceptance probabilities of MCMC sweeps. A higher value means model puts more weight on accepting moves that improve model fit. Only matters if `num_mcmc_sweeps > 0`.
 
 
 ### Role of sigma...
@@ -262,7 +261,7 @@ The only arguments it has that `collapse_blocks()` does not are:
 - `num_final_blocks`: Array of group numbers that the agglomerative merge should target. E.g. 1:10.
 - `parallel`: Should algorithm be run in parallel to speed up?
 
-The parallel argument is particularly valuable as it exploits the fact that each run is independent of eachother and thus can be run on seperate threads for significant speedups. 
+The parallel argument is particularly valuable as it exploits the fact that each run is independent of the others and thus can be run on seperate threads for significant speedups. 
 
 Lets try it on our model scanning from 1-10 groups. 
 
@@ -359,42 +358,10 @@ We see a perfect match between the color and shape, meaning that every node was 
 
 While sigma is the most important parameter for collapse results tuning there are others we can tune. Let's look at how they effect the results. 
 
-### Toggling Beta
-
-We start with Beta. Beta is the inverse temperature parameter for MCMC move proposal acceptance. A higher value means that the model is more likely to select moves that fit the current structure of the SBM. This means it could potentially miss more optimal sollutions due to being stuck in a local minimum. However, it will also make the model converge faster as it wastes less time on poor moves. 
-
-```{r toggling_beta}
-# Select a range of beta values
-beta_vals <- seq(1, 10, length.out = 8)
-
-beta_sweep_results <- purrr::map_dfr(
-  beta_vals, 
-  function(beta){
-    collapse_run(
-      my_sbm,
-      num_final_blocks = 1:8,
-      beta = beta,
-      parallel = TRUE
-    ) %>% 
-      mutate(beta = beta)
-  }
-)
-
-beta_sweep_results %>% 
-  ggplot(aes(x = num_blocks, y = entropy, color = beta)) +
-  geom_line(aes(group = beta)) +
-  geom_point() +
-  scale_y_log10() +
-  ggtitle("Collapse results by beta value")
-```
-
-So we can see that the behavior isnt changed much at all by the different betas. Most of the time the default value of `1.5` is fine. 
-
 ## Epsilon values
 
-While beta controls how conservative the model is when choosing which moves to accept, epsilon controls how conservative the model is when generating those proposals. As epsilon goes to infinity the moves proposed by the model approach randomness. When epsilon is zero a node can only move to groups that nodes it is connected belong to.
+Epsilon controls how conservative the model is when generating those proposals. As epsilon goes to infinity the moves proposed by the model approach randomness. When epsilon is zero a node can only move to groups that nodes it is connected belong to.
 
-While beta only came into plan when we had MCMC sweeps after each merge, epsilon comes into play at all times as the merge proposals are made by the same algorithm that does mcmc move proposals. 
 
 ```{r, toggling_epsilon}
 # Get logaritmically spaced epsilon range

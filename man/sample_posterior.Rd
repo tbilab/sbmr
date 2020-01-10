@@ -12,7 +12,6 @@ sample_posterior(
   burnin_sweeps = 10,
   return_sweep_info = TRUE,
   starting_partition = "agglomerative",
-  beta = 1.5,
   epsilon = 0.1,
   greedy = TRUE,
   n_checks_per_block = 5,
@@ -42,8 +41,6 @@ sweep (defaults to \code{TRUE})}
 
 \item{starting_partition}{Algorithm to start each chain with? Current options
 are \code{"agglomerative"} or \code{"random"}.}
-
-\item{beta}{Inverse temperature parameter for MCMC acceptance probability}
 
 \item{epsilon}{Parameter to inforce ergodicity of markov chain. Setting to
 zero will remove ergodicity from model, setting high will make model moves
