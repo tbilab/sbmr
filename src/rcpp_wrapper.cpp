@@ -195,7 +195,7 @@ public:
     return SBM::compute_entropy(level);
   }
 
-  // Sets up all the initial values for the node pair tracking structure 
+  // Sets up all the initial values for the node pair tracking structure
   inline void initialize_pair_tracking_map(std::unordered_map<std::string, Pair_Status> & concensus_pairs,
                                     const LevelPtr node_map)
   {
@@ -253,20 +253,20 @@ public:
                   const bool track_pairs)
   {
 
-    MCMC_Sweep results = SBM::mcmc_sweep(level,
+    MCMC_Sweeps results = SBM::mcmc_sweep(level,
                                          num_sweeps,
                                          variable_num_blocks,
                                          track_pairs);
 
-    // Initialze vectors to hold pair tracking results, if needed.
+    // Initialize vectors to hold pair tracking results, if needed.
     std::vector<std::string> node_pair;
     std::vector<int> times_connected;
 
     if (track_pairs)
     {
       // Fill out pair tracking vectors with map internals
-      node_pair.reserve(num_sweeps);
-      times_connected.reserve(num_sweeps);
+      node_pair.reserve(results.concensus_pairs.size());
+      times_connected.reserve(results.concensus_pairs.size());
 
       for (auto pair_it = results.concensus_pairs.begin();
            pair_it != results.concensus_pairs.end();
