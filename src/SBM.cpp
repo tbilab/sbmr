@@ -296,7 +296,13 @@ MCMC_Sweeps SBM::mcmc_sweep(const int level,
                                pair_moves);
         }
       } // End accepted if statement
-    } // End loop over all nodes
+    }   // End current sweep
+    
+    // Update the concensus pairs map with results if needed.
+    if (track_pairs)
+    {
+      update_pair_tracking_map(results.concensus_pairs, pair_moves);
+    }
   } // End multi-sweep loop
 
   return results;
