@@ -3,6 +3,7 @@
 
 #include "Network.h"
 #include "Sampler.h"
+#include "Block_Consensus.h"
 #include <math.h>
 
 // =============================================================================
@@ -31,13 +32,13 @@ struct Proposal_Res
                                      prob_of_accept(p){};
 };
 
-struct Pair_Status 
-{
-  bool connected;
-  int times_connected;
-  Pair_Status(bool c): connected(c),
-                       times_connected(0){};
-};
+// struct Pair_Status 
+// {
+//   bool connected;
+//   int times_connected;
+//   Pair_Status(bool c): connected(c),
+//                        times_connected(0){};
+// };
 
 struct Sweep_Res
 {
@@ -51,7 +52,7 @@ struct MCMC_Sweeps
 {
   std::vector<double> sweep_entropy_delta;
   std::vector<int> sweep_num_nodes_moved;
-  std::unordered_map<std::string, Pair_Status> concensus_pairs;
+  Block_Consensus block_consensus;
   std::list<std::string> nodes_moved;
   MCMC_Sweeps(const int n)
   {

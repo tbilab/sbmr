@@ -154,62 +154,13 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   );
 }
 
-// Sets up all the initial values for the node pair tracking structure
-inline void initialize_pair_tracking_map(std::unordered_map<std::string, Pair_Status> &concensus_pairs,
-                                         const LevelPtr node_map)
-{
-  for (auto node_a_it = node_map->begin();
-       node_a_it != node_map->end();
-       node_a_it++)
-  {
-    for (auto node_b_it = std::next(node_a_it);
-         node_b_it != node_map->end();
-         node_b_it++)
-    {
-      bool in_same_group = node_a_it->second->parent ==
-                           node_b_it->second->parent;
-
-      // Initialize pair info for group
-      concensus_pairs.emplace(
-          make_pair_key(node_a_it->first, node_b_it->first),
-          Pair_Status(in_same_group));
-    }
-  }
-}
-
-// Update the concensus pair struct with a single sweep's results
-inline void update_pair_tracking_map(std::unordered_map<std::string, Pair_Status> &concensus_pairs,
-                                     const std::unordered_set<std::string> &updated_pairs)
-{
-  for (auto pair_it = concensus_pairs.begin();
-       pair_it != concensus_pairs.end();
-       pair_it++)
-  {
-    // Check if this pair was updated on last sweep
-    auto sweep_change_loc = updated_pairs.find(pair_it->first);
-    bool updated_last_sweep = sweep_change_loc != updated_pairs.end();
-
-    if (updated_last_sweep)
-    {
-      // Update the pair connection status
-      (pair_it->second).connected = !(pair_it->second).connected;
-    }
-
-    // Increment the counts if needed
-    if ((pair_it->second).connected)
-    {
-      (pair_it->second).times_connected++;
-    }
-  }
-}
-
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
 MCMC_Sweeps SBM::mcmc_sweep(const int level,
-                          const int num_sweeps,
-                          const bool variable_num_blocks,
-                          const bool track_pairs)
+                            const int num_sweeps,
+                            const bool variable_num_blocks,
+                            const bool track_pairs)
 {
   PROFILE_FUNCTION();
 
@@ -224,7 +175,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int level,
   // Initialize pair tracking map if needed
   if (track_pairs)
   {
-    initialize_pair_tracking_map(results.concensus_pairs, get_level(level));
+    results.block_consensus.initialize(get_level(level));
   }
 
   // Grab level map
@@ -290,10 +241,10 @@ MCMC_Sweeps SBM::mcmc_sweep(const int level,
 
         if (track_pairs)
         {
-          update_changed_pairs(curr_node,
-                               old_block->children,
-                               proposed_new_block->children,
-                               pair_moves);
+          Block_Consensus::update_changed_pairs(curr_node,
+                                                old_block->children,
+                                                proposed_new_block->children,
+                                                pair_moves);
         }
       } // End accepted if statement
     }   // End current sweep
@@ -301,7 +252,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int level,
     // Update the concensus pairs map with results if needed.
     if (track_pairs)
     {
-      update_pair_tracking_map(results.concensus_pairs, pair_moves);
+      results.block_consensus.update_pair_tracking_map(pair_moves);
     }
   } // End multi-sweep loop
 
