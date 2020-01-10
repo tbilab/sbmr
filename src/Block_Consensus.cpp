@@ -1,12 +1,11 @@
 #include "Block_Consensus.h"
 
-
 // Helper to build alphabetically string pair of two node ids for pair maps
 inline std::string make_pair_key(const std::string a_node, const std::string b_node)
 {
-  return a_node > b_node
-             ? a_node + "--" + b_node
-             : b_node + "--" + a_node;
+    return a_node > b_node
+               ? a_node + "--" + b_node
+               : b_node + "--" + a_node;
 }
 
 void Block_Consensus::initialize(const LevelPtr node_map)
@@ -54,6 +53,22 @@ void Block_Consensus::update_pair_tracking_map(const std::unordered_set<std::str
     }
 }
 
+void Block_Consensus::dump_results(std::vector<std::string> &node_pair,
+                                   std::vector<int> &times_connected)
+{
+    // Fill out pair tracking vectors with map internals
+    node_pair.reserve(concensus_pairs.size());
+    times_connected.reserve(concensus_pairs.size());
+
+    for (auto pair_it = concensus_pairs.begin();
+         pair_it != concensus_pairs.end();
+         pair_it++)
+    {
+        node_pair.push_back(pair_it->first);
+        times_connected.push_back((pair_it->second).times_connected);
+    }
+}
+
 void Block_Consensus::update_changed_pairs(NodePtr curr_node,
                                            ChildSet &old_connections,
                                            ChildSet &new_connections,
@@ -79,5 +94,3 @@ void Block_Consensus::update_changed_pairs(NodePtr curr_node,
         }
     }
 }
-
-
