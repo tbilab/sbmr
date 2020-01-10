@@ -212,6 +212,31 @@ public:
     sweep_entropy_delta.reserve(num_sweeps);
     sweep_num_nodes_moved.reserve(num_sweeps);
 
+    // Map that keeps track of all pairs of nodes and if they are connected
+    // and their total number of times connected over the all the sweeps
+    std::unordered_map<std::string, Pair_Status> concensus_pairs;
+
+    // Initialize pair tracking map if needed
+    if (track_pairs)
+    {
+      for (auto node_a_it = node_map->begin();
+           node_a_it != node_map->end();
+           node_a_it++)
+      {
+        for (auto node_b_it = std::next(node_a_it);
+             node_b_it != node_map->end();
+             node_b_it++)
+        {
+          bool in_same_group = node_a_it->second->parent ==
+                               node_b_it->second->parent;
+
+          // Initialize pair info for group
+          concensus_pairs.emplace(
+              make_pair_key(node_a_it->first, node_b_it->first),
+              Pair_Status(in_same_group));
+        }
+      }
+    }
     // Holder for a given sweep's results
     Sweep_Res current_sweep;
 
