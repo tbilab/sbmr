@@ -253,52 +253,10 @@ public:
                   const bool track_pairs)
   {
 
-    MCMC_Sweep results = SBM::mcmc_sweep(level, num_sweeps, variable_num_blocks, track_pairs);
-
-    // // Setup the node-to-new-group lists
-    // std::list<std::string> nodes_moved;
-    // std::list<std::string> new_groups;
-
-    // // Setup the entropy change and num groups moved in sweep vectors and preallocate
-    // std::vector<double> sweep_entropy_delta;
-    // std::vector<int> sweep_num_nodes_moved;
-    // sweep_entropy_delta.reserve(num_sweeps);
-    // sweep_num_nodes_moved.reserve(num_sweeps);
-
-    // // Map that keeps track of all pairs of nodes and if they are connected
-    // // and their total number of times connected over the all the sweeps
-    // std::unordered_map<std::string, Pair_Status> concensus_pairs;
-
-    // // Initialize pair tracking map if needed
-    // if (track_pairs)
-    // {
-    //   initialize_pair_tracking_map(concensus_pairs, get_level(level));
-    // }
-
-    // // Holder for a given sweep's results
-    // Sweep_Res current_sweep;
-
-    // for (int j = 0; j < num_sweeps; j++)
-    // {
-    //   // Run single sweep
-    //   current_sweep = SBM::mcmc_sweep(level, variable_num_blocks, track_pairs);
-
-    //   // Add this sweep's entropy delta to record
-    //   sweep_entropy_delta.push_back(current_sweep.entropy_delta);
-
-    //   // Add number of nodes moved
-    //   sweep_num_nodes_moved.push_back(current_sweep.nodes_moved.size());
-
-    //   // Append the move results into the main run results
-    //   nodes_moved.splice(nodes_moved.end(), current_sweep.nodes_moved);
-    //   new_groups.splice(new_groups.end(), current_sweep.new_groups);
-
-    //   // Update the concensus pairs map with results if needed.
-    //   if (track_pairs)
-    //   {
-    //     update_pair_tracking_map(concensus_pairs, current_sweep.pair_moves);
-    //   }
-    // }
+    MCMC_Sweep results = SBM::mcmc_sweep(level,
+                                         num_sweeps,
+                                         variable_num_blocks,
+                                         track_pairs);
 
     // Initialze vectors to hold pair tracking results, if needed.
     std::vector<std::string> node_pair;
