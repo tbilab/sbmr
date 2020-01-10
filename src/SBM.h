@@ -36,7 +36,7 @@ struct Pair_Status
   bool connected;
   int times_connected;
   Pair_Status(bool c): connected(c),
-                       times_connected(c ? 1: 0){};
+                       times_connected(0){};
 };
 
 struct Sweep_Res
