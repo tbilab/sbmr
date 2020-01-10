@@ -199,10 +199,11 @@ public:
   // =============================================================================
   // Runs multiple MCMC sweeps and keeps track of the results efficiently
   // =============================================================================
-  List mcmc_sweep(const int level, const int num_sweeps, const bool variable_num_blocks)
-  { 
-    bool track_pairs(true);
-
+  List mcmc_sweep(const int level,
+                  const int num_sweeps,
+                  const bool variable_num_blocks,
+                  const bool track_pairs)
+  {
     // Setup the node-to-new-group lists
     std::list<std::string> nodes_moved;
     std::list<std::string> new_groups;
@@ -246,7 +247,7 @@ public:
     for (int j = 0; j < num_sweeps; j++)
     {
       // Run single sweep
-      current_sweep = SBM::mcmc_sweep(level, variable_num_blocks);
+      current_sweep = SBM::mcmc_sweep(level, variable_num_blocks, track_pairs);
 
       // Add this sweep's entropy delta to record
       sweep_entropy_delta.push_back(current_sweep.entropy_delta);
@@ -280,7 +281,7 @@ public:
           {
             (pair_it->second).times_connected++;
           }
-          
+
         }
       }
     }
