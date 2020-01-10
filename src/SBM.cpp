@@ -187,6 +187,10 @@ MCMC_Sweeps SBM::mcmc_sweep(const int level,
 
   for (int i = 0; i < num_sweeps; i++)
   {    
+    // Book keeper variables for this sweeps stats
+    int num_nodes_moved = 0;
+    double entropy_delta = 0;
+
     // Generate a random order of nodes to be run through for sweep
     shuffle_nodes(node_vec, node_map, sampler.int_gen);
     
@@ -229,8 +233,8 @@ MCMC_Sweeps SBM::mcmc_sweep(const int level,
 
         // Update results
         results.nodes_moved.push_back(curr_node->id);
-        results.sweep_num_nodes_moved[i]++;
-        results.sweep_entropy_delta[i] += proposal_results.entropy_delta;
+        num_nodes_moved++;
+        entropy_delta += proposal_results.entropy_delta;
 
         // If we are varying number of blocks and we made a move we should clean
         // up the now potentially empty blocks for the next node proposal.
@@ -249,6 +253,10 @@ MCMC_Sweeps SBM::mcmc_sweep(const int level,
       } // End accepted if statement
     }   // End current sweep
     
+    // Update results for this sweep
+    results.sweep_num_nodes_moved.push_back(num_nodes_moved);
+    results.sweep_entropy_delta.push_back(entropy_delta);
+
     // Update the concensus pairs map with results if needed.
     if (track_pairs)
     {
@@ -583,10 +591,8 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int node_level,
     if (num_mcmc_steps != 0)
     {
       // Let model equilibriate with new block layout...
-      for (int j = 0; j < num_mcmc_steps; j++)
-      {
-        mcmc_sweep(node_level, 1, false, false);
-      }
+      mcmc_sweep(node_level, num_mcmc_steps, false, false);
+ 
       clean_empty_blocks();
       // Update the step entropy results with new equilibriated model
       if (report_all_steps) merge_results.entropy = compute_entropy(node_level);
