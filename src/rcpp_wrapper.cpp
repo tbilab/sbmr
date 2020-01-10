@@ -261,20 +261,9 @@ public:
     // Initialize vectors to hold pair tracking results, if needed.
     std::vector<std::string> node_pair;
     std::vector<int> times_connected;
-
     if (track_pairs)
     {
-      // Fill out pair tracking vectors with map internals
-      node_pair.reserve(results.concensus_pairs.size());
-      times_connected.reserve(results.concensus_pairs.size());
-
-      for (auto pair_it = results.concensus_pairs.begin();
-           pair_it != results.concensus_pairs.end();
-           pair_it++)
-      {
-        node_pair.push_back(pair_it->first);
-        times_connected.push_back((pair_it->second).times_connected);
-      }
+      results.block_consensus.dump_results(node_pair, times_connected);
     }
 
     // package up results into a list
@@ -302,7 +291,6 @@ public:
                                                  num_mcmc_steps,
                                                  desired_num_blocks,
                                                  report_all_steps);
-
 
     List entropy_results;
 
