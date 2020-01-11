@@ -1,4 +1,5 @@
 #include "SBM.h"
+#include "sbm_helpers.h"
 
 // =============================================================================
 // Propose a potential block move for a node.
@@ -7,61 +8,29 @@ NodePtr SBM::propose_move(const NodePtr node)
 {
   PROFILE_FUNCTION();
 
-  int block_level = node->level + 1;
+  const int block_level = node->level + 1;
 
   // Grab a list of all the blocks that the node could join
-  std::vector<NodePtr> potential_blocks = get_nodes_of_type_at_level(
+  const std::vector<NodePtr> potential_blocks = get_nodes_of_type_at_level(
     node->type,
     block_level);
 
   // Sample a random neighbor of the current node
-  NodePtr rand_neighbor = sampler.sample(
+  const NodePtr rand_neighbor = sampler.sample(
     node->get_edges_to_level(node->level)
   );
 
   // Get number total number edges for neighbor's block
-  int neighbor_block_degree = rand_neighbor->parent->degree;
+  const int neighbor_block_degree = rand_neighbor->parent->degree;
 
   // Decide if we are going to choose a random block for our node
-  double ergo_amnt = EPS*potential_blocks.size();
-  double prob_of_random_block = ergo_amnt/(neighbor_block_degree + ergo_amnt);
+  const double ergo_amnt = EPS*potential_blocks.size();
+  const double prob_of_random_block = ergo_amnt/(neighbor_block_degree + ergo_amnt);
 
   // Decide where we will get new block from and draw from potential candidates
   return sampler.draw_unif() < prob_of_random_block ?
     sampler.sample(potential_blocks):
     sampler.sample(rand_neighbor->get_edges_to_level(block_level));
-}
-
-
-inline static void process_block_pair(
-    const std::map<NodePtr, int>::iterator con_block_it,
-    const double edges_from_node,
-    const double moved_degree_pre,
-    const double moved_degree_post,
-    double * entropy_pre,
-    double * entropy_post)
-{
-
-  const double neighbor_deg = con_block_it->first->degree;
-  const double edge_count_pre = con_block_it->second;
-
-  // The old and new edge counts we need to compute entropy
-  // If we're looking at the neighbor blocks for the old block we need to
-  // subtract the edges the node contributed, otherwise we need to add.
-  double edge_count_post = edge_count_pre + edges_from_node;
-
-  // Calculate entropy contribution pre move
-  double entropy_pre_delta = edge_count_pre > 0 ? edge_count_pre *
-                                                      log(edge_count_pre / (moved_degree_pre * neighbor_deg))
-                                                : 0;
-
-  // Calculate entropy contribution post move
-  double entropy_post_delta = edge_count_post > 0 ? edge_count_post *
-                                                        log(edge_count_post / (moved_degree_post * neighbor_deg))
-                                                  : 0;
-
-  (*entropy_pre) += entropy_pre_delta;
-  (*entropy_post) += entropy_post_delta;
 }
 
 // =============================================================================
@@ -72,21 +41,21 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 {
   PROFILE_FUNCTION();
   // The level that this proposal is taking place on
-  int block_level = node->level + 1;
+  const int block_level = node->level + 1;
 
   // Reference to old block that would be swapped for new_block
-  NodePtr old_block = node->parent;
+  const NodePtr old_block = node->parent;
 
   // Grab degree of the node to move
-  double node_degree = node->degree;
+  const double node_degree = node->degree;
 
   // Get degrees of the two blocks pre-move
-  double old_block_degree_pre = old_block->degree;
-  double new_block_degree_pre = new_block->degree;
+  const double old_block_degree_pre = old_block->degree;
+  const double new_block_degree_pre = new_block->degree;
 
   // Get degrees of the two blocks post-move
-  double old_block_degree_post = old_block_degree_pre - node_degree;
-  double new_block_degree_post = new_block_degree_pre + node_degree;
+  const double old_block_degree_post = old_block_degree_pre - node_degree;
+  const double new_block_degree_post = new_block_degree_pre + node_degree;
 
   // Initialize the partial edge entropy sum holders
   double entropy_pre = 0;
@@ -145,8 +114,8 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   // Now we can clean up all the calculations into to entropy delta and the
   // probability ratio for the moves and use those to calculate the acceptance
   // probability for the proposed move.
-  double entropy_delta = entropy_post - entropy_pre;
-  double acceptance_prob = exp(entropy_delta) * (pre_move_prob/post_move_prob);
+  const double entropy_delta = entropy_post - entropy_pre;
+  const double acceptance_prob = exp(entropy_delta) * (pre_move_prob/post_move_prob);
 
   return Proposal_Res(
     entropy_delta,
@@ -166,9 +135,6 @@ MCMC_Sweeps SBM::mcmc_sweep(const int level,
 
   const int block_level = level + 1;
 
-  // Setup container to track what pairs need to be updated for a given sweep
-  std::unordered_set<std::string> pair_moves;
-
   // Initialize structure that contains the returned values for this/these sweeps
   MCMC_Sweeps results(num_sweeps);
 
@@ -179,7 +145,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int level,
   }
 
   // Grab level map
-  LevelPtr node_map = get_level(level);
+  const LevelPtr node_map = get_level(level);
 
   // Initialize vector to hold nodes in order of pass through for a sweep.
   std::vector<NodePtr> node_vec;
@@ -194,13 +160,13 @@ MCMC_Sweeps SBM::mcmc_sweep(const int level,
     // Generate a random order of nodes to be run through for sweep
     Sampler::shuffle_nodes(node_vec, node_map, sampler.int_gen);
     
-    // Clear the set of updated pairs for new sweep
-    pair_moves.clear();
+    // Setup container to track what pairs need to be updated for sweep
+    std::unordered_set<std::string> pair_moves;
 
     // Loop through each node
     for (auto node_it = node_vec.begin(); node_it != node_vec.end(); ++node_it)
     {
-      NodePtr curr_node = *node_it;
+      const NodePtr curr_node = *node_it;
 
       // Check if we're running sweep with variable block numbers. If we are, we
       // need to add a new block as a potential for the node to enter
@@ -211,7 +177,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int level,
       }
 
       // Get a move proposal
-      NodePtr proposed_new_block = propose_move(curr_node);
+      const NodePtr proposed_new_block = propose_move(curr_node);
 
       // If the propsosed block is the nodes current block, we don't need to waste
       // time checking because decision will always result in same state.
@@ -219,14 +185,13 @@ MCMC_Sweeps SBM::mcmc_sweep(const int level,
         continue;
 
       // Calculate acceptance probability based on posterior changes
-      Proposal_Res proposal_results = make_proposal_decision(
-          curr_node,
-          proposed_new_block);
+      Proposal_Res proposal_results = make_proposal_decision(curr_node,
+                                                             proposed_new_block);
 
       // Is the move accepted?
       if (sampler.draw_unif() < proposal_results.prob_of_accept)
       {
-        NodePtr old_block = curr_node->parent;
+        const NodePtr old_block = curr_node->parent;
 
         // Move the node
         curr_node->set_parent(proposed_new_block);
