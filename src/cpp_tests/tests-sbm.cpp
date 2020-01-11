@@ -65,7 +65,6 @@ TEST_CASE("Calculate Model entropy", "[SBM]")
   NodePtr from_block = node_to_move->parent;
   NodePtr to_block = my_SBM.get_node_by_id("a12", 1);
 
-
   // Calculate the entropy delta along with acceptance prob
   Proposal_Res proposal_results = my_SBM.make_proposal_decision(
       node_to_move,
@@ -91,6 +90,78 @@ TEST_CASE("Calculate Model entropy", "[SBM]")
       proposal_results.entropy_delta ==
       entropy_delta);
 }
+
+TEST_CASE("Move proposal entropy delta is correct", "[SBM]"){
+
+  int num_sweeps = 10;
+
+  // Setup simple SBM model
+  SBM my_SBM = build_simple_SBM();
+
+  auto all_nodes = my_SBM.get_level(0);
+
+  for (int i = 0; i < num_sweeps; i++)
+  {
+    // Loop through all nodes
+    for (auto node_to_move_it = all_nodes->begin();
+              node_to_move_it != all_nodes->end();
+              node_to_move_it++)
+    {
+      NodePtr node_to_move = node_to_move_it->second;
+      
+      // Calculate current model entropy
+      double pre_entropy = my_SBM.compute_entropy(0);
+
+      // Choose random group for node to join
+      NodePtr group_to_move_to = my_SBM.sampler.sample(my_SBM.get_nodes_of_type_at_level(node_to_move->type, 1));
+      
+      // Get move proposal report for move
+      Proposal_Res proposal_vals = my_SBM.make_proposal_decision(node_to_move, group_to_move_to);
+
+      double reported_entropy_delta = proposal_vals.entropy_delta;
+
+      // Move node
+      node_to_move->set_parent(group_to_move_to);
+
+      // Take new model entropy
+      double post_entropy = my_SBM.compute_entropy(0);
+
+      // They should be the same
+      REQUIRE((post_entropy - pre_entropy) ==
+            Approx(reported_entropy_delta).epsilon(0.1));
+
+    } // End node loop
+  } // End iteration loop
+}
+
+
+// TEST_CASE("MCMC Entropy Delta is accurate", "[SBM]"){
+
+//   int num_sweeps = 10;
+
+//   // Setup simple SBM model
+//   SBM my_SBM = build_simple_SBM();
+
+//   for (int i = 0; i < num_sweeps; i++)
+//   {
+//     std::cout << "Entropy delta sweep #" << i << std::endl;
+//     double pre_sweep_entropy = my_SBM.compute_entropy(0); 
+
+//     // Run a single MCMC sweep
+//     MCMC_Sweeps sweep_res = my_SBM.mcmc_sweep(0, 1, true, false);
+
+//     // Get reported entropy delta from sweep
+//     double reported_delta = sweep_res.sweep_entropy_delta[0];
+
+//     // Get new whole model entropy
+//     double post_sweep_entropy = my_SBM.compute_entropy(0);
+
+//     // They should be the same
+//     REQUIRE((pre_sweep_entropy - post_sweep_entropy) ==
+//             Approx(reported_delta).epsilon(0.1));
+//   }
+
+// }
 
 TEST_CASE("Basic MCMC sweeps", "[SBM]")
 {
