@@ -77,8 +77,8 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
                        -node_edges[con_block_it->first],
                        old_block_degree_pre,
                        old_block_degree_post,
-                       &entropy_pre,
-                       &entropy_post);
+                       entropy_pre,
+                       entropy_post);
   }
 
   // Do the same for the new block - neighbor
@@ -90,8 +90,8 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
                        node_edges[con_block_it->first],
                        new_block_degree_pre,
                        new_block_degree_post,
-                       &entropy_pre,
-                       &entropy_post);
+                       entropy_pre,
+                       entropy_post);
   }
 
   // Now we move on to calculating the probability ratios for the node moving
