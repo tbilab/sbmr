@@ -87,5 +87,21 @@ NodePtr Sampler::sample(std::vector<NodePtr> node_vec)
   return node_vec.at(random_index);
 }
 
+void Sampler::shuffle_nodes(std::vector<NodePtr> &node_vec,
+                            const std::shared_ptr<std::map<string, NodePtr>> &node_map,
+                            std::mt19937 &sampler)
+{
+  // Initialize vector size to hold nodes
+  node_vec.clear();
 
+  // Fill in vector with map elements
+  for (auto node_it = node_map->begin();
+       node_it != node_map->end();
+       node_it++)
+  {
+    node_vec.push_back(node_it->second);
+  }
 
+  // Shuffle node order
+  std::shuffle(node_vec.begin(), node_vec.end(), sampler);
+}

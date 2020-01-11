@@ -52,10 +52,14 @@ public:
   int sample(int max_val);               
 
   // Sample random node from a list of nodes
-  NodePtr sample(std::list<NodePtr> nodes_to_sample);    
+  NodePtr sample(std::list<NodePtr> nodes_to_sample);
 
   // Sample random node from vector of nodes
-  NodePtr sample(std::vector<NodePtr> nodes_to_sample);  
+  NodePtr sample(std::vector<NodePtr> nodes_to_sample);
+
+  static void shuffle_nodes(std::vector<NodePtr> &node_vec,
+                            const std::shared_ptr<std::map<string, NodePtr>> &node_map,
+                            std::mt19937 &sampler);
 };
 
 #endif
