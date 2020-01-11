@@ -252,6 +252,13 @@ public:
                   const bool variable_num_blocks,
                   const bool track_pairs)
   {
+    // Make sure network has blocks at the level for MCMC sweeps to take place. 
+    // Warn and initialize groups for user
+    if (get_level(level + 1)->size() == 0)
+    {
+      warning("No blocks present. Initializing one block per node.");
+      Network::initialize_blocks(-1, level);
+    }
 
     MCMC_Sweeps results = SBM::mcmc_sweep(level,
                                          num_sweeps,
