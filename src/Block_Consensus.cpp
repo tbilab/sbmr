@@ -1,12 +1,6 @@
 #include "Block_Consensus.h"
 
-// Helper to build alphabetically string pair of two node ids for pair maps
-inline std::string make_pair_key(const std::string a_node, const std::string b_node)
-{
-    return a_node > b_node
-               ? a_node + "--" + b_node
-               : b_node + "--" + a_node;
-}
+
 
 void Block_Consensus::initialize(const LevelPtr node_map)
 {
