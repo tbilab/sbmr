@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "../helpers.h"
+#include "../print_helpers.h"
 #include "../Node.h"
 
 // Smart pointer to node instance

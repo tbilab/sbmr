@@ -192,7 +192,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int level,
     double entropy_delta = 0;
 
     // Generate a random order of nodes to be run through for sweep
-    shuffle_nodes(node_vec, node_map, sampler.int_gen);
+    Sampler::shuffle_nodes(node_vec, node_map, sampler.int_gen);
     
     // Clear the set of updated pairs for new sweep
     pair_moves.clear();
@@ -383,7 +383,6 @@ Merge_Step SBM::agglomerative_merge(const int block_level,
 
   // Grab all the blocks we're looking to merge
   LevelPtr all_blocks = get_level(block_level);
-
 
   // Build vectors for recording merges
   std::vector<NodePtr> from_blocks;

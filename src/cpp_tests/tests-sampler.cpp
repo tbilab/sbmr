@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "../Sampler.h"
-#include "../helpers.h"
+#include "../print_helpers.h"
 
 
 TEST_CASE("Setting Seeds", "[Sampler]")
