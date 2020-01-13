@@ -46,6 +46,12 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   // Reference to old block that would be swapped for new_block
   const NodePtr from_block = node->parent;
 
+  // Make sure we're actually doing something
+  if (from_block == to_block)
+  {
+    return Proposal_Res(0.0, 0.0);
+  }
+
   // Grab degree of the node to move
   const double deg_node = node->degree;
 
@@ -57,10 +63,6 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   const double deg_from_block_post = deg_from_block - deg_node;
   const double deg_to_block_post = deg_to_block + deg_node;
 
-  // // Initialize the partial edge entropy sum holders
-  // double entropy_pre = 0;
-  // double entropy_post = 0;
-
   // Gather edge maps for the node and its moved blocks as these will have
   // changes in their entropy contribution
   std::map<NodePtr, int> node_cons = node->gather_edges_to_level(block_level);
@@ -69,34 +71,30 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 
   // Build a set of groups that we need to loop over 
   std::unordered_set<NodePtr> blocks_to_loop;
+
   // Add both the from and to blocks to the set
   blocks_to_loop.insert(from_block);
   blocks_to_loop.insert(to_block);
 
+  // Add the from and to block connections
+  for (auto from_block_con_it = from_block_cons.begin();
+            from_block_con_it != from_block_cons.end();
+            from_block_con_it++)
+  {
+    blocks_to_loop.insert(from_block_con_it->first);
+  }
 
-  // // Now we move on to calculating the probability ratios for the node moving
-  // // from old->new and then new->old assuming node was already in new.
-
-  // // Loop over all the node's edges to neighbor blocks
-  // for (auto con_block_it = node_cons.begin();
-  //      con_block_it != node_edges.end();
-  //      con_block_it++)
-  // {
-  // }
+  for (auto to_block_con_it = to_block_cons.begin();
+            to_block_con_it != to_block_cons.end();
+            to_block_con_it++)
+  {
+    blocks_to_loop.insert(to_block_con_it->first);
+  }
 
   // Fill in set with all the blocks that the node is connected to, in addition, 
   // calculate the probability ratios for performing node moves
-
   double pre_move_prob = 0.0;
   double post_move_prob = 0.0;
-
-  for (auto node_con_it = node_cons.begin();
-            node_con_it != node_cons.end();
-            node_con_it++)
-  {
-    // Insert block into the blocks to loop over for entropy delta
-    blocks_to_loop.insert(node_con_it->first);
-  }
 
   // Initialize a holder for the entropy delta summation
   double entropy_delta = 0.0;
@@ -128,14 +126,10 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 
     // Compute this changed groups component of the entropy delta
     entropy_delta += (
-      (
-        partial_entropy(e_from_changed, deg_from_block, deg_changed) - 
-        partial_entropy(e_from_changed_post, deg_from_block_post, deg_changed_post)
-      ) + 
-      (
-        partial_entropy(e_to_changed, deg_to_block, deg_changed) - 
-        partial_entropy(e_to_changed_post, deg_to_block_post, deg_changed_post)
-      )
+        partial_entropy(e_from_changed,      deg_from_block,      deg_changed)      - 
+        partial_entropy(e_from_changed_post, deg_from_block_post, deg_changed_post) +
+        partial_entropy(e_to_changed,        deg_to_block,        deg_changed)      -
+        partial_entropy(e_to_changed_post,   deg_to_block_post,   deg_changed_post) 
     );
 
     // If the node has any connections to the changed group we need to also calculate
@@ -150,12 +144,10 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     }
   }
 
- 
-
   // Now we can clean up all the calculations into to entropy delta and the
   // probability ratio for the moves and use those to calculate the acceptance
   // probability for the proposed move.
-  const double entropy_delta = entropy_post - entropy_pre;
+  // const double entropy_delta = entropy_post - entropy_pre;
   const double acceptance_prob = exp(entropy_delta) * (pre_move_prob/post_move_prob);
 
   return Proposal_Res(
