@@ -80,7 +80,7 @@ TEST_CASE("Calculate Model entropy", "[SBM]")
   double new_entropy = my_SBM.compute_entropy(0);
 
   // Get difference from original
-  double real_entropy_delta = model_entropy - new_entropy;
+  double real_entropy_delta = new_entropy - model_entropy;
 
   REQUIRE(
       real_entropy_delta ==
