@@ -33,8 +33,7 @@ inline void process_block_pair(
   entropy_post += entropy_post_delta;
 }
 
-
 inline double partial_entropy(const double a, const double b, const double c)
 {
-  return a*std::log(a/(b * c));
+    return a == 0 ? 0 : a * std::log(a / (b * c));
 }
