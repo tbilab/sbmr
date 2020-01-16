@@ -130,9 +130,9 @@ SBM build_simple_SBM()
 }
 
 // Loads a simple unipartite sbm model with hierarchy added
-SBM build_simple_SBM_unipartite(bool extra_edge = false)
+SBM build_simple_SBM_unipartite()
 {
-   SBM my_SBM;
+  SBM my_SBM;
 
   // Add nodes to graph first
   NodePtr n1 = my_SBM.add_node("n1", 0);
@@ -141,32 +141,26 @@ SBM build_simple_SBM_unipartite(bool extra_edge = false)
   NodePtr n4 = my_SBM.add_node("n4", 0);
   NodePtr n5 = my_SBM.add_node("n5", 0);
   NodePtr n6 = my_SBM.add_node("n6", 0);
- 
 
   // Add edges
+  my_SBM.add_edge(n1, n2);
   my_SBM.add_edge(n1, n3);
   my_SBM.add_edge(n1, n4);
   my_SBM.add_edge(n1, n5);
-
   my_SBM.add_edge(n2, n3);
   my_SBM.add_edge(n2, n4);
   my_SBM.add_edge(n2, n5);
-
   my_SBM.add_edge(n3, n4);
   my_SBM.add_edge(n3, n6);
-
+  my_SBM.add_edge(n4, n5);
   my_SBM.add_edge(n4, n6);
+  my_SBM.add_edge(n5, n6);
 
-  if (extra_edge)
-  {
-    my_SBM.add_edge(n5, n6);
-  }
-  
   // Make 3 blocks
   NodePtr a = my_SBM.add_node("a", 0, 1);
   NodePtr b = my_SBM.add_node("b", 0, 1);
   NodePtr c = my_SBM.add_node("c", 0, 1);
- 
+
   // Assign nodes to their blocks
   n1->set_parent(a);
   n2->set_parent(a);
@@ -179,7 +173,6 @@ SBM build_simple_SBM_unipartite(bool extra_edge = false)
 
   return my_SBM;
 }
-
 
 SBM build_bipartite_simulated()
 {
