@@ -73,6 +73,36 @@ inline double compute_node_edge_entropy(const NodePtr node)
     return entropy_sum;
 }
 
+// Takes a node and computes its portion of the edge counts entropy
+inline double compute_node_edge_entropy_partial(const NodePtr node, const NodePtr partner)
+{
+    // First we collapse the nodes edge counts to all it's neighbors
+    const std::map<NodePtr, int> node_edge_counts = node->gather_edges_to_level(node->level);
+    const int node_degree = node->degree;
+
+    double entropy_sum = 0;
+
+    // Next we loop over this edge counts list
+    for (auto neighbor_group_edges = node_edge_counts.begin();
+         neighbor_group_edges != node_edge_counts.end();
+         neighbor_group_edges++)
+    {
+        NodePtr neighbor = neighbor_group_edges->first;
+
+        // If the neighbor is a partner or this is a self pair we need to
+        // divide the results by two so we don't double count them.
+        const bool neighbor_is_partner = neighbor == partner;
+        const bool is_self_pair = node == neighbor;
+        const int scalar = (neighbor_is_partner | is_self_pair) ? 2 : 1;
+
+        entropy_sum += partial_entropy(neighbor_group_edges->second,
+                                       neighbor->degree,
+                                       node_degree) / scalar;
+    }
+
+    return entropy_sum;
+}
+
 inline double calc_edge_entropy_for_blocks(const std::vector<NodePtr> nodes_to_check)
 {
     double edge_entropy = 0.0;

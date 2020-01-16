@@ -54,21 +54,21 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 
   // Gather edge entropy values corresponding to the pre-move state from both
   // the new and old block
-  const double old_block_entropy_pre = compute_node_edge_entropy(old_block);
-  const double new_block_entropy_pre = compute_node_edge_entropy(new_block);
+  const double old_block_entropy_pre = compute_node_edge_entropy_partial(old_block, new_block);
+  const double new_block_entropy_pre = compute_node_edge_entropy_partial(new_block, old_block);
   
   // Move node to new block
   node->set_parent(new_block);
 
   // Gather the new entropy portions from the two blocks
-  const double old_block_entropy_post = compute_node_edge_entropy(old_block);
-  const double new_block_entropy_post = compute_node_edge_entropy(new_block);
+  const double old_block_entropy_post = compute_node_edge_entropy_partial(old_block, new_block);
+  const double new_block_entropy_post = compute_node_edge_entropy_partial(new_block, old_block);
 
   // Return the node to the old block
   node->set_parent(old_block);
 
   const double entropy_delta = (old_block_entropy_pre + new_block_entropy_pre) -
-                               (old_block_entropy_post - new_block_entropy_post);
+                               (old_block_entropy_post + new_block_entropy_post);
 
   // Gather edge maps for the node and its moved blocks as these will have
   // changes in their entropy contribution
@@ -156,7 +156,6 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     }
   }
 
-  // const double entropy_delta = pre_move_entropy_portion - post_move_entropy_portion;
 
   // Portion of accept prob corresponding to entropy change
   const double entropy_ratio = exp(entropy_delta);
