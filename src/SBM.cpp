@@ -52,6 +52,24 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     return Proposal_Res(0.0, 0.0);
   }
 
+  // Gather edge entropy values corresponding to the pre-move state from both
+  // the new and old block
+  const double old_block_entropy_pre = compute_node_edge_entropy(old_block);
+  const double new_block_entropy_pre = compute_node_edge_entropy(new_block);
+  
+  // Move node to new block
+  node->set_parent(new_block);
+
+  // Gather the new entropy portions from the two blocks
+  const double old_block_entropy_post = compute_node_edge_entropy(old_block);
+  const double new_block_entropy_post = compute_node_edge_entropy(new_block);
+
+  // Return the node to the old block
+  node->set_parent(old_block);
+
+  const double entropy_delta = (old_block_entropy_pre + new_block_entropy_pre) -
+                               (old_block_entropy_post - new_block_entropy_post);
+
   // Gather edge maps for the node and its moved blocks as these will have
   // changes in their entropy contribution
   std::map<NodePtr, int> node_cons = node->gather_edges_to_level(block_level);
@@ -81,51 +99,8 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     }
   }
 
-  double pre_move_entropy_portion = calculate_partial_prob(old_block, new_block, neighbor_groups);
-
-  // Make move
-  node->set_parent(new_block);
-
-  // Calculate post move entropy portion
-  double post_move_entropy_portion = calculate_partial_prob(old_block, new_block, neighbor_groups);
-
-  // Make move back
-  node->set_parent(old_block);
-
   // Grab degree of the node to move
   const double deg_node = node->degree;
-
- 
-  // // Get degrees of the two blocks post-move
-  // const double deg_old_block_post = deg_old_block - deg_node;
-  // const double deg_new_block_post = deg_new_block + deg_node;
-
- 
-  // const double e_node_to_old = old_block_cons[node];
-  // const double e_node_to_new = new_block_cons[node];
-
-  // // Build a set of groups that we need to loop over 
-  // std::unordered_set<NodePtr> blocks_to_loop;
-
-  
-  // // Fill in all the blocks to look at by going gathering all
-  // // unique groups connected to the new and old groups
-  // for (auto old_block_connection_it = old_block_cons.begin();
-  //           old_block_connection_it != old_block_cons.end();
-  //           old_block_connection_it++)
-  // {
-  //   blocks_to_loop.insert(old_block_connection_it->first);
-  // }
-
-  // for (auto new_block_connection_it = new_block_cons.begin();
-  //           new_block_connection_it != new_block_cons.end();
-  //           new_block_connection_it++)
-  // {
-  //   blocks_to_loop.insert(new_block_connection_it->first);
-  // }
-
-  // Grab all the possible blocks the node could be connected to
-  // std::vector<NodePtr> potential_blocks = get_nodes_of_type_at_level(connections_type, block_level);
 
   // Fill in set with all the blocks that the node is connected to, in addition, 
   // calculate the probability ratios for performing node moves
@@ -134,9 +109,6 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 
   // Keep track of the group pairs we've calculated so we don't double count
   std::unordered_set<std::string> parsed_pairs;
-
-  // double old_block_entropy_changes = 0;
-  // double new_block_entropy_changes = 0;
 
   for (auto neighbor_block_it = potential_blocks.begin();
             neighbor_block_it != potential_blocks.end();
@@ -147,7 +119,6 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     
     // // How many edges are there from the new block to this neighbor before and after the moving of the node
     const int e_new_to_neighbor = new_block_cons[neighbor_block];
-    // int e_new_to_neighbor_post = e_new_to_neighbor + e_node_to_neighbor;
     
     // // Repeat for the old block
     const int e_old_to_neighbor = old_block_cons[neighbor_block];
@@ -161,10 +132,6 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     {
       // If the neighbor is the old block we need to subtract the moved node's degrees from its degrees
       deg_neighbor_block_post -= deg_node;
-      
-      // // Changes in edge counts cancel eachother in this case
-      // // e_new_to_neighbor_post = e_new_to_neighbor;
-      // e_old_to_neighbor_post -= e_node_to_new;      
     }
 
     if (neighbor_block == new_block)
@@ -172,23 +139,6 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
       // Same for if it's the new, except now we add the node's degrees.
       deg_neighbor_block_post += deg_node;
     }
-
-    // // Insert pair into set and use results to determine if this is a new pair that should be processed.
-    // const bool old_to_neighbor_uncalculated = parsed_pairs.insert(make_pair_key(neighbor_block->id, old_block->id)).second;
-    // const bool new_to_neighbor_uncalculated = parsed_pairs.insert(make_pair_key(neighbor_block->id, new_block->id)).second;
-
-    // if (old_to_neighbor_uncalculated)
-    // {
-    //   old_block_entropy_changes += partial_entropy(e_old_to_neighbor, deg_neighbor_block, deg_old_block) -
-    //                                partial_entropy(e_old_to_neighbor_post, deg_neighbor_block_post, deg_old_block_post);
-    // }
-
-    // if (new_to_neighbor_uncalculated)
-    // {
-    //   new_block_entropy_changes += partial_entropy(e_new_to_neighbor, deg_neighbor_block, deg_new_block) -
-    //                                partial_entropy(e_new_to_neighbor_post, deg_neighbor_block_post, deg_new_block_post);
-    // }
-
     // If this group could be connected to the node being moved, 
     // we need to calculate its portion of the move probability ratio
     if (e_node_to_neighbor != 0)
@@ -206,7 +156,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     }
   }
 
-  const double entropy_delta = pre_move_entropy_portion - post_move_entropy_portion;
+  // const double entropy_delta = pre_move_entropy_portion - post_move_entropy_portion;
 
   // Portion of accept prob corresponding to entropy change
   const double entropy_ratio = exp(entropy_delta);
