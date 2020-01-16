@@ -116,6 +116,35 @@ TEST_CASE("Simple entropy calculation (bipartite)", "[SBM]")
   //     entropy_delta);
 }
 
+TEST_CASE("Move proposal entropy delta is correct (simple unipartite)", "[SBM")
+{
+  SBM unipartite_sbm = build_simple_SBM_unipartite();
+
+  // Propose move of n4 to group c 
+  const NodePtr n4 = unipartite_sbm.get_node_by_id("n4", 0);
+  const NodePtr c = unipartite_sbm.get_node_by_id("c", 1);
+
+  const double proposal_delta = unipartite_sbm.make_proposal_decision(n4, c).entropy_delta;
+
+  // Delta from hand calculation
+  REQUIRE(proposal_delta == Approx(-0.1117765).epsilon(0.1));
+}
+
+TEST_CASE("Move proposal entropy delta is correct (simple bipartite)", "[SBM")
+{
+   // Setup simple SBM model
+  SBM my_SBM = build_simple_SBM();
+
+  // Now move node a2 to group a11 and calculate entropy
+  NodePtr a2 = my_SBM.get_node_by_id("a2");
+  NodePtr a11 = my_SBM.get_node_by_id("a11", 1);
+
+  const double proposal_delta = my_SBM.make_proposal_decision(a2, a11).entropy_delta;
+
+  // Delta from hand calculation
+  REQUIRE(proposal_delta == Approx(-0.5924696).epsilon(0.1));
+}
+
 // TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
 // {
 //   std::cout << "Unipartite =================================================" << std::endl;
