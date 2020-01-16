@@ -84,53 +84,26 @@ TEST_CASE("Simple entropy calculation (bipartite)", "[SBM]")
 
   // Again hand-calculated and again negative because of approximation
   REQUIRE(my_SBM.compute_entropy(0) == Approx(-2.013081).epsilon(0.1));
-
-  // // Calculate entropy delta caused by moving a node
-  // NodePtr node_to_move = my_SBM.get_node_by_id("a2");
-  // NodePtr from_block = node_to_move->parent;
-  // NodePtr to_block = my_SBM.get_node_by_id("a12", 1);
-
-  // // Calculate the entropy delta along with acceptance prob
-  // Proposal_Res proposal_results = my_SBM.make_proposal_decision(
-  //     node_to_move,
-  //     to_block);
-
-  // double entropy_delta = proposal_results.entropy_delta;
-
-  // // Now we will actually move the desired node and test to see if entropy has changed
-  // // Move node
-  // node_to_move->set_parent(to_block);
-
-  // // Recalculate entropy
-  // double new_entropy = my_SBM.compute_entropy(0);
-
-  // // Get difference from original
-  // double real_entropy_delta = new_entropy - model_entropy;
-
-  // REQUIRE(
-  //     real_entropy_delta ==
-  //     Approx(entropy_delta).epsilon(0.1));
-
-  // REQUIRE(
-  //     proposal_results.entropy_delta ==
-  //     entropy_delta);
 }
 
-TEST_CASE("Move proposal entropy delta is correct (simple unipartite)", "[SBM")
+TEST_CASE("Move proposal returns values are correct (simple unipartite)", "[SBM")
 {
   SBM unipartite_sbm = build_simple_SBM_unipartite();
 
-  // Propose move of n4 to group c 
+  // Propose move of n4 to group c
   const NodePtr n4 = unipartite_sbm.get_node_by_id("n4", 0);
   const NodePtr c = unipartite_sbm.get_node_by_id("c", 1);
 
-  const double proposal_delta = unipartite_sbm.make_proposal_decision(n4, c).entropy_delta;
+  const auto proposal_results = unipartite_sbm.make_proposal_decision(n4, c);
 
   // Delta from hand calculation
-  REQUIRE(proposal_delta == Approx(-0.1117765).epsilon(0.1));
+  REQUIRE(proposal_results.entropy_delta == Approx(-0.1117765).epsilon(0.1));
+
+  // Probality of accepting from hand calculation
+  REQUIRE(proposal_results.prob_of_accept == Approx(1.748512).epsilon(0.1));
 }
 
-TEST_CASE("Move proposal entropy delta is correct (simple bipartite)", "[SBM")
+TEST_CASE("Move proposal returns values are correct (simple bipartite)", "[SBM")
 {
    // Setup simple SBM model
   SBM my_SBM = build_simple_SBM();
@@ -139,10 +112,12 @@ TEST_CASE("Move proposal entropy delta is correct (simple bipartite)", "[SBM")
   NodePtr a2 = my_SBM.get_node_by_id("a2");
   NodePtr a11 = my_SBM.get_node_by_id("a11", 1);
 
-  const double proposal_delta = my_SBM.make_proposal_decision(a2, a11).entropy_delta;
+  const auto proposal_results = my_SBM.make_proposal_decision(a2, a11);
 
   // Delta from hand calculation
-  REQUIRE(proposal_delta == Approx(-0.5924696).epsilon(0.1));
+  REQUIRE(proposal_results.entropy_delta == Approx(-0.5924696).epsilon(0.1));
+  
+  REQUIRE(proposal_results.prob_of_accept == Approx(0.1514709).epsilon(0.1));
 }
 
 TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
