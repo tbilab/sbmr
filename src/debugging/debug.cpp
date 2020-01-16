@@ -7,52 +7,65 @@
 
 int main(int argc, char **argv)
 {
+ int num_sweeps = 2;
 
-  int num_sweeps = 10;
+  Sampler random(312);
 
-  // Setup simple SBM model
-  SBM my_SBM = build_simple_SBM();
+  // Setup a simulated SBM model
+  SBM my_SBM = build_unipartite_simulated();
+
+  // Give it some random groupings of the correct number of groups
+  my_SBM.initialize_blocks(3, 0);
 
   auto all_nodes = my_SBM.get_level(0);
 
   for (int i = 0; i < num_sweeps; i++)
   {
-    std::cout << "mcmc sweep: " << i << std::endl;
+    std::cout << "=================================================" << std::endl;
+    std::cout << "Sweep #" << i << std::endl;
+
     // Loop through all nodes
     for (auto node_to_move_it = all_nodes->begin();
-         node_to_move_it != all_nodes->end();
-         node_to_move_it++)
+              node_to_move_it != all_nodes->end();
+              node_to_move_it++)
     {
-      NodePtr node_to_move = node_to_move_it->second;
+      const NodePtr node_to_move = node_to_move_it->second;
 
+      const std::string original_parent = (node_to_move->parent)->id;
+      
       // Calculate current model entropy
-      double pre_entropy = my_SBM.compute_entropy(0);
+      const double pre_entropy = my_SBM.compute_entropy(0);
+
+      // Make sure that our entropy value is positive as it should be
+      // REQUIRE(pre_entropy > 0);
 
       // Choose random group for node to join
-      NodePtr group_to_move_to = my_SBM.sampler.sample(my_SBM.get_nodes_of_type_at_level(node_to_move->type, 1));
-
-
-      std::cout << "Moving node " << node_to_move->id << " from " <<  
-                   (node_to_move->parent)->id << " to " <<
-                    group_to_move_to->id << std::endl;
-
+      auto potential_groups = my_SBM.get_nodes_of_type_at_level(node_to_move->type, 1);
+      
+      random.sample(potential_groups);
+      const NodePtr group_to_move_to = random.sample(potential_groups);
+      
       // Get move proposal report for move
-      Proposal_Res proposal_vals = my_SBM.make_proposal_decision(node_to_move, group_to_move_to);
+      const Proposal_Res proposal_vals = my_SBM.make_proposal_decision(node_to_move, group_to_move_to);
 
-      double reported_entropy_delta = proposal_vals.entropy_delta;
+      const double reported_entropy_delta = proposal_vals.entropy_delta;
 
       // Move node
       node_to_move->set_parent(group_to_move_to);
 
       // Take new model entropy
-      double post_entropy = my_SBM.compute_entropy(0);
+      const double true_delta = my_SBM.compute_entropy(0) - pre_entropy;
 
-      std::cout << "(True : Reported) -> ("
-                << std::to_string(post_entropy - pre_entropy) << " , " << reported_entropy_delta << ")"
+      std::cout << node_to_move->id << "(" << original_parent <<  ")" << " -> " << group_to_move_to->id << " | "
+                << std::to_string(true_delta) << " - " 
+                << std::to_string(reported_entropy_delta) << " = " 
+                << std::to_string(true_delta - reported_entropy_delta) 
                 << std::endl;
+      
+      // They should be the same
+      // REQUIRE(true_delta == Approx(reported_entropy_delta).epsilon(0.1));
 
     } // End node loop
-  }   // End iteration loop
-
+  } // End iteration loop
   return 0;
 }
