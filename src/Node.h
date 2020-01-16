@@ -55,8 +55,6 @@ public:
   string id;
   // Nodes that are connected to this node
   std::list<NodePtr> edges;
-  // Map keyed by neighbor nodes at the same level to an integer with total number of edges to that node
-  std::map<NodePtr, int> edge_counts;
   // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
   int level;
   // What node contains this node (aka its cluster)

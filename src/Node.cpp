@@ -23,9 +23,6 @@ inline void Node::add_edge(const NodePtr node)
   {
     // Add node to base edges
     (current_node->edges).push_back(node);
-    // This will throw an error if there is a node without a parent
-    // at a given level, which shouldn't happen.
-    (current_node->edge_counts)[node->get_parent_at_level(current_level)]++;
     current_node->degree++;
     current_node = current_node->parent;
     current_level++;
@@ -41,7 +38,6 @@ void Node::update_edges_from_node(const NodePtr node, const bool remove)
 
   // Grab list of nodes from node being removed or added we are updating
   const auto changed_node_edges = node->edges;
-  auto counts_being_updated = node->edge_counts;
 
   // Keep track of which node in the hierarchy is being updated. 
   // Starts with this node
@@ -53,17 +49,11 @@ void Node::update_edges_from_node(const NodePtr node, const bool remove)
     // Loop through all the edges that are being updated...
     // Grab reference to the current nodes edges list
     std::list<NodePtr> &curr_edges = node_being_updated->edges;
-    std::map<NodePtr, int> &curr_edge_counts = node_being_updated->edge_counts;
 
     for (auto &edge_to_update : changed_node_edges)
     {
       if (remove)
       {
-        // Remove one count of this edge
-        curr_edge_counts[edge_to_update]--;
-        // If we just removed the last entry for this edge delete from map
-        // NEEDS IMPLEMENTATION
-
         // Scan through this nodes edges untill we find the first instance
         // of the connected node we want to remove
         auto last_place = curr_edges.end();
@@ -80,7 +70,6 @@ void Node::update_edges_from_node(const NodePtr node, const bool remove)
       }
       else
       {
-        curr_edge_counts[edge_to_update]++;
         // Just add this edge to nodes edges
         curr_edges.push_back(edge_to_update);
       }
