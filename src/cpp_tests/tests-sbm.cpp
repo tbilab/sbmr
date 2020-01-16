@@ -46,7 +46,7 @@ TEST_CASE("Generate Node move proposals", "[SBM]")
       frac_of_time_no_change);
 }
 
-TEST_CASE("Simple entropy calculation", "[SBM")
+TEST_CASE("Simple entropy calculation (unipartite)", "[SBM")
 {
   SBM unipartite_sbm = build_simple_SBM_unipartite();
 
@@ -62,50 +62,59 @@ TEST_CASE("Simple entropy calculation", "[SBM")
           Approx(6.321931).epsilon(0.1));
 }
 
-// TEST_CASE("Calculate Model entropy", "[SBM]")
-// {
-//   // Setup simple SBM model
-//   SBM my_SBM = build_simple_SBM();
+TEST_CASE("Simple entropy calculation (bipartite)", "[SBM]")
+{
+  // Setup simple SBM model
+  SBM my_SBM = build_simple_SBM();
 
-//  // Compute full entropy at first level of nodes
-//   double model_entropy = my_SBM.compute_entropy(0);
+  // Compute full entropy at first level of nodes
+  double model_entropy = my_SBM.compute_entropy(0);
 
-//   // Test entropy is near a hand-calculated value
-//   // Should be -8 - ( 2*log(2) + 3*log(6) ) - ( 2*log(2/12) + 4*log(4/30) + 1*log(1/5) + 1*log(1) ) = -1.509004
-//   REQUIRE(
-//       model_entropy ==
-//       Approx(-1.509004).epsilon(0.1));
+  // Test entropy is near a hand-calculated value
+  // Note that this network being so small and having bipartite structure causes the entropy 
+  // to be negative becuause we're using an entropy approximation function, rather than directly calculating the entropy
+  // of the degree corrected model. 
+  REQUIRE(model_entropy == Approx(-1.420612).epsilon(0.1));
 
-//   // Calculate entropy delta caused by moving a node
-//   NodePtr node_to_move = my_SBM.get_node_by_id("a1");
-//   NodePtr from_block = node_to_move->parent;
-//   NodePtr to_block = my_SBM.get_node_by_id("a12", 1);
+  // Now move node a2 to group a11 and calculate entropy
+  NodePtr a2 = my_SBM.get_node_by_id("a2");
+  NodePtr a11 = my_SBM.get_node_by_id("a11", 1);
 
-//   // Calculate the entropy delta along with acceptance prob
-//   Proposal_Res proposal_results = my_SBM.make_proposal_decision(
-//       node_to_move,
-//       to_block);
+  a2->set_parent(a11);
 
-//   double entropy_delta = proposal_results.entropy_delta;
+  // Again hand-calculated and again negative because of approximation
+  REQUIRE(my_SBM.compute_entropy(0) == Approx(-2.013081).epsilon(0.1));
 
-//   // Now we will actually move the desired node and test to see if entropy has changed
-//   // Move node
-//   node_to_move->set_parent(to_block);
+  // // Calculate entropy delta caused by moving a node
+  // NodePtr node_to_move = my_SBM.get_node_by_id("a2");
+  // NodePtr from_block = node_to_move->parent;
+  // NodePtr to_block = my_SBM.get_node_by_id("a12", 1);
 
-//   // Recalculate entropy
-//   double new_entropy = my_SBM.compute_entropy(0);
+  // // Calculate the entropy delta along with acceptance prob
+  // Proposal_Res proposal_results = my_SBM.make_proposal_decision(
+  //     node_to_move,
+  //     to_block);
 
-//   // Get difference from original
-//   double real_entropy_delta = new_entropy - model_entropy;
+  // double entropy_delta = proposal_results.entropy_delta;
 
-//   REQUIRE(
-//       real_entropy_delta ==
-//       Approx(entropy_delta).epsilon(0.1));
+  // // Now we will actually move the desired node and test to see if entropy has changed
+  // // Move node
+  // node_to_move->set_parent(to_block);
 
-//   REQUIRE(
-//       proposal_results.entropy_delta ==
-//       entropy_delta);
-// }
+  // // Recalculate entropy
+  // double new_entropy = my_SBM.compute_entropy(0);
+
+  // // Get difference from original
+  // double real_entropy_delta = new_entropy - model_entropy;
+
+  // REQUIRE(
+  //     real_entropy_delta ==
+  //     Approx(entropy_delta).epsilon(0.1));
+
+  // REQUIRE(
+  //     proposal_results.entropy_delta ==
+  //     entropy_delta);
+}
 
 // TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
 // {
