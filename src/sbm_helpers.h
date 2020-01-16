@@ -49,6 +49,30 @@ inline double prob_move_r_to_s(const double e_ts, const double e_t, const double
     return (e_ts + eps) / (e_t + eps * B);
 }
 
+
+
+// Takes a node and computes its portion of the edge counts entropy
+inline double compute_node_edge_entropy(const NodePtr node)
+{
+    // First we collapse the nodes edge counts to all it's neighbors
+    const std::map<NodePtr, int> node_edge_counts = node->gather_edges_to_level(node->level);
+    const int node_degree = node->degree;
+
+    double entropy_sum = 0;
+
+    // Next we loop over this edge counts list
+    for (auto neighbor_group_edges = node_edge_counts.begin();
+         neighbor_group_edges != node_edge_counts.end();
+         neighbor_group_edges++)
+    {
+        entropy_sum += partial_entropy(neighbor_group_edges->second,
+                                       (neighbor_group_edges->first)->degree,
+                                       node_degree);
+    }
+
+    return entropy_sum;
+}
+
 inline double calc_edge_entropy_for_blocks(const std::vector<NodePtr> nodes_to_check)
 {
     double edge_entropy = 0.0;
@@ -60,24 +84,10 @@ inline double calc_edge_entropy_for_blocks(const std::vector<NodePtr> nodes_to_c
     {
         const NodePtr block_r = *block_r_ptr;
 
-        const int deg_block_r = block_r->degree;
-
-        // Gather all of block r's edges to its own level
-        auto block_r_edge_counts = block_r->gather_edges_to_level(block_r->level);
-
-        // Second loop over remaining pairs of nodes
-        for (auto block_s_ptr = block_r_ptr;
-             block_s_ptr != nodes_to_check.end();
-             block_s_ptr++)
-        {
-            const NodePtr block_s = *block_s_ptr;
-            const int e_rs = block_r_edge_counts[block_s];
-            // Compute this iteration's controbution to sum
-            edge_entropy += partial_entropy(e_rs, block_s->degree, deg_block_r);
-        }
+        edge_entropy += compute_node_edge_entropy(block_r);
     }
 
-    return edge_entropy;
+    return edge_entropy/2;
 }
 
 inline void process_block_pair(
