@@ -193,7 +193,7 @@ std::vector<NodePtr> Node::get_edges_to_level(const int desired_level)
 // =============================================================================
 std::map<NodePtr, int> Node::gather_edges_to_level(const int level)
 {
-  //PROFILE_FUNCTION();
+  // PROFILE_FUNCTION();
   // Gather all edges from the moved node to the level of the blocks we're
   // working with
   std::vector<NodePtr> all_edges = get_edges_to_level(level);
@@ -207,6 +207,17 @@ std::map<NodePtr, int> Node::gather_edges_to_level(const int level)
        ++curr_edge)
   {
     edges_counts[*curr_edge]++;
+  }
+
+  // We double count edges to the node itself so fix that
+  for (auto edge_count_it = edges_counts.begin();
+            edge_count_it != edges_counts.end();
+            edge_count_it++)
+  {
+    if (edge_count_it->first == this_ptr())
+    {
+      edge_count_it->second /= 2;
+    }
   }
 
   return edges_counts;
