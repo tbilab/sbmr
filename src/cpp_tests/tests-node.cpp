@@ -141,6 +141,118 @@ TEST_CASE("Gathering edge counts to a level", "[Node]")
   
 }
 
+TEST_CASE("Edge count gathering (unipartite)", "[Node]")
+{
+
+  NodePtr n1 = std::make_shared<Node>("n1", 0, 1);
+  NodePtr n2 = std::make_shared<Node>("n2", 0, 1);
+  NodePtr n3 = std::make_shared<Node>("n3", 0, 1);
+  NodePtr n4 = std::make_shared<Node>("n4", 0, 1);
+  NodePtr n5 = std::make_shared<Node>("n5", 0, 1);
+  NodePtr n6 = std::make_shared<Node>("n6", 0, 1);
+
+  // Add edges
+  Node::connect_nodes(n1, n2);
+  Node::connect_nodes(n1, n3);
+  Node::connect_nodes(n1, n4);
+  Node::connect_nodes(n1, n5);
+  Node::connect_nodes(n2, n3);
+  Node::connect_nodes(n2, n4);
+  Node::connect_nodes(n2, n5);
+  Node::connect_nodes(n3, n4);
+  Node::connect_nodes(n3, n6);
+  Node::connect_nodes(n4, n5);
+  Node::connect_nodes(n4, n6);
+  Node::connect_nodes(n5, n6);
+
+   // Make 3 blocks
+  NodePtr a = std::make_shared<Node>("a", 1, 1);
+  NodePtr b = std::make_shared<Node>("b", 1, 1);
+  NodePtr c = std::make_shared<Node>("c", 1, 1);
+
+  // Assign nodes to their blocks
+  n1->set_parent(a);
+  n2->set_parent(a);
+  n3->set_parent(b);
+  n4->set_parent(b);
+  n5->set_parent(c);
+  n6->set_parent(c);
+
+  // Move node 4 to c block
+  n4->set_parent(c);
+
+  const auto a_edges = a->gather_edges_to_level(1);
+  REQUIRE(a_edges.size() == 3);
+  REQUIRE(a_edges.at(a) == 2*1); // self edges will be double
+  REQUIRE(a_edges.at(b) == 2);
+  REQUIRE(a_edges.at(c) == 4);
+
+  const auto b_edges = b->gather_edges_to_level(1);
+  REQUIRE(b_edges.size() == 2);
+  REQUIRE(b_edges.at(a) == 2);
+  REQUIRE(b_edges.at(c) == 2);
+
+  const auto c_edges = c->gather_edges_to_level(1);
+  REQUIRE(c_edges.at(a) == 4);
+  REQUIRE(c_edges.at(b) == 2);
+  REQUIRE(c_edges.at(c) == 2*3);
+}
+
+TEST_CASE("Edge count gathering after moving (unipartite)", "[Node]")
+{
+
+  NodePtr n1 = std::make_shared<Node>("n1", 0, 1);
+  NodePtr n2 = std::make_shared<Node>("n2", 0, 1);
+  NodePtr n3 = std::make_shared<Node>("n3", 0, 1);
+  NodePtr n4 = std::make_shared<Node>("n4", 0, 1);
+  NodePtr n5 = std::make_shared<Node>("n5", 0, 1);
+  NodePtr n6 = std::make_shared<Node>("n6", 0, 1);
+
+  // Add edges
+  Node::connect_nodes(n1, n2);
+  Node::connect_nodes(n1, n3);
+  Node::connect_nodes(n1, n4);
+  Node::connect_nodes(n1, n5);
+  Node::connect_nodes(n2, n3);
+  Node::connect_nodes(n2, n4);
+  Node::connect_nodes(n2, n5);
+  Node::connect_nodes(n3, n4);
+  Node::connect_nodes(n3, n6);
+  Node::connect_nodes(n4, n5);
+  Node::connect_nodes(n4, n6);
+  Node::connect_nodes(n5, n6);
+
+   // Make 3 blocks
+  NodePtr a = std::make_shared<Node>("a", 1, 1);
+  NodePtr b = std::make_shared<Node>("b", 1, 1);
+  NodePtr c = std::make_shared<Node>("c", 1, 1);
+
+  // Assign nodes to their blocks
+  n1->set_parent(a);
+  n2->set_parent(a);
+  n3->set_parent(b);
+  n4->set_parent(b);
+  n5->set_parent(c);
+  n6->set_parent(c);
+
+  const auto a_edges = a->gather_edges_to_level(1);
+  REQUIRE(a_edges.size() == 3);
+  REQUIRE(a_edges.at(a) == 2*1); // self edges will be double
+  REQUIRE(a_edges.at(b) == 4);
+  REQUIRE(a_edges.at(c) == 2);
+
+  const auto b_edges = b->gather_edges_to_level(1);
+  REQUIRE(b_edges.size() == 3);
+  REQUIRE(b_edges.at(a) == 4);
+  REQUIRE(b_edges.at(b) == 1*2); 
+  REQUIRE(b_edges.at(c) == 3);
+
+  const auto c_edges = c->gather_edges_to_level(1);
+  REQUIRE(c_edges.at(a) == 2);
+  REQUIRE(c_edges.at(b) == 3);
+  REQUIRE(c_edges.at(c) == 2*1);
+}
+
 TEST_CASE("Tracking node degrees", "[Node]")
 {
   // Node level
