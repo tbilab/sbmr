@@ -37,123 +37,196 @@ NodePtr SBM::propose_move(const NodePtr node)
 // Make a decision on the proposed new block for node
 // =============================================================================
 Proposal_Res SBM::make_proposal_decision(const NodePtr node,
-                                         const NodePtr to_block)
+                                         const NodePtr new_block)
 {
   PROFILE_FUNCTION();
   // The level that this proposal is taking place on
   const int block_level = node->level + 1;
 
   // Reference to old block that would be swapped for new_block
-  const NodePtr from_block = node->parent;
+  const NodePtr old_block = node->parent;
 
   // Make sure we're actually doing something
-  if (from_block == to_block)
+  if (old_block == new_block)
   {
     return Proposal_Res(0.0, 0.0);
   }
 
-  // Grab degree of the node to move
-  const double deg_node = node->degree;
-
-  // Get degrees of the two blocks pre-move
-  const double deg_from_block = from_block->degree;
-  const double deg_to_block = to_block->degree;
-
-  // Get degrees of the two blocks post-move
-  const double deg_from_block_post = deg_from_block - deg_node;
-  const double deg_to_block_post = deg_to_block + deg_node;
-
   // Gather edge maps for the node and its moved blocks as these will have
   // changes in their entropy contribution
   std::map<NodePtr, int> node_cons = node->gather_edges_to_level(block_level);
-  std::map<NodePtr, int> from_block_cons = from_block->gather_edges_to_level(block_level);
-  std::map<NodePtr, int> to_block_cons = to_block->gather_edges_to_level(block_level);
+  std::map<NodePtr, int> old_block_cons = old_block->gather_edges_to_level(block_level);
+  std::map<NodePtr, int> new_block_cons = new_block->gather_edges_to_level(block_level);
 
-  // Build a set of groups that we need to loop over 
-  std::unordered_set<NodePtr> blocks_to_loop;
+  // What type of nodes does the current node connect to?
+  const int connections_type = ((node_cons.begin())->first)->type;
 
-  // Add both the from and to blocks to the set
-  blocks_to_loop.insert(from_block);
-  blocks_to_loop.insert(to_block);
+  // Grab all the possible blocks the node could be connected to
+  std::vector<NodePtr> potential_blocks = get_nodes_of_type_at_level(connections_type, block_level);
+  const int num_potential_blocks = potential_blocks.size();
 
-  // Add the from and to block connections
-  for (auto from_block_con_it = from_block_cons.begin();
-            from_block_con_it != from_block_cons.end();
-            from_block_con_it++)
+  // Build vector of neighbor groups that will have edge entropy contributions change from moving of node
+  std::vector<NodePtr> neighbor_groups = {new_block, old_block};
+  neighbor_groups.reserve(num_potential_blocks);
+
+  // Insert the rest of the blocks into neighbor vector, ignoring the new and old blocks
+  for (auto neighbor_block_it = potential_blocks.begin();
+            neighbor_block_it != potential_blocks.end();
+            neighbor_block_it++)
   {
-    blocks_to_loop.insert(from_block_con_it->first);
-  }
-
-  for (auto to_block_con_it = to_block_cons.begin();
-            to_block_con_it != to_block_cons.end();
-            to_block_con_it++)
-  {
-    blocks_to_loop.insert(to_block_con_it->first);
-  }
-
-  // Fill in set with all the blocks that the node is connected to, in addition, 
-  // calculate the probability ratios for performing node moves
-  double pre_move_prob = 0.0;
-  double post_move_prob = 0.0;
-
-  // Initialize a holder for the entropy delta summation
-  double entropy_delta = 0.0;
-
-  for (auto changed_block_it = blocks_to_loop.begin();
-            changed_block_it != blocks_to_loop.end();
-            changed_block_it++)
-  {
-    NodePtr changed_block = *changed_block_it;
-    const double deg_changed = changed_block->degree;
-
-    // Edges between node and this changed block...
-    const double e_node_changed = node_cons[changed_block];
-
-    // Edges between from and to groups and changed block
-    const double e_from_changed = from_block_cons[changed_block];
-    const double e_to_changed = to_block_cons[changed_block];
-
-    // Updated edge counts after move
-    const double e_from_changed_post = e_from_changed - e_node_changed;
-    const double e_to_changed_post = e_to_changed + e_node_changed;
-
-    // Only if the changed block is one of the from or to blocks does its value change after move
-    const double deg_changed_post = changed_block == from_block
-                                        ? deg_from_block_post
-                                        : (changed_block == to_block
-                                               ? deg_to_block_post
-                                               : deg_changed);
-
-    // Compute this changed groups component of the entropy delta
-    entropy_delta += (
-        partial_entropy(e_from_changed,      deg_from_block,      deg_changed)      - 
-        partial_entropy(e_from_changed_post, deg_from_block_post, deg_changed_post) +
-        partial_entropy(e_to_changed,        deg_to_block,        deg_changed)      -
-        partial_entropy(e_to_changed_post,   deg_to_block_post,   deg_changed_post) 
-    );
-
-    // If the node has any connections to the changed group we need to also calculate
-    // the pair's contribution to pre and post move relative probabilities
-    if (e_node_changed != 0)
+    NodePtr potential_neighbor = *neighbor_block_it;
+    if (potential_neighbor != old_block & potential_neighbor != new_block)
     {
-      // Edges from new block to t pre move...
-      pre_move_prob += e_from_changed + EPS;
-
-      // Edges from old block to t post move...
-      post_move_prob += e_to_changed + EPS;
+      neighbor_groups.push_back(potential_neighbor);
     }
   }
 
-  // Now we can clean up all the calculations into to entropy delta and the
-  // probability ratio for the moves and use those to calculate the acceptance
-  // probability for the proposed move.
-  // const double entropy_delta = entropy_post - entropy_pre;
-  const double acceptance_prob = exp(entropy_delta) * (pre_move_prob/post_move_prob);
+  double pre_move_entropy_portion = calculate_partial_prob(old_block, new_block, neighbor_groups);
 
-  return Proposal_Res(
-    entropy_delta,
-    acceptance_prob > 1 ? 1: acceptance_prob
-  );
+  // Make move
+  node->set_parent(new_block);
+
+  // Calculate post move entropy portion
+  double post_move_entropy_portion = calculate_partial_prob(old_block, new_block, neighbor_groups);
+
+  // Make move back
+  node->set_parent(old_block);
+
+  // Grab degree of the node to move
+  const double deg_node = node->degree;
+
+ 
+  // // Get degrees of the two blocks post-move
+  // const double deg_old_block_post = deg_old_block - deg_node;
+  // const double deg_new_block_post = deg_new_block + deg_node;
+
+ 
+  // const double e_node_to_old = old_block_cons[node];
+  // const double e_node_to_new = new_block_cons[node];
+
+  // // Build a set of groups that we need to loop over 
+  // std::unordered_set<NodePtr> blocks_to_loop;
+
+  
+  // // Fill in all the blocks to look at by going gathering all
+  // // unique groups connected to the new and old groups
+  // for (auto old_block_connection_it = old_block_cons.begin();
+  //           old_block_connection_it != old_block_cons.end();
+  //           old_block_connection_it++)
+  // {
+  //   blocks_to_loop.insert(old_block_connection_it->first);
+  // }
+
+  // for (auto new_block_connection_it = new_block_cons.begin();
+  //           new_block_connection_it != new_block_cons.end();
+  //           new_block_connection_it++)
+  // {
+  //   blocks_to_loop.insert(new_block_connection_it->first);
+  // }
+
+  // Grab all the possible blocks the node could be connected to
+  // std::vector<NodePtr> potential_blocks = get_nodes_of_type_at_level(connections_type, block_level);
+
+  // Fill in set with all the blocks that the node is connected to, in addition, 
+  // calculate the probability ratios for performing node moves
+  double move_prob = 0.0;
+  double rev_move_prob = 0.0;
+
+  // Keep track of the group pairs we've calculated so we don't double count
+  std::unordered_set<std::string> parsed_pairs;
+
+  // double old_block_entropy_changes = 0;
+  // double new_block_entropy_changes = 0;
+
+  for (auto neighbor_block_it = potential_blocks.begin();
+            neighbor_block_it != potential_blocks.end();
+            neighbor_block_it++)
+  {
+    NodePtr neighbor_block = *neighbor_block_it;
+    const int e_node_to_neighbor = node_cons[neighbor_block];
+    
+    // // How many edges are there from the new block to this neighbor before and after the moving of the node
+    const int e_new_to_neighbor = new_block_cons[neighbor_block];
+    // int e_new_to_neighbor_post = e_new_to_neighbor + e_node_to_neighbor;
+    
+    // // Repeat for the old block
+    const int e_old_to_neighbor = old_block_cons[neighbor_block];
+    int e_old_to_neighbor_post = e_old_to_neighbor - e_node_to_neighbor;
+    
+    // // Now get the degree of the neighbor block pre and post move
+    const int deg_neighbor_block = neighbor_block->degree;
+    int deg_neighbor_block_post = deg_neighbor_block;
+    
+    if (neighbor_block == old_block)
+    {
+      // If the neighbor is the old block we need to subtract the moved node's degrees from its degrees
+      deg_neighbor_block_post -= deg_node;
+      
+      // // Changes in edge counts cancel eachother in this case
+      // // e_new_to_neighbor_post = e_new_to_neighbor;
+      // e_old_to_neighbor_post -= e_node_to_new;      
+    }
+
+    if (neighbor_block == new_block)
+    {
+      // Same for if it's the new, except now we add the node's degrees.
+      deg_neighbor_block_post += deg_node;
+    }
+
+    // // Insert pair into set and use results to determine if this is a new pair that should be processed.
+    // const bool old_to_neighbor_uncalculated = parsed_pairs.insert(make_pair_key(neighbor_block->id, old_block->id)).second;
+    // const bool new_to_neighbor_uncalculated = parsed_pairs.insert(make_pair_key(neighbor_block->id, new_block->id)).second;
+
+    // if (old_to_neighbor_uncalculated)
+    // {
+    //   old_block_entropy_changes += partial_entropy(e_old_to_neighbor, deg_neighbor_block, deg_old_block) -
+    //                                partial_entropy(e_old_to_neighbor_post, deg_neighbor_block_post, deg_old_block_post);
+    // }
+
+    // if (new_to_neighbor_uncalculated)
+    // {
+    //   new_block_entropy_changes += partial_entropy(e_new_to_neighbor, deg_neighbor_block, deg_new_block) -
+    //                                partial_entropy(e_new_to_neighbor_post, deg_neighbor_block_post, deg_new_block_post);
+    // }
+
+    // If this group could be connected to the node being moved, 
+    // we need to calculate its portion of the move probability ratio
+    if (e_node_to_neighbor != 0)
+    {
+      // This value will only be non-zero if there are connections to the neighbor
+      // group which is why the if statement requires that. We don't want to waste
+      // time on groups that we won't look at. 
+      const double prop_nodes_edges_to_neighbor = e_node_to_neighbor/deg_node;
+
+      // Prob of making the move itself
+      move_prob += prop_nodes_edges_to_neighbor * prob_move_r_to_s(e_new_to_neighbor, deg_neighbor_block, num_potential_blocks, EPS);
+
+      // Prob of reversing the move after making it
+      rev_move_prob += prop_nodes_edges_to_neighbor * prob_move_r_to_s(e_old_to_neighbor_post, deg_neighbor_block_post, num_potential_blocks, EPS);
+    }
+  }
+
+  const double entropy_delta = pre_move_entropy_portion - post_move_entropy_portion;
+
+  // Portion of accept prob corresponding to entropy change
+  const double entropy_ratio = exp(entropy_delta);
+
+  // Portion of accept prob corresponding to detailed balance
+  const double balance_ratio = move_prob/rev_move_prob;
+
+  // Multiply both together to get the acceptance probability
+  const double acceptance_prob = entropy_ratio*balance_ratio;
+  
+  // std::cout << node->id 
+  //           << "| e_delta = "  << std::to_string(entropy_delta) 
+  //           << "; P_move = " << std::to_string(move_prob)
+  //           << "; P_rev = "  << std::to_string(rev_move_prob) 
+  //           << "; ent_ratio = " << std::to_string(entropy_ratio) 
+  //           << "; bal_ratio = " << std::to_string(balance_ratio)
+  //           << "; P_accept = " << std::to_string(acceptance_prob) 
+  //           << std::endl;
+
+  return Proposal_Res(entropy_delta, acceptance_prob);
 }
 
 // =============================================================================
@@ -218,8 +291,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int level,
         continue;
 
       // Calculate acceptance probability based on posterior changes
-      Proposal_Res proposal_results = make_proposal_decision(curr_node,
-                                                             proposed_new_block);
+      Proposal_Res proposal_results = make_proposal_decision(curr_node, proposed_new_block);
 
       // Is the move accepted?
       if (sampler.draw_unif() < proposal_results.prob_of_accept)
@@ -317,32 +389,22 @@ double SBM::compute_entropy(const int level)
   // Grab all block nodes
   auto block_level = get_level(level + 1);
 
-  double edge_entropy = 0.0;
+  // Turn level into a vector that can be iterated over
+  std::vector<NodePtr> nodes_in_level;
+  nodes_in_level.reserve(block_level->size());
 
-  // Full loop over all block nodes
-  for (auto block_r_it = block_level->begin();
-       block_r_it != block_level->end();
-       block_r_it++)
+  for (auto block_it = block_level->begin();
+            block_it != block_level->end();
+            block_it++)
   {
-    NodePtr block_r = block_r_it->second;
-    // Gather all of block r's edges to our level
-    auto block_r_edge_counts = block_r->gather_edges_to_level(level + 1);
+    nodes_in_level.push_back(block_it->second);
+  }
 
-    // Now loop over all the nodes connected to block r
-    for (auto block_s_it = block_r_edge_counts.begin();
-         block_s_it != block_r_edge_counts.end();
-         block_s_it++)
-    {
-      // Grab total number of edges between r and s
-      double e_rs = block_s_it->second;
-
-      // Compute this iteration's controbution to sum
-      edge_entropy += e_rs * log(e_rs / double(block_r->degree * block_s_it->first->degree));
-    } // end block s loop
-  }   // end block r loop
+  // Now calculate the edge entropy betweeen nodes. 
+  const double edge_entropy = calc_edge_entropy_for_blocks(nodes_in_level);
 
   // Add three components together to return
-  return -1 * (n_total_edges + degree_summation + edge_entropy / 2);
+  return -1 * (n_total_edges + degree_summation + edge_entropy);
 }
 
 // =============================================================================
@@ -462,8 +524,10 @@ Merge_Step SBM::agglomerative_merge(const int block_level,
 
   for (int i = 0; i < move_delta.size(); ++i)
   {
-    // Place this move's results in the queue
-    best_moves.push(std::pair<double, int>(move_delta[i], i));
+    // Place this move's results in the queue. 
+    // The negative here means that when we pop the top value of
+    // the queue we get the smallest value, not the largeset. 
+    best_moves.push(std::pair<double, int>(-move_delta[i], i));
   }
 
   // A set of the unique merges we've made
