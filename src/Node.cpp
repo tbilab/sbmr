@@ -19,8 +19,7 @@ inline void Node::add_edge(const NodePtr node)
   // propigate new edge upwards to all parents
   NodePtr current_node = this_ptr();
   int current_level = level;
-  while (current_node)
-  {
+  while (current_node) {
     // Add node to base edges
     (current_node->edges).push_back(node);
     current_node->degree++;
@@ -39,37 +38,30 @@ void Node::update_edges_from_node(const NodePtr node, const bool remove)
   // Grab list of nodes from node being removed or added we are updating
   const auto changed_node_edges = node->edges;
 
-  // Keep track of which node in the hierarchy is being updated. 
+  // Keep track of which node in the hierarchy is being updated.
   // Starts with this node
   auto node_being_updated = this_ptr();
 
   // While we still have a node to continue to in the hierarchy...
-  while (node_being_updated)
-  {
+  while (node_being_updated) {
     // Loop through all the edges that are being updated...
     // Grab reference to the current nodes edges list
-    std::list<NodePtr> &curr_edges = node_being_updated->edges;
+    std::list<NodePtr>& curr_edges = node_being_updated->edges;
 
-    for (auto &edge_to_update : changed_node_edges)
-    {
-      if (remove)
-      {
+    for (auto& edge_to_update : changed_node_edges) {
+      if (remove) {
         // Scan through this nodes edges untill we find the first instance
         // of the connected node we want to remove
         auto last_place = curr_edges.end();
         for (auto con_it = curr_edges.begin();
              con_it != last_place;
-             con_it++)
-        {
-          if (*con_it == edge_to_update)
-          {
+             con_it++) {
+          if (*con_it == edge_to_update) {
             curr_edges.erase(con_it);
             break;
           }
         }
-      }
-      else
-      {
+      } else {
         // Just add this edge to nodes edges
         curr_edges.push_back(edge_to_update);
       }
@@ -90,14 +82,12 @@ void Node::set_parent(NodePtr parent_node_ptr)
 {
   //PROFILE_FUNCTION();
 
-  if(level != parent_node_ptr->level - 1)
-  {
+  if (level != parent_node_ptr->level - 1) {
     throw std::logic_error("Parent node must be one level above child");
   }
 
   // Remove self from previous parents children list (if it existed)
-  if (parent)
-  {
+  if (parent) {
     // Remove this node's edges contribution from parent's
     parent->update_edges_from_node(this_ptr(), true);
 
@@ -142,9 +132,8 @@ inline NodePtr Node::get_parent_at_level(const int level_of_parent)
 {
   // First we need to make sure that the requested level is not less than that
   // of the current node.
-  if (level_of_parent < level)
-  {
-    std::string error_msg = "Requested parent level (" +std::to_string(level_of_parent) + ") lower than current node level (" + std::to_string(level) + ").";
+  if (level_of_parent < level) {
+    std::string error_msg = "Requested parent level (" + std::to_string(level_of_parent) + ") lower than current node level (" + std::to_string(level) + ").";
     std::cerr << error_msg;
     throw std::logic_error(error_msg);
   }
@@ -152,8 +141,7 @@ inline NodePtr Node::get_parent_at_level(const int level_of_parent)
   // Start with this node as current node
   NodePtr current_node = this_ptr();
 
-  while (current_node->level != level_of_parent)
-  {
+  while (current_node->level != level_of_parent) {
     if (!parent) {
       std::string error_msg = "No parent at level " + std::to_string(level_of_parent) + " for " + id;
       std::cerr << error_msg;
@@ -182,8 +170,7 @@ std::vector<NodePtr> Node::get_edges_to_level(const int desired_level)
 
   // Go through every child node's edges list, find parent at
   // desired level and place in connected nodes vector
-  for (auto edge : edges)
-  {
+  for (auto edge : edges) {
     level_cons.push_back(edge->get_parent_at_level(desired_level));
   }
 
@@ -207,8 +194,7 @@ std::map<NodePtr, int> Node::gather_edges_to_level(const int level)
   // Fill out edge count map
   for (auto curr_edge = all_edges.begin();
        curr_edge != all_edges.end();
-       ++curr_edge)
-  {
+       ++curr_edge) {
     edges_counts[*curr_edge]++;
   }
 
