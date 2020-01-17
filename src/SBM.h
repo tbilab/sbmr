@@ -30,9 +30,11 @@ struct Merge_Step {
 struct Proposal_Res {
   double entropy_delta;
   double prob_of_accept;
-  Proposal_Res(double e, double p)
+  bool   move_accepted;
+  Proposal_Res(const double e, const double p, const bool a)
       : entropy_delta(e)
-      , prob_of_accept(p){};
+      , prob_of_accept(p)
+      , move_accepted(a){};
 };
 
 struct Sweep_Res {
@@ -96,7 +98,7 @@ class SBM : public Network {
   NodePtr propose_move(NodePtr node);
 
   // Make a decision on the proposed new block for node
-  Proposal_Res make_proposal_decision(NodePtr node, NodePtr new_block);
+  Proposal_Res make_proposal_decision(NodePtr node, NodePtr new_block, bool merge_testing);
 
   // Runs efficient MCMC sweep algorithm on desired node level
   MCMC_Sweeps mcmc_sweep(int  level,

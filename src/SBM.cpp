@@ -34,7 +34,8 @@ NodePtr SBM::propose_move(const NodePtr node)
 // Make a decision on the proposed new block for node
 // =============================================================================
 Proposal_Res SBM::make_proposal_decision(const NodePtr node,
-                                         const NodePtr new_block)
+                                         const NodePtr new_block,
+                                         const bool merge_testing = false)
 {
   PROFILE_FUNCTION();
   // The level that this proposal is taking place on
@@ -45,7 +46,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 
   // Make sure we're actually doing something
   if (old_block == new_block) {
-    return Proposal_Res(0.0, 0.0);
+    return Proposal_Res(0.0, 0.0, false);
   }
 
   // What type of nodes does the current node connect to?
@@ -63,7 +64,11 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   const double partial_entropy_pre = compute_node_edge_entropy_partial(old_block_edge_counts_pre, old_block, new_block) + compute_node_edge_entropy_partial(new_block_edge_counts_pre, new_block, old_block);
 
   // Calculate the probability of doing the move to the new node
-  const double prob_move_to_new = calc_prob_of_move(new_block_edge_counts_pre, potential_neighbors, EPS);
+  double prob_move_to_new;
+  if (!merge_testing) {
+    // No need to do this if we're looking at merge results
+    prob_move_to_new = calc_prob_of_move(new_block_edge_counts_pre, potential_neighbors, EPS);
+  }
 
   // Move node to new block
   node->set_parent(new_block);
@@ -75,19 +80,32 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   // Calculate the entropy portion that will change after doing the move
   const double partial_entropy_post = compute_node_edge_entropy_partial(old_block_edge_counts_post, old_block, new_block) + compute_node_edge_entropy_partial(new_block_edge_counts_post, new_block, old_block);
 
-  // Calculate the probability of moving back to the old node
-  const double prob_move_back_to_old = calc_prob_of_move(old_block_edge_counts_post, potential_neighbors, EPS);
-
+  double prob_move_back_to_old;
+  if (!merge_testing) {
+    // Calculate the probability of moving back to the old node
+    prob_move_back_to_old = calc_prob_of_move(old_block_edge_counts_post, potential_neighbors, EPS);
+  }
   // Get difference in entropy values from before and after move
   const double entropy_delta = partial_entropy_pre - partial_entropy_post;
 
-  // Multiply both together to get the acceptance probability
-  const double acceptance_prob = exp(entropy_delta) * (prob_move_to_new / prob_move_back_to_old);
+  bool move_accepted = false;
+  double acceptance_prob = 0;
 
-  // Return the node to the old block
-  node->set_parent(old_block);
+  if (!merge_testing) {
+    // Multiply both together to get the acceptance probability
+    acceptance_prob = exp(entropy_delta) * (prob_move_to_new / prob_move_back_to_old);
 
-  return Proposal_Res(entropy_delta, acceptance_prob);
+    move_accepted = acceptance_prob > 1
+        ? true
+        : sampler.draw_unif() < acceptance_prob;
+  }
+
+  if (!move_accepted | merge_testing) {
+    // Return the node to the old block if move wasn't accepted
+    node->set_parent(old_block);
+  }
+
+  return Proposal_Res(entropy_delta, acceptance_prob, move_accepted);
 }
 
 // =============================================================================
@@ -151,7 +169,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int  level,
       Proposal_Res proposal_results = make_proposal_decision(curr_node, proposed_new_block);
 
       // Is the move accepted?
-      if (sampler.draw_unif() < proposal_results.prob_of_accept) {
+      if (proposal_results.move_accepted) {
         const NodePtr old_block = curr_node->parent;
 
         // Move the node
@@ -339,10 +357,7 @@ Merge_Step SBM::agglomerative_merge(const int block_level,
         continue;
 
       // Calculate entropy delta for move
-      double entropy_delta = make_proposal_decision(
-                                 block.second,
-                                 metablock)
-                                 .entropy_delta;
+      double entropy_delta = make_proposal_decision(block.second, metablock, true).entropy_delta;
 
       from_blocks.push_back(block.second);
       to_blocks.push_back(merge_block);
