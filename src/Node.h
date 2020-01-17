@@ -5,15 +5,15 @@
 #ifndef __NODE_INCLUDED__
 #define __NODE_INCLUDED__
 
-#include <unordered_set>
-#include <queue>
-#include <string>
-#include <vector>
+#include <exception>
+#include <iostream>
 #include <list>
 #include <map>
 #include <memory>
-#include <exception>
-#include <iostream>
+#include <queue>
+#include <string>
+#include <unordered_set>
+#include <vector>
 
 #include "profiling/Instrument.h"
 
@@ -25,29 +25,34 @@ using std::string;
 class Node;
 
 // For a bit of clarity
-typedef std::shared_ptr<Node> NodePtr;
+typedef std::shared_ptr<Node>       NodePtr;
 typedef std::unordered_set<NodePtr> ChildSet;
 
 //=================================
 // Main node class declaration
 //=================================
-class Node : public std::enable_shared_from_this<Node>
-{
-public:
+class Node : public std::enable_shared_from_this<Node> {
+  public:
   // Constructors
   // =========================================================================
 
   // Takes ID, node hiearchy level, and assumes default 0 for type
-  Node(string node_id, int level) : id(node_id),
-                                    level(level),
-                                    type(0),
-                                    degree(0) {}
+  Node(string node_id, int level)
+      : id(node_id)
+      , level(level)
+      , type(0)
+      , degree(0)
+  {
+  }
 
   // Takes the node's id, level, and type.
-  Node(string node_id, int level, int type) : id(node_id),
-                                              level(level),
-                                              type(type),
-                                              degree(0) {}
+  Node(string node_id, int level, int type)
+      : id(node_id)
+      , level(level)
+      , type(type)
+      , degree(0)
+  {
+  }
 
   // Attributes
   // =========================================================================
@@ -65,7 +70,6 @@ public:
   int type;
   // How many edges/ edges does this node have?
   int degree;
-
 
   // Methods
   // =========================================================================
@@ -86,7 +90,7 @@ public:
 
   // Add or remove edges from nodes edge list
   void update_edges_from_node(NodePtr node, bool remove);
- 
+
   // Get parent of node at a given level
   NodePtr get_parent_at_level(int level);
 
@@ -100,7 +104,5 @@ public:
   // Static method to connect two nodes to each other with edge
   static void connect_nodes(NodePtr node_a, NodePtr node_b);
 };
-
-
 
 #endif

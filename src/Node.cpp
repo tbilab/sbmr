@@ -17,8 +17,8 @@ inline void Node::add_edge(const NodePtr node)
   //PROFILE_FUNCTION();
 
   // propigate new edge upwards to all parents
-  NodePtr current_node = this_ptr();
-  int current_level = level;
+  NodePtr current_node  = this_ptr();
+  int     current_level = level;
   while (current_node) {
     // Add node to base edges
     (current_node->edges).push_back(node);
