@@ -22,11 +22,9 @@ inline double compute_node_edge_entropy(const NodePtr node)
   double entropy_sum = 0;
 
   // Next we loop over this edge counts list
-  for (auto neighbor_group_edges = node_edge_counts.begin();
-       neighbor_group_edges != node_edge_counts.end();
-       neighbor_group_edges++) {
-    entropy_sum += partial_entropy(neighbor_group_edges->second,
-                                   (neighbor_group_edges->first)->degree,
+  for (auto const& neighbor_group_edges : node_edge_counts) {
+    entropy_sum += partial_entropy(neighbor_group_edges.second,
+                                   (neighbor_group_edges.first)->degree,
                                    node_degree);
   }
 
@@ -45,19 +43,16 @@ inline double compute_node_edge_entropy_partial(const NodeEdgeMap& node_edge_cou
   double entropy_sum = 0;
 
   // Next we loop over this edge counts list
-  for (auto neighbor_group_edges = node_edge_counts.begin();
-       neighbor_group_edges != node_edge_counts.end();
-       neighbor_group_edges++) {
-    NodePtr neighbor = neighbor_group_edges->first;
+  for (auto const& neighbor_group_edges : node_edge_counts) {
 
     // If the neighbor is a partner or this is a self pair we need to
     // divide the results by two so we don't double count them.
-    const bool neighbor_is_partner = neighbor == partner;
-    const bool is_self_pair        = node == neighbor;
+    const bool neighbor_is_partner = neighbor_group_edges.first == partner;
+    const bool is_self_pair        = node == neighbor_group_edges.first;
     const int  scalar              = (neighbor_is_partner | is_self_pair) ? 2 : 1;
 
-    entropy_sum += partial_entropy(neighbor_group_edges->second,
-                                   neighbor->degree,
+    entropy_sum += partial_entropy(neighbor_group_edges.second,
+                                   neighbor_group_edges.first->degree,
                                    node_degree)
         / scalar;
   }
@@ -77,7 +72,9 @@ inline double calc_prob_of_move(const NodeEdgeMap& to_node_cons,
     const auto count_to_neighbor_it = to_node_cons.find(neighbor);
 
     // If it wasnt found set count to 0, otherwise set it to its value.
-    const double count_to_neighbor = count_to_neighbor_it == to_node_cons.end() ? 0 : count_to_neighbor_it->second;
+    const double count_to_neighbor = count_to_neighbor_it != to_node_cons.end()
+        ? count_to_neighbor_it->second
+        : 0;
 
     // Add on this pair's contribution to probability sum
     prob += ((count_to_neighbor + eps) / (neighbor->degree + (eps * n_possible)));

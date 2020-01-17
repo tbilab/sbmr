@@ -77,11 +77,9 @@ class Rcpp_SBM : public SBM {
     std::vector<string> string_types;
     string_types.reserve(int_types.size());
 
-    for (auto type_it = int_types.begin();
-         type_it != int_types.end();
-         type_it++) {
+    for (auto const& type : int_types) {
       // Convert int to string and push to vector
-      string_types.push_back(type_int_to_string[*type_it]);
+      string_types.push_back(type_int_to_string[type]);
     }
 
     return string_types;
@@ -92,15 +90,12 @@ class Rcpp_SBM : public SBM {
     std::vector<int> int_types;
     int_types.reserve(string_types.size());
 
-    for (auto type_it = string_types.begin();
-         type_it != string_types.end();
-         type_it++) {
-
+    for (auto const& type : string_types) {
       // Make sure that the requested type has been seen by the model already and
       // send message to R if it hasnt.
-      auto loc_of_int_type = type_string_to_int.find(*type_it);
+      auto loc_of_int_type = type_string_to_int.find(type);
       if (loc_of_int_type == type_string_to_int.end()) {
-        stop((*type_it) + " not found in model");
+        stop(type + " not found in model");
       }
       else {
         // Convert string to int and push to vector
@@ -146,11 +141,9 @@ class Rcpp_SBM : public SBM {
     node_ids.reserve(level_data->size());
     node_types.reserve(level_data->size());
     // scan through level and fill in vectors
-    for (auto node_it = level_data->begin();
-         node_it != level_data->end();
-         node_it++) {
-      node_ids.push_back(node_it->first);
-      node_types.push_back(type_int_to_string[node_it->second->type]);
+    for (auto const& node : *level_data) {
+      node_ids.push_back(node.first);
+      node_types.push_back(type_int_to_string[node.second->type]);
     }
 
     return List::create(
@@ -205,21 +198,20 @@ class Rcpp_SBM : public SBM {
   inline void update_pair_tracking_map(std::unordered_map<std::string, Pair_Status>& concensus_pairs,
                                        const std::unordered_set<std::string>&        updated_pairs)
   {
-    for (auto pair_it = concensus_pairs.begin();
-         pair_it != concensus_pairs.end();
-         pair_it++) {
+    for (auto& pair : concensus_pairs) {
+
       // Check if this pair was updated on last sweep
-      auto sweep_change_loc   = updated_pairs.find(pair_it->first);
+      auto sweep_change_loc   = updated_pairs.find(pair.first);
       bool updated_last_sweep = sweep_change_loc != updated_pairs.end();
 
       if (updated_last_sweep) {
         // Update the pair connection status
-        (pair_it->second).connected = !(pair_it->second).connected;
+        pair.second.connected = !(pair.second).connected;
       }
 
       // Increment the counts if needed
-      if ((pair_it->second).connected) {
-        (pair_it->second).times_connected++;
+      if (pair.second.connected) {
+        pair.second.times_connected++;
       }
     }
   }
@@ -279,14 +271,13 @@ class Rcpp_SBM : public SBM {
 
     List entropy_results;
 
-    for (auto step = collapse_results.begin();
-         step != collapse_results.end();
-         step++) {
+    for (auto const& step : collapse_results) {
+
       entropy_results.push_back(
           List::create(
-              _["entropy"]    = step->entropy,
-              _["state"]      = state_to_df(step->state),
-              _["num_blocks"] = step->num_blocks));
+              _["entropy"]    = step.entropy,
+              _["state"]      = state_to_df(step.state),
+              _["num_blocks"] = step.num_blocks));
     }
 
     return entropy_results;
@@ -301,7 +292,7 @@ class Rcpp_SBM : public SBM {
     // if(num_steps <= 0) stop("End number of blocks for collapse run to be higher than start.");
 
     List return_to_r;
-    for (int target_num : block_nums) {
+    for (const int& target_num : block_nums) {
       return_to_r.push_back(
           collapse_blocks(
               node_level,

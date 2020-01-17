@@ -136,17 +136,16 @@ NodeVec Network::get_nodes_from_level(const int  type,
   nodes_to_return.reserve(node_level->size());
 
   // Loop through every node belonging to the desired level
-  for (auto node_it = node_level->begin();
-       node_it != node_level->end();
-       ++node_it) {
+  for (auto const& node : *node_level) {
+    
     // Decide to keep the node or not based on if it matches or doesn't and our
     // keeping preferance
-    bool keep_node = match_type ? (node_it->second->type == type)
-                                : (node_it->second->type != type);
+    bool keep_node = match_type ? (node.second->type == type)
+                                : (node.second->type != type);
 
     if (keep_node) {
       // ...Place it in returning list
-      nodes_to_return.push_back(node_it->second);
+      nodes_to_return.push_back(node.second);
     }
   }
 
@@ -179,9 +178,7 @@ void Network::add_edge(const string node1_id, const string node2_id)
 void Network::add_edge(const NodePtr node1, const NodePtr node2)
 {
   PROFILE_FUNCTION();
-  Node::connect_nodes(
-      node1,
-      node2);
+  Node::connect_nodes(node1, node2);
 };
 
 // =============================================================================
@@ -229,26 +226,23 @@ void Network::initialize_blocks(const int num_blocks, const int level)
   // If we're randomly distributing nodes, we'll use this map to sample a random
   // block for a given node by its type
   if (!one_block_per_node) {
-    for (auto type_it = node_type_counts.begin();
-         type_it != node_type_counts.end();
-         type_it++) {
+    for (auto const& type : node_type_counts) {
       // Reserve proper number of slots for new blocks
-      type_to_blocks[type_it->first].reserve(num_blocks);
+      type_to_blocks[type.first].reserve(num_blocks);
 
       // Buid new blocks to fill those slots
       for (int i = 0; i < num_blocks; i++) {
         // build a block node at the next level
-        type_to_blocks[type_it->first].push_back(create_block_node(type_it->first, level + 1));
+        type_to_blocks[type.first].push_back(create_block_node(type.first, level + 1));
       }
     }
   }
 
   // Loop through every node in the level and assign it its new parent
   // Loop through each of the nodes,
-  for (auto node_it = node_level->begin();
-       node_it != node_level->end();
-       ++node_it) {
-    const int node_type = node_it->second->type;
+  for (auto const& node : *node_level) {
+
+    const int node_type = node.second->type;
 
     // build a block node at the next level
     // We either build a new block for node if we're giving each node a block
@@ -256,7 +250,7 @@ void Network::initialize_blocks(const int num_blocks, const int level)
     NodePtr new_block = one_block_per_node ? create_block_node(node_type, level + 1) : block_sampler.sample(type_to_blocks[node_type]);
 
     // assign that block node to the node
-    node_it->second->set_parent(new_block);
+    node.second->set_parent(new_block);
   }
 }
 
@@ -290,25 +284,22 @@ NodeVec Network::clean_empty_blocks()
     std::queue<string> blocks_to_delete;
 
     // Loop through every node at level
-    for (auto block_it = block_level->begin();
-         block_it != block_level->end();
-         ++block_it) {
-      NodePtr current_block = block_it->second;
+    for (auto const& block : *block_level) {
 
       // If there are no children for the current block
-      if (current_block->children.size() == 0) {
+      if (block.second->children.size() == 0) {
         // Remove block from children of its parent (if it has one)
-        if (current_block->parent) {
-          current_block->parent->remove_child(current_block);
+        if (block.second->parent) {
+          block.second->parent->remove_child(block.second);
         }
 
-        blocks_removed.push_back(current_block);
+        blocks_removed.push_back(block.second);
 
         // Add current block to the removal list
-        blocks_to_delete.push(current_block->id);
+        blocks_to_delete.push(block.second->id);
 
         // Remove nodes contribution to node counts map
-        node_type_counts[current_block->type][level]--;
+        node_type_counts[block.second->type][level]--;
       }
     }
 
@@ -339,15 +330,10 @@ State_Dump Network::get_state()
   // Keep track of how many nodes we've seen so we can preallocate vector sizes
   int n_nodes_seen = 0;
 
-  // Loop through all the levels present in Network
-  for (auto level_it = nodes.begin();
-       level_it != nodes.end();
-       ++level_it) {
-    int      level      = level_it->first;
-    LevelPtr node_level = level_it->second;
+  for (auto const& level : nodes) {
 
     // Add level's nodes to current total
-    n_nodes_seen += node_level->size();
+    n_nodes_seen += level.second->size();
 
     // Update sizes of the state vectors
     state.id.reserve(n_nodes_seen);
@@ -356,20 +342,17 @@ State_Dump Network::get_state()
     state.type.reserve(n_nodes_seen);
 
     // Loop through each node in level
-    for (auto node_it = node_level->begin();
-         node_it != node_level->end();
-         ++node_it) {
-      // Get currrent node
-      NodePtr current_node = node_it->second;
+    for (auto const& node : *level.second) {
 
       // Dump all its desired info into its element in the state vectors
-      state.id.push_back(current_node->id);
-      state.level.push_back(level);
-      state.type.push_back(current_node->type);
+      state.id.push_back(node.second->id);
+      state.level.push_back(level.first);
+      state.type.push_back(node.second->type);
 
       // Record parent if node has one
-      state.parent.push_back(
-          current_node->parent ? current_node->parent->id : "none");
+      state.parent.push_back(node.second->parent
+                                 ? node.second->parent->id
+                                 : "none");
 
     } // End node loop
   }   // End level loop

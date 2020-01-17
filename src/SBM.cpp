@@ -12,13 +12,10 @@ NodePtr SBM::propose_move(const NodePtr node)
   const int block_level = node->level + 1;
 
   // Grab a list of all the blocks that the node could join
-  const NodeVec potential_blocks = get_nodes_of_type_at_level(
-      node->type,
-      block_level);
+  const NodeVec potential_blocks = get_nodes_of_type_at_level(node->type, block_level);
 
   // Sample a random neighbor of the current node
-  const NodePtr rand_neighbor = sampler.sample(
-      node->get_edges_to_level(node->level));
+  const NodePtr rand_neighbor = sampler.sample(node->get_edges_to_level(node->level));
 
   // Get number total number edges for neighbor's block
   const int neighbor_block_degree = rand_neighbor->parent->degree;
@@ -28,7 +25,9 @@ NodePtr SBM::propose_move(const NodePtr node)
   const double prob_of_random_block = ergo_amnt / (neighbor_block_degree + ergo_amnt);
 
   // Decide where we will get new block from and draw from potential candidates
-  return sampler.draw_unif() < prob_of_random_block ? sampler.sample(potential_blocks) : sampler.sample(rand_neighbor->get_edges_to_level(block_level));
+  return sampler.draw_unif() < prob_of_random_block
+      ? sampler.sample(potential_blocks)
+      : sampler.sample(rand_neighbor->get_edges_to_level(block_level));
 }
 
 // =============================================================================
@@ -130,8 +129,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int  level,
     std::unordered_set<std::string> pair_moves;
 
     // Loop through each node
-    for (auto node_it = node_vec.begin(); node_it != node_vec.end(); ++node_it) {
-      const NodePtr curr_node = *node_it;
+    for (const NodePtr& curr_node : node_vec) {
 
       // Check if we're running sweep with variable block numbers. If we are, we
       // need to add a new block as a potential for the node to enter
@@ -145,8 +143,9 @@ MCMC_Sweeps SBM::mcmc_sweep(const int  level,
 
       // If the propsosed block is the nodes current block, we don't need to waste
       // time checking because decision will always result in same state.
-      if (curr_node->parent->id == proposed_new_block->id)
+      if (curr_node->parent->id == proposed_new_block->id) {
         continue;
+      }
 
       // Calculate acceptance probability based on posterior changes
       Proposal_Res proposal_results = make_proposal_decision(curr_node, proposed_new_block);
@@ -209,10 +208,8 @@ double SBM::compute_entropy(const int level)
 
   // Grab pointer to current level and start loop
   LevelPtr node_level = get_level(level);
-  for (auto node_it = node_level->begin();
-       node_it != node_level->end();
-       ++node_it) {
-    int node_degree = node_it->second->degree;
+  for (auto const& node : *node_level) {
+    int node_degree = node.second->degree;
     n_total_edges += node_degree;
     n_nodes_w_degree[node_degree]++;
   }
@@ -225,12 +222,9 @@ double SBM::compute_entropy(const int level)
 
   // Calculate first component (sum of node degree counts portion)
   double degree_summation = 0.0;
-  for (auto degree_count = n_nodes_w_degree.begin();
-       degree_count != n_nodes_w_degree.end();
-       ++degree_count) {
-
+  for (auto const& degree_count : n_nodes_w_degree) {
     // Using std's built in lgamma here: lgamma(x + 1) = log(x!)
-    degree_summation += degree_count->second * lgamma(degree_count->first + 1);
+    degree_summation += degree_count.second * lgamma(degree_count.first + 1);
   }
 
   //============================================================================
@@ -245,16 +239,14 @@ double SBM::compute_entropy(const int level)
   NodeVec nodes_in_level;
   nodes_in_level.reserve(block_level->size());
 
-  for (auto block_it = block_level->begin();
-       block_it != block_level->end();
-       block_it++) {
-    nodes_in_level.push_back(block_it->second);
+  for (auto const& block : *block_level) {
+    nodes_in_level.push_back(block.second);
   }
 
   // Now calculate the edge entropy betweeen nodes.
   double edge_entropy = 0.0;
 
-  for (auto block_r : nodes_in_level) {
+  for (const auto& block_r : nodes_in_level) {
     edge_entropy += compute_node_edge_entropy(block_r);
   }
 
@@ -272,7 +264,7 @@ void SBM::merge_blocks(NodePtr block_a, NodePtr block_b)
   // Place all the members of block b under block a
   auto children_to_move = block_b->children;
 
-  for (NodePtr member_node : children_to_move) {
+  for (const NodePtr& member_node : children_to_move) {
     member_node->set_parent(block_a);
   }
 }
@@ -317,10 +309,7 @@ Merge_Step SBM::agglomerative_merge(const int block_level,
   }
 
   // Loop over each block and find best merge option
-  for (auto block_it = all_blocks->begin();
-       block_it != all_blocks->end();
-       block_it++) {
-    NodePtr curr_block = block_it->second;
+  for (const auto& block : *all_blocks) {
 
     NodeVec metablocks_to_search;
 
@@ -328,34 +317,34 @@ Merge_Step SBM::agglomerative_merge(const int block_level,
     // add every possible block to the blocks-to-search list
     if (GREEDY) {
       // Get a list of all the potential merges for block
-      metablocks_to_search = get_nodes_of_type_at_level(curr_block->type, meta_level);
+      metablocks_to_search = get_nodes_of_type_at_level(block.second->type, meta_level);
     }
     else {
       metablocks_to_search.reserve(N_CHECKS_PER_block);
       // Otherwise, we should sample a given number of blocks to check
       for (int i = 0; i < N_CHECKS_PER_block; i++) {
         // Sample a block from potential blocks
-        metablocks_to_search.push_back(propose_move(curr_block));
+        metablocks_to_search.push_back(propose_move(block.second));
       }
     }
 
     // Now that we have gathered all the merges to check, we can loop
     // through them and check entropy changes
-    for (NodePtr metablock : metablocks_to_search) {
+    for (const NodePtr& metablock : metablocks_to_search) {
       // Get block that the metablock belongs to
       NodePtr merge_block = *((metablock->children).begin());
 
       // Skip block if it is the current block for this node
-      if (merge_block->id == curr_block->id)
+      if (merge_block->id == block.second->id)
         continue;
 
       // Calculate entropy delta for move
       double entropy_delta = make_proposal_decision(
-                                 curr_block,
+                                 block.second,
                                  metablock)
                                  .entropy_delta;
 
-      from_blocks.push_back(curr_block);
+      from_blocks.push_back(block.second);
       to_blocks.push_back(merge_block);
       move_delta.push_back(entropy_delta);
     }

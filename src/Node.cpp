@@ -20,6 +20,7 @@ inline void Node::add_edge(const NodePtr node)
   // propigate new edge upwards to all parents
   NodePtr current_node  = this_ptr();
   int     current_level = level;
+  
   while (current_node) {
     // Add node to base edges
     (current_node->edges).push_back(node);
@@ -49,7 +50,7 @@ void Node::update_edges_from_node(const NodePtr node, const bool remove)
     // Grab reference to the current nodes edges list
     NodeList& curr_edges = node_being_updated->edges;
 
-    for (auto& edge_to_update : changed_node_edges) {
+    for (const auto& edge_to_update : changed_node_edges) {
       if (remove) {
         // Scan through this nodes edges untill we find the first instance
         // of the connected node we want to remove
@@ -172,7 +173,7 @@ NodeVec Node::get_edges_to_level(const int desired_level)
 
   // Go through every child node's edges list, find parent at
   // desired level and place in connected nodes vector
-  for (auto edge : edges) {
+  for (const auto& edge : edges) {
     level_cons.push_back(edge->get_parent_at_level(desired_level));
   }
 
@@ -194,10 +195,8 @@ NodeEdgeMap Node::gather_edges_to_level(const int level)
   NodeEdgeMap edges_counts;
 
   // Fill out edge count map
-  for (auto curr_edge = all_edges.begin();
-       curr_edge != all_edges.end();
-       ++curr_edge) {
-    edges_counts[*curr_edge]++;
+  for (const NodePtr& curr_edge : all_edges) {
+    edges_counts[curr_edge]++;
   }
 
   return edges_counts;

@@ -85,10 +85,8 @@ void Sampler::shuffle_nodes(NodeVec&                                          no
   node_vec.clear();
 
   // Fill in vector with map elements
-  for (auto node_it = node_map->begin();
-       node_it != node_map->end();
-       node_it++) {
-    node_vec.push_back(node_it->second);
+  for (auto const& node : *node_map) {
+    node_vec.push_back(node.second);
   }
 
   // Shuffle node order
