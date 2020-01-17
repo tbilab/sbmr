@@ -8,12 +8,9 @@
 
 int main(int argc, char** argv)
 {
-  int num_sweeps = 2;
-
   Sampler random(312);
-
-  // Setup a simulated SBM model
-  SBM my_SBM = build_unipartite_simulated();
+  int     num_sweeps = 2;
+  SBM     my_SBM     = build_unipartite_simulated(); // Setup a simulated SBM model
 
   // Give it some random groupings of the correct number of groups
   my_SBM.initialize_blocks(3, 0);
