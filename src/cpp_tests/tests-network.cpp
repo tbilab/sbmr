@@ -1,5 +1,5 @@
 #include "../Network.h"
-#include "../print_helpers.h"
+#include "print_helpers.h"
 #include "catch.hpp"
 
 #include <iomanip>

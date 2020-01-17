@@ -1,5 +1,5 @@
 #include "../SBM.h"
-#include "../print_helpers.h"
+#include "print_helpers.h"
 #include "catch.hpp"
 #include "network_builders.cpp"
 

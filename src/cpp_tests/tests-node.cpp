@@ -1,5 +1,5 @@
 #include "../Node.h"
-#include "../print_helpers.h"
+#include "print_helpers.h"
 #include "catch.hpp"
 
 // Smart pointer to node instance
