@@ -1,0 +1,11 @@
+BasedOnStyle: WebKit
+UseTab: Never
+IndentWidth: 2
+AlignAfterOpenBracket: Align
+AlignConsecutiveDeclarations: true
+AlignConsecutiveAssignments: true
+AllowShortIfStatementsOnASingleLine: true
+AlignTrailingComments: true
+BreakBeforeTernaryOperators: true
+BreakBeforeBraces: Stroustrup
+IncludeBlocks: Regroup
