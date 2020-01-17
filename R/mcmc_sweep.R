@@ -17,6 +17,9 @@
 #'   constant?
 #' @param track_pairs Return a dataframe with all pairs of nodes along with the
 #'   number of sweeps they shared the same group?
+#' @param verbose If set to `TRUE` then each proposed move for all sweeps will
+#'   have information given on entropy delta, probability of moving, and if the
+#'   move were accepted printed to the console.
 #'
 #' @return List with two dataframes. The first telling for all sweeps everytime
 #'   a node was moved and what group it was moved to. The second telling for
@@ -46,12 +49,13 @@
 #' # Get idea of node-pair similarity by looking at how often every pair of nodes is connected over sweeps
 #' my_sbm %>% mcmc_sweep(num_sweeps = 4, track_pairs = TRUE)
 #'
-mcmc_sweep <- function(sbm, num_sweeps = 1, variable_num_blocks = TRUE, track_pairs = FALSE, level = 0){
+mcmc_sweep <- function(sbm, num_sweeps = 1, variable_num_blocks = TRUE, track_pairs = FALSE, level = 0, verbose = FALSE){
 
   results <- sbm$mcmc_sweep(as.integer(level),
                  as.integer(num_sweeps),
                  variable_num_blocks,
-                 track_pairs)
+                 track_pairs,
+                 verbose)
 
   if (track_pairs) {
     # Clean up pair connections results
