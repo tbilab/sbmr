@@ -1,4 +1,5 @@
 # Helper to get number of blocks from a given state
+library(dplyr)
 get_num_blocks <- function(sbm){
   sbm %>%
     get_state() %>%
@@ -118,16 +119,14 @@ test_that("Number of block changes is accurate", {
     # Get reported number of nodes moved
     n_nodes_moved <- sweep_res$sweep_info$num_nodes_moved
 
+    new_state <- my_sbm %>% get_node_to_group_pair()
+
+
     # Compare new state and old state
-    num_common_pairs <- my_sbm %>%
-      get_node_to_group_pair() %>%
+    num_common_pairs <- new_state %>%
       dplyr::inner_join(original_state, by = c("id", "parent")) %>%
       nrow()
 
-    expect_equal(
-      num_common_pairs,
-      n_nodes - n_nodes_moved
-    )
 
   }
 
