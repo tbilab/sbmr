@@ -68,12 +68,12 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   // Calculate the entropy portion that will change from move for before the move
   const double partial_entropy_pre = compute_node_edge_entropy_partial(old_block_edge_counts_pre, old_block, new_block) + compute_node_edge_entropy_partial(new_block_edge_counts_pre, new_block, old_block);
 
-  // Calculate the probability of doing the move to the new node
-  double prob_move_to_new;
-  if (!merge_testing) {
-    // No need to do this if we're looking at merge results
-    prob_move_to_new = calc_prob_of_move(new_block_edge_counts_pre, potential_neighbors, node_edges_to_neighbor_blocks, node_degree, EPS);
-  }
+  // // Calculate the probability of doing the move to the new node
+  // double prob_move_to_new;
+  // if (!merge_testing) {
+  //   // No need to do this if we're looking at merge results
+  //   prob_move_to_new = calc_prob_of_move(new_block_edge_counts_pre, potential_neighbors, node_edges_to_neighbor_blocks, node_degree, EPS);
+  // }
 
   // Move node to new block
   node->set_parent(new_block);
@@ -85,20 +85,28 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   // Calculate the entropy portion that will change after doing the move
   const double partial_entropy_post = compute_node_edge_entropy_partial(old_block_edge_counts_post, old_block, new_block) + compute_node_edge_entropy_partial(new_block_edge_counts_post, new_block, old_block);
 
-  double prob_move_back_to_old;
-  if (!merge_testing) {
-    // Calculate the probability of moving back to the old node
-    prob_move_back_to_old = calc_prob_of_move(old_block_edge_counts_post, potential_neighbors, node_edges_to_neighbor_blocks, node_degree, EPS);
-  }
+  // double prob_move_back_to_old;
+  // if (!merge_testing) {
+  //   // Calculate the probability of moving back to the old node
+  //   prob_move_back_to_old = calc_prob_of_move(old_block_edge_counts_post, potential_neighbors, node_edges_to_neighbor_blocks, node_degree, EPS);
+  // }
   // Get difference in entropy values from before and after move
   const double entropy_delta = partial_entropy_pre - partial_entropy_post;
 
-  bool move_accepted = false;
+  bool   move_accepted   = false;
   double acceptance_prob = 0;
 
   if (!merge_testing) {
-    // Multiply both together to get the acceptance probability
-    acceptance_prob = exp(-entropy_delta) * (prob_move_back_to_old/ prob_move_to_new);
+    acceptance_prob = calc_prob_of_move(new_block_edge_counts_pre,
+                                        old_block_edge_counts_post,
+                                        node_edges_to_neighbor_blocks,
+                                        potential_neighbors,
+                                        node_degree,
+                                        EPS)
+        * exp(-entropy_delta);
+
+    // // Multiply both together to get the acceptance probability
+    // acceptance_prob = exp(-entropy_delta) * (prob_move_back_to_old/ prob_move_to_new);
 
     move_accepted = acceptance_prob > 1
         ? true
