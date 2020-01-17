@@ -60,24 +60,34 @@ inline double compute_node_edge_entropy_partial(const NodeEdgeMap& node_edge_cou
   return entropy_sum;
 }
 
-inline double calc_prob_of_move(const NodeEdgeMap& to_node_cons,
+inline double calc_prob_of_move(const NodeEdgeMap& to_block_cons,
                                 const NodeVec&     possible_neighbors,
+                                const NodeEdgeMap& moved_node_cons,
+                                const double       node_degree,
                                 const double       eps)
 {
   double       prob       = 0;
   const double n_possible = possible_neighbors.size();
 
-  for (NodePtr neighbor : possible_neighbors) {
-    // Search the node being moved to's connections for the current neighbor
-    const auto count_to_neighbor_it = to_node_cons.find(neighbor);
+  for (const NodePtr& neighbor : possible_neighbors) {
+    // First check if node being moved has any connections to this block
+    const auto node_to_neighbor_it = moved_node_cons.find(neighbor);
 
-    // If it wasnt found set count to 0, otherwise set it to its value.
-    const double count_to_neighbor = count_to_neighbor_it != to_node_cons.end()
-        ? count_to_neighbor_it->second
-        : 0;
+    // If there are connections we can continue, otherwise result will be 0
+    if (node_to_neighbor_it != moved_node_cons.end()) {
+      // Search the node being moved to's connections for the current neighbor
+      const auto count_to_neighbor_it = to_block_cons.find(neighbor);
 
-    // Add on this pair's contribution to probability sum
-    prob += ((count_to_neighbor + eps) / (neighbor->degree + (eps * n_possible)));
+      // If it wasnt found set count to 0, otherwise set it to its value.
+      const double count_to_neighbor = count_to_neighbor_it != to_block_cons.end()
+          ? count_to_neighbor_it->second
+          : 0;
+
+      const double prop_node_edges_to_neighbor = double(node_to_neighbor_it->second) / node_degree;
+
+      // Add on this pair's contribution to probability sum
+      prob += prop_node_edges_to_neighbor * ((count_to_neighbor + eps) / (neighbor->degree + (eps * n_possible)));
+    }
   }
 
   return prob;
