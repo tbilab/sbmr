@@ -47,7 +47,7 @@ void Node::update_edges_from_node(const NodePtr node, const bool remove)
   while (node_being_updated) {
     // Loop through all the edges that are being updated...
     // Grab reference to the current nodes edges list
-    std::list<NodePtr>& curr_edges = node_being_updated->edges;
+    NodeList& curr_edges = node_being_updated->edges;
 
     for (auto& edge_to_update : changed_node_edges) {
       if (remove) {
@@ -163,11 +163,11 @@ inline NodePtr Node::get_parent_at_level(const int level_of_parent)
 // We return a vector because we need random access to elements in this array
 // and that isn't provided to us with the list format.
 // =============================================================================
-std::vector<NodePtr> Node::get_edges_to_level(const int desired_level)
+NodeVec Node::get_edges_to_level(const int desired_level)
 {
   //PROFILE_FUNCTION();
   // Vector to return containing parents at desired level for edges
-  std::vector<NodePtr> level_cons;
+  NodeVec level_cons;
   level_cons.reserve(edges.size());
 
   // Go through every child node's edges list, find parent at
@@ -183,15 +183,15 @@ std::vector<NodePtr> Node::get_edges_to_level(const int desired_level)
 // Collapse a nodes edge to a given level into a map of
 // connected block id->count
 // =============================================================================
-std::map<NodePtr, int> Node::gather_edges_to_level(const int level)
+NodeEdgeMap Node::gather_edges_to_level(const int level)
 {
   // PROFILE_FUNCTION();
   // Gather all edges from the moved node to the level of the blocks we're
   // working with
-  std::vector<NodePtr> all_edges = get_edges_to_level(level);
+  NodeVec all_edges = get_edges_to_level(level);
 
   // Setup an edge count map for node
-  std::map<NodePtr, int> edges_counts;
+  NodeEdgeMap edges_counts;
 
   // Fill out edge count map
   for (auto curr_edge = all_edges.begin();

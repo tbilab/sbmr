@@ -66,13 +66,13 @@ TEST_CASE("Node list and vector sampling", "[Sampler]")
   NodePtr n3 = std::make_shared<Node>("n3", 0, 1);
 
   // Add three nodes to a list
-  std::list<NodePtr> nodes_list;
+  NodeList nodes_list;
   nodes_list.push_back(n1);
   nodes_list.push_back(n2);
   nodes_list.push_back(n3);
 
   // Add three nodes to vector
-  std::vector<NodePtr> nodes_vec;
+  NodeVec nodes_vec;
   nodes_vec.push_back(n1);
   nodes_vec.push_back(n2);
   nodes_vec.push_back(n3);

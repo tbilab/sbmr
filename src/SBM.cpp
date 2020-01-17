@@ -1,4 +1,5 @@
 #include "SBM.h"
+
 #include "sbm_helpers.h"
 
 // =============================================================================
@@ -11,7 +12,7 @@ NodePtr SBM::propose_move(const NodePtr node)
   const int block_level = node->level + 1;
 
   // Grab a list of all the blocks that the node could join
-  const std::vector<NodePtr> potential_blocks = get_nodes_of_type_at_level(
+  const NodeVec potential_blocks = get_nodes_of_type_at_level(
       node->type,
       block_level);
 
@@ -27,9 +28,7 @@ NodePtr SBM::propose_move(const NodePtr node)
   const double prob_of_random_block = ergo_amnt / (neighbor_block_degree + ergo_amnt);
 
   // Decide where we will get new block from and draw from potential candidates
-  return sampler.draw_unif() < prob_of_random_block ? 
-  sampler.sample(potential_blocks) : 
-  sampler.sample(rand_neighbor->get_edges_to_level(block_level));
+  return sampler.draw_unif() < prob_of_random_block ? sampler.sample(potential_blocks) : sampler.sample(rand_neighbor->get_edges_to_level(block_level));
 }
 
 // =============================================================================
@@ -54,12 +53,12 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   const int connections_type = (node->edges).front()->type;
 
   // Get vector of all nodes of the desired type at the block level
-  std::vector<NodePtr> potential_neighbors = get_nodes_of_type_at_level(connections_type, block_level);
+  NodeVec potential_neighbors = get_nodes_of_type_at_level(connections_type, block_level);
 
   // Gather edge entropy values corresponding to the pre-move state from both
   // the new and old block
-  const std::map<NodePtr, int> old_block_edge_counts_pre = old_block->gather_edges_to_level(block_level);
-  const std::map<NodePtr, int> new_block_edge_counts_pre = new_block->gather_edges_to_level(block_level);
+  const NodeEdgeMap old_block_edge_counts_pre = old_block->gather_edges_to_level(block_level);
+  const NodeEdgeMap new_block_edge_counts_pre = new_block->gather_edges_to_level(block_level);
 
   // Calculate the entropy portion that will change from move for before the move
   const double partial_entropy_pre = compute_node_edge_entropy_partial(old_block_edge_counts_pre, old_block, new_block) + compute_node_edge_entropy_partial(new_block_edge_counts_pre, new_block, old_block);
@@ -71,8 +70,8 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   node->set_parent(new_block);
 
   // Gather the new entropy portions from the two blocks
-  const std::map<NodePtr, int> old_block_edge_counts_post = old_block->gather_edges_to_level(block_level);
-  const std::map<NodePtr, int> new_block_edge_counts_post = new_block->gather_edges_to_level(block_level);
+  const NodeEdgeMap old_block_edge_counts_post = old_block->gather_edges_to_level(block_level);
+  const NodeEdgeMap new_block_edge_counts_post = new_block->gather_edges_to_level(block_level);
 
   // Calculate the entropy portion that will change after doing the move
   const double partial_entropy_post = compute_node_edge_entropy_partial(old_block_edge_counts_post, old_block, new_block) + compute_node_edge_entropy_partial(new_block_edge_counts_post, new_block, old_block);
@@ -116,7 +115,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int  level,
   const LevelPtr node_map = get_level(level);
 
   // Initialize vector to hold nodes in order of pass through for a sweep.
-  std::vector<NodePtr> node_vec;
+  NodeVec node_vec;
   node_vec.reserve(node_map->size());
 
   for (int i = 0; i < num_sweeps; i++) {
@@ -177,7 +176,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int  level,
                                                 pair_moves);
         }
       } // End accepted if statement
-    } // End current sweep
+    }   // End current sweep
 
     // Update results for this sweep
     results.sweep_num_nodes_moved.push_back(num_nodes_moved);
@@ -243,7 +242,7 @@ double SBM::compute_entropy(const int level)
   auto block_level = get_level(level + 1);
 
   // Turn level into a vector that can be iterated over
-  std::vector<NodePtr> nodes_in_level;
+  NodeVec nodes_in_level;
   nodes_in_level.reserve(block_level->size());
 
   for (auto block_it = block_level->begin();
@@ -300,9 +299,9 @@ Merge_Step SBM::agglomerative_merge(const int block_level,
   LevelPtr all_blocks = get_level(block_level);
 
   // Build vectors for recording merges
-  std::vector<NodePtr> from_blocks;
-  std::vector<NodePtr> to_blocks;
-  std::vector<double>  move_delta;
+  NodeVec             from_blocks;
+  NodeVec             to_blocks;
+  std::vector<double> move_delta;
 
   const int size_to_return = N_CHECKS_PER_block * all_blocks->size();
   from_blocks.reserve(size_to_return);
@@ -323,14 +322,15 @@ Merge_Step SBM::agglomerative_merge(const int block_level,
        block_it++) {
     NodePtr curr_block = block_it->second;
 
-    std::vector<NodePtr> metablocks_to_search;
+    NodeVec metablocks_to_search;
 
     // If we're running algorithm in greedy mode we should just
     // add every possible block to the blocks-to-search list
     if (GREEDY) {
       // Get a list of all the potential merges for block
       metablocks_to_search = get_nodes_of_type_at_level(curr_block->type, meta_level);
-    } else {
+    }
+    else {
       metablocks_to_search.reserve(N_CHECKS_PER_block);
       // Otherwise, we should sample a given number of blocks to check
       for (int i = 0; i < N_CHECKS_PER_block; i++) {
@@ -478,7 +478,8 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int  node_level,
       merge_results = agglomerative_merge(
           block_level,
           num_merges);
-    } catch (...) {
+    }
+    catch (...) {
       std::cerr << "Collapsibility limit of network reached so we break early\n"
                 << "There are currently " << curr_num_blocks << " blocks left.\n";
 

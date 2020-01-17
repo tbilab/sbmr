@@ -39,7 +39,7 @@ inline std::string print_ids_to_string(std::vector<std::string> node_ids)
 
 // =======================================================
 // List Version
-inline std::string print_node_ids(std::list<NodePtr> nodes)
+inline std::string print_node_ids(NodeList nodes)
 {
   // Vector of node ids to be filled in
   std::vector<std::string> node_ids;
@@ -56,7 +56,7 @@ inline std::string print_node_ids(std::list<NodePtr> nodes)
 }
 
 // Set Version
-inline std::string print_node_ids(std::unordered_set<NodePtr> nodes)
+inline std::string print_node_ids(ChildSet nodes)
 {
   // Vector of node ids to be filled in
   std::vector<std::string> node_ids;
@@ -73,7 +73,7 @@ inline std::string print_node_ids(std::unordered_set<NodePtr> nodes)
 }
 
 // Vector Version
-inline std::string print_node_ids(std::vector<NodePtr> nodes)
+inline std::string print_node_ids(NodeVec nodes)
 {
   // Vector of node ids to be filled in
   std::vector<std::string> node_ids;

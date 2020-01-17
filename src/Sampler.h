@@ -32,31 +32,19 @@ class Sampler {
 
   // Attributes
   // ===========================================================================
-  // Generates random integers
-  rand_int_gen int_gen;
-
-  // Generates random uniforms
-  rand_unif_gen unif_gen;
+  rand_int_gen  int_gen;  // Generates random integers
+  rand_unif_gen unif_gen; // Generates random uniforms
 
   // ==========================================
   // Methods
-  // Sets stuff up for us, used to decide if we want to have
-  // deterministic seeding
-  void initialize_seed(int random_seed);
 
-  // Return random uniform value between 0 and 1.
-  double draw_unif();
+  void    initialize_seed(int random_seed); // Used to decide if we want to have deterministic seeding
+  double  draw_unif();                      // Return random uniform value between 0 and 1.
+  int     sample(int max_val);              // Sample from discrete random uniform from 0 to max
+  NodePtr sample(NodeList nodes_to_sample); // Sample random node from a list of nodes
+  NodePtr sample(NodeVec nodes_to_sample);  // Sample random node from vector of nodes
 
-  // Sample from discrete random uniform from 0 to max
-  int sample(int max_val);
-
-  // Sample random node from a list of nodes
-  NodePtr sample(std::list<NodePtr> nodes_to_sample);
-
-  // Sample random node from vector of nodes
-  NodePtr sample(std::vector<NodePtr> nodes_to_sample);
-
-  static void shuffle_nodes(std::vector<NodePtr>&                             node_vec,
+  static void shuffle_nodes(NodeVec&                                          node_vec,
                             const std::shared_ptr<std::map<string, NodePtr>>& node_map,
                             std::mt19937&                                     sampler);
 };

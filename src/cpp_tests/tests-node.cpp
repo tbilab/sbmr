@@ -89,7 +89,7 @@ TEST_CASE("Gathering edge counts to a level", "[Node]")
   Node::connect_nodes(a3, b3);
 
   // Gather all the edges from node a1 to level 1
-  std::map<NodePtr, int> a1_to_l1 = a1->gather_edges_to_level(1);
+  NodeEdgeMap a1_to_l1 = a1->gather_edges_to_level(1);
 
   REQUIRE(
       a1_to_l1[b11] == 2);
@@ -98,7 +98,7 @@ TEST_CASE("Gathering edge counts to a level", "[Node]")
       a1_to_l1[b12] == 0);
 
   // now a3 to l1
-  std::map<NodePtr, int> a3_to_l1 = a3->gather_edges_to_level(1);
+  NodeEdgeMap a3_to_l1 = a3->gather_edges_to_level(1);
 
   REQUIRE(
       a3_to_l1[b11] == 1);
@@ -107,7 +107,7 @@ TEST_CASE("Gathering edge counts to a level", "[Node]")
       a3_to_l1[b12] == 1);
 
   // now b2 to l1
-  std::map<NodePtr, int> b2_to_l1 = b2->gather_edges_to_level(1);
+  NodeEdgeMap b2_to_l1 = b2->gather_edges_to_level(1);
 
   REQUIRE(
       b2_to_l1[a11] == 1);
@@ -116,7 +116,7 @@ TEST_CASE("Gathering edge counts to a level", "[Node]")
       b2_to_l1[a12] == 2);
 
   // Last b11 to a21
-  std::map<NodePtr, int> b11_to_l2 = b11->gather_edges_to_level(2);
+  NodeEdgeMap b11_to_l2 = b11->gather_edges_to_level(2);
 
   REQUIRE(
       b11_to_l2[a21] == 5);

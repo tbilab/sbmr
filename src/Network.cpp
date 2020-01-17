@@ -115,9 +115,9 @@ NodePtr Network::create_block_node(const int type, const int level)
 // nodes returned are of the same type as specified, otherwise the nodes
 // returned are _not_ of the same type.
 // =============================================================================
-std::vector<NodePtr> Network::get_nodes_from_level(const int  type,
-                                                   const int  level,
-                                                   const bool match_type)
+NodeVec Network::get_nodes_from_level(const int  type,
+                                      const int  level,
+                                      const bool match_type)
 {
   PROFILE_FUNCTION();
   // Grab desired level reference
@@ -132,7 +132,7 @@ std::vector<NodePtr> Network::get_nodes_from_level(const int  type,
   }
 
   // Where we will store all the nodes found from level
-  std::vector<NodePtr> nodes_to_return;
+  NodeVec nodes_to_return;
   nodes_to_return.reserve(node_level->size());
 
   // Loop through every node belonging to the desired level
@@ -156,7 +156,7 @@ std::vector<NodePtr> Network::get_nodes_from_level(const int  type,
 // =============================================================================
 // Return nodes of a desired type from level.
 // =============================================================================
-std::vector<NodePtr> Network::get_nodes_of_type_at_level(const int type, const int level)
+NodeVec Network::get_nodes_of_type_at_level(const int type, const int level)
 {
   PROFILE_FUNCTION();
   return get_nodes_from_level(type, level, true);
@@ -224,7 +224,7 @@ void Network::initialize_blocks(const int num_blocks, const int level)
   bool one_block_per_node = num_blocks == -1;
 
   // Make a map that gives us type -> array of new blocks
-  std::map<int, std::vector<NodePtr>> type_to_blocks;
+  std::map<int, NodeVec> type_to_blocks;
 
   // If we're randomly distributing nodes, we'll use this map to sample a random
   // block for a given node by its type
@@ -273,13 +273,13 @@ NodePtr Network::get_node_from_level(const int level)
 // Scan through entire Network and remove all block nodes that have no children.
 // Returns the number removed
 // =============================================================================
-std::vector<NodePtr> Network::clean_empty_blocks()
+NodeVec Network::clean_empty_blocks()
 {
   PROFILE_FUNCTION();
   int num_levels    = nodes.size();
   int total_deleted = 0;
 
-  std::vector<NodePtr> blocks_removed;
+  NodeVec blocks_removed;
 
   // Scan through all levels up to final
   for (int level = 1; level < num_levels; ++level) {

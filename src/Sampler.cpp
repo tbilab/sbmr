@@ -45,7 +45,7 @@ int Sampler::sample(int max_val)
 // =============================================================================
 // Sample a random element from a list of node pointers
 // =============================================================================
-NodePtr Sampler::sample(std::list<NodePtr> node_list)
+NodePtr Sampler::sample(NodeList node_list)
 {
   // Select a random index to grab
   int random_index = sample(node_list.size() - 1);
@@ -68,7 +68,7 @@ NodePtr Sampler::sample(std::list<NodePtr> node_list)
 // Sample random node from vector of nodes
 // Easier than list because we can just index to a spot
 // =============================================================================
-NodePtr Sampler::sample(std::vector<NodePtr> node_vec)
+NodePtr Sampler::sample(NodeVec node_vec)
 {
   // Select a random index to grab
   int random_index = sample(node_vec.size() - 1);
@@ -77,7 +77,7 @@ NodePtr Sampler::sample(std::vector<NodePtr> node_vec)
   return node_vec.at(random_index);
 }
 
-void Sampler::shuffle_nodes(std::vector<NodePtr>&                             node_vec,
+void Sampler::shuffle_nodes(NodeVec&                                          node_vec,
                             const std::shared_ptr<std::map<string, NodePtr>>& node_map,
                             std::mt19937&                                     sampler)
 {

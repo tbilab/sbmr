@@ -16,8 +16,8 @@ inline double partial_entropy(const double a, const double b, const double c)
 inline double compute_node_edge_entropy(const NodePtr node)
 {
   // First we collapse the nodes edge counts to all it's neighbors
-  const std::map<NodePtr, int> node_edge_counts = node->gather_edges_to_level(node->level);
-  const int                    node_degree      = node->degree;
+  const NodeEdgeMap node_edge_counts = node->gather_edges_to_level(node->level);
+  const int         node_degree      = node->degree;
 
   double entropy_sum = 0;
 
@@ -34,12 +34,12 @@ inline double compute_node_edge_entropy(const NodePtr node)
 }
 
 // Takes a node and computes its portion of the edge counts entropy
-inline double compute_node_edge_entropy_partial(const std::map<NodePtr, int>& node_edge_counts,
-                                                const NodePtr                 node,
-                                                const NodePtr                 partner)
+inline double compute_node_edge_entropy_partial(const NodeEdgeMap& node_edge_counts,
+                                                const NodePtr      node,
+                                                const NodePtr      partner)
 {
   // First we collapse the nodes edge counts to all it's neighbors
-  // const std::map<NodePtr, int> node_edge_counts = node->gather_edges_to_level(node->level);
+  // const NodeEdgeMap node_edge_counts = node->gather_edges_to_level(node->level);
   const int node_degree = node->degree;
 
   double entropy_sum = 0;
@@ -65,9 +65,9 @@ inline double compute_node_edge_entropy_partial(const std::map<NodePtr, int>& no
   return entropy_sum;
 }
 
-inline double calc_prob_of_move(const std::map<NodePtr, int>& to_node_cons,
-                                const std::vector<NodePtr>&   possible_neighbors,
-                                const double                  eps)
+inline double calc_prob_of_move(const NodeEdgeMap& to_node_cons,
+                                const NodeVec&     possible_neighbors,
+                                const double       eps)
 {
   double       prob       = 0;
   const double n_possible = possible_neighbors.size();
