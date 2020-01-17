@@ -1,7 +1,7 @@
 #include "../SBM.h"
-#include "print_helpers.h"
 #include "catch.hpp"
 #include "network_builders.cpp"
+#include "print_helpers.h"
 
 #include <iomanip>
 
@@ -206,244 +206,140 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
   }   // End iteration loop
 }
 
-// TEST_CASE("Unipartite simple move decision works", "[SBM]")
-// {
-//    // Setup a simulated SBM model
-//   SBM my_SBM = build_simple_SBM_unipartite();
+TEST_CASE("Simple move decision matches brute force calculation", "[SBM]")
+{
 
-//   // Grab node to move
-//   NodePtr n5 = my_SBM.get_node_by_id("n5");
+  // Setup a simulated SBM model with another self-edge
+  SBM my_SBM = build_simple_SBM_unipartite();
 
-//   // Grab the new group for the node
-//   NodePtr b = my_SBM.get_node_by_id("b", 1);
+  const double pre_entropy = my_SBM.compute_entropy(0);
 
-//   // Get move proposal report
-//   Proposal_Res proposal_vals = my_SBM.make_proposal_decision(n5, b);
+  // Grab node to move
+  NodePtr n5 = my_SBM.get_node_by_id("n5");
 
-//   // Does entropy delta equal what it should?
-//   REQUIRE(-1.587649 == Approx(proposal_vals.entropy_delta).epsilon(0.1));
+  // Grab the new group for the node
+  NodePtr b = my_SBM.get_node_by_id("b", 1);
 
-//   // Now do move in reverse
-//   NodePtr c = n5->parent;
-//   n5->set_parent(b);
+  const double expected_delta = my_SBM.make_proposal_decision(n5, b).entropy_delta;
 
-//   // Get rev move proposal report
-//   Proposal_Res rev_proposal_vals = my_SBM.make_proposal_decision(n5, c);
+  n5->set_parent(b);
+  const double post_entropy   = my_SBM.compute_entropy(0);
+  const double reported_delta = post_entropy - pre_entropy;
+  REQUIRE(expected_delta == Approx(reported_delta).epsilon(0.1));
+}
 
-//   // Does entropy delta equal the negative of the first?
-//   REQUIRE(1.587649 == Approx(rev_proposal_vals.entropy_delta).epsilon(0.1));
-// }
+TEST_CASE("Basic MCMC sweeps", "[SBM]")
+{
+  // Setup simple SBM model
+  SBM my_SBM = build_simple_SBM();
 
-// TEST_CASE("Simple move decision matches brute force calculation", "[SBM]")
-// {
+  State_Dump pre_sweep = my_SBM.get_state();
 
-//   // Setup a simulated SBM model with another self-edge
-//   SBM my_SBM = build_simple_SBM_unipartite();
+  // Run a few rounds of sweeps of the MCMC algorithm on network
+  int num_sweeps = 100;
 
-//   const double pre_entropy = my_SBM.compute_entropy(0);
+  // Loop over a few different epsilon values
+  std::vector<double> epsilons = { 0.01, 0.9 };
+  std::vector<double> avg_num_moves;
 
-//   // Grab node to move
-//   NodePtr n5 = my_SBM.get_node_by_id("n5");
+  for (double eps : epsilons) {
+    int total_num_changes = 0;
 
-//   // Grab the new group for the node
-//   NodePtr b = my_SBM.get_node_by_id("b", 1);
+    for (int i = 0; i < num_sweeps; i++) {
+      my_SBM.EPS    = eps;
+      int n_changes = my_SBM.mcmc_sweep(0, 1, false, false).sweep_num_nodes_moved[0];
+      total_num_changes += n_changes;
+    }
 
-//   const double expected_delta = my_SBM.make_proposal_decision(n5, b).entropy_delta;
+    double avg_num_changes = double(total_num_changes) / double(num_sweeps);
 
-//   n5->set_parent(b);
-//   const double post_entropy = my_SBM.compute_entropy(0);
-//   const double reported_delta = post_entropy - pre_entropy;
-//   REQUIRE(expected_delta == Approx(reported_delta).epsilon(0.1));
-// }
+    avg_num_moves.push_back(avg_num_changes);
+  }
 
-// TEST_CASE("Simple move decision matches brute force calculation (extra edge)", "[SBM]")
-// {
+  // Make sure that we have a more move-prone model when we have a high epsilon value...
+  REQUIRE(avg_num_moves.at(0) < avg_num_moves.at(epsilons.size() - 1));
+}
 
-//   // Setup a simulated SBM model with another self-edge
-//   SBM my_SBM = build_simple_SBM_unipartite(true);
+TEST_CASE("Agglomerative merge steps", "[SBM]")
+{
+  // Setup simple SBM model
+  SBM my_SBM = build_simple_SBM();
 
-//   const double pre_entropy = my_SBM.compute_entropy(0);
+  int    num_initial_blocks = my_SBM.get_level(1)->size();
+  double initial_entropy    = my_SBM.compute_entropy(0);
 
-//   // Grab node to move
-//   NodePtr n5 = my_SBM.get_node_by_id("n5");
+  // Run greedy aglomerative merge with best single merge done
+  Merge_Step single_merge = my_SBM.agglomerative_merge(1, 1);
 
-//   // Grab the new group for the node
-//   NodePtr b = my_SBM.get_node_by_id("b", 1);
+  // Make sure that we now have one less block than before for each type
+  int new_block_num    = my_SBM.get_level(1)->size();
+  int change_in_blocks = num_initial_blocks - new_block_num;
+  REQUIRE(change_in_blocks == 1);
 
-//   const double expected_delta = my_SBM.make_proposal_decision(n5, b).entropy_delta;
+  // Make sure entropy has gone down as we would expect
+  REQUIRE(initial_entropy < single_merge.entropy);
 
-//   n5->set_parent(b);
-//   const double post_entropy = my_SBM.compute_entropy(0);
-//   const double reported_delta = post_entropy - pre_entropy;
-//   REQUIRE(expected_delta == Approx(reported_delta).epsilon(0.1));
-// }
+  // Run again but this time merging the best 2
+  SBM new_SBM = build_simple_SBM();
 
-// TEST_CASE("Unipartite simple move entropy delta proper using main entropy calculation function", "[SBM]")
-// {
+  // Run greedy aglomerative merge with best single merge done
+  Merge_Step double_merge = new_SBM.agglomerative_merge(1, 2);
 
-//   // Setup a simulated SBM model
-//   SBM my_SBM = build_simple_SBM_unipartite();
+  // Make sure that we now have two fewer blocks per type than before
+  REQUIRE(2 == num_initial_blocks - new_SBM.get_level(1)->size());
 
-//   const double start_entropy = my_SBM.compute_entropy(0);
+  // Entropy should go down even more with two merges
+  REQUIRE(single_merge.entropy < double_merge.entropy);
+}
 
-//   // Grab node to move
-//   NodePtr n5 = my_SBM.get_node_by_id("n5");
+TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
+{
+  // Setup simple SBM model
+  SBM my_SBM = build_simple_SBM();
 
-//   // Grab the new group for the node
-//   NodePtr b = my_SBM.get_node_by_id("b", 1);
+  int    num_initial_blocks = my_SBM.get_level(1)->size();
+  double initial_entropy    = my_SBM.compute_entropy(0);
 
-//   n5->set_parent(b);
+  my_SBM.SIGMA = 2;
+  // my_SBM.EPS = 0.01;
 
-//   const double n5_in_b_entropy = my_SBM.compute_entropy(0);
-//   const double reported_delta = n5_in_b_entropy - start_entropy;
+  // Run full agglomerative merging algorithm till we have just 3 blocks left
+  auto run_results = my_SBM.collapse_blocks(0, 0, 3, false);
 
-//   // Does entropy delta equal what it should?
-//   REQUIRE(-1.587649 == Approx(reported_delta).epsilon(0.1));
+  // Make sure that we now have just 3 blocks left
+  REQUIRE(my_SBM.get_level(1)->size() == 3);
+}
 
-//   // Now reverse the decision going back to group c
-//    // Now do move in reverse
-//   NodePtr c = my_SBM.get_node_by_id("c", 1);
-//   n5->set_parent(c);
-//   const double n5_in_c_entropy = my_SBM.compute_entropy(0);
-//   const double reported_delta_reverse = n5_in_c_entropy - n5_in_b_entropy;
+TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]")
+{
+  // Setup simple SBM model
+  SBM my_SBM = build_bipartite_simulated();
 
-//   // Does entropy delta equal the negative of the first?
-//   REQUIRE(1.587649 == Approx(reported_delta_reverse).epsilon(0.1));
+  int desired_num_blocks = 6;
 
-// }
+  my_SBM.SIGMA = 0.5;
+  my_SBM.EPS   = 2;
 
-// TEST_CASE("Basic MCMC sweeps", "[SBM]")
-// {
-//   // Setup simple SBM model
-//   SBM my_SBM = build_simple_SBM();
+  // Run full agglomerative merging algorithm
+  auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, true);
 
-//   State_Dump pre_sweep = my_SBM.get_state();
+  int num_blocks_removed = my_SBM.get_level(0)->size() - my_SBM.get_level(1)->size();
 
-//   // Run a few rounds of sweeps of the MCMC algorithm on network
-//   int num_sweeps = 1000;
+  // Make sure we have a single step for each block removed.
+  REQUIRE(num_blocks_removed == run_results.size());
+}
 
-//   // Loop over a few different epsilon values
-//   std::vector<double> epsilons = {0.01, 0.9};
-//   std::vector<double> avg_num_moves;
+TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]")
+{
+  // Setup simple SBM model
+  SBM my_SBM = build_bipartite_simulated();
 
-//   for (double eps : epsilons)
-//   {
-//     int total_num_changes = 0;
+  int desired_num_blocks = 4;
 
-//     for (int i = 0; i < num_sweeps; i++)
-//     {
-//       my_SBM.EPS = eps;
-//       int n_changes = my_SBM.mcmc_sweep(0, 1, false, false).sweep_num_nodes_moved[0];
-//       total_num_changes += n_changes;
-//     }
+  my_SBM.GREEDY = false;
+  // Run full agglomerative merging algorithm till we have just 3 blocks left
+  auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, false);
 
-//     double avg_num_changes = double(total_num_changes) / double(num_sweeps);
-
-//     avg_num_moves.push_back(avg_num_changes);
-//   }
-
-//   // Make sure that we have a more move-prone model when we have a high epsilon value...
-//   REQUIRE(
-//       avg_num_moves.at(0) < avg_num_moves.at(epsilons.size() - 1));
-// }
-
-// TEST_CASE("Agglomerative merge steps", "[SBM]")
-// {
-//   // Setup simple SBM model
-//   SBM my_SBM = build_simple_SBM();
-
-//   int num_initial_blocks = my_SBM.get_level(1)->size();
-//   double initial_entropy = my_SBM.compute_entropy(0);
-
-//   // Run greedy aglomerative merge with best single merge done
-//   Merge_Step single_merge = my_SBM.agglomerative_merge(1, 1);
-
-//   // Make sure that we now have one less block than before for each type
-//   int new_block_num = my_SBM.get_level(1)->size();
-//   int change_in_blocks = num_initial_blocks - new_block_num;
-//   REQUIRE(change_in_blocks == 1);
-
-//   // Make sure entropy has gone down as we would expect
-//   REQUIRE(initial_entropy < single_merge.entropy);
-
-//   // Run again but this time merging the best 2
-//   SBM new_SBM = build_simple_SBM();
-
-//   // Run greedy aglomerative merge with best single merge done
-//   Merge_Step double_merge = new_SBM.agglomerative_merge(1, 2);
-
-//   // Make sure that we now have two fewer blocks per type than before
-//   REQUIRE(
-//       2 ==
-//       num_initial_blocks - new_SBM.get_level(1)->size());
-
-//   // Entropy should go down even more with two merges
-//   REQUIRE(single_merge.entropy < double_merge.entropy);
-// }
-
-// TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
-// {
-//   // Setup simple SBM model
-//   SBM my_SBM = build_simple_SBM();
-
-//   int num_initial_blocks = my_SBM.get_level(1)->size();
-//   double initial_entropy = my_SBM.compute_entropy(0);
-
-//   my_SBM.SIGMA = 2;
-//   // my_SBM.EPS = 0.01;
-
-//   // Run full agglomerative merging algorithm till we have just 3 blocks left
-//   auto run_results = my_SBM.collapse_blocks(
-//     0,
-//     0,
-//     3,
-//     false
-//   );
-
-//   // Make sure that we now have just 3 blocks left
-//   REQUIRE(my_SBM.get_level(1)->size() == 3);
-// }
-
-// // TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]")
-// // {
-// //   // Setup simple SBM model
-// //   SBM my_SBM = build_bipartite_simulated();
-
-// //   int desired_num_blocks = 6;
-
-// //   my_SBM.SIGMA = 0.5;
-// //   my_SBM.EPS = 2;
-
-// //   // Run full agglomerative merging algorithm
-// //   auto run_results = my_SBM.collapse_blocks(
-// //     0,
-// //     0,
-// //     desired_num_blocks,
-// //     true
-// //   );
-
-// //   int num_blocks_removed = my_SBM.get_level(0)->size() - my_SBM.get_level(1)->size();
-
-// //   // Make sure we have a single step for each block removed.
-// //   REQUIRE(num_blocks_removed == run_results.size());
-// // }
-
-// // TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]")
-// // {
-// //   // Setup simple SBM model
-// //   SBM my_SBM = build_bipartite_simulated();
-
-// //   int desired_num_blocks = 4;
-
-// //   my_SBM.GREEDY = false;
-// //   // Run full agglomerative merging algorithm till we have just 3 blocks left
-// //   auto run_results = my_SBM.collapse_blocks(
-// //     0,
-// //     0,
-// //     desired_num_blocks,
-// //     false
-// //   );
-
-// //   // Make sure that we have lumped together at least some blocks
-// //   REQUIRE(my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size());
-// // }
+  // Make sure that we have lumped together at least some blocks
+  REQUIRE(my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size());
+}
