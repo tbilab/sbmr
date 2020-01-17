@@ -5,6 +5,8 @@
 #ifndef __NODE_INCLUDED__
 #define __NODE_INCLUDED__
 
+#include "profiling/Instrument.h"
+
 #include <exception>
 #include <iostream>
 #include <list>
@@ -14,9 +16,6 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
-
-#include "profiling/Instrument.h"
-
 using std::string;
 
 // =============================================================================

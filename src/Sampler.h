@@ -4,18 +4,18 @@
 #ifndef __SAMPLER_INCLUDED__
 #define __SAMPLER_INCLUDED__
 
-#include <random>
 #include "Node.h"
 
-typedef std::mt19937 rand_int_gen;
+#include <random>
+
+typedef std::mt19937                     rand_int_gen;
 typedef std::uniform_real_distribution<> rand_unif_gen;
 
 //=================================
 // Main class declaration
 //=================================
-class Sampler
-{
-public:
+class Sampler {
+  public:
   // Constructors
   // ===========================================================================
   Sampler()
@@ -29,27 +29,26 @@ public:
   {
     initialize_seed(random_seed);
   }
-  
+
   // Attributes
   // ===========================================================================
   // Generates random integers
-  rand_int_gen int_gen;   
+  rand_int_gen int_gen;
 
   // Generates random uniforms
-  rand_unif_gen unif_gen; 
-
+  rand_unif_gen unif_gen;
 
   // ==========================================
   // Methods
-  // Sets stuff up for us, used to decide if we want to have 
+  // Sets stuff up for us, used to decide if we want to have
   // deterministic seeding
-  void initialize_seed(int random_seed); 
+  void initialize_seed(int random_seed);
 
   // Return random uniform value between 0 and 1.
-  double draw_unif();                    
+  double draw_unif();
 
   // Sample from discrete random uniform from 0 to max
-  int sample(int max_val);               
+  int sample(int max_val);
 
   // Sample random node from a list of nodes
   NodePtr sample(std::list<NodePtr> nodes_to_sample);
@@ -57,9 +56,9 @@ public:
   // Sample random node from vector of nodes
   NodePtr sample(std::vector<NodePtr> nodes_to_sample);
 
-  static void shuffle_nodes(std::vector<NodePtr> &node_vec,
-                            const std::shared_ptr<std::map<string, NodePtr>> &node_map,
-                            std::mt19937 &sampler);
+  static void shuffle_nodes(std::vector<NodePtr>&                             node_vec,
+                            const std::shared_ptr<std::map<string, NodePtr>>& node_map,
+                            std::mt19937&                                     sampler);
 };
 
 #endif

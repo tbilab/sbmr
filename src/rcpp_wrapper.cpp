@@ -1,4 +1,5 @@
 #include "SBM.h"
+
 #include <Rcpp.h>
 
 using namespace Rcpp;
@@ -33,7 +34,8 @@ class Rcpp_SBM : public SBM {
 
       // Iterate type integer keeper forward
       current_type_int++;
-    } else {
+    }
+    else {
       node_int_type = loc_of_int_type->second;
     }
 
@@ -41,7 +43,8 @@ class Rcpp_SBM : public SBM {
     auto base_level = get_level(level);
     if (base_level->find(id) != base_level->end()) {
       warning(id + " already exists in network\n");
-    } else {
+    }
+    else {
       // Add node to model
       SBM::add_node(id, node_int_type, level);
     }
@@ -51,7 +54,8 @@ class Rcpp_SBM : public SBM {
   {
     try {
       return nodes.at(level)->at(node_id);
-    } catch (...) {
+    }
+    catch (...) {
       stop("Can't find node " + node_id + " at level " + std::to_string(level));
     }
   }
@@ -97,7 +101,8 @@ class Rcpp_SBM : public SBM {
       auto loc_of_int_type = type_string_to_int.find(*type_it);
       if (loc_of_int_type == type_string_to_int.end()) {
         stop((*type_it) + " not found in model");
-      } else {
+      }
+      else {
         // Convert string to int and push to vector
         int_types.push_back(loc_of_int_type->second);
       }

@@ -1,4 +1,5 @@
 #include "Node.h"
+
 #include <iostream>
 
 // =============================================================================
@@ -61,7 +62,8 @@ void Node::update_edges_from_node(const NodePtr node, const bool remove)
             break;
           }
         }
-      } else {
+      }
+      else {
         // Just add this edge to nodes edges
         curr_edges.push_back(edge_to_update);
       }

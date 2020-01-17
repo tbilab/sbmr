@@ -1,31 +1,27 @@
+#include "../SBM.h"
+#include "../print_helpers.h"
 #include "catch.hpp"
+#include "network_builders.cpp"
 
 #include <iomanip>
 
-#include "../print_helpers.h"
-#include "../SBM.h"
-
-#include "network_builders.cpp"
-
-
 TEST_CASE("Generate Node move proposals", "[SBM]")
 {
-  double tol = 0.01;
-  double eps = 0.01;
-  SBM my_SBM = build_simple_SBM();
+  double tol    = 0.01;
+  double eps    = 0.01;
+  SBM    my_SBM = build_simple_SBM();
 
   NodePtr a1 = my_SBM.get_node_by_id("a1");
 
   // Initialize a sampler to choose block
   Sampler my_sampler;
 
-  int num_trials = 5000;
-  int num_times_no_move = 0;
-  NodePtr old_block = a1->parent;
+  int     num_trials        = 5000;
+  int     num_times_no_move = 0;
+  NodePtr old_block         = a1->parent;
 
   // Run multiple trials and of move and see how often a given node is moved
-  for (int i = 0; i < num_trials; ++i)
-  {
+  for (int i = 0; i < num_trials; ++i) {
     // Do move attempt (dry run)
     NodePtr new_block = my_SBM.propose_move(a1);
 
@@ -37,13 +33,12 @@ TEST_CASE("Generate Node move proposals", "[SBM]")
 
   // Prob of a1 staying in a1_1 should be approximately (2 + eps)/(6 + 4*eps)
   // Make sure model's decisions to move a1 reflects this.
-  double two = 2;
-  double six = 6;
+  double two  = 2;
+  double six  = 6;
   double four = 4;
 
   REQUIRE(
-      Approx((two + eps) / (six + four * eps)).epsilon(tol) ==
-      frac_of_time_no_change);
+      Approx((two + eps) / (six + four * eps)).epsilon(tol) == frac_of_time_no_change);
 }
 
 TEST_CASE("Simple entropy calculation (unipartite)", "[SBM")
@@ -51,15 +46,13 @@ TEST_CASE("Simple entropy calculation (unipartite)", "[SBM")
   SBM unipartite_sbm = build_simple_SBM_unipartite();
 
   // Hand calculated
-  REQUIRE(unipartite_sbm.compute_entropy(0) ==
-          Approx(6.433708).epsilon(0.1));
+  REQUIRE(unipartite_sbm.compute_entropy(0) == Approx(6.433708).epsilon(0.1));
 
   // Move node 4 to group c and compute entropy
   const NodePtr n4 = unipartite_sbm.get_node_by_id("n4", 0);
   n4->set_parent(unipartite_sbm.get_node_by_id("c", 1));
 
-  REQUIRE(unipartite_sbm.compute_entropy(0) ==
-          Approx(6.321931).epsilon(0.1));
+  REQUIRE(unipartite_sbm.compute_entropy(0) == Approx(6.321931).epsilon(0.1));
 }
 
 TEST_CASE("Simple entropy calculation (bipartite)", "[SBM]")
@@ -71,13 +64,13 @@ TEST_CASE("Simple entropy calculation (bipartite)", "[SBM]")
   double model_entropy = my_SBM.compute_entropy(0);
 
   // Test entropy is near a hand-calculated value
-  // Note that this network being so small and having bipartite structure causes the entropy 
+  // Note that this network being so small and having bipartite structure causes the entropy
   // to be negative becuause we're using an entropy approximation function, rather than directly calculating the entropy
-  // of the degree corrected model. 
+  // of the degree corrected model.
   REQUIRE(model_entropy == Approx(-1.420612).epsilon(0.1));
 
   // Now move node a2 to group a11 and calculate entropy
-  NodePtr a2 = my_SBM.get_node_by_id("a2");
+  NodePtr a2  = my_SBM.get_node_by_id("a2");
   NodePtr a11 = my_SBM.get_node_by_id("a11", 1);
 
   a2->set_parent(a11);
@@ -92,7 +85,7 @@ TEST_CASE("Move proposal returns values are correct (simple unipartite)", "[SBM"
 
   // Propose move of n4 to group c
   const NodePtr n4 = unipartite_sbm.get_node_by_id("n4", 0);
-  const NodePtr c = unipartite_sbm.get_node_by_id("c", 1);
+  const NodePtr c  = unipartite_sbm.get_node_by_id("c", 1);
 
   const auto proposal_results = unipartite_sbm.make_proposal_decision(n4, c);
 
@@ -105,18 +98,18 @@ TEST_CASE("Move proposal returns values are correct (simple unipartite)", "[SBM"
 
 TEST_CASE("Move proposal returns values are correct (simple bipartite)", "[SBM")
 {
-   // Setup simple SBM model
+  // Setup simple SBM model
   SBM my_SBM = build_simple_SBM();
 
   // Now move node a2 to group a11 and calculate entropy
-  NodePtr a2 = my_SBM.get_node_by_id("a2");
+  NodePtr a2  = my_SBM.get_node_by_id("a2");
   NodePtr a11 = my_SBM.get_node_by_id("a11", 1);
 
   const auto proposal_results = my_SBM.make_proposal_decision(a2, a11);
 
   // Delta from hand calculation
   REQUIRE(proposal_results.entropy_delta == Approx(-0.5924696).epsilon(0.1));
-  
+
   REQUIRE(proposal_results.prob_of_accept == Approx(0.1514709).epsilon(0.1));
 }
 
@@ -134,21 +127,19 @@ TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
 
   auto all_nodes = my_SBM.get_level(0);
 
-  for (int i = 0; i < num_sweeps; i++)
-  {
-      // Loop through all nodes
+  for (int i = 0; i < num_sweeps; i++) {
+    // Loop through all nodes
     for (auto node_to_move_it = all_nodes->begin();
-              node_to_move_it != all_nodes->end();
-              node_to_move_it++)
-    {
+         node_to_move_it != all_nodes->end();
+         node_to_move_it++) {
       const NodePtr node_to_move = node_to_move_it->second;
-      
+
       // Calculate current model entropy
       const double pre_entropy = my_SBM.compute_entropy(0);
 
       // Choose random group for node to join
       const NodePtr group_to_move_to = random.sample(my_SBM.get_nodes_of_type_at_level(node_to_move->type, 1));
-      
+
       // Get move proposal report for move
       const Proposal_Res proposal_vals = my_SBM.make_proposal_decision(node_to_move, group_to_move_to);
 
@@ -160,16 +151,16 @@ TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
       // Take new model entropy
       const double true_delta = my_SBM.compute_entropy(0) - pre_entropy;
 
-     // They should be the same
+      // They should be the same
       REQUIRE(true_delta == Approx(reported_entropy_delta).epsilon(0.1));
 
     } // End node loop
-  } // End iteration loop
+  }   // End iteration loop
 }
 
 TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
 {
-  int num_sweeps = 2;
+  int     num_sweeps = 2;
   Sampler random(312);
 
   // Setup a simulated SBM model
@@ -180,13 +171,11 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
 
   auto all_nodes = my_SBM.get_level(0);
 
-  for (int i = 0; i < num_sweeps; i++)
-  {
+  for (int i = 0; i < num_sweeps; i++) {
     // Loop through all nodes
     for (auto node_to_move_it = all_nodes->begin();
          node_to_move_it != all_nodes->end();
-         node_to_move_it++)
-    {
+         node_to_move_it++) {
       NodePtr node_to_move = node_to_move_it->second;
 
       // Calculate current model entropy
@@ -209,12 +198,12 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
 
       // Take new model entropy
       double true_delta = my_SBM.compute_entropy(0) - pre_entropy;
-   
+
       // They should be the same
       REQUIRE(true_delta == Approx(reported_entropy_delta).epsilon(0.1));
 
     } // End node loop
-  } // End iteration loop
+  }   // End iteration loop
 }
 
 // TEST_CASE("Unipartite simple move decision works", "[SBM]")
@@ -252,7 +241,7 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
 //   SBM my_SBM = build_simple_SBM_unipartite();
 
 //   const double pre_entropy = my_SBM.compute_entropy(0);
-  
+
 //   // Grab node to move
 //   NodePtr n5 = my_SBM.get_node_by_id("n5");
 
@@ -274,7 +263,7 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
 //   SBM my_SBM = build_simple_SBM_unipartite(true);
 
 //   const double pre_entropy = my_SBM.compute_entropy(0);
-  
+
 //   // Grab node to move
 //   NodePtr n5 = my_SBM.get_node_by_id("n5");
 
@@ -291,12 +280,12 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
 
 // TEST_CASE("Unipartite simple move entropy delta proper using main entropy calculation function", "[SBM]")
 // {
-  
+
 //   // Setup a simulated SBM model
 //   SBM my_SBM = build_simple_SBM_unipartite();
 
 //   const double start_entropy = my_SBM.compute_entropy(0);
-  
+
 //   // Grab node to move
 //   NodePtr n5 = my_SBM.get_node_by_id("n5");
 
@@ -307,7 +296,7 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
 
 //   const double n5_in_b_entropy = my_SBM.compute_entropy(0);
 //   const double reported_delta = n5_in_b_entropy - start_entropy;
- 
+
 //   // Does entropy delta equal what it should?
 //   REQUIRE(-1.587649 == Approx(reported_delta).epsilon(0.1));
 
@@ -317,12 +306,11 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
 //   n5->set_parent(c);
 //   const double n5_in_c_entropy = my_SBM.compute_entropy(0);
 //   const double reported_delta_reverse = n5_in_c_entropy - n5_in_b_entropy;
- 
+
 //   // Does entropy delta equal the negative of the first?
 //   REQUIRE(1.587649 == Approx(reported_delta_reverse).epsilon(0.1));
 
 // }
-
 
 // TEST_CASE("Basic MCMC sweeps", "[SBM]")
 // {
@@ -358,7 +346,6 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
 //   REQUIRE(
 //       avg_num_moves.at(0) < avg_num_moves.at(epsilons.size() - 1));
 // }
-
 
 // TEST_CASE("Agglomerative merge steps", "[SBM]")
 // {
@@ -409,14 +396,13 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
 //   auto run_results = my_SBM.collapse_blocks(
 //     0,
 //     0,
-//     3, 
+//     3,
 //     false
 //   );
 
 //   // Make sure that we now have just 3 blocks left
 //   REQUIRE(my_SBM.get_level(1)->size() == 3);
 // }
-
 
 // // TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]")
 // // {
@@ -428,7 +414,7 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
 // //   my_SBM.SIGMA = 0.5;
 // //   my_SBM.EPS = 2;
 
-// //   // Run full agglomerative merging algorithm 
+// //   // Run full agglomerative merging algorithm
 // //   auto run_results = my_SBM.collapse_blocks(
 // //     0,
 // //     0,

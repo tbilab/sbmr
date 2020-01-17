@@ -115,7 +115,7 @@ SBM build_simple_SBM()
   NodePtr a11 = my_SBM.add_node("a11", 0, 1);
   NodePtr a12 = my_SBM.add_node("a12", 0, 1);
   NodePtr a13 = my_SBM.add_node("a13", 0, 1);
-  
+
   NodePtr b11 = my_SBM.add_node("b11", 1, 1);
   NodePtr b12 = my_SBM.add_node("b12", 1, 1);
   NodePtr b13 = my_SBM.add_node("b13", 1, 1);
@@ -125,14 +125,14 @@ SBM build_simple_SBM()
 
   a2->set_parent(a12);
   a3->set_parent(a12);
-  
+
   a4->set_parent(a13);
-  
+
   b1->set_parent(b11);
   b2->set_parent(b11);
-  
+
   b3->set_parent(b12);
-  
+
   b4->set_parent(b13);
 
   return my_SBM;
@@ -497,15 +497,15 @@ SBM build_bipartite_simulated()
 // n_blocks <- 3   # Total number of blocks
 // block_size <- 15 # How many nodes in each block
 // network <- sim_basic_block_network(
-//   n_blocks = n_blocks,     
-//   n_nodes_per_block = block_size,  
+//   n_blocks = n_blocks,
+//   n_nodes_per_block = block_size,
 //   return_edge_propensities = TRUE
 // )
-// network %>% 
-//   pluck("nodes") %>% 
+// network %>%
+//   pluck("nodes") %>%
 //   glue_data("my_SBM.add_node(\"{id}\", 0);")
-// network %>% 
-//   pluck("edges") %>% 
+// network %>%
+//   pluck("edges") %>%
 //   glue_data("my_SBM.add_edge(\"{from}\", \"{to}\");")
 SBM build_unipartite_simulated()
 {

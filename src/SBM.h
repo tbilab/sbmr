@@ -4,6 +4,7 @@
 #include "Block_Consensus.h"
 #include "Network.h"
 #include "Sampler.h"
+
 #include <math.h>
 
 // =============================================================================
@@ -33,7 +34,6 @@ struct Proposal_Res {
       : entropy_delta(e)
       , prob_of_accept(p){};
 };
-
 
 struct Sweep_Res {
   std::list<std::string>          nodes_moved;
@@ -109,11 +109,10 @@ class SBM : public Network {
 
   // Run mcmc chain initialization by finding best organization
   // of B' blocks for all B from B = N to B = 1.
-  std::vector<Merge_Step> collapse_blocks(
-      int  node_level,
-      int  num_mcmc_steps,
-      int  desired_num_blocks, // Default value which lets model drop to 1 block per type.
-      bool report_all_steps);
+  std::vector<Merge_Step> collapse_blocks(int  node_level,
+                                          int  num_mcmc_steps,
+                                          int  desired_num_blocks, // Default value which lets model drop to 1 block per type.
+                                          bool report_all_steps);
 
 }; // End SBM class declaration
 

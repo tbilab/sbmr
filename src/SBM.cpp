@@ -27,7 +27,9 @@ NodePtr SBM::propose_move(const NodePtr node)
   const double prob_of_random_block = ergo_amnt / (neighbor_block_degree + ergo_amnt);
 
   // Decide where we will get new block from and draw from potential candidates
-  return sampler.draw_unif() < prob_of_random_block ? sampler.sample(potential_blocks) : sampler.sample(rand_neighbor->get_edges_to_level(block_level));
+  return sampler.draw_unif() < prob_of_random_block ? 
+  sampler.sample(potential_blocks) : 
+  sampler.sample(rand_neighbor->get_edges_to_level(block_level));
 }
 
 // =============================================================================

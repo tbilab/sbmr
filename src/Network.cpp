@@ -46,7 +46,8 @@ NodePtr Network::get_node_by_id(const string desired_id, const int level)
   try {
     // Attempt to find node on the 'node level' of the Network
     return nodes.at(level)->at(desired_id);
-  } catch (...) {
+  }
+  catch (...) {
     // Throw informative error if it fails
     std::cerr << "Could not find requested node" << std::endl;
     throw "Could not find requested node";
@@ -106,6 +107,9 @@ NodePtr Network::create_block_node(const int type, const int level)
   return add_node("new block", type, level);
 };
 
+// "C_Cpp.clang_format_fallbackStyle": "{BasedOnStyle: WebKit, AllowShortBlocksOnASingleLine: Always, AlignAfterOpenBracket: Align, AlignConsecutiveDeclarations: true, AlignConsecutiveAssignments: true, IndentWidth: 2, AlignTrailingComments:true, AllowShortIfStatementsOnASingleLine: true}",
+// { BasedOnStyle: LLVM, AllowShortBlocksOnASingleLine: Always, AlignAfterOpenBracket: Align, AlignConsecutiveDeclarations: true, AlignConsecutiveAssignments: true, IndentWidth: 2, AlignTrailingComments:true, AllowShortIfStatementsOnASingleLine: true }
+
 // =============================================================================
 // Return nodes of a desired type from level. If match_type = true then the
 // nodes returned are of the same type as specified, otherwise the nodes
@@ -122,8 +126,8 @@ std::vector<NodePtr> Network::get_nodes_from_level(const int  type,
   // Make sure level has nodes before looping through it
   if (node_level->size() == 0) {
     std::cerr << "Requested level " << level << " is empty of nodes of type "
-              << type << " when " << (match_type ? "" : "not ") << "matching type"
-              << std::endl;
+              << type << " when " << (match_type ? "" : "not ")
+              << "matching type" << std::endl;
     throw "Requested level is empty.";
   }
 
@@ -137,7 +141,8 @@ std::vector<NodePtr> Network::get_nodes_from_level(const int  type,
        ++node_it) {
     // Decide to keep the node or not based on if it matches or doesn't and our
     // keeping preferance
-    bool keep_node = match_type ? (node_it->second->type == type) : (node_it->second->type != type);
+    bool keep_node = match_type ? (node_it->second->type == type)
+                                : (node_it->second->type != type);
 
     if (keep_node) {
       // ...Place it in returning list
@@ -156,7 +161,6 @@ std::vector<NodePtr> Network::get_nodes_of_type_at_level(const int type, const i
   PROFILE_FUNCTION();
   return get_nodes_from_level(type, level, true);
 }
-
 
 // =============================================================================
 // Adds a edge between two nodes based on their ids
@@ -368,7 +372,7 @@ State_Dump Network::get_state()
           current_node->parent ? current_node->parent->id : "none");
 
     } // End node loop
-  } // End level loop
+  }   // End level loop
 
   return state;
 }
@@ -385,10 +389,9 @@ void Network::load_from_state(const State_Dump state)
   for (int i = 0; i < n; i++) {
     int node_type = state.type[i];
 
-    string child_id    = state.id[i];
-    int    child_level = state.level[i];
-
+    string child_id     = state.id[i];
     string parent_id    = state.parent[i];
+    int    child_level  = state.level[i];
     int    parent_level = child_level + 1;
 
     auto aquire_node = [node_type, this](string node_id, int node_level) {
@@ -399,7 +402,8 @@ void Network::load_from_state(const State_Dump state)
 
       if (node_loc == nodes_at_level->end()) {
         return add_node(node_id, node_type, node_level);
-      } else {
+      }
+      else {
         return node_loc->second;
       }
     };
