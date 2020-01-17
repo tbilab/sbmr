@@ -222,7 +222,8 @@ class Rcpp_SBM : public SBM {
   List mcmc_sweep(const int  level,
                   const int  num_sweeps,
                   const bool variable_num_blocks,
-                  const bool track_pairs)
+                  const bool track_pairs,
+                  const bool verbose)
   {
     // Make sure network has blocks at the level for MCMC sweeps to take place.
     // Warn and initialize groups for user
@@ -234,7 +235,8 @@ class Rcpp_SBM : public SBM {
     MCMC_Sweeps results = SBM::mcmc_sweep(level,
                                           num_sweeps,
                                           variable_num_blocks,
-                                          track_pairs);
+                                          track_pairs,
+                                          verbose);
 
     // Initialize vectors to hold pair tracking results, if needed.
     std::vector<std::string> node_pair;

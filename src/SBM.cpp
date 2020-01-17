@@ -114,7 +114,8 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 MCMC_Sweeps SBM::mcmc_sweep(const int  level,
                             const int  num_sweeps,
                             const bool variable_num_blocks,
-                            const bool track_pairs)
+                            const bool track_pairs,
+                            const bool verbose)
 {
   PROFILE_FUNCTION();
 
@@ -134,6 +135,17 @@ MCMC_Sweeps SBM::mcmc_sweep(const int  level,
   // Initialize vector to hold nodes in order of pass through for a sweep.
   NodeVec node_vec;
   node_vec.reserve(node_map->size());
+
+  if (verbose) {
+    std::cout << "sweep_num" << " | "
+              << "node" << " | "
+              << "current_block" << " | "
+              << "proposed_block" << " | "
+              << "entropy_delta" << " | "
+              << "prob_of_accept" << " | "
+              << "move_accepted"
+              << std::endl;
+  }
 
   for (int i = 0; i < num_sweeps; i++) {
     // Book keeper variables for this sweeps stats
@@ -165,9 +177,21 @@ MCMC_Sweeps SBM::mcmc_sweep(const int  level,
         continue;
       }
 
+      if (verbose) {
+        std::cout << i << " | "
+                  << curr_node->id << " | "
+                  << (curr_node->parent)->id << " | "
+                  << proposed_new_block->id << " | ";
+      }
       // Calculate acceptance probability based on posterior changes
       Proposal_Res proposal_results = make_proposal_decision(curr_node, proposed_new_block);
 
+      if (verbose) {
+        std::cout << proposal_results.entropy_delta << " | "
+                  << proposal_results.prob_of_accept << " | "
+                  << proposal_results.move_accepted
+                  << std::endl;
+      }
       // Is the move accepted?
       if (proposal_results.move_accepted) {
         const NodePtr old_block = curr_node->parent;

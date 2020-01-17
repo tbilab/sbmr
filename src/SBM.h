@@ -104,7 +104,8 @@ class SBM : public Network {
   MCMC_Sweeps mcmc_sweep(int  level,
                          int  num_sweeps,
                          bool variable_num_blocks,
-                         bool track_pairs);
+                         bool track_pairs,
+                         bool verbose = false);
 
   // Merge two blocks at a given level based on the probability of doing so
   Merge_Step agglomerative_merge(int level_of_blocks, int n_merges);
