@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Node.h"
+#include "../Node.h"
 
 // ============================================================================
 // Takes a vector of node ids and returns a string of them pasted together
@@ -18,17 +18,14 @@ inline std::string print_ids_to_string(std::vector<std::string> node_ids)
   node_id_string.reserve(node_ids.size() * 5);
 
   // Dump vector of id strings to one big string
-  for (auto node_id_it = node_ids.begin();
-       node_id_it != node_ids.end();
-       ++node_id_it) {
+  for (auto const& node_id : node_ids) {
     // Append node id to return string.
-    node_id_string.append(*node_id_it + ", ");
+    node_id_string.append(node_id + ", ");
   }
 
   // Remove last comma for cleanliness
-  node_id_string.erase(
-      node_id_string.end() - 2,
-      node_id_string.end());
+  node_id_string.erase(node_id_string.end() - 2,
+                       node_id_string.end());
 
   return node_id_string;
 }
@@ -45,11 +42,8 @@ inline std::string print_node_ids(NodeList nodes)
   std::vector<std::string> node_ids;
 
   // Add node ids to containing vector
-  for (auto node_it = nodes.begin();
-       node_it != nodes.end();
-       ++node_it) {
-    // Append node id to return string.
-    node_ids.push_back((*node_it)->id);
+  for (auto const& node : nodes) {
+    node_ids.push_back(node->id);
   }
 
   return print_ids_to_string(node_ids);
@@ -62,11 +56,9 @@ inline std::string print_node_ids(ChildSet nodes)
   std::vector<std::string> node_ids;
 
   // Add node ids to containing vector
-  for (auto node_it = nodes.begin();
-       node_it != nodes.end();
-       ++node_it) {
+  for (auto const& node : nodes) {
     // Append node id to return string.
-    node_ids.push_back((*node_it)->id);
+    node_ids.push_back(node->id);
   }
 
   return print_ids_to_string(node_ids);
