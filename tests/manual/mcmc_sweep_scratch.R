@@ -31,20 +31,20 @@ my_sbm <- create_sbm(network) %>%
   initialize_blocks(n_blocks)
 
 start_entropy <- my_sbm %>% compute_entropy()
-num_sweeps <- 25
+num_sweeps <- 30
 sweep_results <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps, track_pairs = FALSE, variable_num_blocks = FALSE, verbose = FALSE)
 end_entropy <- my_sbm %>% compute_entropy()
-#
+
 # sweep_info <- read_csv(here::here("tests/manual/sweep_results.txt"))
 # sweep_info %>%
 #   filter(prob_of_accept < 40) %>%
 #   ggplot(aes(x = entropy_delta, y = prob_of_accept, color = move_accepted)) +
 #   geom_point()
-#
-# sweep_info %>%
-#   filter(prob_of_accept < 4) %>%
-#   ggplot(aes(x = prob_of_accept)) +
-#   geom_histogram(bins = 40)
+
+sweep_info %>%
+  filter(prob_of_accept < 4) %>%
+  ggplot(aes(x = prob_of_accept)) +
+  geom_histogram(bins = 40)
 
 
 sweep_results$sweep_info %>%
@@ -177,3 +177,15 @@ visualize_network(edges = network$edges,
                   node_color_col = 'block',
                   node_shape_col = 'inferred',
                   width = '100%')
+
+
+
+probs <- rbeta(n = 10, 2, 2)
+
+top_vals <- rnorm(n = 10, mean = 5)
+bottom_vals <- rnorm(n = 10, mean = 4)
+
+
+sum(probs*top_vals)/sum(probs*bottom_vals)
+
+sum(top_vals)/sum(bottom_vals)
