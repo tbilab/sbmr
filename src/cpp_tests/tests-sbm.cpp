@@ -152,12 +152,12 @@ TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
       // Take new model entropy
       const double true_delta = my_SBM.compute_entropy(0) - pre_entropy;
 
-      std::cout << node_to_move->id << ": ("
-                << pre_move_group_id << " -> "
-                << group_to_move_to->id << ") = "
-                << std::to_string(reported_entropy_delta) << " ~ "
-                << std::to_string(true_delta)
-                << std::endl;
+      // std::cout << node_to_move->id << ": ("
+      //           << pre_move_group_id << " -> "
+      //           << group_to_move_to->id << ") = "
+      //           << std::to_string(reported_entropy_delta) << " ~ "
+      //           << std::to_string(true_delta)
+      //           << std::endl;
 
       // They should be the same
       REQUIRE(true_delta == Approx(reported_entropy_delta).epsilon(0.1));
@@ -300,54 +300,54 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
   REQUIRE(single_merge.entropy < double_merge.entropy);
 }
 
-TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
-{
-  // Setup simple SBM model
-  SBM my_SBM = build_simple_SBM();
+// TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
+// {
+//   // Setup simple SBM model
+//   SBM my_SBM = build_simple_SBM();
 
-  int    num_initial_blocks = my_SBM.get_level(1)->size();
-  double initial_entropy    = my_SBM.compute_entropy(0);
+//   int    num_initial_blocks = my_SBM.get_level(1)->size();
+//   double initial_entropy    = my_SBM.compute_entropy(0);
 
-  my_SBM.SIGMA = 2;
-  // my_SBM.EPS = 0.01;
+//   my_SBM.SIGMA = 2;
+//   // my_SBM.EPS = 0.01;
 
-  // Run full agglomerative merging algorithm till we have just 3 blocks left
-  auto run_results = my_SBM.collapse_blocks(0, 0, 3, false);
+//   // Run full agglomerative merging algorithm till we have just 3 blocks left
+//   auto run_results = my_SBM.collapse_blocks(0, 0, 3, false);
 
-  // Make sure that we now have just 3 blocks left
-  REQUIRE(my_SBM.get_level(1)->size() == 3);
-}
+//   // Make sure that we now have just 3 blocks left
+//   REQUIRE(my_SBM.get_level(1)->size() == 3);
+// }
 
-TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]")
-{
-  // Setup simple SBM model
-  SBM my_SBM = build_bipartite_simulated();
+// TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]")
+// {
+//   // Setup simple SBM model
+//   SBM my_SBM = build_bipartite_simulated();
 
-  int desired_num_blocks = 6;
+//   int desired_num_blocks = 6;
 
-  my_SBM.SIGMA = 0.5;
-  my_SBM.EPS   = 2;
+//   my_SBM.SIGMA = 0.5;
+//   my_SBM.EPS   = 2;
 
-  // Run full agglomerative merging algorithm
-  auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, true);
+//   // Run full agglomerative merging algorithm
+//   auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, true);
 
-  int num_blocks_removed = my_SBM.get_level(0)->size() - my_SBM.get_level(1)->size();
+//   int num_blocks_removed = my_SBM.get_level(0)->size() - my_SBM.get_level(1)->size();
 
-  // Make sure we have a single step for each block removed.
-  REQUIRE(num_blocks_removed == run_results.size());
-}
+//   // Make sure we have a single step for each block removed.
+//   REQUIRE(num_blocks_removed == run_results.size());
+// }
 
-TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]")
-{
-  // Setup simple SBM model
-  SBM my_SBM = build_bipartite_simulated();
+// TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]")
+// {
+//   // Setup simple SBM model
+//   SBM my_SBM = build_bipartite_simulated();
 
-  int desired_num_blocks = 4;
+//   int desired_num_blocks = 4;
 
-  my_SBM.GREEDY = false;
-  // Run full agglomerative merging algorithm till we have just 3 blocks left
-  auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, false);
+//   my_SBM.GREEDY = false;
+//   // Run full agglomerative merging algorithm till we have just 3 blocks left
+//   auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, false);
 
-  // Make sure that we have lumped together at least some blocks
-  REQUIRE(my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size());
-}
+//   // Make sure that we have lumped together at least some blocks
+//   REQUIRE(my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size());
+// }
