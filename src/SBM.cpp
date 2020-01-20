@@ -137,11 +137,10 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     // First check if node being moved has any connections to this block and if we need to calculate ratio
     if ((node_to_neighbor != 0) & need_prob_ratio) {
       const double prop_node_edges_to_neighbor = double(node_to_neighbor) / node_degree;
+      const double eps_B                       = EPS * n_possible;
 
-      const double fraction_bottom = neighbor_degree_pre + (EPS * n_possible);
-
-      pre_move_prob += prop_node_edges_to_neighbor * (new_to_neighbor_pre + EPS) / fraction_bottom;
-      post_move_prob += prop_node_edges_to_neighbor * (old_to_neighbor_post + EPS) / fraction_bottom;
+      pre_move_prob += prop_node_edges_to_neighbor * (new_to_neighbor_pre + EPS) / (neighbor_degree_pre + eps_B);
+      post_move_prob += prop_node_edges_to_neighbor * (old_to_neighbor_post + EPS) / (neighbor_degree_post + eps_B);
     }
   }
 
