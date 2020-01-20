@@ -133,6 +133,7 @@ TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
          node_to_move_it != all_nodes->end();
          node_to_move_it++) {
       const NodePtr node_to_move = node_to_move_it->second;
+      const std::string pre_move_group_id = node_to_move->parent->id;
 
       // Calculate current model entropy
       const double pre_entropy = my_SBM.compute_entropy(0);
@@ -150,6 +151,13 @@ TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
 
       // Take new model entropy
       const double true_delta = my_SBM.compute_entropy(0) - pre_entropy;
+
+      std::cout << node_to_move->id << ": ("
+                << pre_move_group_id << " -> "
+                << group_to_move_to->id << ") = "
+                << std::to_string(reported_entropy_delta) << " ~ "
+                << std::to_string(true_delta)
+                << std::endl;
 
       // They should be the same
       REQUIRE(true_delta == Approx(reported_entropy_delta).epsilon(0.1));

@@ -72,127 +72,70 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   const double old_block_degree_post = old_block->degree - node_degree;
   const double new_block_degree_post = new_block->degree + node_degree;
 
-  // Make copy of the edge counts for post move
-  NodeEdgeMap old_block_edge_counts_post2 = old_block_edge_counts_pre;
-  NodeEdgeMap new_block_edge_counts_post2 = new_block_edge_counts_pre;
+  double entropy_delta = 0;
 
   // Loop through the node neighbor blocks
   for (auto const& neighbor_block : potential_neighbors) {
 
-    int old_block_count_delta;
-    int new_block_count_delta;
+    const bool is_old_block = neighbor_block == old_block;
+    const bool is_new_block = neighbor_block == new_block;
 
-    if (neighbor_block == old_block) {
-      old_block_count_delta = 2 * node_to_old;
-      new_block_count_delta = old_new_delta;
+    const int neighbor_block_degree_pre = neighbor_block->degree;
+    int       neighbor_block_degree_post;
+
+    int    old_block_count_delta;
+    int    new_block_count_delta;
+    double scalar = 2;
+
+    if (is_old_block) {
+      old_block_count_delta      = 2 * node_to_old;
+      new_block_count_delta      = old_new_delta;
+      neighbor_block_degree_post = old_block_degree_post;
     }
-    else if (neighbor_block == new_block) {
-      old_block_count_delta = -old_new_delta;
-      new_block_count_delta = 2 * node_to_new;
+    else if (is_new_block) {
+      old_block_count_delta      = old_new_delta;
+      new_block_count_delta      = 2 * node_to_new;
+      neighbor_block_degree_post = new_block_degree_post;
     }
     else {
-      old_block_count_delta = get_edge_counts(node_edges_to_neighbor_blocks, neighbor_block);
-      new_block_count_delta = old_block_count_delta;
+      new_block_count_delta      = get_edge_counts(node_edges_to_neighbor_blocks, neighbor_block);
+      old_block_count_delta      = new_block_count_delta;
+      neighbor_block_degree_post = neighbor_block_degree_pre;
+      scalar                     = 1;
     }
 
-    old_block_edge_counts_post2[neighbor_block] -= old_block_count_delta;
-    new_block_edge_counts_post2[neighbor_block] += new_block_count_delta;
+    const int old_to_neighbor_pre  = get_edge_counts(old_block_edge_counts_pre, neighbor_block);
+    const int new_to_neighbor_pre  = get_edge_counts(new_block_edge_counts_pre, neighbor_block);
+
+    const int old_to_neighbor_post = old_to_neighbor_pre - old_block_count_delta;
+    const int new_to_neighbor_post = new_to_neighbor_pre + new_block_count_delta;
+
+    const double old_block_ent_pre = partial_entropy(old_to_neighbor_pre,
+                                                     old_block_degree_pre,
+                                                     neighbor_block_degree_pre);
+
+    const double new_block_ent_pre = partial_entropy(new_to_neighbor_pre,
+                                                     new_block_degree_pre,
+                                                     neighbor_block_degree_pre);
+
+    const double old_block_ent_post = partial_entropy(old_to_neighbor_post,
+                                                      old_block_degree_post,
+                                                      neighbor_block_degree_post);
+
+    const double new_block_ent_post = partial_entropy(new_to_neighbor_post,
+                                                      new_block_degree_post,
+                                                      neighbor_block_degree_post);
+
+    entropy_delta += (old_block_ent_pre - old_block_ent_post + new_block_ent_pre - new_block_ent_pre) / scalar;
   }
 
-  double old_block_ent_pre = 0;
-  for (auto const& old_block_con : old_block_edge_counts_pre) {
-    if (old_block_con.first == new_block) {
-      continue;
-    }
-    const bool   is_old_block = old_block_con.first == old_block;
-    const double scalar       = is_old_block ? 2 : 1;
-
-    old_block_ent_pre += partial_entropy(old_block_con.second,
-                                         old_block_con.first->degree,
-                                         old_block_degree_pre)
-        / scalar;
-  }
-
-  double old_block_ent_post = 0;
-  for (auto const& old_block_con_post : old_block_edge_counts_post2) {
-    // We only need to look at the old-new combo once.
-    if (old_block_con_post.first == new_block) {
-      continue;
-    }
-
-    const bool   is_old_block    = old_block_con_post.first == old_block;
-    const double scalar          = is_old_block ? 2 : 1;
-    const double neighbor_degree = is_old_block
-        ? old_block_degree_post
-        : old_block_con_post.first->degree;
-
-    old_block_ent_post += partial_entropy(old_block_con_post.second,
-                                          neighbor_degree,
-                                          old_block_degree_post)
-        / scalar;
-  }
-
-  double new_block_ent_pre = 0;
-  for (auto const& new_block_con : new_block_edge_counts_pre) {
-    const bool   is_old_block = new_block_con.first == old_block;
-    const bool   is_new_block = new_block_con.first == new_block;
-    const double scalar       = is_new_block ? 2 : 1;
-
-    old_block_ent_pre += partial_entropy(new_block_con.second,
-                                         new_block_con.first->degree,
-                                         new_block_degree_pre)
-        / scalar;
-  }
-
-  double new_block_ent_post = 0;
-  for (auto const& new_block_con_post : new_block_edge_counts_post2) {
-
-    const bool   is_new_block = new_block_con_post.first == new_block;
-    const bool   is_old_block = new_block_con_post.first == old_block;
-    const double scalar       = is_new_block ? 2 : 1;
-
-    const double neighbor_degree = is_new_block
-        ? new_block_degree_post
-        : is_old_block
-            ? old_block_degree_post
-            : new_block_con_post.first->degree;
-
-    new_block_ent_post += partial_entropy(new_block_con_post.second,
-                                          neighbor_degree,
-                                          new_block_degree_post)
-        / scalar;
-  }
-
-  // Calculate the entropy portion that will change from move for before the move
-  const double partial_entropy_pre  = (new_block_ent_pre + old_block_ent_pre);
-  const double partial_entropy_post = (new_block_ent_post + old_block_ent_post);
-
-  // // Calculate the probability of doing the move to the new node
-  // double prob_move_to_new;
-  // if (!merge_testing) {
-  //   // No need to do this if we're looking at merge results
-  //   prob_move_to_new = calc_prob_of_move(new_block_edge_counts_pre, potential_neighbors, node_edges_to_neighbor_blocks, node_degree, EPS);
-  // }
-
+ 
   // Move node to new block
   node->set_parent(new_block);
 
   // Gather the new entropy portions from the two blocks
   const NodeEdgeMap old_block_edge_counts_post = old_block->gather_edges_to_level(block_level);
   const NodeEdgeMap new_block_edge_counts_post = new_block->gather_edges_to_level(block_level);
-  if ((old_block->id == "0-1_1") & (new_block->id == "0-1_0")) {
-    old_new_delta;
-  }
-  // Calculate the entropy portion that will change after doing the move
-  // const double partial_entropy_post = compute_node_edge_entropy_partial(old_block_edge_counts_post, old_block, new_block) + compute_node_edge_entropy_partial(new_block_edge_counts_post, new_block, old_block);
-
-  // double prob_move_back_to_old;
-  // if (!merge_testing) {
-  //   // Calculate the probability of moving back to the old node
-  //   prob_move_back_to_old = calc_prob_of_move(old_block_edge_counts_post, potential_neighbors, node_edges_to_neighbor_blocks, node_degree, EPS);
-  // }
-  // Get difference in entropy values from before and after move
-  const double entropy_delta = partial_entropy_pre - partial_entropy_post;
 
   bool   move_accepted   = false;
   double acceptance_prob = 0;
