@@ -38,6 +38,9 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
                                          const bool merge_testing = false)
 {
   PROFILE_FUNCTION();
+
+  const bool need_prob_ratio = !merge_testing;
+
   const int node_degree = node->degree;
 
   // The level that this proposal is taking place on
@@ -75,16 +78,22 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   // Make copy of the edge counts for post move
   NodeEdgeMap old_block_edge_counts_post2 = old_block_edge_counts_pre;
   NodeEdgeMap new_block_edge_counts_post2 = new_block_edge_counts_pre;
-  
-  double entropy_delta = 0;
+
+  double entropy_delta  = 0;
+  double pre_move_prob  = 0;
+  double post_move_prob = 0;
+
+  const double n_possible = potential_neighbors.size();
 
   // Loop through the node neighbor blocks
   for (auto const& neighbor_block : potential_neighbors) {
 
-    int        new_block_count_delta;
-    int        old_block_count_delta;
-    const int  old_to_neighbor_pre  = get_edge_counts(old_block_edge_counts_pre, neighbor_block);
-    const int  new_to_neighbor_pre  = get_edge_counts(new_block_edge_counts_pre, neighbor_block);
+    int       new_block_count_delta;
+    int       old_block_count_delta;
+    const int old_to_neighbor_pre = get_edge_counts(old_block_edge_counts_pre, neighbor_block);
+    const int new_to_neighbor_pre = get_edge_counts(new_block_edge_counts_pre, neighbor_block);
+    const int node_to_neighbor    = get_edge_counts(node_edges_to_neighbor_blocks, neighbor_block);
+
     const bool is_new_block         = neighbor_block == new_block;
     const bool is_old_block         = neighbor_block == old_block;
     double     old_scalar           = 2;
@@ -104,7 +113,6 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
       new_scalar            = 2;
     }
     else {
-      const int node_to_neighbor = get_edge_counts(node_edges_to_neighbor_blocks, neighbor_block);
       old_block_count_delta      = -node_to_neighbor;
       new_block_count_delta      = node_to_neighbor;
       old_scalar                 = 1;
@@ -135,39 +143,37 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
                                      new_block_degree_post)
         / new_scalar;
 
-    old_block_edge_counts_post2[neighbor_block] = old_to_neighbor_post;
-    new_block_edge_counts_post2[neighbor_block] = new_to_neighbor_post;
+    // Now calculate the probability of the move to the new block and the probability
+    // of a move back to the original block to get ratio for accept prob.
+
+    // First check if node being moved has any connections to this block
+
+    // If there are connections we can continue, otherwise result will be 0
+    if ((node_to_neighbor != 0) & need_prob_ratio) {
+      const double prop_node_edges_to_neighbor = double(node_to_neighbor) / node_degree;
+
+      const double fraction_bottom = neighbor_degree_pre + (EPS * n_possible);
+
+      pre_move_prob += prop_node_edges_to_neighbor * (new_to_neighbor_pre + EPS) / fraction_bottom;
+      post_move_prob += prop_node_edges_to_neighbor * (old_to_neighbor_post + EPS) / fraction_bottom;
+    }
   }
-
-
-  // Move node to new block
-  node->set_parent(new_block);
-
-  // Gather the new entropy portions from the two blocks
-  const NodeEdgeMap old_block_edge_counts_post = old_block->gather_edges_to_level(block_level);
-  const NodeEdgeMap new_block_edge_counts_post = new_block->gather_edges_to_level(block_level);  
 
   bool   move_accepted   = false;
   double acceptance_prob = 0;
 
-  if (!merge_testing) {
-    acceptance_prob = calc_prob_of_move(new_block_edge_counts_pre,
-                                        old_block_edge_counts_post,
-                                        node_edges_to_neighbor_blocks,
-                                        potential_neighbors,
-                                        node_degree,
-                                        EPS)
-        * exp(-entropy_delta);
+  if (need_prob_ratio) {
+    // Multiply both together to get the acceptance probability
+    acceptance_prob = exp(-entropy_delta) * (post_move_prob / pre_move_prob);
 
-    // // Multiply both together to get the acceptance probability
     move_accepted = acceptance_prob > 1
         ? true
         : sampler.draw_unif() < acceptance_prob;
-  }
 
-  if (!move_accepted | merge_testing) {
-    // Return the node to the old block if move wasn't accepted
-    node->set_parent(old_block);
+    if (move_accepted) {
+      // Move node to new block
+      node->set_parent(new_block);
+    }
   }
 
   return Proposal_Res(entropy_delta, acceptance_prob, move_accepted);
