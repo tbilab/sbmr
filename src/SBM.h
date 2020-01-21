@@ -98,7 +98,7 @@ class SBM : public Network {
   NodePtr propose_move(NodePtr node);
 
   // Make a decision on the proposed new block for node
-  Proposal_Res make_proposal_decision(NodePtr node, NodePtr new_block, bool merge_testing);
+  Proposal_Res make_proposal_decision(NodePtr node, NodePtr new_block, bool calc_accept_ratio = true);
 
   // Runs efficient MCMC sweep algorithm on desired node level
   MCMC_Sweeps mcmc_sweep(int  level,

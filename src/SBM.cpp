@@ -35,7 +35,7 @@ NodePtr SBM::propose_move(const NodePtr node)
 // =============================================================================
 Proposal_Res SBM::make_proposal_decision(const NodePtr node,
                                          const NodePtr new_block,
-                                         const bool    merge_testing = false)
+                                         const bool    calc_accept_ratio)
 {
   PROFILE_FUNCTION();
 
@@ -45,7 +45,6 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     return Proposal_Res(0.0, 0.0, false);
   }
 
-  const bool need_prob_ratio = !merge_testing;
   const int  node_degree     = node->degree;
   const int  block_level     = new_block->level; // The level that this proposal is taking place on
 
@@ -137,19 +136,19 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     // of a move back to the original block to get ratio for accept prob.
 
     // First check if node being moved has any connections to this block and if we need to calculate ratio
-    if ((node_to_neighbor != 0) & need_prob_ratio) {
+    if ((node_to_neighbor != 0) & calc_accept_ratio) {
       const double prop_edges_to_neighbor = double(node_to_neighbor) / node_degree;
       const double eps_B                  = EPS * n_possible;
 
       pre_move_prob += prop_edges_to_neighbor * (new_to_neighbor_pre + EPS) / (neighbor_degree_pre + eps_B);
       post_move_prob += prop_edges_to_neighbor * (old_to_neighbor_post + EPS) / (neighbor_degree_post + eps_B);
     }
-  }
+  } // End main block loop
+
 
   bool   move_accepted   = false;
   double acceptance_prob = 0;
-
-  if (need_prob_ratio) {
+  if (calc_accept_ratio) {
     // Multiply both together to get the acceptance probability
     acceptance_prob = exp(-entropy_delta) * (post_move_prob / pre_move_prob);
     move_accepted   = sampler.draw_unif() < acceptance_prob;
@@ -437,7 +436,7 @@ Merge_Step SBM::agglomerative_merge(const int block_level,
         continue;
 
       // Calculate entropy delta for move
-      double entropy_delta = make_proposal_decision(block.second, metablock, true).entropy_delta;
+      double entropy_delta = make_proposal_decision(block.second, metablock, false).entropy_delta;
 
       from_blocks.push_back(block.second);
       to_blocks.push_back(merge_block);
