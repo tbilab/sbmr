@@ -20,7 +20,7 @@ inline void Node::add_edge(const NodePtr node)
   // propigate new edge upwards to all parents
   NodePtr current_node  = this_ptr();
   int     current_level = level;
-  
+
   while (current_node) {
     // Add node to base edges
     (current_node->edges).push_back(node);

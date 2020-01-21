@@ -15,12 +15,11 @@ void Block_Consensus::initialize(const LevelPtr node_map)
       concensus_pairs.emplace(
           make_pair_key(node_a_it->first, node_b_it->first),
           Pair_Status(node_a_it->second->parent == node_b_it->second->parent)); // Checks if in same group
-    
     }
   }
 }
 
-void Block_Consensus::update_pair_tracking_map(const std::unordered_set<std::string>& updated_pairs)
+void Block_Consensus::update_pair_tracking_map(const PairSet& updated_pairs)
 {
   for (auto& pair : concensus_pairs) {
 
@@ -53,10 +52,10 @@ void Block_Consensus::dump_results(std::vector<std::string>& node_pair,
   }
 }
 
-void Block_Consensus::update_changed_pairs(NodePtr                          curr_node,
-                                           ChildSet&                        old_connections,
-                                           ChildSet&                        new_connections,
-                                           std::unordered_set<std::string>& pair_moves)
+void Block_Consensus::update_changed_pairs(NodePtr   curr_node,
+                                           ChildSet& old_connections,
+                                           ChildSet& new_connections,
+                                           PairSet&  pair_moves)
 {
   // Loop through all the nodes in the previous group node changes
   for (auto const& lost_pair : old_connections) {

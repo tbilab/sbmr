@@ -57,9 +57,7 @@ NodePtr Network::get_node_by_id(const string desired_id, const int level)
 // =============================================================================
 // Builds a block id from a scaffold for generated new blocks
 // =============================================================================
-string Network::build_block_id(const int type,
-                               const int level,
-                               const int index)
+string Network::build_block_id(const int type, const int level, const int index)
 {
   PROFILE_FUNCTION();
   return std::to_string(type) + "-" + std::to_string(level) + "_" + std::to_string(index);
@@ -68,9 +66,7 @@ string Network::build_block_id(const int type,
 // =============================================================================
 // Adds a node with an id and type to network
 // =============================================================================
-NodePtr Network::add_node(const string id,
-                          const int    type,
-                          const int    level)
+NodePtr Network::add_node(const string id, const int type, const int level)
 {
   PROFILE_FUNCTION();
   // Grab level
@@ -107,17 +103,12 @@ NodePtr Network::create_block_node(const int type, const int level)
   return add_node("new block", type, level);
 };
 
-// "C_Cpp.clang_format_fallbackStyle": "{BasedOnStyle: WebKit, AllowShortBlocksOnASingleLine: Always, AlignAfterOpenBracket: Align, AlignConsecutiveDeclarations: true, AlignConsecutiveAssignments: true, IndentWidth: 2, AlignTrailingComments:true, AllowShortIfStatementsOnASingleLine: true}",
-// { BasedOnStyle: LLVM, AllowShortBlocksOnASingleLine: Always, AlignAfterOpenBracket: Align, AlignConsecutiveDeclarations: true, AlignConsecutiveAssignments: true, IndentWidth: 2, AlignTrailingComments:true, AllowShortIfStatementsOnASingleLine: true }
-
 // =============================================================================
 // Return nodes of a desired type from level. If match_type = true then the
 // nodes returned are of the same type as specified, otherwise the nodes
 // returned are _not_ of the same type.
 // =============================================================================
-NodeVec Network::get_nodes_from_level(const int  type,
-                                      const int  level,
-                                      const bool match_type)
+NodeVec Network::get_nodes_from_level(const int type, const int level, const bool match_type)
 {
   PROFILE_FUNCTION();
   // Grab desired level reference
@@ -125,9 +116,8 @@ NodeVec Network::get_nodes_from_level(const int  type,
 
   // Make sure level has nodes before looping through it
   if (node_level->size() == 0) {
-    std::cerr << "Requested level " << level << " is empty of nodes of type "
-              << type << " when " << (match_type ? "" : "not ")
-              << "matching type" << std::endl;
+    std::cerr << "Requested level " << level << " is empty of nodes of type " << type << " when "
+              << (match_type ? "" : "not ") << "matching type" << std::endl;
     throw "Requested level is empty.";
   }
 
@@ -137,11 +127,10 @@ NodeVec Network::get_nodes_from_level(const int  type,
 
   // Loop through every node belonging to the desired level
   for (auto const& node : *node_level) {
-    
+
     // Decide to keep the node or not based on if it matches or doesn't and our
     // keeping preferance
-    bool keep_node = match_type ? (node.second->type == type)
-                                : (node.second->type != type);
+    bool keep_node = match_type ? (node.second->type == type) : (node.second->type != type);
 
     if (keep_node) {
       // ...Place it in returning list
@@ -168,8 +157,7 @@ void Network::add_edge(const string node1_id, const string node2_id)
 {
   PROFILE_FUNCTION();
 
-  Node::connect_nodes(get_node_by_id(node1_id),
-                      get_node_by_id(node2_id));
+  Node::connect_nodes(get_node_by_id(node1_id), get_node_by_id(node2_id));
 };
 
 // =============================================================================
@@ -247,7 +235,9 @@ void Network::initialize_blocks(const int num_blocks, const int level)
     // build a block node at the next level
     // We either build a new block for node if we're giving each node a block
     // or sample new block from available list of blocks for this type
-    NodePtr new_block = one_block_per_node ? create_block_node(node_type, level + 1) : block_sampler.sample(type_to_blocks[node_type]);
+    NodePtr new_block = one_block_per_node
+        ? create_block_node(node_type, level + 1)
+        : block_sampler.sample(type_to_blocks[node_type]);
 
     // assign that block node to the node
     node.second->set_parent(new_block);
@@ -350,9 +340,7 @@ State_Dump Network::get_state()
       state.type.push_back(node.second->type);
 
       // Record parent if node has one
-      state.parent.push_back(node.second->parent
-                                 ? node.second->parent->id
-                                 : "none");
+      state.parent.push_back(node.second->parent ? node.second->parent->id : "none");
 
     } // End node loop
   }   // End level loop
@@ -392,7 +380,8 @@ void Network::load_from_state(const State_Dump state)
     };
 
     // "none" indicates the highest level has been reached
-    if (parent_id == "none") continue;
+    if (parent_id == "none")
+      continue;
 
     // Attempt to find the parent node in the network
     NodePtr parent_node = aquire_node(parent_id, parent_level);

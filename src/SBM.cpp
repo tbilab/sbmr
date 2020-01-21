@@ -32,7 +32,9 @@ NodePtr SBM::propose_move(const NodePtr node)
 // =============================================================================
 // Make a decision on the proposed new block for node
 // =============================================================================
-Proposal_Res SBM::make_proposal_decision(const NodePtr node, const NodePtr new_block, const bool calc_accept_ratio)
+Proposal_Res SBM::make_proposal_decision(const NodePtr node,
+                                         const NodePtr new_block,
+                                         const bool    calc_accept_ratio)
 {
   PROFILE_FUNCTION();
 
@@ -84,8 +86,9 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node, const NodePtr new_b
     //  Get the degree of the neighbor before everything (will only change if its the new or old block.)
     const int neighbor_degree_pre = neighbor_block->degree;
 
-    if ((old_to_neighbor_pre == 0) & (new_to_neighbor_pre == 0) & (node_to_neighbor == 0))
+    if ((old_to_neighbor_pre == 0) & (new_to_neighbor_pre == 0) & (node_to_neighbor == 0)) {
       continue;
+    }
 
     // Initialize variables that will change based upon if the currently looped
     // group is one of the old or new blocks.
@@ -147,8 +150,9 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node, const NodePtr new_b
     move_accepted   = sampler.draw_unif() < acceptance_prob;
 
     // Move node to new block
-    if (move_accepted)
+    if (move_accepted) {
       node->set_parent(new_block);
+    }
   }
 
   return Proposal_Res(entropy_delta, acceptance_prob, move_accepted);
@@ -157,12 +161,11 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node, const NodePtr new_b
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-MCMC_Sweeps SBM::mcmc_sweep(
-    const int  level,
-    const int  num_sweeps,
-    const bool variable_num_blocks,
-    const bool track_pairs,
-    const bool verbose)
+MCMC_Sweeps SBM::mcmc_sweep(const int  level,
+                            const int  num_sweeps,
+                            const bool variable_num_blocks,
+                            const bool track_pairs,
+                            const bool verbose)
 {
   PROFILE_FUNCTION();
 
@@ -218,11 +221,15 @@ MCMC_Sweeps SBM::mcmc_sweep(
 
       // If the propsosed block is the nodes current block, we don't need to waste
       // time checking because decision will always result in same state.
-      if (curr_node->parent->id == proposed_new_block->id)
+      if (curr_node->parent->id == proposed_new_block->id) {
         continue;
+      }
 
       if (verbose) {
-        std::cout << i << "," << curr_node->id << "," << (curr_node->parent)->id << "," << proposed_new_block->id
+        std::cout << i
+                  << "," << curr_node->id
+                  << "," << (curr_node->parent)->id
+                  << "," << proposed_new_block->id
                   << ",";
       }
       // Calculate acceptance probability based on posterior changes

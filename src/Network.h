@@ -2,7 +2,6 @@
 #define __NETWORK_INCLUDED__
 
 #include "Node.h"
-// #include "helpers.h"
 #include "Sampler.h"
 
 #include <unordered_map>
@@ -17,7 +16,7 @@ struct State_Dump {
   std::vector<string> parent;
   std::vector<int>    level;
   std::vector<int>    type;
-  State_Dump(){};
+  State_Dump() {};
   State_Dump(
       std::vector<string> i,
       std::vector<string> p,

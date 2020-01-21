@@ -18,7 +18,9 @@ struct Merge_Step {
   int                 num_blocks;
   std::vector<string> from_node;
   std::vector<string> to_node;
-  Merge_Step() {}
+  Merge_Step()
+  {
+  }
   Merge_Step(const double e, const State_Dump s, const int n)
       : entropy(e)
       , state(s)
@@ -34,7 +36,7 @@ struct Proposal_Res {
   Proposal_Res(const double e, const double p, const bool a)
       : entropy_delta(e)
       , prob_of_accept(p)
-      , move_accepted(a){};
+      , move_accepted(a) {};
 };
 
 struct Sweep_Res {
@@ -65,7 +67,9 @@ class SBM : public Network {
   // Constructors
   // =========================================================================
   // Just sets default epsilon value to computer derived seed
-  SBM() {}
+  SBM()
+  {
+  }
 
   // Sets default seed to specified value
   SBM(int sampler_seed)

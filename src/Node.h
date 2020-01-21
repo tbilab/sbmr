@@ -11,10 +11,10 @@
 #include <iostream>
 #include <list>
 #include <map>
-#include <unordered_map>
 #include <memory>
 #include <queue>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 using std::string;
@@ -30,7 +30,7 @@ typedef std::unordered_set<NodePtr> ChildSet;
 typedef std::vector<NodePtr>        NodeVec;
 typedef std::list<NodePtr>          NodeList;
 // typedef std::map<NodePtr, int>      NodeEdgeMap;
-typedef std::unordered_map<NodePtr, int>      NodeEdgeMap;
+typedef std::unordered_map<NodePtr, int> NodeEdgeMap;
 
 //=================================
 // Main node class declaration
