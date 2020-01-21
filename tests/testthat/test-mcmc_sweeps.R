@@ -72,6 +72,7 @@ test_that("Pair tracking can be enabled and disabled",{
 
 })
 
+
 test_that("No nodes should have pairs for more steps than number of sweeps",{
   num_sweeps <- 5
   num_trails <- 20
@@ -91,43 +92,6 @@ test_that("No nodes should have pairs for more steps than number of sweeps",{
     expect_false(
       any(pair_connections$times_connected > num_sweeps)
     )
-  }
-
-})
-
-test_that("Number of block changes is accurate", {
-
-  n_nodes <- 30
-  n_blocks <- 10
-  n_tests <- 10
-
-  # Start with a random network
-  my_sbm <- create_sbm(sim_random_network(n_nodes = n_nodes)) %>%
-    initialize_blocks(num_blocks = n_blocks)
-
-  get_node_to_group_pair <- . %>%
-    get_state() %>%
-    dplyr::filter(level == 0) %>%
-    dplyr::select(id, parent)
-
-  for(i in 1:n_tests){
-    original_state <- my_sbm %>% get_node_to_group_pair()
-
-    # Run a single mcmc sweep
-    sweep_res <- my_sbm %>% mcmc_sweep()
-
-    # Get reported number of nodes moved
-    n_nodes_moved <- sweep_res$sweep_info$num_nodes_moved
-
-    new_state <- my_sbm %>% get_node_to_group_pair()
-
-
-    # Compare new state and old state
-    num_common_pairs <- new_state %>%
-      dplyr::inner_join(original_state, by = c("id", "parent")) %>%
-      nrow()
-
-
   }
 
 })
