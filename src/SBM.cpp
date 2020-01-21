@@ -86,9 +86,9 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     //  Get the degree of the neighbor before everything (will only change if its the new or old block.)
     const int neighbor_degree_pre = neighbor_block->degree;
 
-    if ((old_to_neighbor_pre == 0) & (new_to_neighbor_pre == 0) & (node_to_neighbor == 0)) {
-      continue;
-    }
+    // if ((old_to_neighbor_pre == 0) & (new_to_neighbor_pre == 0) & (node_to_neighbor == 0)) {
+    //   continue;
+    // }
 
     // Initialize variables that will change based upon if the currently looped
     // group is one of the old or new blocks.
@@ -211,17 +211,19 @@ MCMC_Sweeps SBM::mcmc_sweep(const int  level,
     for (const NodePtr& curr_node : node_vec) {
 
       // Check if we're running sweep with variable block numbers. If we are, we
-      // need to add a new block as a potential for the node to enter
-      // Add a new block node for the current node type
-      if (variable_num_blocks)
+      // need to make sure we don't have any extra unoccupied blocks floating around,
+      // then we need to add a new block as a potential for the node to enter
+      if (variable_num_blocks) {
+        clean_empty_blocks();
         create_block_node(curr_node->type, block_level);
+      }
 
       // Get a move proposal
       const NodePtr proposed_new_block = propose_move(curr_node);
 
-      // If the propsosed block is the nodes current block, we don't need to waste
+      // If the proposed block is the nodes current block, we don't need to waste
       // time checking because decision will always result in same state.
-      if (curr_node->parent->id == proposed_new_block->id) {
+      if ((curr_node->parent)->id == proposed_new_block->id) {
         continue;
       }
 
@@ -239,6 +241,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int  level,
         std::cout << proposal_results.entropy_delta << "," << proposal_results.prob_of_accept << ","
                   << proposal_results.move_accepted << std::endl;
       }
+
       // Is the move accepted?
       if (proposal_results.move_accepted) {
         const NodePtr old_block = curr_node->parent;
@@ -250,11 +253,6 @@ MCMC_Sweeps SBM::mcmc_sweep(const int  level,
         results.nodes_moved.push_back(curr_node->id);
         num_nodes_moved++;
         entropy_delta += proposal_results.entropy_delta;
-
-        // If we are varying number of blocks and we made a move we should clean
-        // up the now potentially empty blocks for the next node proposal.
-        if (variable_num_blocks)
-          clean_empty_blocks();
 
         if (track_pairs) {
           Block_Consensus::update_changed_pairs(curr_node, old_block->children, proposed_new_block->children,
@@ -347,10 +345,10 @@ void SBM::merge_blocks(NodePtr block_a, NodePtr block_b)
 {
   PROFILE_FUNCTION();
   // Place all the members of block b under block a
-  auto children_to_move = block_b->children;
+  const ChildSet children_to_move = block_b->children;
 
-  for (const NodePtr& member_node : children_to_move) {
-    member_node->set_parent(block_a);
+  for (const NodePtr& child_node : children_to_move) {
+    child_node->set_parent(block_a);
   }
 }
 
@@ -361,33 +359,40 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
 {
   PROFILE_FUNCTION();
   // Quick check to make sure reasonable request
-  if (num_merges_to_make == 0) {
+  if (num_merges_to_make <= 0) {
     throw "Zero merges requested.";
   }
 
   // Level that the block metablocks will sit at
-  int meta_level = block_level + 1;
+  const int meta_level = block_level + 1;
 
-  // Build a single meta-block for each node at desired level
-  give_every_node_at_level_own_block(block_level);
+  if (nodes.count(meta_level) < 1) {
+    // Build a single meta-block for each block if they don't exist already
+    give_every_node_at_level_own_block(block_level);
+  }
 
   // Grab all the blocks we're looking to merge
-  LevelPtr all_blocks = get_level(block_level);
+  const LevelPtr all_blocks = get_level(block_level);
 
-  // Build vectors for recording merges
-  NodeVec             from_blocks;
-  NodeVec             to_blocks;
-  std::vector<double> move_delta;
+  // // Build vectors for recording merges
+  // NodeVec             from_blocks;
+  // NodeVec             to_blocks;
+  // std::vector<double> move_delta;
 
   const int size_to_return = N_CHECKS_PER_block * all_blocks->size();
-  from_blocks.reserve(size_to_return);
-  to_blocks.reserve(size_to_return);
-  move_delta.reserve(size_to_return);
+  // from_blocks.reserve(size_to_return);
+  // to_blocks.reserve(size_to_return);
+  // move_delta.reserve(size_to_return);
+
+  // Priority queue to find best moves
+  std::priority_queue<std::pair<double, std::pair<NodePtr, NodePtr>>> best_moves_q;
 
   // Make sure doing a merge makes sense by checking we have enough blocks
   // of every type
   for (int i = 0; i < node_type_counts.size(); i++) {
-    if (node_type_counts[i][block_level] < 2) {
+    const int num_blocks_of_type = node_type_counts[i][block_level];
+    
+    if (num_blocks_of_type < 2) {
       throw "To few blocks to perform merge.";
     }
   }
@@ -400,14 +405,14 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
     // If we're running algorithm in greedy mode we should just
     // add every possible block to the blocks-to-search list
     if (GREEDY) {
-      // Get a list of all the potential merges for block
+      // Get a list of all the potential metablocks for block
       metablocks_to_search = get_nodes_of_type_at_level(block.second->type, meta_level);
     }
     else {
       metablocks_to_search.reserve(N_CHECKS_PER_block);
       // Otherwise, we should sample a given number of blocks to check
       for (int i = 0; i < N_CHECKS_PER_block; i++) {
-        // Sample a block from potential blocks
+        // Sample a metablock from potentials
         metablocks_to_search.push_back(propose_move(block.second));
       }
     }
@@ -416,18 +421,24 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
     // through them and check entropy changes
     for (const NodePtr& metablock : metablocks_to_search) {
       // Get block that the metablock belongs to
-      NodePtr merge_block = *((metablock->children).begin());
+      const NodePtr merge_block = *((metablock->children).begin());
 
       // Skip block if it is the current block for this node
-      if (merge_block->id == block.second->id)
+      if (merge_block->id == block.second->id) {
         continue;
+      }
 
       // Calculate entropy delta for move
       double entropy_delta = make_proposal_decision(block.second, metablock, false).entropy_delta;
 
-      from_blocks.push_back(block.second);
-      to_blocks.push_back(merge_block);
-      move_delta.push_back(entropy_delta);
+      // from_blocks.push_back(block.second);
+      // to_blocks.push_back(merge_block);
+      // move_delta.push_back(entropy_delta);
+
+      // Place this move's results in the queue.
+      // The negative here means that when we pop the top value of
+      // the queue we get the smallest value, not the largeset.
+      best_moves_q.push(std::make_pair(-entropy_delta, std::make_pair(block.second, merge_block)));
     }
   }
 
@@ -435,15 +446,6 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
   // Initialize a merge result holder struct
   Merge_Step results;
 
-  // Priority queue to find best moves
-  std::priority_queue<std::pair<double, int>> best_moves;
-
-  for (int i = 0; i < move_delta.size(); ++i) {
-    // Place this move's results in the queue.
-    // The negative here means that when we pop the top value of
-    // the queue we get the smallest value, not the largeset.
-    best_moves.push(std::pair<double, int>(-move_delta[i], i));
-  }
 
   // A set of the unique merges we've made
   std::unordered_set<string> merges_made;
@@ -455,18 +457,17 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
 
   while (more_merges_needed & queue_not_empty) {
     // Extract index of best remaining merge
-    int merge_index = best_moves.top().second;
+    const auto best_merge = best_moves_q.top().second;
 
     // Get blocks that are being merged (culled)
-    NodePtr from_block = from_blocks[merge_index];
-    NodePtr to_block   = to_blocks[merge_index];
+    const NodePtr from_block = best_merge.first;
+    const NodePtr to_block   = best_merge.second;
 
     // Make sure we haven't already merged the culled block
-    bool from_still_exists = merges_made.find(from_block->id) == merges_made.end();
+    const bool from_still_exists = merges_made.find(from_block->id) == merges_made.end();
 
-    // Also make sure that we haven't removed the block we're trying to
-    // merge into
-    bool to_still_exists = merges_made.find(to_block->id) == merges_made.end();
+    // Also make sure that we haven't removed the block we're trying to merge into
+    const bool to_still_exists = merges_made.find(to_block->id) == merges_made.end();
 
     if (from_still_exists & to_still_exists) {
       // Insert new culled block into set
@@ -481,15 +482,15 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
     }
 
     // Remove the last index from our queue and go again
-    best_moves.pop();
+    best_moves_q.pop();
 
     // Update termination checking conditions
     more_merges_needed = merges_made.size() < num_merges_to_make;
-    queue_not_empty    = best_moves.size() != 0;
+    queue_not_empty    = best_moves_q.size() != 0;
   }
 
   // Erase the empty blocks and metablocks
-  auto removed_blocks = clean_empty_blocks();
+  clean_empty_blocks();
 
   // Return the entropy for new model and merges done
   results.entropy = compute_entropy(block_level - 1);
@@ -512,8 +513,11 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int  node_level,
   // Start by giving every node at the desired level its own block
   give_every_node_at_level_own_block(node_level);
 
+  // Build a metagroup for all the groups
+  give_every_node_at_level_own_block(block_level);
+
   // Grab reference to the block nodes container
-  auto block_level_ptr = get_level(block_level);
+  const LevelPtr block_level_ptr = get_level(block_level);
 
   // A conservative estimate of how many steps collapsing will take as
   // anytime we're not doing an exhaustive search we will use less than
@@ -529,17 +533,13 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int  node_level,
 
   while (curr_num_blocks > desired_num_blocks) {
     // Decide how many merges we should do.
-    int num_merges = int(curr_num_blocks - (curr_num_blocks / SIGMA));
-
-    // Need to remove at least 1 block
-    if (num_merges < 1)
-      num_merges = 1;
-
-    // Make sure we don't overstep the goal number of blocks
-    const int num_blocks_after_merge = curr_num_blocks - num_merges;
-    if (num_blocks_after_merge < desired_num_blocks) {
-      num_merges = curr_num_blocks - desired_num_blocks;
-    }
+    // Make sure we don't overstep the goal number of blocks and
+    // we need to remove at least 1 block
+    const int num_merges = std::max(
+        std::min(
+            curr_num_blocks - desired_num_blocks,
+            int(curr_num_blocks - (curr_num_blocks / SIGMA))),
+        1);
 
     Merge_Step merge_results;
 
@@ -559,11 +559,12 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int  node_level,
     if (num_mcmc_steps != 0) {
       // Let model equilibriate with new block layout...
       mcmc_sweep(node_level, num_mcmc_steps, false, false);
-
       clean_empty_blocks();
+
       // Update the step entropy results with new equilibriated model
-      if (report_all_steps)
+      if (report_all_steps) {
         merge_results.entropy = compute_entropy(node_level);
+      }
     }
 
     // Update current number of blocks
