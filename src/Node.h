@@ -11,6 +11,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <unordered_map>
 #include <memory>
 #include <queue>
 #include <string>
@@ -28,7 +29,8 @@ typedef std::shared_ptr<Node>       NodePtr;
 typedef std::unordered_set<NodePtr> ChildSet;
 typedef std::vector<NodePtr>        NodeVec;
 typedef std::list<NodePtr>          NodeList;
-typedef std::map<NodePtr, int>      NodeEdgeMap;
+// typedef std::map<NodePtr, int>      NodeEdgeMap;
+typedef std::unordered_map<NodePtr, int>      NodeEdgeMap;
 
 //=================================
 // Main node class declaration
