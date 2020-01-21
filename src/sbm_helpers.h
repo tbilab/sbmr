@@ -2,7 +2,9 @@
 
 #include "Node.h"
 
-inline double partial_entropy(const double a, const double b, const double c)
+inline double partial_entropy(const double& a,
+                              const double& b,
+                              const double& c)
 {
 
   if (a == 0 | b == 0 | c == 0) {
@@ -11,7 +13,6 @@ inline double partial_entropy(const double a, const double b, const double c)
 
   return a * std::log(a / (b * c));
 }
-
 
 inline int get_edge_counts(const NodeEdgeMap& node_cons, const NodePtr& neighbor)
 {
