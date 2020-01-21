@@ -22,7 +22,7 @@ class Rcpp_SBM : public SBM {
     int node_int_type;
 
     // See if the node's type is in our list
-    auto loc_of_int_type = type_string_to_int.find(type);
+    const auto loc_of_int_type = type_string_to_int.find(type);
 
     if (loc_of_int_type == type_string_to_int.end()) {
       // If its a new type, we need to add a new entry for this type to both maps
@@ -93,7 +93,7 @@ class Rcpp_SBM : public SBM {
     for (auto const& type : string_types) {
       // Make sure that the requested type has been seen by the model already and
       // send message to R if it hasnt.
-      auto loc_of_int_type = type_string_to_int.find(type);
+      const auto loc_of_int_type = type_string_to_int.find(type);
       if (loc_of_int_type == type_string_to_int.end()) {
         stop(type + " not found in model");
       }
@@ -133,7 +133,7 @@ class Rcpp_SBM : public SBM {
   List get_data()
   {
     // Grab level 0
-    LevelPtr level_data = get_level(0);
+    const LevelPtr level_data = get_level(0);
 
     // Initialize vectors to hold ids and types of nodes
     std::vector<string> node_ids;
@@ -201,8 +201,7 @@ class Rcpp_SBM : public SBM {
     for (auto& pair : concensus_pairs) {
 
       // Check if this pair was updated on last sweep
-      auto sweep_change_loc   = updated_pairs.find(pair.first);
-      bool updated_last_sweep = sweep_change_loc != updated_pairs.end();
+      const bool updated_last_sweep = updated_pairs.find(pair.first) != updated_pairs.end();
 
       if (updated_last_sweep) {
         // Update the pair connection status
@@ -253,9 +252,9 @@ class Rcpp_SBM : public SBM {
             _["num_nodes_moved"]  = results.sweep_num_nodes_moved,
             _["stringsAsFactors"] = false),
         _["pairing_counts"] = track_pairs ? DataFrame::create(
-                                                _["node_pair"]        = node_pair,
-                                                _["times_connected"]  = times_connected,
-                                                _["stringsAsFactors"] = false)
+                                  _["node_pair"]        = node_pair,
+                                  _["times_connected"]  = times_connected,
+                                  _["stringsAsFactors"] = false)
                                           : "NA");
   }
 
@@ -266,10 +265,10 @@ class Rcpp_SBM : public SBM {
   {
 
     // Perform collapse
-    auto collapse_results = SBM::collapse_blocks(node_level,
-                                                 num_mcmc_steps,
-                                                 desired_num_blocks,
-                                                 report_all_steps);
+    const auto collapse_results = SBM::collapse_blocks(node_level,
+                                                       num_mcmc_steps,
+                                                       desired_num_blocks,
+                                                       report_all_steps);
 
     List entropy_results;
 
@@ -316,17 +315,41 @@ class Rcpp_SBM : public SBM {
     SBM::load_from_state(State_Dump(id, parent, level, type_to_int(string_types)));
   }
 
-  void   set_epsilon(const double eps) { EPS = eps; }
-  double get_epsilon() { return EPS; }
+  void set_epsilon(const double eps)
+  {
+    EPS = eps;
+  }
+  double get_epsilon()
+  {
+    return EPS;
+  }
 
-  void   set_sigma(const double sigma) { SIGMA = sigma; }
-  double get_sigma() { return SIGMA; }
+  void set_sigma(const double sigma)
+  {
+    SIGMA = sigma;
+  }
+  double get_sigma()
+  {
+    return SIGMA;
+  }
 
-  void set_greedy(const bool greedy) { GREEDY = greedy; }
-  bool get_greedy() { return GREEDY; }
+  void set_greedy(const bool greedy)
+  {
+    GREEDY = greedy;
+  }
+  bool get_greedy()
+  {
+    return GREEDY;
+  }
 
-  void set_n_checks_per_block(const int n) { N_CHECKS_PER_block = n; }
-  int  get_n_checks_per_block() { return N_CHECKS_PER_block; }
+  void set_n_checks_per_block(const int n)
+  {
+    N_CHECKS_PER_block = n;
+  }
+  int get_n_checks_per_block()
+  {
+    return N_CHECKS_PER_block;
+  }
 };
 
 RCPP_MODULE(SBM)
