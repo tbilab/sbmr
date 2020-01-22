@@ -68,8 +68,8 @@ class Network {
   NodeVec       get_nodes_of_type_at_level(int type, int level); // Return nodes of a desired type from level matching type
   void          add_edge(NodePtr node_a, NodePtr node_b);        // Adds a edge between two nodes based on their references
   void          add_edge(string id_a, string id_b);              // Adds a edge between two nodes based on their ids
-  LevelPtr      give_every_node_at_level_own_block(int level);   // Builds and assigns a block node for every node in a given level
-  LevelPtr      initialize_blocks(int num_blocks, int level);    // Adds a num_blocks to model and randomly assigns them for a given level (-1 means every node gets their own block)
+  void          give_every_node_at_level_own_block(int level);   // Builds and assigns a block node for every node in a given level
+  void          initialize_blocks(int num_blocks, int level);    // Adds a num_blocks to model and randomly assigns them for a given level (-1 means every node gets their own block)
   NodeVec       clean_empty_blocks();                            // Scan through levels and remove all block nodes that have no children. Returns # of blocks removed
   static string build_block_id(int type, int level, int index);  // Builds a block id from a scaffold for generated new blocks
 };
