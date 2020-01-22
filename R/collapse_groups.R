@@ -74,7 +74,7 @@ collapse_blocks <- function(
 
   # Set free parameters
   sbm$GREEDY <- greedy
-  sbm$N_CHECKS_PER_block <- num_block_proposals
+  sbm$N_CHECKS_PER_BLOCK <- num_block_proposals
   sbm$SIGMA <- sigma
 
   collapse_results <- sbm$collapse_blocks(

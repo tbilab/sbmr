@@ -42,7 +42,7 @@ copy_sbm <- function(old_sbm, match_state = FALSE){
 
   # Set free parameters
   new_sbm$SIGMA <- old_sbm$SIGMA
-  new_sbm$N_CHECKS_PER_block <- old_sbm$N_CHECKS_PER_block
+  new_sbm$N_CHECKS_PER_BLOCK <- old_sbm$N_CHECKS_PER_BLOCK
   new_sbm$GREEDY <- old_sbm$GREEDY
 
   # Update state of new model if needed

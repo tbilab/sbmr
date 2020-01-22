@@ -86,7 +86,7 @@ class SBM : public Network {
   double EPS                = 0.1;
   double SIGMA              = 0.5;
   bool   GREEDY             = true;
-  int    N_CHECKS_PER_block = 5; // When not greedy
+  int    N_CHECKS_PER_BLOCK = 5; // When not greedy
 
   // Methods
   // =========================================================================

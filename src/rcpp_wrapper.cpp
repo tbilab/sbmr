@@ -344,11 +344,11 @@ class Rcpp_SBM : public SBM {
 
   void set_n_checks_per_block(const int n)
   {
-    N_CHECKS_PER_block = n;
+    N_CHECKS_PER_BLOCK = n;
   }
   int get_n_checks_per_block()
   {
-    return N_CHECKS_PER_block;
+    return N_CHECKS_PER_BLOCK;
   }
 };
 
@@ -370,7 +370,7 @@ RCPP_MODULE(SBM)
                 &Rcpp_SBM::get_sigma, &Rcpp_SBM::set_sigma,
                 "Sigma value for determining rate of agglomerative merging")
 
-      .property("N_CHECKS_PER_block",
+      .property("N_CHECKS_PER_BLOCK",
                 &Rcpp_SBM::get_n_checks_per_block, &Rcpp_SBM::set_n_checks_per_block,
                 "If not in greedy mode, how many options do we check per node for moves in agglomerative merging?")
 
@@ -447,7 +447,7 @@ sbm$set_node_parent("b3", "b12", 0)
 # Set some model parameters
 sbm$GREEDY <- TRUE
 sbm$EPS <- 0.1
-sbm$N_CHECKS_PER_block <- 5
+sbm$N_CHECKS_PER_BLOCK <- 5
 
 original_state <- sbm$get_state()
 

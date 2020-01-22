@@ -73,7 +73,7 @@ test_that("Hyperparameters are copied over", {
   initial_sbm <- create_sbm(eps = eps)
   initial_sbm$SIGMA <- sigma
   initial_sbm$GREEDY <- greedy
-  initial_sbm$N_CHECKS_PER_block <- n_checks
+  initial_sbm$N_CHECKS_PER_BLOCK <- n_checks
 
   # Copy initial sbm and tell it to match state as well
   copied_sbm <- copy_sbm(initial_sbm)
@@ -81,5 +81,5 @@ test_that("Hyperparameters are copied over", {
   expect_equal(initial_sbm$EPS, eps)
   expect_equal(initial_sbm$SIGMA, sigma)
   expect_equal(initial_sbm$GREEDY, greedy)
-  expect_equal(initial_sbm$N_CHECKS_PER_block, n_checks)
+  expect_equal(initial_sbm$N_CHECKS_PER_BLOCK, n_checks)
 })

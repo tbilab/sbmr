@@ -60,7 +60,7 @@ collapse_run <- function(
     )
   } else {
     sbm$SIGMA <- sigma
-    sbm$N_CHECKS_PER_block <- num_block_proposals
+    sbm$N_CHECKS_PER_BLOCK <- num_block_proposals
     collapse_results <- sbm$collapse_run(as.integer(level),
                                 as.integer(num_mcmc_sweeps),
                                 as.integer(block_range))
