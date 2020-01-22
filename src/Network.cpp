@@ -172,16 +172,16 @@ void Network::add_edge(const NodePtr node1, const NodePtr node2)
 // =============================================================================
 // Builds and assigns a block node for every node in a given level
 // =============================================================================
-void Network::give_every_node_at_level_own_block(const int level)
+LevelPtr Network::give_every_node_at_level_own_block(const int level)
 {
-  initialize_blocks(-1, level);
+  return initialize_blocks(-1, level);
 }
 
 // =============================================================================
 // Adds a desired number of blocks and randomly assigns them for a given level
 // num_blocks = -1 means every node gets their own block
 // =============================================================================
-void Network::initialize_blocks(const int num_blocks, const int level)
+LevelPtr Network::initialize_blocks(const int num_blocks, const int level)
 {
   PROFILE_FUNCTION();
 
@@ -206,7 +206,7 @@ void Network::initialize_blocks(const int num_blocks, const int level)
 
   // Figure out how we're making blocks, is it one block per node or a set number
   // of blocks total?
-  bool one_block_per_node = num_blocks == -1;
+  const bool one_block_per_node = num_blocks == -1;
 
   // Make a map that gives us type -> array of new blocks
   std::map<int, NodeVec> type_to_blocks;
@@ -242,6 +242,8 @@ void Network::initialize_blocks(const int num_blocks, const int level)
     // assign that block node to the node
     node.second->set_parent(new_block);
   }
+
+  return node_level;
 }
 
 // =============================================================================
