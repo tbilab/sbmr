@@ -8,54 +8,28 @@
 
 int main(int argc, char** argv)
 {
-  int num_sweeps = 2;
+  // Setup simple SBM model
+  SBM my_SBM = build_simple_SBM();
 
-  Sampler random(312);
+  int    num_initial_blocks = my_SBM.get_level(1)->size();
+  double initial_entropy    = my_SBM.compute_entropy(0);
 
-  // Setup a simulated SBM model
-  SBM my_SBM = build_unipartite_simulated();
+  // Run greedy aglomerative merge with best single merge done
+  Merge_Step single_merge = my_SBM.agglomerative_merge(1, 1);
 
-  // Give it some random groupings of the correct number of groups
-  my_SBM.initialize_blocks(3, 0);
+  // Make sure that we now have one less block than before for each type
+  int new_block_num    = my_SBM.get_level(1)->size();
+  int change_in_blocks = num_initial_blocks - new_block_num;
+  // REQUIRE(change_in_blocks == 1);
 
-  auto all_nodes = my_SBM.get_level(0);
+  // Make sure entropy has gone up as we would expect
+  // REQUIRE(single_merge.entropy_delta > 0);
 
-  for (int i = 0; i < num_sweeps; i++) {
-    // Loop through all nodes
-    for (auto node_to_move_it = all_nodes->begin();
-         node_to_move_it != all_nodes->end();
-         node_to_move_it++) {
-      const NodePtr     node_to_move      = node_to_move_it->second;
-      const std::string pre_move_group_id = node_to_move->parent->id;
+  // Run again but this time merging the best 2
+  SBM new_SBM = build_simple_SBM();
 
-      // Calculate current model entropy
-      const double pre_entropy = my_SBM.compute_entropy(0);
+  // Run greedy aglomerative merge with best single merge done
+  Merge_Step double_merge = new_SBM.agglomerative_merge(1, 2);
 
-      // Choose random group for node to join
-      const NodePtr group_to_move_to = random.sample(my_SBM.get_nodes_of_type_at_level(node_to_move->type, 1));
-
-      // Get move proposal report for move
-      const Proposal_Res proposal_vals = my_SBM.make_proposal_decision(node_to_move, group_to_move_to, true);
-
-      const double reported_entropy_delta = proposal_vals.entropy_delta;
-
-      // Move node
-      node_to_move->set_parent(group_to_move_to);
-
-      // Take new model entropy
-      const double true_delta = my_SBM.compute_entropy(0) - pre_entropy;
-
-      std::cout << node_to_move->id << ": ("
-                << pre_move_group_id << " -> "
-                << group_to_move_to->id << ") = "
-                << std::to_string(reported_entropy_delta) << " ~ "
-                << std::to_string(true_delta)
-                << std::endl;
-
-      // // They should be the same
-      // REQUIRE(true_delta == Approx(reported_entropy_delta).epsilon(0.1));
-
-    } // End node loop
-  }   // End iteration loop
   return 0;
 }
