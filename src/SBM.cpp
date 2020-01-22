@@ -385,7 +385,7 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
 
   // Priority queue to find best moves
   std::priority_queue<std::pair<double, std::pair<NodePtr, NodePtr>>> best_moves_q;
-  
+
   // Set to keep track of what pairs of nodes we have checked already so we dont double check
   std::unordered_set<std::string> checked_pairs;
 
@@ -393,7 +393,7 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
   // of every type
   for (int i = 0; i < node_type_counts.size(); i++) {
     const int num_blocks_of_type = node_type_counts[i][block_level];
-    
+
     if (num_blocks_of_type < 2) {
       throw "To few blocks to perform merge.";
     }
@@ -404,7 +404,7 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
 
     NodeVec metablocks_to_search;
 
-    // No point in running M checks if there are < M blocks left. 
+    // No point in running M checks if there are < M blocks left.
     const bool less_blocks_than_checks = node_type_counts[block.second->type][meta_level] <= N_CHECKS_PER_BLOCK;
     // If we're running algorithm in greedy mode we should just
     // add every possible block to the blocks-to-search list
@@ -445,17 +445,17 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
     }
   }
 
-  // Now we find the top merges
-  // Initialize a merge result holder struct
+  // Now we find the top merges...
+  // Start by initializing a merge result struct
   Merge_Step results;
 
   // A set of the blocks that have been merged already this step and thus are off limits
   std::unordered_set<NodePtr> merged_blocks;
-  int                         num_merges_made    = 0;
+  int                         num_merges_made = 0;
 
   // Start working our way through the queue of best moves and making merges
   while ((num_merges_made < num_merges_to_make) & (best_moves_q.size() != 0)) {
-    // Extract index of best remaining merge
+    // Extract best remaining merge
     const auto best_merge = best_moves_q.top().second;
 
     // Make sure we haven't already merged the culled block
@@ -476,9 +476,6 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
     // Remove the last index from our queue and go again
     best_moves_q.pop();
   }
-
-  // // Erase the empty blocks and metablocks
-  // clean_empty_blocks();
 
   return results;
 }
