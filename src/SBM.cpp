@@ -374,15 +374,7 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
   // Grab all the blocks we're looking to merge
   const LevelPtr all_blocks = get_level(block_level);
 
-  // // Build vectors for recording merges
-  // NodeVec             from_blocks;
-  // NodeVec             to_blocks;
-  // std::vector<double> move_delta;
-
-  const int size_to_return = N_CHECKS_PER_block * all_blocks->size();
-  // from_blocks.reserve(size_to_return);
-  // to_blocks.reserve(size_to_return);
-  // move_delta.reserve(size_to_return);
+  const int size_to_return = N_CHECKS_PER_BLOCK * all_blocks->size();
 
   // Priority queue to find best moves
   std::priority_queue<std::pair<double, std::pair<NodePtr, NodePtr>>> best_moves_q;
@@ -402,16 +394,18 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
 
     NodeVec metablocks_to_search;
 
+    // No point in running M checks if there are < M blocks left. 
+    const bool less_blocks_than_checks = node_type_counts[block.second->type][meta_level] <= N_CHECKS_PER_BLOCK;
     // If we're running algorithm in greedy mode we should just
     // add every possible block to the blocks-to-search list
-    if (GREEDY) {
+    if (GREEDY | less_blocks_than_checks) {
       // Get a list of all the potential metablocks for block
       metablocks_to_search = get_nodes_of_type_at_level(block.second->type, meta_level);
     }
     else {
-      metablocks_to_search.reserve(N_CHECKS_PER_block);
+      metablocks_to_search.reserve(N_CHECKS_PER_BLOCK);
       // Otherwise, we should sample a given number of blocks to check
-      for (int i = 0; i < N_CHECKS_PER_block; i++) {
+      for (int i = 0; i < N_CHECKS_PER_BLOCK; i++) {
         // Sample a metablock from potentials
         metablocks_to_search.push_back(propose_move(block.second));
       }
@@ -431,13 +425,7 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
       // Calculate entropy delta for move
       double entropy_delta = make_proposal_decision(block.second, metablock, false).entropy_delta;
 
-      // from_blocks.push_back(block.second);
-      // to_blocks.push_back(merge_block);
-      // move_delta.push_back(entropy_delta);
-
-      // Place this move's results in the queue.
-      // The negative here means that when we pop the top value of
-      // the queue we get the smallest value, not the largeset.
+     // Place this move's results in the queue.
       best_moves_q.push(std::make_pair(-entropy_delta, std::make_pair(block.second, merge_block)));
     }
   }
