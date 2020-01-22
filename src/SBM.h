@@ -13,16 +13,17 @@
 class SBM;
 
 struct Merge_Step {
-  double              entropy;
+  double              entropy_delta;
   State_Dump          state;
   int                 num_blocks;
   std::vector<string> from_node;
   std::vector<string> to_node;
   Merge_Step()
+      : entropy_delta(0)
   {
   }
   Merge_Step(const double e, const State_Dump s, const int n)
-      : entropy(e)
+      : entropy_delta(e)
       , state(s)
       , num_blocks(n)
   {
