@@ -11,7 +11,6 @@ collapse_blocks(
   desired_num_blocks = 1,
   report_all_steps = FALSE,
   eps = NULL,
-  greedy = FALSE,
   num_block_proposals = 5,
   sigma = 2
 )
@@ -41,15 +40,11 @@ transfer.}
 merging and mcmc sweeps. If value is set to value other than null the SBMs
 current epsilon value will be overridden.}
 
-\item{greedy}{Should every possible block merger be considered? If \code{FALSE},
-candidates for mergers are drawn by similarity in edges (just as MCMC
-move proposals are). This may lead the model to local minimums by always
-pursuing best possible merges.}
-
-\item{num_block_proposals}{If \code{greedy = FALSE}, this parameter controls how
-many merger proposals are drawn for each block in the model. A larger
-number will increase the exploration of merge potentials but may lead the
-model to local minimums for the same reason greedy mode does.}
+\item{num_block_proposals}{Controls how many merger proposals are drawn for
+each block in the model. A larger number will increase the exploration of
+merge potentials but may lead the model to local minimums. If the number of
+proposals is greater than then number of blocks then all blocks are
+searched exhaustively.}
 
 \item{sigma}{Controls the rate of collapse. At each step of the collapsing
 the model will try and remove \code{current_num_nodes(1 - 1/sigma)} nodes from

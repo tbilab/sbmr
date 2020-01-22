@@ -9,7 +9,8 @@ mcmc_sweep(
   num_sweeps = 1,
   variable_num_blocks = TRUE,
   track_pairs = FALSE,
-  level = 0
+  level = 0,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -27,6 +28,10 @@ number of sweeps they shared the same group?}
 
 \item{level}{Level of nodes who's blocks will have their block membership run
 through MCMC proposal-accept routine.}
+
+\item{verbose}{If set to \code{TRUE} then each proposed move for all sweeps will
+have information given on entropy delta, probability of moving, and if the
+move were accepted printed to the console.}
 }
 \value{
 List with two dataframes. The first telling for all sweeps everytime

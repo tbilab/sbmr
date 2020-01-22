@@ -27,10 +27,11 @@ the model. So a larger sigma means a faster collapse rate.}
 
 \item{num_final_blocks}{Array of integers corresponding to number of blocks to check in run.}
 
-\item{num_block_proposals}{If \code{greedy = FALSE}, this parameter controls how
-many merger proposals are drawn for each block in the model. A larger
-number will increase the exploration of merge potentials but may lead the
-model to local minimums for the same reason greedy mode does.}
+\item{num_block_proposals}{Controls how many merger proposals are drawn for
+each block in the model. A larger number will increase the exploration of
+merge potentials but may lead the model to local minimums. If the number of
+proposals is greater than then number of blocks then all blocks are
+searched exhaustively.}
 
 \item{num_mcmc_sweeps}{How many MCMC sweeps the model does at each
 agglomerative merge step. This allows the model to allow nodes to find
