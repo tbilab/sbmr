@@ -86,8 +86,6 @@ class SBM : public Network {
   // Parameters that control the mcmc and merging stuffs
   double EPS                = 0.1;
   double SIGMA              = 0.5;
-  bool   GREEDY             = true;
-  int    N_CHECKS_PER_BLOCK = 5; // When not greedy
 
   // Methods
   // =========================================================================
@@ -113,13 +111,14 @@ class SBM : public Network {
                          bool verbose = false);
 
   // Merge two blocks at a given level based on the probability of doing so
-  Merge_Step agglomerative_merge(int level_of_blocks, int n_merges);
+  Merge_Step agglomerative_merge(int level_of_blocks, int n_merges, int num_checks_per_block);
 
   // Run mcmc chain initialization by finding best organization
   // of B' blocks for all B from B = N to B = 1.
   std::vector<Merge_Step> collapse_blocks(int  node_level,
                                           int  num_mcmc_steps,
-                                          int  desired_num_blocks, // Default value which lets model drop to 1 block per type.
+                                          int  desired_num_blocks, 
+                                          int num_checks_per_block,
                                           bool report_all_steps);
 
 }; // End SBM class declaration

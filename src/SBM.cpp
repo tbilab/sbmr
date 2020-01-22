@@ -362,7 +362,9 @@ void SBM::merge_blocks(NodePtr absorbing_block, NodePtr absorbed_block)
 // =============================================================================
 // Merge blocks at a given level based on the best probability of doing so
 // =============================================================================
-Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_to_make)
+Merge_Step SBM::agglomerative_merge(const int block_level,
+                                    const int num_merges_to_make,
+                                    const int num_checks_per_block)
 {
   PROFILE_FUNCTION();
   // Quick check to make sure reasonable request
@@ -400,15 +402,15 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
     NodeVec metablocks_to_search;
 
     // No point in running M checks if there are < M blocks left.
-    const bool less_blocks_than_checks = node_type_counts[block.second->type][meta_level] <= N_CHECKS_PER_BLOCK;
+    const bool less_blocks_than_checks = node_type_counts[block.second->type][meta_level] <= num_checks_per_block;
     if (less_blocks_than_checks) {
       // Get a list of all the potential metablocks for block
       metablocks_to_search = get_nodes_of_type_at_level(block.second->type, meta_level);
     }
     else {
-      metablocks_to_search.reserve(N_CHECKS_PER_BLOCK);
+      metablocks_to_search.reserve(num_checks_per_block);
       // Otherwise, we should sample a given number of blocks to check
-      for (int i = 0; i < N_CHECKS_PER_BLOCK; i++) {
+      for (int i = 0; i < num_checks_per_block; i++) {
         // Sample a metablock from potentials
         metablocks_to_search.push_back(propose_move(block.second));
       }
@@ -476,9 +478,10 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
 // Run mcmc chain initialization by finding best organization
 // of B' blocks for all B from B = N to B = 1.
 // =============================================================================
-std::vector<Merge_Step> SBM::collapse_blocks(const int  node_level,
-                                             const int  num_mcmc_steps,
-                                             const int  desired_num_blocks,
+std::vector<Merge_Step> SBM::collapse_blocks(const int node_level,
+                                             const int num_mcmc_steps,
+                                             const int desired_num_blocks,
+                                             const int num_checks_per_block,
                                              const bool report_all_steps)
 {
   PROFILE_FUNCTION();
@@ -521,7 +524,7 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int  node_level,
     // Attempt merge step
     try {
       // Perform next best merge and record results
-      merge_results = agglomerative_merge(block_level, num_merges);
+      merge_results = agglomerative_merge(block_level, num_merges, num_checks_per_block);
     }
     catch (...) {
       std::cerr << "Collapsibility limit of network reached so we break early\n"

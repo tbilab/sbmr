@@ -296,8 +296,8 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
   int    num_initial_blocks = my_SBM.get_level(1)->size();
   double initial_entropy    = my_SBM.compute_entropy(0);
 
-  // Run greedy aglomerative merge with best single merge done
-  Merge_Step single_merge = my_SBM.agglomerative_merge(1, 1);
+  // Run aglomerative merge with best single merge done
+  Merge_Step single_merge = my_SBM.agglomerative_merge(1, 1, 5);
 
   // Make sure that we now have one less block than before for each type
   int new_block_num    = my_SBM.get_level(1)->size();
@@ -310,8 +310,8 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
   // Run again but this time merging the best 2
   SBM new_SBM = build_simple_SBM();
 
-  // Run greedy aglomerative merge with best single merge done
-  Merge_Step double_merge = new_SBM.agglomerative_merge(1, 2);
+  // Run aglomerative merge with best single merge done
+  Merge_Step double_merge = new_SBM.agglomerative_merge(1, 2, 5);
 
   // Make sure that we now have two fewer blocks per type than before
   REQUIRE(2 == num_initial_blocks - new_SBM.get_level(1)->size());
@@ -329,10 +329,9 @@ TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
   double initial_entropy    = my_SBM.compute_entropy(0);
 
   my_SBM.SIGMA = 2;
-  // my_SBM.EPS = 0.01;
 
   // Run full agglomerative merging algorithm till we have just 3 blocks left
-  auto run_results = my_SBM.collapse_blocks(0, 0, 3, false);
+  auto run_results = my_SBM.collapse_blocks(0, 0, 3, 5, false);
 
   // Make sure that we now have just 3 blocks left
   REQUIRE(my_SBM.get_level(1)->size() == 3);
@@ -349,7 +348,7 @@ TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]"
   my_SBM.EPS   = 2;
 
   // Run full agglomerative merging algorithm
-  auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, true);
+  auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, 5, true);
 
   int num_blocks_removed = my_SBM.get_level(0)->size() - my_SBM.get_level(1)->size();
 
@@ -357,16 +356,15 @@ TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]"
   REQUIRE(num_blocks_removed == run_results.size());
 }
 
-TEST_CASE("Non-Greedy agglomerative merging on larger network", "[SBM]")
+TEST_CASE("Sgglomerative merging on larger network", "[SBM]")
 {
   // Setup simple SBM model
   SBM my_SBM = build_bipartite_simulated();
 
   int desired_num_blocks = 4;
 
-  my_SBM.GREEDY = false;
   // Run full agglomerative merging algorithm till we have just 3 blocks left
-  auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, false);
+  auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, 5, false);
 
   // Make sure that we have lumped together at least some blocks
   REQUIRE(my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size());

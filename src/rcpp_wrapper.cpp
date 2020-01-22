@@ -261,6 +261,7 @@ class Rcpp_SBM : public SBM {
   List collapse_blocks(const int  node_level,
                        const int  num_mcmc_steps,
                        int        desired_num_blocks,
+                       const int  num_checks_per_block,
                        const bool report_all_steps)
   {
 
@@ -268,6 +269,7 @@ class Rcpp_SBM : public SBM {
     const auto collapse_results = SBM::collapse_blocks(node_level,
                                                        num_mcmc_steps,
                                                        desired_num_blocks,
+                                                       num_checks_per_block,
                                                        report_all_steps);
 
     List entropy_results;
@@ -286,6 +288,7 @@ class Rcpp_SBM : public SBM {
 
   List collapse_run(const int              node_level,
                     const int              num_mcmc_steps,
+                    const int              num_checks_per_block,
                     const std::vector<int> block_nums)
   {
 
@@ -299,6 +302,7 @@ class Rcpp_SBM : public SBM {
               node_level,
               num_mcmc_steps,
               target_num,
+              num_checks_per_block,
               false)[0]);
     }
     return return_to_r;
@@ -333,23 +337,7 @@ class Rcpp_SBM : public SBM {
     return SIGMA;
   }
 
-  void set_greedy(const bool greedy)
-  {
-    GREEDY = greedy;
-  }
-  bool get_greedy()
-  {
-    return GREEDY;
-  }
 
-  void set_n_checks_per_block(const int n)
-  {
-    N_CHECKS_PER_BLOCK = n;
-  }
-  int get_n_checks_per_block()
-  {
-    return N_CHECKS_PER_BLOCK;
-  }
 };
 
 RCPP_MODULE(SBM)
@@ -362,18 +350,9 @@ RCPP_MODULE(SBM)
                 &Rcpp_SBM::get_epsilon, &Rcpp_SBM::set_epsilon,
                 "Epsilon value for ergodicity")
 
-      .property("GREEDY",
-                &Rcpp_SBM::get_greedy, &Rcpp_SBM::set_greedy,
-                "Perform merging and sweeps in greedy way?")
-
       .property("SIGMA",
                 &Rcpp_SBM::get_sigma, &Rcpp_SBM::set_sigma,
                 "Sigma value for determining rate of agglomerative merging")
-
-      .property("N_CHECKS_PER_BLOCK",
-                &Rcpp_SBM::get_n_checks_per_block, &Rcpp_SBM::set_n_checks_per_block,
-                "If not in greedy mode, how many options do we check per node for moves in agglomerative merging?")
-
       .method("add_node",
               &Rcpp_SBM::add_node,
               "Add a node to the network. Takes the node id (string), the node type (string), and the node level (int). Use level = 0 for data-level nodes.")
@@ -445,9 +424,7 @@ sbm$set_node_parent("b3", "b12", 0)
 
 
 # Set some model parameters
-sbm$GREEDY <- TRUE
 sbm$EPS <- 0.1
-sbm$N_CHECKS_PER_BLOCK <- 5
 
 original_state <- sbm$get_state()
 
