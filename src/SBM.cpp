@@ -341,14 +341,21 @@ double SBM::compute_entropy(const int level)
 // Merge two blocks, placing all nodes that were under block_b under block_a and
 // deleting block_a from model.
 // =============================================================================
-void SBM::merge_blocks(NodePtr block_a, NodePtr block_b)
+void SBM::merge_blocks(NodePtr absorbing_block, NodePtr absorbed_block)
 {
   PROFILE_FUNCTION();
   // Place all the members of block b under block a
-  const ChildSet children_to_move = block_b->children;
-
+  const ChildSet children_to_move = absorbed_block->children;
   for (const NodePtr& child_node : children_to_move) {
-    child_node->set_parent(block_a);
+    child_node->set_parent(absorbing_block);
+  }
+
+  // Remove node and all its parents from their respective level blocks
+  NodePtr current_node = absorbed_block;
+  while (current_node) {
+    // Delete the now absorbed block from level map
+    get_level(current_node->level)->erase(current_node->id);
+    current_node = current_node->parent;
   }
 }
 
@@ -378,6 +385,9 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
 
   // Priority queue to find best moves
   std::priority_queue<std::pair<double, std::pair<NodePtr, NodePtr>>> best_moves_q;
+  
+  // Set to keep track of what pairs of nodes we have checked already so we dont double check
+  std::unordered_set<std::string> checked_pairs;
 
   // Make sure doing a merge makes sense by checking we have enough blocks
   // of every type
@@ -422,11 +432,16 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
         continue;
       }
 
-      // Calculate entropy delta for move
-      double entropy_delta = make_proposal_decision(block.second, metablock, false).entropy_delta;
+      // See if this combo of groups has already been lookedl
+      const bool unchecked_pair = checked_pairs.insert(make_pair_key(merge_block, block.second)).second;
 
-      // Place this move's results in the queue.
-      best_moves_q.push(std::make_pair(-entropy_delta, std::make_pair(block.second, merge_block)));
+      if (unchecked_pair) {
+
+        // Calculate entropy delta for move and place this move's results in the queue.
+        best_moves_q.push(std::make_pair(
+            -make_proposal_decision(block.second, metablock, false).entropy_delta,
+            std::make_pair(block.second, merge_block)));
+      }
     }
   }
 
@@ -437,7 +452,6 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
   // A set of the blocks that have been merged already this step and thus are off limits
   std::unordered_set<NodePtr> merged_blocks;
   int                         num_merges_made    = 0;
-  double                      step_entropy_delta = 0;
 
   // Start working our way through the queue of best moves and making merges
   while ((num_merges_made < num_merges_to_make) & (best_moves_q.size() != 0)) {
@@ -453,7 +467,7 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
       merge_blocks(best_merge.second, best_merge.first);
 
       // Record pair for results
-      step_entropy_delta -= best_moves_q.top().first; // we stored the negative entropy delta so we need to subtract
+      results.entropy_delta -= best_moves_q.top().first; // we stored the negative entropy delta so we need to subtract
       results.from_node.push_back(best_merge.first->id);
       results.to_node.push_back(best_merge.second->id);
       num_merges_made++;
@@ -463,12 +477,8 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
     best_moves_q.pop();
   }
 
-  // Erase the empty blocks and metablocks
-  clean_empty_blocks();
-
-  // Return the entropy for new model and merges done
-  // results.entropy = compute_entropy(block_level - 1);
-  results.entropy = step_entropy_delta;
+  // // Erase the empty blocks and metablocks
+  // clean_empty_blocks();
 
   return results;
 }
@@ -538,7 +548,7 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int  node_level,
 
       // Update the step entropy results with new equilibriated model
       if (report_all_steps) {
-        merge_results.entropy = compute_entropy(node_level);
+        merge_results.entropy_delta = compute_entropy(node_level);
       }
     }
 
