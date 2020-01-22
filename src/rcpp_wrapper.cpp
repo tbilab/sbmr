@@ -280,7 +280,7 @@ class Rcpp_SBM : public SBM {
 
       entropy_results.push_back(
           List::create(
-              _["entropy"]    = step.entropy,
+              _["entropy_delta"]    = step.entropy_delta,
               _["state"]      = state_to_df(step.state),
               _["num_blocks"] = step.num_blocks));
     }
