@@ -425,7 +425,7 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
       // Calculate entropy delta for move
       double entropy_delta = make_proposal_decision(block.second, metablock, false).entropy_delta;
 
-     // Place this move's results in the queue.
+      // Place this move's results in the queue.
       best_moves_q.push(std::make_pair(-entropy_delta, std::make_pair(block.second, merge_block)));
     }
   }
@@ -434,54 +434,41 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
   // Initialize a merge result holder struct
   Merge_Step results;
 
-
-  // A set of the unique merges we've made
-  std::unordered_set<string> merges_made;
+  // A set of the blocks that have been merged already this step and thus are off limits
+  std::unordered_set<NodePtr> merged_blocks;
+  int                         num_merges_made    = 0;
+  double                      step_entropy_delta = 0;
 
   // Start working our way through the queue of best moves and making merges
-  // if they are appropriate...
-  bool more_merges_needed = true;
-  bool queue_not_empty    = true;
-
-  while (more_merges_needed & queue_not_empty) {
+  while ((num_merges_made < num_merges_to_make) & (best_moves_q.size() != 0)) {
     // Extract index of best remaining merge
     const auto best_merge = best_moves_q.top().second;
 
-    // Get blocks that are being merged (culled)
-    const NodePtr from_block = best_merge.first;
-    const NodePtr to_block   = best_merge.second;
-
     // Make sure we haven't already merged the culled block
-    const bool from_still_exists = merges_made.find(from_block->id) == merges_made.end();
-
     // Also make sure that we haven't removed the block we're trying to merge into
-    const bool to_still_exists = merges_made.find(to_block->id) == merges_made.end();
+    const bool pair_unmerged = merged_blocks.insert(best_merge.first).second & merged_blocks.insert(best_merge.second).second;
 
-    if (from_still_exists & to_still_exists) {
-      // Insert new culled block into set
-      merges_made.insert(from_block->id);
-
+    if (pair_unmerged) {
       // Merge the best block pair
-      merge_blocks(to_block, from_block);
+      merge_blocks(best_merge.second, best_merge.first);
 
       // Record pair for results
-      results.from_node.push_back(from_block->id);
-      results.to_node.push_back(to_block->id);
+      step_entropy_delta -= best_moves_q.top().first; // we stored the negative entropy delta so we need to subtract
+      results.from_node.push_back(best_merge.first->id);
+      results.to_node.push_back(best_merge.second->id);
+      num_merges_made++;
     }
 
     // Remove the last index from our queue and go again
     best_moves_q.pop();
-
-    // Update termination checking conditions
-    more_merges_needed = merges_made.size() < num_merges_to_make;
-    queue_not_empty    = best_moves_q.size() != 0;
   }
 
   // Erase the empty blocks and metablocks
   clean_empty_blocks();
 
   // Return the entropy for new model and merges done
-  results.entropy = compute_entropy(block_level - 1);
+  // results.entropy = compute_entropy(block_level - 1);
+  results.entropy = step_entropy_delta;
 
   return results;
 }
