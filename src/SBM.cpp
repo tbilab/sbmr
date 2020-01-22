@@ -72,7 +72,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   double post_move_prob = 0;
 
   // Loop through the node neighbor blocks
-  for (auto const& neighbor_block : potential_neighbors) {
+  for (const auto& neighbor_block : potential_neighbors) {
     const bool is_new_block = neighbor_block == new_block;
     const bool is_old_block = neighbor_block == old_block;
 
@@ -292,7 +292,7 @@ double SBM::compute_entropy(const int level)
 
   // Grab pointer to current level and start loop
   const LevelPtr node_level = get_level(level);
-  for (auto const& node : *node_level) {
+  for (const auto& node : *node_level) {
     const int node_degree = node.second->degree;
     n_total_edges += node_degree;
     n_nodes_w_degree[node_degree]++;
@@ -306,7 +306,7 @@ double SBM::compute_entropy(const int level)
 
   // Calculate first component (sum of node degree counts portion)
   double degree_summation = 0.0;
-  for (auto const& degree_count : n_nodes_w_degree) {
+  for (const auto& degree_count : n_nodes_w_degree) {
     // Using std's built in lgamma here: lgamma(x + 1) = log(x!)
     degree_summation += degree_count.second * lgamma(degree_count.first + 1);
   }
@@ -328,7 +328,7 @@ double SBM::compute_entropy(const int level)
     const int         block_degree      = block.second->degree;
 
     // Next we loop over this edge counts list
-    for (auto const& neighbor_group_edges : block_edge_counts) {
+    for (const auto& neighbor_group_edges : block_edge_counts) {
       edge_entropy += partial_entropy(neighbor_group_edges.second, (neighbor_group_edges.first)->degree, block_degree);
     }
   }
@@ -380,7 +380,7 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
 
   // Grab all the blocks we're looking to merge
   const LevelPtr all_blocks = get_level(block_level);
- 
+
   // Priority queue to find best moves
   std::priority_queue<std::pair<double, std::pair<NodePtr, NodePtr>>> best_moves_q;
 
@@ -484,31 +484,32 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int  node_level,
   PROFILE_FUNCTION();
   const int block_level = node_level + 1;
 
-  // Start by giving every node at the desired level its own block
+  // Start by giving every node at the desired level its own block and every
+  // one of those blocks its own metablock
   give_every_node_at_level_own_block(node_level);
-
-  // Build a metagroup for all the groups
   give_every_node_at_level_own_block(block_level);
 
   // Grab reference to the block nodes container
   const LevelPtr block_level_ptr = get_level(block_level);
 
+  // Get the current number of blocks we have (gets updated in while loop so not const)
+  int curr_num_blocks = block_level_ptr->size();
+
   // A conservative estimate of how many steps collapsing will take as
   // anytime we're not doing an exhaustive search we will use less than
   // B_start - B_end moves.
-  const int num_steps = block_level_ptr->size() - desired_num_blocks;
+  const int num_steps = curr_num_blocks - desired_num_blocks;
 
   // Setup vector to hold all merge step results.
   std::vector<Merge_Step> step_results;
   step_results.reserve(report_all_steps ? num_steps : 1);
 
-  // Get the current number of blocks we have
-  int curr_num_blocks = block_level_ptr->size();
+  // Counter to calculate the total entropy delta of this collapse run. Only used when not reporting all results
+  double total_entropy_delta = 0;
 
   while (curr_num_blocks > desired_num_blocks) {
-    // Decide how many merges we should do.
-    // Make sure we don't overstep the goal number of blocks and
-    // we need to remove at least 1 block
+    // Decide how many merges we should do. Make sure we don't overstep the goal
+    // number of blocks and we need to remove at least 1 block
     const int num_merges = std::max(
         std::min(
             curr_num_blocks - desired_num_blocks,
@@ -532,12 +533,11 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int  node_level,
 
     if (num_mcmc_steps != 0) {
       // Let model equilibriate with new block layout...
-      mcmc_sweep(node_level, num_mcmc_steps, false, false);
-      clean_empty_blocks();
+      const std::vector<double> sweep_entropy_deltas = mcmc_sweep(node_level, num_mcmc_steps, false, false).sweep_entropy_delta;
 
-      // Update the step entropy results with new equilibriated model
-      if (report_all_steps) {
-        merge_results.entropy_delta = compute_entropy(node_level);
+      // Update the step entropy delta with the entropy delta from the sweeps
+      for (const double& sweep_delta : sweep_entropy_deltas) {
+        merge_results.entropy_delta += sweep_delta;
       }
     }
 
@@ -554,12 +554,16 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int  node_level,
       // Gather info for return
       step_results.push_back(merge_results);
     }
+    else {
+      // If were just reporting the end result we need to update our entropy delta
+      total_entropy_delta += merge_results.entropy_delta;
+    }
   } // End main while loop
 
   // Gather results if we're only reporting final result
   if (!report_all_steps) {
     // Gather info for return
-    step_results.push_back(Merge_Step(compute_entropy(node_level), get_state(), curr_num_blocks));
+    step_results.push_back(Merge_Step(total_entropy_delta, get_state(), curr_num_blocks));
   }
 
   return step_results;
