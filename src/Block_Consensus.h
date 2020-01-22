@@ -36,11 +36,17 @@ class Block_Consensus {
 };
 
 // Helper to build alphabetically string pair of two node ids for pair maps
-inline std::string make_pair_key(const std::string a_node, const std::string b_node)
+inline std::string make_pair_key(const std::string& a_node, const std::string& b_node)
 {
   return a_node > b_node
       ? a_node + "--" + b_node
       : b_node + "--" + a_node;
+}
+
+// Helper to build alphabetically string pair of two node ids for pair maps
+inline std::string make_pair_key(const NodePtr& a_node, const NodePtr& b_node)
+{
+  return make_pair_key(a_node->id, b_node->id);
 }
 
 #endif
