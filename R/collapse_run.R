@@ -62,8 +62,10 @@ collapse_run <- function(
     sbm$SIGMA <- sigma
     sbm$N_CHECKS_PER_BLOCK <- num_block_proposals
     collapse_results <- sbm$collapse_run(as.integer(level),
-                                as.integer(num_mcmc_sweeps),
-                                as.integer(block_range))
+                                         as.integer(num_mcmc_sweeps),
+                                         as.integer(num_block_proposals),
+                                         sigma,
+                                         as.integer(block_range))
 
     results <- purrr::map_dfr(
       collapse_results,
