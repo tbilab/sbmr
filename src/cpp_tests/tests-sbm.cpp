@@ -305,7 +305,7 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
   REQUIRE(change_in_blocks == 1);
 
   // Make sure entropy has gone up as we would expect
-  REQUIRE(single_merge.entropy > 0);
+  REQUIRE(single_merge.entropy_delta > 0);
 
   // Run again but this time merging the best 2
   SBM new_SBM = build_simple_SBM();
@@ -317,7 +317,7 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
   REQUIRE(2 == num_initial_blocks - new_SBM.get_level(1)->size());
 
   // Entropy should up even more with two merges
-  REQUIRE(single_merge.entropy < double_merge.entropy);
+  REQUIRE(single_merge.entropy_delta < double_merge.entropy_delta);
 }
 
 TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
