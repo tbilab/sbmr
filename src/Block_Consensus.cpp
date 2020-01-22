@@ -46,7 +46,7 @@ void Block_Consensus::dump_results(std::vector<std::string>& node_pair,
   node_pair.reserve(concensus_pairs.size());
   times_connected.reserve(concensus_pairs.size());
 
-  for (auto const& pair : concensus_pairs) {
+  for (const auto& pair : concensus_pairs) {
     node_pair.push_back(pair.first);
     times_connected.push_back((pair.second).times_connected);
   }
@@ -58,12 +58,12 @@ void Block_Consensus::update_changed_pairs(NodePtr   curr_node,
                                            PairSet&  pair_moves)
 {
   // Loop through all the nodes in the previous group node changes
-  for (auto const& lost_pair : old_connections) {
+  for (const auto& lost_pair : old_connections) {
     pair_moves.insert(make_pair_key(curr_node->id, lost_pair->id));
   }
 
   // Repeat for the new groups children
-  for (auto const& new_pair : new_connections) {
+  for (const auto& new_pair : new_connections) {
     // Make sure we don't add this node to itself.
     if (new_pair->id != curr_node->id) {
       pair_moves.insert(make_pair_key(curr_node->id, new_pair->id));

@@ -126,7 +126,7 @@ NodeVec Network::get_nodes_from_level(const int type, const int level, const boo
   nodes_to_return.reserve(node_level->size());
 
   // Loop through every node belonging to the desired level
-  for (auto const& node : *node_level) {
+  for (const auto& node : *node_level) {
 
     // Decide to keep the node or not based on if it matches or doesn't and our
     // keeping preferance
@@ -214,7 +214,7 @@ void Network::initialize_blocks(const int num_blocks, const int level)
   // If we're randomly distributing nodes, we'll use this map to sample a random
   // block for a given node by its type
   if (!one_block_per_node) {
-    for (auto const& type : node_type_counts) {
+    for (const auto& type : node_type_counts) {
       // Reserve proper number of slots for new blocks
       type_to_blocks[type.first].reserve(num_blocks);
 
@@ -228,7 +228,7 @@ void Network::initialize_blocks(const int num_blocks, const int level)
 
   // Loop through every node in the level and assign it its new parent
   // Loop through each of the nodes,
-  for (auto const& node : *node_level) {
+  for (const auto& node : *node_level) {
 
     const int node_type = node.second->type;
 
@@ -274,7 +274,7 @@ NodeVec Network::clean_empty_blocks()
     std::queue<string> blocks_to_delete;
 
     // Loop through every node at level
-    for (auto const& block : *block_level) {
+    for (const auto& block : *block_level) {
 
       // If there are no children for the current block
       if (block.second->children.size() == 0) {
@@ -320,7 +320,7 @@ State_Dump Network::get_state()
   // Keep track of how many nodes we've seen so we can preallocate vector sizes
   int n_nodes_seen = 0;
 
-  for (auto const& level : nodes) {
+  for (const auto& level : nodes) {
 
     // Add level's nodes to current total
     n_nodes_seen += level.second->size();
@@ -332,7 +332,7 @@ State_Dump Network::get_state()
     state.type.reserve(n_nodes_seen);
 
     // Loop through each node in level
-    for (auto const& node : *level.second) {
+    for (const auto& node : *level.second) {
 
       // Dump all its desired info into its element in the state vectors
       state.id.push_back(node.second->id);

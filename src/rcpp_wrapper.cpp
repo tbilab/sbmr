@@ -77,7 +77,7 @@ class Rcpp_SBM : public SBM {
     std::vector<string> string_types;
     string_types.reserve(int_types.size());
 
-    for (auto const& type : int_types) {
+    for (const auto& type : int_types) {
       // Convert int to string and push to vector
       string_types.push_back(type_int_to_string[type]);
     }
@@ -90,7 +90,7 @@ class Rcpp_SBM : public SBM {
     std::vector<int> int_types;
     int_types.reserve(string_types.size());
 
-    for (auto const& type : string_types) {
+    for (const auto& type : string_types) {
       // Make sure that the requested type has been seen by the model already and
       // send message to R if it hasnt.
       const auto loc_of_int_type = type_string_to_int.find(type);
@@ -141,7 +141,7 @@ class Rcpp_SBM : public SBM {
     node_ids.reserve(level_data->size());
     node_types.reserve(level_data->size());
     // scan through level and fill in vectors
-    for (auto const& node : *level_data) {
+    for (const auto& node : *level_data) {
       node_ids.push_back(node.first);
       node_types.push_back(type_int_to_string[node.second->type]);
     }
@@ -272,7 +272,7 @@ class Rcpp_SBM : public SBM {
 
     List entropy_results;
 
-    for (auto const& step : collapse_results) {
+    for (const auto& step : collapse_results) {
 
       entropy_results.push_back(
           List::create(

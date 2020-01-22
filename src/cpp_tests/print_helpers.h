@@ -18,7 +18,7 @@ inline std::string print_ids_to_string(std::vector<std::string> node_ids)
   node_id_string.reserve(node_ids.size() * 5);
 
   // Dump vector of id strings to one big string
-  for (auto const& node_id : node_ids) {
+  for (const auto& node_id : node_ids) {
     // Append node id to return string.
     node_id_string.append(node_id + ", ");
   }
@@ -42,7 +42,7 @@ inline std::string print_node_ids(NodeList nodes)
   std::vector<std::string> node_ids;
 
   // Add node ids to containing vector
-  for (auto const& node : nodes) {
+  for (const auto& node : nodes) {
     node_ids.push_back(node->id);
   }
 
@@ -56,7 +56,7 @@ inline std::string print_node_ids(ChildSet nodes)
   std::vector<std::string> node_ids;
 
   // Add node ids to containing vector
-  for (auto const& node : nodes) {
+  for (const auto& node : nodes) {
     // Append node id to return string.
     node_ids.push_back(node->id);
   }

@@ -85,7 +85,7 @@ void Sampler::shuffle_nodes(NodeVec&                                          no
   node_vec.clear();
 
   // Fill in vector with map elements
-  for (auto const& node : *node_map) {
+  for (const auto& node : *node_map) {
     node_vec.push_back(node.second);
   }
 
