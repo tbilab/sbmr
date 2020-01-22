@@ -478,12 +478,12 @@ Merge_Step SBM::agglomerative_merge(const int block_level,
 // Run mcmc chain initialization by finding best organization
 // of B' blocks for all B from B = N to B = 1.
 // =============================================================================
-std::vector<Merge_Step> SBM::collapse_blocks(const int node_level,
-                                             const int num_mcmc_steps,
-                                             const int desired_num_blocks,
-                                             const int num_checks_per_block,
-                                             const double sigma, 
-                                             const bool report_all_steps)
+std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
+                                             const int    num_mcmc_steps,
+                                             const int    desired_num_blocks,
+                                             const int    num_checks_per_block,
+                                             const double sigma,
+                                             const bool   report_all_steps)
 {
   PROFILE_FUNCTION();
   const int block_level = node_level + 1;

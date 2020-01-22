@@ -120,7 +120,7 @@ TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
   Sampler random(312);
 
   // Setup a simulated SBM model
-  SBM my_SBM = build_unipartite_simulated();
+  SBM  my_SBM    = build_unipartite_simulated();
   bool all_zeros = true;
 
   // Give it some random groupings of the correct number of groups
@@ -133,7 +133,7 @@ TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
     for (auto node_to_move_it = all_nodes->begin();
          node_to_move_it != all_nodes->end();
          node_to_move_it++) {
-      const NodePtr node_to_move = node_to_move_it->second;
+      const NodePtr     node_to_move      = node_to_move_it->second;
       const std::string pre_move_group_id = node_to_move->parent->id;
 
       // Calculate current model entropy
@@ -151,13 +151,14 @@ TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
       node_to_move->set_parent(group_to_move_to);
 
       // Take new model entropy
-      const double true_delta = my_SBM.compute_entropy(0) - pre_entropy;
+      const double true_delta  = my_SBM.compute_entropy(0) - pre_entropy;
       const double differences = true_delta - reported_entropy_delta;
-      if (true_delta != 0) all_zeros = false;
+      if (true_delta != 0)
+        all_zeros = false;
 
       // std::cout << node_to_move->id << ": ("
       //           << pre_move_group_id << " -> "
-      //           << group_to_move_to->id << "): delta = " 
+      //           << group_to_move_to->id << "): delta = "
       //           << std::to_string(differences)
       //           << std::endl;
 
@@ -168,8 +169,7 @@ TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
     } // End node loop
   }   // End iteration loop
 
-    REQUIRE(!all_zeros);
-
+  REQUIRE(!all_zeros);
 }
 
 TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
@@ -213,11 +213,11 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
       node_to_move->set_parent(group_to_move_to);
 
       // Take new model entropy
-      double true_delta = my_SBM.compute_entropy(0) - pre_entropy;
+      double       true_delta  = my_SBM.compute_entropy(0) - pre_entropy;
       const double differences = true_delta - reported_entropy_delta;
 
-
-      if (true_delta != 0) all_zeros = false;
+      if (true_delta != 0)
+        all_zeros = false;
 
       // std::cout << node_to_move->id << ": ("
       //           << pre_move_group_id << " -> "
@@ -328,10 +328,8 @@ TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
   int    num_initial_blocks = my_SBM.get_level(1)->size();
   double initial_entropy    = my_SBM.compute_entropy(0);
 
-  my_SBM.SIGMA = 2;
-
   // Run full agglomerative merging algorithm till we have just 3 blocks left
-  auto run_results = my_SBM.collapse_blocks(0, 0, 3, 5, false);
+  auto run_results = my_SBM.collapse_blocks(0, 0, 3, 5, 2, false);
 
   // Make sure that we now have just 3 blocks left
   REQUIRE(my_SBM.get_level(1)->size() == 3);
@@ -342,21 +340,18 @@ TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]"
   // Setup simple SBM model
   SBM my_SBM = build_bipartite_simulated();
 
-  int desired_num_blocks = 6;
-
-  my_SBM.SIGMA = 0.5;
-  my_SBM.EPS   = 2;
+  const int desired_num_blocks = 6;
 
   // Run full agglomerative merging algorithm
-  auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, 5, true);
+  const auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, 5, 0.5, true);
 
-  int num_blocks_removed = my_SBM.get_level(0)->size() - my_SBM.get_level(1)->size();
+  const int num_blocks_removed = my_SBM.get_level(0)->size() - my_SBM.get_level(1)->size();
 
   // Make sure we have a single step for each block removed.
   REQUIRE(num_blocks_removed == run_results.size());
 }
 
-TEST_CASE("Sgglomerative merging on larger network", "[SBM]")
+TEST_CASE("Agglomerative merging on larger network", "[SBM]")
 {
   // Setup simple SBM model
   SBM my_SBM = build_bipartite_simulated();
@@ -364,7 +359,7 @@ TEST_CASE("Sgglomerative merging on larger network", "[SBM]")
   int desired_num_blocks = 4;
 
   // Run full agglomerative merging algorithm till we have just 3 blocks left
-  auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, 5, false);
+  auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, 5, 1.5, false);
 
   // Make sure that we have lumped together at least some blocks
   REQUIRE(my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size());
