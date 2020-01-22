@@ -482,6 +482,7 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int node_level,
                                              const int num_mcmc_steps,
                                              const int desired_num_blocks,
                                              const int num_checks_per_block,
+                                             const double sigma, 
                                              const bool report_all_steps)
 {
   PROFILE_FUNCTION();
@@ -516,7 +517,7 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int node_level,
     const int num_merges = std::max(
         std::min(
             curr_num_blocks - desired_num_blocks,
-            int(curr_num_blocks - (curr_num_blocks / SIGMA))),
+            int(curr_num_blocks - (curr_num_blocks / sigma))),
         1);
 
     Merge_Step merge_results;

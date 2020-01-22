@@ -260,7 +260,7 @@ class Rcpp_SBM : public SBM {
 
   List collapse_blocks(const int  node_level,
                        const int  num_mcmc_steps,
-                       int        desired_num_blocks,
+                       const int  desired_num_blocks,
                        const int  num_checks_per_block,
                        const bool report_all_steps)
   {
@@ -291,9 +291,6 @@ class Rcpp_SBM : public SBM {
                     const int              num_checks_per_block,
                     const std::vector<int> block_nums)
   {
-
-    // const int num_steps = end_num - start_num;
-    // if(num_steps <= 0) stop("End number of blocks for collapse run to be higher than start.");
 
     List return_to_r;
     for (const int& target_num : block_nums) {

@@ -84,8 +84,7 @@ class SBM : public Network {
   Sampler sampler;
 
   // Parameters that control the mcmc and merging stuffs
-  double EPS                = 0.1;
-  double SIGMA              = 0.5;
+  double EPS = 0.1;
 
   // Methods
   // =========================================================================
@@ -115,11 +114,12 @@ class SBM : public Network {
 
   // Run mcmc chain initialization by finding best organization
   // of B' blocks for all B from B = N to B = 1.
-  std::vector<Merge_Step> collapse_blocks(int  node_level,
-                                          int  num_mcmc_steps,
-                                          int  desired_num_blocks, 
-                                          int num_checks_per_block,
-                                          bool report_all_steps);
+  std::vector<Merge_Step> collapse_blocks(int    node_level,
+                                          int    num_mcmc_steps,
+                                          int    desired_num_blocks,
+                                          int    num_checks_per_block,
+                                          double sigma,
+                                          bool   report_all_steps);
 
 }; // End SBM class declaration
 
