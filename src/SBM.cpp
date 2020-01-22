@@ -380,21 +380,16 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
 
   // Grab all the blocks we're looking to merge
   const LevelPtr all_blocks = get_level(block_level);
-
-  const int size_to_return = N_CHECKS_PER_BLOCK * all_blocks->size();
-
+ 
   // Priority queue to find best moves
   std::priority_queue<std::pair<double, std::pair<NodePtr, NodePtr>>> best_moves_q;
 
   // Set to keep track of what pairs of nodes we have checked already so we dont double check
   std::unordered_set<std::string> checked_pairs;
 
-  // Make sure doing a merge makes sense by checking we have enough blocks
-  // of every type
+  // Make sure doing a merge makes sense by checking we have enough blocks of every type
   for (int i = 0; i < node_type_counts.size(); i++) {
-    const int num_blocks_of_type = node_type_counts[i][block_level];
-
-    if (num_blocks_of_type < 2) {
+    if (node_type_counts[i][block_level] < 2) {
       throw "To few blocks to perform merge.";
     }
   }
@@ -406,9 +401,7 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
 
     // No point in running M checks if there are < M blocks left.
     const bool less_blocks_than_checks = node_type_counts[block.second->type][meta_level] <= N_CHECKS_PER_BLOCK;
-    // If we're running algorithm in greedy mode we should just
-    // add every possible block to the blocks-to-search list
-    if (GREEDY | less_blocks_than_checks) {
+    if (less_blocks_than_checks) {
       // Get a list of all the potential metablocks for block
       metablocks_to_search = get_nodes_of_type_at_level(block.second->type, meta_level);
     }
@@ -432,11 +425,10 @@ Merge_Step SBM::agglomerative_merge(const int block_level, const int num_merges_
         continue;
       }
 
-      // See if this combo of groups has already been lookedl
+      // See if this combo of groups has already been looked at
       const bool unchecked_pair = checked_pairs.insert(make_pair_key(merge_block, block.second)).second;
 
       if (unchecked_pair) {
-
         // Calculate entropy delta for move and place this move's results in the queue.
         best_moves_q.push(std::make_pair(
             -make_proposal_decision(block.second, metablock, false).entropy_delta,
