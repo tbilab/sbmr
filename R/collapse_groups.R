@@ -68,9 +68,6 @@ collapse_blocks <- function(
     sbm$EPS <- eps
   }
 
-  # Set free parameters
-  sbm$N_CHECKS_PER_BLOCK <- num_block_proposals
-
   collapse_results <- sbm$collapse_blocks(
     as.integer(level),
     as.integer(num_mcmc_sweeps),

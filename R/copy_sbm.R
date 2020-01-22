@@ -40,11 +40,6 @@ copy_sbm <- function(old_sbm, match_state = FALSE){
     eps = old_sbm$EPS
   )
 
-  # Set free parameters
-  new_sbm$SIGMA <- old_sbm$SIGMA
-  new_sbm$N_CHECKS_PER_BLOCK <- old_sbm$N_CHECKS_PER_BLOCK
-  new_sbm$GREEDY <- old_sbm$GREEDY
-
   # Update state of new model if needed
   if(match_state){
     load_from_state(new_sbm, old_sbm_state)
