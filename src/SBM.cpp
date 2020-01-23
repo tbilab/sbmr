@@ -75,6 +75,86 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   double pre_move_prob  = 0;
   double post_move_prob = 0;
 
+  struct Node_Move_Cons {
+    int old_to_neighbor = 0;
+    int new_to_neighbor = 0;
+    int node_to_neighbor = 0;
+  };
+
+  // Gather the node to edge counts together to one main map
+  int node_to_old_block = 0;
+  int node_to_new_block = 0;
+
+  std::unordered_map<NodePtr, Node_Move_Cons> move_edge_counts;
+
+  const NodeVec& old_block_edges = old_block->get_edges_to_level(block_level);
+  for (const auto& edge : old_block_edges) {
+    move_edge_counts[edge].old_to_neighbor++;
+  }
+
+  const NodeVec& new_block_edges = new_block->get_edges_to_level(block_level);
+  for (const auto& edge : new_block_edges) {
+    move_edge_counts[edge].new_to_neighbor++;
+  }
+
+  const NodeVec& node_edges = node->get_edges_to_level(block_level);
+  for (const auto& edge : node_edges) {
+    if (edge == old_block) {
+      node_to_old_block++;
+    }
+    else if (edge == new_block) {
+      node_to_new_block++;
+    }
+
+    move_edge_counts[edge].node_to_neighbor++;
+  }
+
+  const int node_to_old_new_delta = node_to_old_block - node_to_new_block;
+  const int pre_old_degree        = old_block->degree;
+  const int post_old_degree       = pre_old_degree - node_degree;
+  const int pre_new_degree        = new_block->degree;
+  const int post_new_degree       = pre_new_degree + node_degree;
+
+  double entropy_delta_new = 0;
+  for (const auto& move_edges : move_edge_counts) {
+    const NodePtr&        neighbor    = move_edges.first;
+    const Node_Move_Cons& pre = move_edges.second;
+    
+    const int pre_neighbor_degree = neighbor->degree;
+
+    int post_neighbor_degree = pre_neighbor_degree;
+    int post_old_to_neighbor = pre.old_to_neighbor;
+    int post_new_to_neighbor = pre.new_to_neighbor;
+   
+    const bool neighbor_is_old = neighbor == old_block;
+    const bool neighbor_is_new = neighbor == new_block;
+
+    if (neighbor_is_old) {
+      post_old_to_neighbor -= 2 * (node_to_old_block);
+      post_new_to_neighbor += node_to_old_new_delta;
+      post_neighbor_degree = post_old_degree;
+    }
+    else if (neighbor_is_new) {
+      post_old_to_neighbor += node_to_old_new_delta;
+      post_new_to_neighbor += 2 * node_to_new_block;
+      post_neighbor_degree = post_new_degree;
+    }
+    else {
+      post_old_to_neighbor -= pre.node_to_neighbor;
+      post_new_to_neighbor += pre.node_to_neighbor;
+    }
+
+    const double scalar = neighbor_is_new | neighbor_is_old ? 0.5 : 1;
+
+    const double pre_old_entropy  = partial_entropy(pre.old_to_neighbor, pre_neighbor_degree, pre_old_degree);
+    const double post_old_entropy = partial_entropy(post_old_to_neighbor, post_neighbor_degree, post_old_degree);
+    entropy_delta_new += (pre_old_entropy - post_old_entropy) * scalar;
+
+    const double pre_new_entropy  = partial_entropy(pre.new_to_neighbor, pre_neighbor_degree, pre_new_degree);
+    const double post_new_entropy = partial_entropy(post_new_to_neighbor, post_neighbor_degree, post_new_degree);
+    entropy_delta_new += (pre_new_entropy - post_new_entropy) * scalar;
+  }
+
   // Loop through the node neighbor blocks
   for (const auto& neighbor_block : potential_neighbors) {
     const bool neighbor_is_new_block = neighbor_block == new_block;
@@ -154,6 +234,9 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
       post_move_prob += prop_edges_to_neighbor * (old_to_neighbor_post + EPS) / (neighbor_degree_post + eps_B);
     }
   } // End main block loop
+
+  // Swap this one with our new format. 
+  entropy_delta = entropy_delta_new;
 
   bool   move_accepted   = false;
   double acceptance_prob = 0;
