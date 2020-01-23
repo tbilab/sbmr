@@ -4,8 +4,8 @@ library(sbmR)
 
 set.seed(42)
 
-n_blocks <- 3    # Total number of blocks
-block_size <- 15 # How many nodes in each block
+n_blocks <- 4    # Total number of blocks
+block_size <- 50 # How many nodes in each block
 
 network <- sim_basic_block_network(
   n_blocks = n_blocks,
@@ -15,12 +15,82 @@ network <- sim_basic_block_network(
 
 my_sbm <- create_sbm(network)
 
+# start_entropy <- my_sbm %>% initialize_blocks() %>% compute_entropy()
+
+single_collapse_no_report <- my_sbm %>%
+  collapse_blocks(report_all_steps = FALSE,
+                  sigma = 0.9,
+                  num_mcmc_sweeps = 0,
+                  desired_num_blocks = 2)
+
+my_sbm %>% compute_entropy()
+
+single_collapse <- my_sbm %>%
+  collapse_blocks(report_all_steps = TRUE,
+                  sigma = 0.9,
+                  num_mcmc_sweeps = 0,
+                  desired_num_blocks = 2)
+
+single_collapse %>%
+  filter(num_blocks < 20) %>%
+  ggplot(aes(x = num_blocks, y = entropy)) +
+  geom_line() +
+  geom_point() +
+  geom_vline(xintercept = n_blocks, color = 'orangered')
+
+my_sbm <- choose_best_collapse_state(my_sbm, single_collapse, heuristic =function(e,b){as.numeric(b == n_blocks)}, verbose = TRUE)
+
+entropy_delta <- single_collapse$entropy[single_collapse$num_blocks == 5]
+predicted_entropy <- start_entropy + entropy_delta
+true_entropy <- my_sbm %>% compute_entropy()
+
+
 collapse_results <- my_sbm %>%
-  collapse_run(num_block_proposals = 15,
-               sigma = 6,
+  collapse_run(num_block_proposals = 10,
+               sigma = 2,
                num_mcmc_sweeps = 10,
                num_final_blocks = 1:15,
                parallel = TRUE)
+
+visualize_collapse_results(collapse_results)
+my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, heuristic =function(e,b){as.numeric(b == n_blocks + 1)}, verbose = TRUE)
+my_sbm %>%
+  get_state() %>%
+  filter(level == 0) %>%
+  right_join(network$nodes, by = 'id')%>%
+  rename(inferred = parent) %>% {
+    table(.$inferred, .$block)
+  }
+
+# network$nodes %>% pull(block) %>% unique()
+
+table(nodes_w_assignments$inferred, nodes_w_assignments$block)
+
+
+
+
+true_delta <- start_entropy - true_entropy
+
+entropy_delta/true_delta
+
+true_delta
+
+collapse_results %>%
+  mutate(
+    score = entropy - lag(entropy)
+  ) %>%
+  pivot_longer(c(score, entropy)) %>%
+  ggplot(aes(x = num_blocks, y = value)) +
+  geom_line() +
+  facet_grid(name~., scales = "free_y") +
+  geom_vline(xintercept = n_blocks, color = 'orangered')
+
+collapse_results %>%
+  mutate(
+    entropy = entropy/first(entropy)
+  ) %>%
+  visualize_collapse_results(heuristic = "dev") +
+  geom_vline(xintercept = n_blocks, color = 'orangered')
 
 collapse_results %>%
   visualize_collapse_results(heuristic = 'nls_residual') +
@@ -34,6 +104,10 @@ nodes_w_assignments <- my_sbm %>%
   filter(level == 0) %>%
   right_join(network$nodes, by = 'id')%>%
   rename(inferred = parent)
+
+# network$nodes %>% pull(block) %>% unique()
+
+table(nodes_w_assignments$inferred, nodes_w_assignments$block)
 
 nodes_w_assignments %>%
   group_by(inferred) %>%
