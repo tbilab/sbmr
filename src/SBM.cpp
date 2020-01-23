@@ -101,14 +101,14 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node, const NodePtr new_b
     // Degree of neighbor group before move
     const int pre_neighbor_degree = neighbor->degree;
 
-    // Initialize variables that will get changed depending on what the neighbor group is 
-    int post_old_to_neighbor = pre.old_to_neighbor;
-    int post_new_to_neighbor = pre.new_to_neighbor;
-    double scalar = 1;  // If we are double counting this pair we will need to downweight it
+    // Initialize variables that will get changed depending on what the neighbor group is
+    int    post_old_to_neighbor = pre.old_to_neighbor;
+    int    post_new_to_neighbor = pre.new_to_neighbor;
+    double scalar               = 1; // If we are double counting this pair we will need to downweight it
 
     // This will stay the same unless the neighbor is one of the old or new blocks
     int post_neighbor_degree = pre_neighbor_degree;
-    
+
     const bool neighbor_is_old = neighbor == old_block;
     const bool neighbor_is_new = neighbor == new_block;
 
@@ -116,13 +116,13 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node, const NodePtr new_b
       post_old_to_neighbor -= 2 * (node_to_old_block);
       post_new_to_neighbor += node_to_old_new_delta;
       post_neighbor_degree = post_old_degree;
-      scalar = 2;
+      scalar               = 2;
     }
     else if (neighbor_is_new) {
       post_old_to_neighbor += node_to_old_new_delta;
       post_new_to_neighbor += 2 * node_to_new_block;
       post_neighbor_degree = post_new_degree;
-      scalar = 2;
+      scalar               = 2;
     }
     else {
       post_old_to_neighbor -= pre.node_to_neighbor;
@@ -233,7 +233,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int  level,
       }
       // Calculate acceptance probability based on posterior changes
       Proposal_Res proposal_results = make_proposal_decision(curr_node, proposed_new_block);
-      
+
       // Make movement decision
       const bool move_accepted = proposal_results.prob_of_accept > sampler.draw_unif();
 
@@ -355,10 +355,10 @@ void SBM::merge_blocks(NodePtr absorbing_block, NodePtr absorbed_block)
   while (current_node) {
     // Delete the now absorbed block from level map
     get_level(current_node->level)->erase(current_node->id);
-    
+
     // Remove nodes contribution to node counts map
     node_type_counts[current_node->type][current_node->level]--;
-    
+
     current_node = current_node->parent;
   }
 }
@@ -442,9 +442,9 @@ Merge_Step SBM::agglomerative_merge(const int block_level,
         // Build a map of neighbor to pair of both groups connections to that neighbor.
         std::unordered_map<NodePtr, std::pair<int, int>> pair_counts_to_neighbor;
 
-        int        e_ab_ab        = 0;
-        int times_merged_seen = 0;
-        const auto block_a_counts = block_a->gather_edges_to_level(block_level);
+        int        e_ab_ab           = 0;
+        int        times_merged_seen = 0;
+        const auto block_a_counts    = block_a->gather_edges_to_level(block_level);
         for (const auto& block_a_count : block_a_counts) {
           pair_counts_to_neighbor[block_a_count.first].first = block_a_count.second;
           if (block_a_count.first == block_a | block_a_count.first == block_b) {
@@ -470,9 +470,9 @@ Merge_Step SBM::agglomerative_merge(const int block_level,
         for (const auto& edge_counts : pair_counts_to_neighbor) {
           const NodePtr& block_s = edge_counts.first;
 
-          const double e_a_s  = edge_counts.second.first;
-          const double e_b_s  = edge_counts.second.second;
-          const double e_s    = block_s->degree;
+          const double e_a_s = edge_counts.second.first;
+          const double e_b_s = edge_counts.second.second;
+          const double e_s   = block_s->degree;
 
           entropy_delta += partial_entropy(e_a_s, e_a, e_s) + partial_entropy(e_b_s, e_b, e_s);
 
@@ -525,7 +525,6 @@ Merge_Step SBM::agglomerative_merge(const int block_level,
       results.from_node.push_back(best_merge.first->id);
       results.to_node.push_back(best_merge.second->id);
       num_merges_made++;
-
     }
 
     // Remove the last index from our queue and go again
@@ -595,7 +594,6 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
       // We reached the collapsibility limit of our network so we break early
       break;
     }
-
 
     if (num_mcmc_steps != 0) {
       // Let model equilibriate with new block layout...

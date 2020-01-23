@@ -11,7 +11,7 @@ inline double partial_entropy(const double& a,
     return 0;
   }
 
-  return a * std::log(a / (b * c));;
+  return a * std::log(a / (b * c));
 }
 
 inline int get_edge_counts(const NodeEdgeMap& node_cons, const NodePtr& neighbor)
