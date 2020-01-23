@@ -32,21 +32,18 @@ NodePtr SBM::propose_move(const NodePtr node)
 // =============================================================================
 // Make a decision on the proposed new block for node
 // =============================================================================
-Proposal_Res SBM::make_proposal_decision(const NodePtr node,
-                                         const NodePtr new_block,
-                                         const bool    calc_accept_ratio)
+Proposal_Res SBM::make_proposal_decision(const NodePtr node, const NodePtr new_block)
 {
   PROFILE_FUNCTION();
 
   const NodePtr old_block = node->parent; // Reference to old block that would be swapped for new_block
   // Make sure we're actually doing something
   if (old_block == new_block) {
-    return Proposal_Res(0.0, 0.0, false);
+    return Proposal_Res(0.0, 0.0);
   }
 
   const double node_degree = node->degree;
   const double block_level = new_block->level; // The level that this proposal is taking place on
-
 
   // Setup a struct to hold all the info we need about a given pair
   struct Node_Move_Cons {
@@ -82,9 +79,10 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     move_edge_counts[edge].node_to_neighbor++;
   }
 
-  const int neighbor_type        = node_edges[0]->type;
-  const int n_possible_neighbors = node_type_counts[neighbor_type][block_level];
+  // How many possible neighbor blocks are there?
+  const int n_possible_neighbors = node_type_counts[node_edges[0]->type][block_level];
 
+  // These are constants for edge connections that are used in entropy calc
   const int node_to_old_new_delta = node_to_old_block - node_to_new_block;
   const int pre_old_degree        = old_block->degree;
   const int post_old_degree       = pre_old_degree - node_degree;
@@ -100,12 +98,17 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     const NodePtr&        neighbor = move_edges.first;
     const Node_Move_Cons& pre      = move_edges.second;
 
+    // Degree of neighbor group before move
     const int pre_neighbor_degree = neighbor->degree;
 
-    int post_neighbor_degree = pre_neighbor_degree;
+    // Initialize variables that will get changed depending on what the neighbor group is 
     int post_old_to_neighbor = pre.old_to_neighbor;
     int post_new_to_neighbor = pre.new_to_neighbor;
+    double scalar = 1;  // If we are double counting this pair we will need to downweight it
 
+    // This will stay the same unless the neighbor is one of the old or new blocks
+    int post_neighbor_degree = pre_neighbor_degree;
+    
     const bool neighbor_is_old = neighbor == old_block;
     const bool neighbor_is_new = neighbor == new_block;
 
@@ -113,28 +116,32 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
       post_old_to_neighbor -= 2 * (node_to_old_block);
       post_new_to_neighbor += node_to_old_new_delta;
       post_neighbor_degree = post_old_degree;
+      scalar = 2;
     }
     else if (neighbor_is_new) {
       post_old_to_neighbor += node_to_old_new_delta;
       post_new_to_neighbor += 2 * node_to_new_block;
       post_neighbor_degree = post_new_degree;
+      scalar = 2;
     }
     else {
       post_old_to_neighbor -= pre.node_to_neighbor;
       post_new_to_neighbor += pre.node_to_neighbor;
     }
 
-    const double scalar = neighbor_is_new | neighbor_is_old ? 0.5 : 1;
-
+    // First calculate old group's entropy contributions pre and post move
     const double pre_old_entropy  = partial_entropy(pre.old_to_neighbor, pre_neighbor_degree, pre_old_degree);
     const double post_old_entropy = partial_entropy(post_old_to_neighbor, post_neighbor_degree, post_old_degree);
-    entropy_delta += (pre_old_entropy - post_old_entropy) * scalar;
 
+    // Then do the same for the new group
     const double pre_new_entropy  = partial_entropy(pre.new_to_neighbor, pre_neighbor_degree, pre_new_degree);
     const double post_new_entropy = partial_entropy(post_new_to_neighbor, post_neighbor_degree, post_new_degree);
-    entropy_delta += (pre_new_entropy - post_new_entropy) * scalar;
 
-    // First check if node being moved has any connections to this block and if we need to calculate ratio
+    // Add this neighbors contribution to the overall delta
+    entropy_delta += (pre_old_entropy + pre_new_entropy - post_old_entropy - post_new_entropy) / scalar;
+
+    // Before moving calculating probability ratio components for neighbor we
+    // first check if node being moved has any connections to this neighbor
     if (pre.node_to_neighbor != 0) {
       const double prop_edges_to_neighbor = pre.node_to_neighbor / node_degree;
       const double eps_B                  = EPS * n_possible_neighbors;
@@ -142,18 +149,10 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
       pre_move_prob += prop_edges_to_neighbor * (pre.new_to_neighbor + EPS) / (pre_neighbor_degree + eps_B);
       post_move_prob += prop_edges_to_neighbor * (post_old_to_neighbor + EPS) / (post_neighbor_degree + eps_B);
     }
-  }
+  } // End main neighbor loop
 
-  // Multiply both together to get the acceptance probability
-  const double acceptance_prob = exp(-entropy_delta) * (post_move_prob / pre_move_prob);
-  const bool move_accepted   = sampler.draw_unif() < acceptance_prob;
-
-  // Move node to new block
-  if (move_accepted) {
-    node->set_parent(new_block);
-  }
-
-  return Proposal_Res(entropy_delta, acceptance_prob, move_accepted);
+  // Multiply both exponential of entropy delta and prob ratio to get the acceptance probability
+  return Proposal_Res(entropy_delta, exp(-entropy_delta) * (post_move_prob / pre_move_prob));
 }
 
 // =============================================================================
@@ -234,14 +233,17 @@ MCMC_Sweeps SBM::mcmc_sweep(const int  level,
       }
       // Calculate acceptance probability based on posterior changes
       Proposal_Res proposal_results = make_proposal_decision(curr_node, proposed_new_block);
+      
+      // Make movement decision
+      const bool move_accepted = proposal_results.prob_of_accept > sampler.draw_unif();
 
       if (verbose) {
         std::cout << proposal_results.entropy_delta << "," << proposal_results.prob_of_accept << ","
-                  << proposal_results.move_accepted << std::endl;
+                  << move_accepted << std::endl;
       }
 
       // Is the move accepted?
-      if (proposal_results.move_accepted) {
+      if (move_accepted) {
         const NodePtr old_block = curr_node->parent;
 
         // Move the node
