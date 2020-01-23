@@ -69,9 +69,10 @@ build_score_fn <- function(heuristic){
     } else
     if(heuristic == 'delta_ratio'){
       score_func <- function(value, k){
-        prev_value_norm <- dplyr::lag(value) / (dplyr::lag(k) - k)
-        next_value_norm <- dplyr::lead(value) / (k - dplyr::lead(k))
-        next_value_norm/prev_value_norm
+        window_size <- 2
+        rolling_avg_at_k <- rolling_mean(value, window = window_size)
+        rolling_avg_after <- dplyr::lead(rolling_avg_at_k, window_size)
+        rolling_avg_at_k/rolling_avg_after
       }
     } else
     {stop("Hueristic must be either a function or one of {\"lowest\", \"dev_from_rolling_mean\", \"nls_residual\"}.")}
