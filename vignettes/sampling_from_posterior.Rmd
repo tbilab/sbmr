@@ -33,10 +33,10 @@ In this document we will explore how to use the function `mcmc_sweep()` to sampl
 First we will generate our simulated network. First we set a seed to make the structure reproducable and then we draw our random network using the `sim_basic_block_network()` function to draw from a network with 3 groups and 40 nodes per group. 
 
 ```{r}
-set.seed(42)
+set.seed(312)
 
 n_blocks <- 4    # Total number of blocks
-block_size <- 50 # How many nodes in each block
+block_size <- 75 # How many nodes in each block
 
 network <- sim_basic_block_network(
   n_blocks = n_blocks,     
@@ -49,10 +49,14 @@ network <- sim_basic_block_network(
 First we can make sure our edge propensities look reasonable 
 
 ```{r}
-network$edge_propensities %>% 
+bind_rows(
+  network$edge_propensities %>% rename(block_1 = block_2, block_2 = block_1),
+  network$edge_propensities
+) %>% 
   ggplot(aes(x = block_1, y = block_2, fill = propensity)) +
   geom_tile(color = 'white') +
-  theme_bw()
+  theme_bw() +
+  labs(x = "", y = "")
 ```
 
 
@@ -70,7 +74,7 @@ We can see a decent amount of separation with perhaps more cohesion between the 
 Now that we have our data we can load it into an SBM object and look at the first few nodes worth of summary
 
 ```{r}
-my_sbm <- create_sbm(network)
+my_sbm <- create_sbm(network, eps = 0.01)
 
 my_sbm %>% get_state() %>% head()
 ```
@@ -82,9 +86,9 @@ In an attempt to set our initial chain location to an optimal position we will a
 
 ```{r}
 collapse_results <- my_sbm %>% 
-  collapse_run(num_block_proposals = 15, 
+  collapse_run(num_block_proposals = 10, 
                sigma = 6,
-               num_mcmc_sweeps = 15, 
+               num_mcmc_sweeps = 10, 
                num_final_blocks = 1:15,
                parallel = TRUE)
 ```
@@ -114,6 +118,8 @@ merged_state <- my_sbm %>%
 nodes_w_inferred_block <- network$nodes  %>%
   left_join(merged_state, by = 'id') %>% 
   rename(inferred = parent)
+
+table(nodes_w_inferred_block$inferred,nodes_w_inferred_block$block)
 ```
 
 ```{r visualize_inferred_blocks}
@@ -124,26 +130,19 @@ visualize_network(edges = network$edges,
                   width = '100%')
 ```
 
-The colors and shapes seem to match very well. We can check the aggreement as well.
 
-```{r check_inferred_accuracy}
-nodes_w_inferred_block %>% 
-  group_by(block) %>% 
-  summarise(n_unique_inferred = length(unique(inferred)))
-```
-
-So each group was mapped into by only one class, meaning we perfectly matched the structure. 
+This should be a decent starting place for our sampling.
 
 
 
 ## Sampling from the posterior
 
-Now that we have our model in a decent starting place we can initiate the MCMC sampling. We will start by doing 500 sweeps to see if our model shape has stabalized at all. 
+Now that we have our model in a decent starting place we can initiate the MCMC sampling. We will start by doing a few sweeps to see if our model shape has stabalized at all. 
 
 ```{r}
-num_sweeps <- 50
+num_sweeps <- 200
 
-sweep_results <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps, track_pairs = TRUE)
+sweep_results <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps, track_pairs = FALSE)
 
 sweep_df <- sweep_results$sweep_info %>% 
   mutate(sweep = 1:n(),
@@ -173,17 +172,15 @@ nodes_w_inferred_block <- my_sbm %>%
   right_join(network$nodes, by = 'id') %>% 
   rename(inferred = parent)
 
+table(nodes_w_inferred_block$inferred,nodes_w_inferred_block$block)
+```
+
+```{r}
 visualize_network(edges = network$edges, 
                   nodes = nodes_w_inferred_block, 
                   node_color_col = 'block', 
                   node_shape_col = 'inferred',
                   width = '100%')
-```
-
-```{r}
-nodes_w_inferred_block %>% 
-  group_by(inferred) %>% 
-  summarise(n_unique_blocks = length(unique(block)))
 ```
 
 So even though we have more groups than we should, we never have an infered group that spans more than a single true group. 
@@ -204,7 +201,7 @@ my_sbm <- create_sbm(network, eps = lower_eps) %>%
 
 
 # Run our mcmc sweeps again
-sweep_df_lower_eps <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps)$sweep_info %>% 
+sweep_df_lower_eps <- mcmc_sweep(my_sbm, num_sweeps = 200)$sweep_info %>% 
   mutate(sweep = 1:n(),
          label = glue::glue('eps = {lower_eps}')) %>% 
   pivot_longer(entropy_delta:num_nodes_moved)
