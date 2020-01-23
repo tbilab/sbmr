@@ -48,14 +48,12 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   const int block_level = new_block->level; // The level that this proposal is taking place on
 
   // Get vector of all nodes of the desired type at the block level
-  const int    neighbor_type       = (node->edges).front()->type;
-  NodeVec      potential_neighbors = get_nodes_of_type_at_level(neighbor_type, block_level);
-  const double n_possible          = potential_neighbors.size();
+  const int     neighbor_type       = (node->edges).front()->type;
+  const NodeVec potential_neighbors = get_nodes_of_type_at_level(neighbor_type, block_level);
+  const double  n_possible          = potential_neighbors.size();
 
   // Get map to neighbors blocks for node and both old and new group
   const NodeEdgeMap node_edges_to_neighbor_blocks = node->gather_edges_to_level(block_level);
-  const NodeEdgeMap old_block_edge_counts_pre     = old_block->gather_edges_to_level(block_level);
-  const NodeEdgeMap new_block_edge_counts_pre     = new_block->gather_edges_to_level(block_level);
 
   // Gather a few constants correponding to edge connections pre and post move.
   const int    node_to_old           = get_edge_counts(node_edges_to_neighbor_blocks, old_block);
@@ -66,22 +64,34 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   const double new_block_degree_pre  = new_block->degree;
   const double new_block_degree_post = new_block->degree + node_degree;
 
+  const bool node_is_only_child_of_old = old_block_degree_post == 0;
+
+  // We know if the old block has zero connections after merge that its only member is the node being moved and
+  // thus it must have the same connection structure as it.
+  const NodeEdgeMap old_block_edge_counts_pre = node_is_only_child_of_old ? node_edges_to_neighbor_blocks : old_block->gather_edges_to_level(block_level);
+  const NodeEdgeMap new_block_edge_counts_pre = new_block->gather_edges_to_level(block_level);
+
   // These will get summed into as we loop over all the neighbor blocks
   double entropy_delta  = 0;
   double pre_move_prob  = 0;
   double post_move_prob = 0;
 
+  double new_pre_delta = 0;
+  double new_post_delta = 0;
+  double old_pre_delta = 0;
+  double old_post_delta = 0;
+
   // Loop through the node neighbor blocks
   for (const auto& neighbor_block : potential_neighbors) {
-    const bool is_new_block = neighbor_block == new_block;
-    const bool is_old_block = neighbor_block == old_block;
+    const bool neighbor_is_new_block = neighbor_block == new_block;
+    const bool neighbor_is_old_block = neighbor_block == old_block;
 
     // First extract the neccesary edge counts from the various edge count maps
     const int old_to_neighbor_pre = get_edge_counts(old_block_edge_counts_pre, neighbor_block);
     const int new_to_neighbor_pre = get_edge_counts(new_block_edge_counts_pre, neighbor_block);
-    const int node_to_neighbor    = is_new_block
+    const int node_to_neighbor    = neighbor_is_new_block
         ? node_to_new
-        : is_old_block ? node_to_old : get_edge_counts(node_edges_to_neighbor_blocks, neighbor_block);
+        : neighbor_is_old_block ? node_to_old : get_edge_counts(node_edges_to_neighbor_blocks, neighbor_block);
 
     //  Get the degree of the neighbor before everything (will only change if its the new or old block.)
     const int neighbor_degree_pre = neighbor_block->degree;
@@ -98,13 +108,13 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     double new_scalar           = 1;                   // We need to scale double counted block contributions by half
     double old_scalar           = 1;
 
-    if (is_old_block) {
+    if (neighbor_is_old_block) {
       new_to_neighbor_post += old_new_delta;
       old_to_neighbor_post -= 2 * node_to_old;
       neighbor_degree_post = old_block_degree_post;
       old_scalar           = 2;
     }
-    else if (is_new_block) {
+    else if (neighbor_is_new_block) {
       new_to_neighbor_post += 2 * node_to_new;
       old_to_neighbor_post += old_new_delta;
       neighbor_degree_post = new_block_degree_post;
@@ -116,17 +126,32 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
       old_to_neighbor_post -= node_to_neighbor;
     }
 
+    // Since we're emptying out the old node entirely we know that any edge counts
+    // either to or from the old group will be zero post move.
+    if (node_is_only_child_of_old) {
+      old_to_neighbor_post = 0;
+      if (neighbor_is_old_block) {
+        neighbor_degree_post = 0;
+        new_to_neighbor_post = 0;
+        old_scalar           = 1;
+      }
+    }
+
     const double new_pre  = partial_entropy(new_to_neighbor_pre, neighbor_degree_pre, new_block_degree_pre);
     const double new_post = partial_entropy(new_to_neighbor_post, neighbor_degree_post, new_block_degree_post);
+    new_pre_delta += new_pre/new_scalar;
+    new_post_delta += new_post/new_scalar;
 
-    entropy_delta += (new_pre - new_post) / new_scalar;
+    // entropy_delta += (new_pre - new_post) / new_scalar;
 
-    if (!is_new_block) {
+    if (!neighbor_is_new_block) {
       // The new-old combo will get counted twice but we should only need to record it once
       const double old_pre  = partial_entropy(old_to_neighbor_pre, neighbor_degree_pre, old_block_degree_pre);
       const double old_post = partial_entropy(old_to_neighbor_post, neighbor_degree_post, old_block_degree_post);
 
-      entropy_delta += (old_pre - old_post) / old_scalar;
+      old_pre_delta += old_pre/old_scalar;
+      old_post_delta += old_post/old_scalar;
+      // entropy_delta += (old_pre - old_post) / old_scalar;
     }
 
     // Now calculate the probability of the move to the new block and the probability
@@ -141,6 +166,8 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
       post_move_prob += prop_edges_to_neighbor * (old_to_neighbor_post + EPS) / (neighbor_degree_post + eps_B);
     }
   } // End main block loop
+
+  entropy_delta = old_pre_delta - old_post_delta + new_pre_delta - new_post_delta;
 
   bool   move_accepted   = false;
   double acceptance_prob = 0;
@@ -355,6 +382,10 @@ void SBM::merge_blocks(NodePtr absorbing_block, NodePtr absorbed_block)
   while (current_node) {
     // Delete the now absorbed block from level map
     get_level(current_node->level)->erase(current_node->id);
+    
+    // Remove nodes contribution to node counts map
+    node_type_counts[current_node->type][current_node->level]--;
+    
     current_node = current_node->parent;
   }
 }
@@ -431,9 +462,42 @@ Merge_Step SBM::agglomerative_merge(const int block_level,
       const bool unchecked_pair = checked_pairs.insert(make_pair_key(merge_block, block.second)).second;
 
       if (unchecked_pair) {
+        // Build a map of neighbor to pair of both groups connections to that neighbor.
+        std::unordered_map<NodePtr, std::pair<int, int>> pair_counts_to_neighbor;
+
+        const auto block_a_counts = merge_block->gather_edges_to_level(block_level);
+        for (const auto& block_a_count : block_a_counts) {
+          pair_counts_to_neighbor[block_a_count.first].first = block_a_count.second;
+        }
+
+        const auto block_b_counts = block.second->gather_edges_to_level(block_level);
+        for (const auto& block_b_count : block_b_counts) {
+          pair_counts_to_neighbor[block_b_count.first].second = block_b_count.second;
+        }
+
+        const int    e_a             = merge_block->degree;
+        const int    e_b             = block.second->degree;
+        const double log_e_a         = std::log(e_a);
+        const double log_e_b         = std::log(e_b);
+        const double log_e_a_plus_e_b = std::log(e_a + e_b);
+
+        double entropy_delta = 0;
+        for (const auto& edge_counts : pair_counts_to_neighbor) {
+          const int    e_a_s    = edge_counts.second.first;
+          const int    e_b_s    = edge_counts.second.second;
+          const double log_e_s = std::log(edge_counts.first->degree);
+          const double log_e_a_s = e_a_s == 0 ? 0 : std::log(e_a_s);
+          const double log_e_b_s = e_b_s == 0 ? 0 : std::log(e_b_s);
+
+          entropy_delta += (e_a_s + e_b_s) * (
+            (log_e_a + log_e_b + log_e_s + std::log(e_a_s + e_b_s)) -
+            (log_e_a_s + log_e_b_s + log_e_a_plus_e_b) 
+          );
+        }
+
         // Calculate entropy delta for move and place this move's results in the queue.
         best_moves_q.push(std::make_pair(
-            -make_proposal_decision(block.second, metablock, false).entropy_delta,
+            -entropy_delta,
             std::make_pair(block.second, merge_block)));
       }
     }
@@ -457,14 +521,17 @@ Merge_Step SBM::agglomerative_merge(const int block_level,
     const bool pair_unmerged = merged_blocks.insert(best_merge.first).second & merged_blocks.insert(best_merge.second).second;
 
     if (pair_unmerged) {
+      const double merge_entropy_delta = -best_moves_q.top().first; // we stored the negative entropy delta so we need to subtract
+
       // Merge the best block pair
       merge_blocks(best_merge.second, best_merge.first);
 
       // Record pair for results
-      results.entropy_delta -= best_moves_q.top().first; // we stored the negative entropy delta so we need to subtract
+      results.entropy_delta += merge_entropy_delta;
       results.from_node.push_back(best_merge.first->id);
       results.to_node.push_back(best_merge.second->id);
       num_merges_made++;
+
     }
 
     // Remove the last index from our queue and go again
@@ -535,14 +602,17 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
       break;
     }
 
+
     if (num_mcmc_steps != 0) {
       // Let model equilibriate with new block layout...
-      const std::vector<double> sweep_entropy_deltas = mcmc_sweep(node_level, num_mcmc_steps, false, false).sweep_entropy_delta;
-
+      const std::vector<double> sweep_entropy_deltas     = mcmc_sweep(node_level, num_mcmc_steps, false, false).sweep_entropy_delta;
+      double                    mcmc_sweep_delta_changes = 0;
       // Update the step entropy delta with the entropy delta from the sweeps
       for (const double& sweep_delta : sweep_entropy_deltas) {
-        merge_results.entropy_delta += sweep_delta;
+        mcmc_sweep_delta_changes += sweep_delta;
       }
+
+      merge_results.entropy_delta += mcmc_sweep_delta_changes;
     }
 
     // Update current number of blocks
