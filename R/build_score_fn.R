@@ -9,7 +9,7 @@
 #'   function that takes one/two arguments: an entropy vector and an optional
 #'   number of blocks vector with each element corresponding to a given
 #'   location, or a string labeling algorithm. Currently only `"lowest"`,
-#'   `"dev_from_rolling_mean"`, and `"nls_residual"` are supported.
+#'   `"dev_from_rolling_mean"`, `"delta_ratio"`, and `"nls_residual"` are supported.
 #'
 #' @return A function that takes and entropy and number of block vector and
 #'   returns a score for partitioning (higher = better)
@@ -66,6 +66,14 @@ build_score_fn <- function(heuristic){
          entropy_model <- nls(e ~ a + b * log(k), start = list(a = max(e), b = -25))
          -residuals(entropy_model)
        }
-    } else {stop("Hueristic must be either a function or one of {\"lowest\", \"dev_from_rolling_mean\", \"nls_residual\"}.")}
+    } else
+    if(heuristic == 'delta_ratio'){
+      score_func <- function(value, k){
+        prev_value_norm <- dplyr::lag(value) / (dplyr::lag(k) - k)
+        next_value_norm <- dplyr::lead(value) / (k - dplyr::lead(k))
+        next_value_norm/prev_value_norm
+      }
+    } else
+    {stop("Hueristic must be either a function or one of {\"lowest\", \"dev_from_rolling_mean\", \"nls_residual\"}.")}
   }
 }
