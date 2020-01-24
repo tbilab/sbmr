@@ -64,10 +64,14 @@ visualize_collapse_results <- function(collapse_results, use_entropy_value_for_s
   collapse_results %>%
     dplyr::select(-state) %>%
     tidyr::pivot_longer(-num_blocks) %>%
+    dplyr::mutate(
+      name = stringr::str_replace_all(name, "_", " ")
+    ) %>%
     ggplot2::ggplot(ggplot2::aes(x = num_blocks, y = value)) +
     ggplot2::geom_point() +
     ggplot2::geom_line() +
-    ggplot2::facet_grid(name~., scales = 'free_y')
+    ggplot2::facet_grid(name~., scales = 'free_y') +
+    ggplot2::labs(x = "number of blocks", y = "")
 }
 
 
