@@ -8,6 +8,7 @@
 #' if new blocks blocks can be proposed and empty blocks removed (boolean).
 #'
 #' @inheritParams add_node
+#' @inheritParams collapse_blocks
 #' @param num_sweeps Number of times all nodes are passed through for move
 #'   proposals.
 #' @param level Level of nodes who's blocks will have their block membership run

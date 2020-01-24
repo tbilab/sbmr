@@ -12,7 +12,7 @@ copy_sbm(old_sbm, match_state = FALSE)
 \item{match_state}{Should copy also match the current blocking state of old model?}
 }
 \value{
-A new deep copy of the original SBM with parameters preserved.
+A new deep copy of the original SBM.
 }
 \description{
 Copy existing SBM object

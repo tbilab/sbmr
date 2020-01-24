@@ -11,7 +11,7 @@ build_score_fn(heuristic)
 function that takes one/two arguments: an entropy vector and an optional
 number of blocks vector with each element corresponding to a given
 location, or a string labeling algorithm. Currently only \code{"lowest"},
-\code{"dev_from_rolling_mean"}, and \code{"nls_residual"} are supported.}
+\code{"dev_from_rolling_mean"}, \code{"delta_ratio"}, and \code{"nls_residual"} are supported.}
 }
 \value{
 A function that takes and entropy and number of block vector and

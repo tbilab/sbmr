@@ -21,7 +21,7 @@ on sbm with \code{\link{collapse_blocks}}.}
 function that takes one/two arguments: an entropy vector and an optional
 number of blocks vector with each element corresponding to a given
 location, or a string labeling algorithm. Currently only \code{"lowest"},
-\code{"dev_from_rolling_mean"}, and \code{"nls_residual"} are supported.}
+\code{"dev_from_rolling_mean"}, \code{"delta_ratio"}, and \code{"nls_residual"} are supported.}
 
 \item{verbose}{Should model tell you what step was chosen (\code{TRUE} or \code{FALSE})?}
 }

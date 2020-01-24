@@ -138,8 +138,7 @@ complete discussion of options/behavior.</p>
   <span class='kw'>num_mcmc_sweeps</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>desired_num_blocks</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>report_all_steps</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>eps</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>greedy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
   <span class='kw'>num_block_proposals</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>2</span>
 )</pre>
@@ -147,10 +146,6 @@ complete discussion of options/behavior.</p>
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>sbm</th>
-      <td><p>SBM model object as created by <code><a href='create_sbm.html'>create_sbm()</a></code>.</p></td>
-    </tr>
     <tr>
       <th>level</th>
       <td><p>Level of nodes who's blocks will have their block membership run
@@ -180,22 +175,15 @@ transfer.</p></td>
     <tr>
       <th>eps</th>
       <td><p>Controls randomness of move proposals. Effects both the block
-merging and mcmc sweeps. If value is set to value other than null the SBMs
-current epsilon value will be overridden.</p></td>
-    </tr>
-    <tr>
-      <th>greedy</th>
-      <td><p>Should every possible block merger be considered? If <code>FALSE</code>,
-candidates for mergers are drawn by similarity in edges (just as MCMC
-move proposals are). This may lead the model to local minimums by always
-pursuing best possible merges.</p></td>
+merging and mcmc sweeps.</p></td>
     </tr>
     <tr>
       <th>num_block_proposals</th>
-      <td><p>If <code>greedy = FALSE</code>, this parameter controls how
-many merger proposals are drawn for each block in the model. A larger
-number will increase the exploration of merge potentials but may lead the
-model to local minimums for the same reason greedy mode does.</p></td>
+      <td><p>Controls how many merger proposals are drawn for
+each block in the model. A larger number will increase the exploration of
+merge potentials but may lead the model to local minimums. If the number of
+proposals is greater than then number of blocks then all blocks are
+searched exhaustively.</p></td>
     </tr>
     <tr>
       <th>sigma</th>
@@ -227,7 +215,7 @@ of <code>state</code> which is the state dump dataframe for model at end of merg
   <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span>(-<span class='no'>state</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 1 x 2</span><span>
 #&gt;   entropy num_blocks
 #&gt;     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>    816.          1</div><div class='input'>
+#&gt; </span><span style='color: #555555;'>1</span><span>    410.          1</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

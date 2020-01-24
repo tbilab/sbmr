@@ -10,14 +10,12 @@ collapse_blocks(
   num_mcmc_sweeps = 0,
   desired_num_blocks = 1,
   report_all_steps = FALSE,
-  eps = NULL,
+  eps = 0.1,
   num_block_proposals = 5,
   sigma = 2
 )
 }
 \arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
-
 \item{level}{Level of nodes who's blocks will have their block membership run
 through MCMC proposal-accept routine.}
 
@@ -37,8 +35,7 @@ to \code{TRUE}, otherwise it will slow down collapsing due to increased data
 transfer.}
 
 \item{eps}{Controls randomness of move proposals. Effects both the block
-merging and mcmc sweeps. If value is set to value other than null the SBMs
-current epsilon value will be overridden.}
+merging and mcmc sweeps.}
 
 \item{num_block_proposals}{Controls how many merger proposals are drawn for
 each block in the model. A larger number will increase the exploration of

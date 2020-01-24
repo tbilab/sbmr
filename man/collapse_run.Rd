@@ -11,13 +11,11 @@ collapse_run(
   num_final_blocks = 1:10,
   num_block_proposals = 5,
   num_mcmc_sweeps = 10,
-  eps = NULL,
+  eps = 0.1,
   parallel = FALSE
 )
 }
 \arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
-
 \item{level}{Level of nodes who's blocks will have their block membership run
 through MCMC proposal-accept routine.}
 
@@ -39,8 +37,7 @@ their most natural resting place in a given collapsed state. Larger values
 will slow down runtime but can potentially lead for more stable results.}
 
 \item{eps}{Controls randomness of move proposals. Effects both the block
-merging and mcmc sweeps. If value is set to value other than null the SBMs
-current epsilon value will be overridden.}
+merging and mcmc sweeps.}
 
 \item{parallel}{Run in parallel using \code{furrr}?}
 }

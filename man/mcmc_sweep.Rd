@@ -8,6 +8,7 @@ mcmc_sweep(
   sbm,
   num_sweeps = 1,
   variable_num_blocks = TRUE,
+  eps = 0.1,
   track_pairs = FALSE,
   level = 0,
   verbose = FALSE
@@ -22,6 +23,9 @@ proposals.}
 \item{variable_num_blocks}{Should the model allow new blocks to be created or
 empty blocks removed while sweeping or should number of blocks remain
 constant?}
+
+\item{eps}{Controls randomness of move proposals. Effects both the block
+merging and mcmc sweeps.}
 
 \item{track_pairs}{Return a dataframe with all pairs of nodes along with the
 number of sweeps they shared the same group?}
