@@ -382,14 +382,14 @@ system.time({
 We can use the same collapse viewing and selection functions as we did previously. 
 
 ```{r}
-visualize_collapse_results(run_results, heuristic = "dev_from_rolling_mean") +
+visualize_collapse_results(run_results, heuristic = "nls_residual") +
   true_num_clusters_line +
   ggtitle("Collapse run")
 ```
 
 
 ```{r}
-choose_best_collapse_state(my_sbm, run_results, heuristic = "dev_from_rolling_mean", verbose = TRUE) %>% 
+choose_best_collapse_state(my_sbm, run_results, heuristic = "nls_residual", verbose = TRUE) %>% 
   state_to_truth_table()
 ```
 
@@ -413,10 +413,10 @@ eps_vals <- exp(seq(log(0.1), log(15), length.out = 9))
 eps_sweep_results <- purrr::map_dfr(
   eps_vals, 
   function(eps){
-    my_sbm$EPS <- eps
     collapse_run(
       my_sbm,
       num_final_blocks = 1:8,
+      eps = eps,
       parallel = TRUE
     ) %>% 
       mutate(eps = eps)
