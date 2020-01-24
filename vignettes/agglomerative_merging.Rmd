@@ -101,17 +101,21 @@ collapse_results <- my_sbm %>%
 head(collapse_results)
 ```
 
-The results of the collapse function are a column with entropy of the model at a given state, and the number of groups in the model at that state. We can plot these using the included `visualize_collapse_results()` function to check for patterns. 
+The results of the collapse function are a column with entropy of the model at a given state, entropy delta caused by that move, and the number of groups in the model at that state. We can plot these using the included `visualize_collapse_results()` function to check for patterns. 
 
 ```{r plot_default_collapse}
 visualize_collapse_results(collapse_results)
 ```
 
-Right away we see a sharp increase in our entropy after we get to the true number of groups. This shows that the model effectively found the true partitioning and then as soon as it was forced to merge non-member nodes together the performance got much worse.
+Right away we see a sharp leveling off of the entropy/ entropy delta after we get to the true number of groups. This shows that the model effectively found the true partitioning and then as soon as it was forced to merge non-member nodes together the performance got much worse.
 
 ### Deciding the end partition
 
-While this example may seem simple enough that we could just select the optimal clusters by looking at the graph, we want an automated way to choose the best state that will get us away from guessing. There are a few included heuristics in the package (and you can build your own). The one that seems to work best is called "delta_ratio". it looks at the ratio of the average entropy pre and post a given location to find the point where there is the largest divergence, which usually indicates when the model has stopped being able to fill true groups into unique inferred groups. 
+While this example may seem simple enough that we could just select the optimal clusters by looking at the graph, we want an automated way to choose the best state that will get us away from guessing. There are a few included heuristics in the package (and you can build your own).
+
+These heuristics try to guess the point where the model found the best partitioning by looking at the trends in the entropy delta value. The one that seems to work best is called "delta_ratio". it looks at the ratio of the average entropy delta pre and post a given location to find the point where there is the largest divergence, which usually indicates when the model has stopped being able to fill true groups into unique inferred groups. 
+
+Any of these heuristics can be run on the entropy value instead of the entropy_delta just by setting the argument `use_entropy_value_for_score = TRUE`. 
 
 
 #### Visualizing Collapse Results Scores
@@ -126,6 +130,28 @@ visualize_collapse_results(collapse_results, heuristic = "delta_ratio") +
   axis_limits +
   true_num_clusters_line +
   ggtitle("Delta ratio heuristic score")
+```
+
+```{r}
+get_state(my_sbm) %>%
+  filter(level == 0) %>%
+  right_join(network$nodes, by = 'id') %>%
+  rename(inferred = parent) %>% {
+    table(.$inferred, .$block)
+  } %>% 
+  as.data.frame.matrix() %>% 
+  mutate(inferred = rownames(.)) %>% 
+  pivot_longer(-inferred, values_to = "count", names_to = "truth") %>% 
+  ggplot(aes(x = truth, y = inferred)) +
+  geom_tile(aes(fill = count), color = "white") +
+  geom_text(aes(label = count), color = "white", size = 8) +
+  guides(fill = FALSE) +
+  labs(
+    x = "True Group",
+    y = "Inferred group",
+    title = "Performance of single-step merging algorithm",
+    subtitle = "Delta-ratio heuristic used for optimal cut"
+  )
 ```
 
 
@@ -154,7 +180,6 @@ visualize_collapse_results(collapse_results, heuristic = "dev_from_rolling_mean"
 
 The deviation from the rolling mean function works similar to the NLS fit but uses a non-parametric smoother in a windowed mean that averages the last three values. 
 
-
 #### Choosing
 
 The function `choose_best_collapse_state()` will take a collapse results object and your model and use your heuristic of choice to find the best partitioning and then set the model to that. The same heuristics work for the `visualize_collapse_results()` and `choose_best_collapse_state()` functions. Lets choose our results using the deviation from rolling mean hueristic...
@@ -182,6 +207,9 @@ state_to_truth_table <- function(sbm){
 
 state_to_truth_table(my_sbm)
 ```
+
+
+
 
 So we can see that the merging algorithm perfectly separated our nodes into their true groups. 
 
