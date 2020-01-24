@@ -9,7 +9,7 @@
 #'   function that takes one/two arguments: an entropy vector and an optional
 #'   number of blocks vector with each element corresponding to a given
 #'   location, or a string labeling algorithm. Currently only `"lowest"`,
-#'   `"dev_from_rolling_mean"`, `"delta_ratio"`, and `"nls_residual"` are supported.
+#'   `"dev_from_rolling_mean"`, `"delta_ratio"`, `"trend_deviation"`, and `"nls_residual"` are supported.
 #'
 #' @return A function that takes and entropy and number of block vector and
 #'   returns a score for partitioning (higher = better)
@@ -73,6 +73,19 @@ build_score_fn <- function(heuristic){
         rolling_avg_at_k <- rolling_mean(value, window = window_size)
         rolling_avg_after <- dplyr::lead(rolling_avg_at_k, window_size)
         rolling_avg_at_k/rolling_avg_after
+      }
+    } else
+    if(heuristic == 'trend_deviation'){
+
+      score_func <- function(value, k){
+        x1 <- lag(k)
+        y1 <- lag(value)
+        x2 <- lead(k)
+        y2 <- lead(value)
+        px <- k
+        py <- value
+        # Distance between a line defined by two points and a given point
+        abs((y2 - y1)*px - (x2 - x1)*py + x2*y1 - y2*x1)/sqrt( (y2-y1)^2 + (x2-x1)^2 )
       }
     } else
     {stop("Hueristic must be either a function or one of {\"lowest\", \"dev_from_rolling_mean\", \"nls_residual\"}.")}
