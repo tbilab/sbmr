@@ -89,10 +89,157 @@ There are a few important input parameters we need to consider:
 - `num_block_proposals`: If `greedy = FALSE`, this parameter controls how many merger proposals are drawn for each group in the model. A larger number will increase the exploration of merge potentials but may lead the model to local minimums for the same reason greedy mode does. 
 - `num_mcmc_sweeps`: How many MCMC sweeps the model does at each agglomerative merge step. This allows the model to allow nodes to find their most natural resting place in a given collapsed state. Larger values will slow down runtime but can potentially lead for more stable results. 
 
+### Performing a single merge with 1 group per merge
 
-### Role of sigma...
+To perform the complete merge we put our `sigma < 1` and our `num_mcmc_sweeps = 0`. In addition we return all the steps so we can look at the progress of the model as it collapses. 
 
-The most important parameter from above is `sigma`. This controls the rate the model is collapsed. A slower (and lower) value will allow the model to explore more intermediate steps and make less drastic jumps between. 
+
+```{r default_collapse_blocks}
+collapse_results <- my_sbm %>% 
+  collapse_blocks(sigma = 0.9, report_all_steps = TRUE)
+
+head(collapse_results)
+```
+
+The results of the collapse function are a column with entropy of the model at a given state, and the number of groups in the model at that state. We can plot these using the included `visualize_collapse_results()` function to check for patterns. 
+
+```{r plot_default_collapse}
+visualize_collapse_results(collapse_results)
+```
+
+Right away we see a sharp increase in our entropy after we get to the true number of groups. This shows that the model effectively found the true partitioning and then as soon as it was forced to merge non-member nodes together the performance got much worse.
+
+### Deciding the end partition
+
+While this example may seem simple enough that we could just select the optimal clusters by looking at the graph, we want an automated way to choose the best state that will get us away from guessing. There are a few included heuristics in the package (and you can build your own). The one that seems to work best is called "delta_ratio". it looks at the ratio of the average entropy pre and post a given location to find the point where there is the largest divergence, which usually indicates when the model has stopped being able to fill true groups into unique inferred groups. 
+
+
+#### Visualizing Collapse Results Scores
+
+We can check out what a given heuristic looks like on our data by simply telling the `visualize_collapse_results()` function which one we want. 
+
+```{r}
+axis_limits <- xlim(0,20)
+true_num_clusters_line <- geom_vline(xintercept = n_blocks, color = 'orangered')
+
+visualize_collapse_results(collapse_results, heuristic = "delta_ratio") +
+  axis_limits +
+  true_num_clusters_line +
+  ggtitle("Delta ratio heuristic score")
+```
+
+
+So we see that the true number of clusters corresponds to the highest heuristic score, we can use this to automatically select our best grouping. First let's look at the other heuristic options.
+
+__Non-linear least-squares residual__
+
+This heueristic fits a non-linear regression model to the entropy as predicted by the number of groups. The equation it attempts to fit is $\text{entropy} \approx \beta_0 + \beta_1 \log(\text{num_blocks})$. This is based on the expected decay of entropy for a model with no true structure. Once this equation is fit each points residual from the fit is recorded. The point that is the farthest below the expected value according to the model is considered the 'best' fit. This is fit with `heuristic = 'nls_residual'`. 
+ 
+
+```{r}
+visualize_collapse_results(collapse_results, heuristic = "nls_residual") +
+  axis_limits +
+  true_num_clusters_line +
+  ggtitle("NLS residual heuristic score")
+```
+
+__Deviation from rolling mean__
+
+```{r}
+visualize_collapse_results(collapse_results, heuristic = "dev_from_rolling_mean") +
+  axis_limits +
+  true_num_clusters_line +
+  ggtitle("Deviation from rolling mean")
+```
+
+The deviation from the rolling mean function works similar to the NLS fit but uses a non-parametric smoother in a windowed mean that averages the last three values. 
+
+
+#### Choosing
+
+The function `choose_best_collapse_state()` will take a collapse results object and your model and use your heuristic of choice to find the best partitioning and then set the model to that. The same heuristics work for the `visualize_collapse_results()` and `choose_best_collapse_state()` functions. Lets choose our results using the deviation from rolling mean hueristic...
+
+```{r}
+my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, heuristic = "dev_from_rolling_mean", verbose = TRUE)
+```
+
+So, as expected, the chosen best fit is the correct `n_blocks` blocks. 
+
+### Investigating Results
+
+Since we have the true groups for our nodes we can check to see how well the merging did. To do that we just need to merge our results and the raw network data and look at the contingency table of truth to inferred groups. 
+
+```{r}
+state_to_truth_table <- function(sbm){
+  sbm %>%
+    get_state() %>%
+    filter(level == 0) %>%
+    right_join(network$nodes, by = 'id') %>%
+    rename(inferred = parent) %>% {
+      table(.$inferred, .$block)
+    }
+}
+
+state_to_truth_table(my_sbm)
+```
+
+So we can see that the merging algorithm perfectly separated our nodes into their true groups. 
+
+We can also look at the results by plotting the network itself and encoding true blocks in node color and inferred blocks in node shape. 
+
+```{r}
+nodes_w_inferred_block <- get_state(my_sbm) %>%
+  filter(level == 0) %>%
+  right_join(network$nodes, by = 'id') 
+
+visualize_network(edges = network$edges, 
+                  nodes = nodes_w_inferred_block, 
+                  node_color_col = 'block', 
+                  node_shape_col = 'parent',
+                  width = '100%')
+```
+
+
+
+### Allowing for node shuffling
+
+Sometimes if we were worried that the model may be making bad merges early on that manifest in poor performance for smaller groups we may want to let the collapsing allow the nodes to find their prefered locations within each collapse. To do this we simply pause the collapsing and run a few mcmc sweeps to let the nodes find their natural resting place. This can help if a node or two accidentally got merged into an incorrect group earlier in the collapse. 
+
+To enable this shuffing we simply set the argument `num_mcmc_sweeps` to a value greater than `0`. 
+
+This will cause the algorithm to slow down a good bit because every each MCMC sweep move proposal takes O(N) (N = num nodes) time to complete. 
+
+Let's try our above merging run with 5 MCMC sweeps after each step. 
+
+
+```{r collapse_w_shuffle}
+collapse_mcmc10 <- my_sbm %>% 
+  collapse_blocks(sigma = 0.9, 
+                  num_mcmc_sweeps = 5,
+                  report_all_steps = TRUE)
+
+visualize_collapse_results(collapse_mcmc10, heuristic = 'dev_from_rolling_mean') +
+  axis_limits +
+  true_num_clusters_line +
+  ggtitle("num_mcmc_sweeps = 10")
+```
+
+Now that we have allowed node shuffling the nice monotonicly decreasing entropy as the number of groups increases has gone away because our mcmc sweeps have the potential to improve the model fit more than the previous merge harmed it. We still however see a strong indicator of where our true number of blocks is. Let's select that value and see how the model performed. 
+
+```{r}
+choose_best_collapse_state(my_sbm, collapse_mcmc10, heuristic = "dev_from_rolling_mean", verbose = TRUE) %>% 
+  state_to_truth_table()
+```
+
+Again we got a perfect collapsing into the `n_block` generating blocks. 
+
+
+
+## Raising sigma
+
+One problem with these runs that collapse one group at a time is they are slow, when we add in MCMC sweeps they can get even slower. One way of dealing with this is the parameter `sigma`. 
+
+`sigma` controls the rate the model is collapsed. A slower (and lower) value will allow the model to explore more intermediate steps and make less drastic jumps between. 
 
 We can see how `sigma` effects the speed of the collapse by looking at the total number of steps needed to fully collapse a network down to one remaining group by the total number of nodes in the network. 
 
@@ -100,7 +247,7 @@ We can see how `sigma` effects the speed of the collapse by looking at the total
 ```{r steps_needed_to_collapse, echo = FALSE}
 expand_grid(
   num_nodes = seq(10, 250, by = 10),
-  sigma = exp(seq(log(1.3), log(4), length.out = 6))
+  sigma = exp(seq(log(1.1), log(2.5), length.out = 6))
 ) %>% 
   mutate(
     steps_to_collapse = map2_dbl(
@@ -125,12 +272,12 @@ expand_grid(
        y = "Steps needed to collapse")
 ```
 
-We can see that at `sigma > 2` the algorithm takes very few steps to collapse the network even as the network gets large. 
+We can see that at after around `sigma = 1.3` the algorithm takes very few steps to collapse the network even as the network gets large. 
 
 If we pin the network size at a constant (here 150) we can see the path of collapsing in terms of groups remaining for a variety of sigmas...
 
 ```{r merge_traces}
-exp(seq(log(1.3), log(3), length.out = 6)) %>% 
+exp(seq(log(1.1), log(2.5), length.out = 6)) %>% 
   map_dfr(function(sigma, starting_num = 150, num_steps = 15){
     steps <- 1:(num_steps-1) %>% 
       reduce(function(group_nums, i){
@@ -154,103 +301,61 @@ exp(seq(log(1.3), log(3), length.out = 6)) %>%
        x = "Step Number")
 ```
 
-Again we see that the model drops very quickly at values of `sigma > 2`. 
+Again we see that the model collapses very quickly at values of `sigma > 1.5`. 
 
 We can see that with larger sigma values we get very rapid convergence to our desired model size. In theory this could cause issues like follows:
 
 There are four groups in model (`{a,b,c,d}`). Groups `a` and `b` may be close to eachother and group `c` may be closer to `b` than it is do `d`. If we force two merges in a given step, `a`, and `b`, may be merged together and then, because those groups are merged and `c` is now left to merge with only `d`, which it does, forgoing the more optimal merging of `a->b->c`, `d`. In practive however, this scenario tends to not be an issue. 
 
-If you want to merge groups together one at a time, specifying `sigma <= 1` will force that to happen. This can be combined with `num_mcmc_sweeps = 0` to give you a dendrogram-compatable collapse of your network. 
+
+Let's try setting sigma to `1.5` and seeing how both the collapse performs and how long it takes compared to an exhaustive collapse. 
 
 
-### Performing a single merge with 1 group per merge
+First time the normal exhaustive collapse...
+```{r}
+full_collapse_time <- system.time({
+  full_collapse_results <- collapse_blocks(my_sbm, sigma = 0.9, report_all_steps = TRUE)
+})
 
-To perform the complete merge we put our `sigma < 1` and our `num_mcmc_sweeps = 0`. In addition we return all the steps so we can look at the progress of the model as it collapses. 
-
-
-```{r default_collapse_blocks}
-collapse_results <- my_sbm %>% 
-  collapse_blocks(sigma = 0.9, report_all_steps = TRUE)
-
-head(collapse_results)
+full_collapse_time
 ```
 
-The results of the collapse function are a column with entropy of the model at a given state, and the number of groups in the model at that state. We can plot these using the included `visualize_collapse_results()` function to check for patterns. 
 
-```{r plot_default_collapse}
-visualize_collapse_results(collapse_results)
+Now raise sigma to 1.5 and time...
+
+```{r}
+raised_sigma_collapse_time <- system.time({
+  raised_sigma_results <- collapse_blocks(my_sbm, sigma = 1.5, report_all_steps = TRUE)
+})
+
+raised_sigma_collapse_time
 ```
 
-We see a nice smooth line going from one group per node down to a single group for all nodes. This line will always be monotonic increasing as the number of groups goes down. This is because removing more groups _always_ result in a poorer model fit because less information is being provided by the model structure. 
+Just by increasing sigma to 1.5 we have sped up the collapsing by `r round(full_collapse_time[1]/raised_sigma_collapse_time[1], 2)` times.
 
+Speed isn't important if the model isnt working properly, however. So let's see how the collapse worked.
 
-
-### Allowing for node shuffling
-
-We can also let the model move the nodes around at each merge step which potentially allows it to get itself out of poor local minimums that the strict merging has gotten it into. We do this by setting `num_mcmc_sweeps > 0`.
- 
-
-```{r collapse_w_shuffle}
-collapse_mcmc10 <- my_sbm %>% 
-  collapse_blocks(sigma = 0.9, 
-                  num_mcmc_sweeps = 10,
-                  report_all_steps = TRUE)
-
-visualize_collapse_results(collapse_mcmc10) +
-  ggtitle("num_mcmc_sweeps = 10")
+```{r}
+visualize_collapse_results(raised_sigma_results, heuristic = "dev_from_rolling_mean") +
+  axis_limits +
+  true_num_clusters_line +
+  ggtitle("Collapse with sigma = 1.5")
 ```
 
-Now we see a completely different type of entropy path. The entropy decreases as we decrease the number of groups. This is a sign that the model is finding much better arrangements of its nodes into the groups through the MCMC steps. 
+So even with this speedup we are finding the proper number of clusters. Let's see if the separation is good. 
 
-## Greedy Mode
-
-By adding the greedy mode to this we in theory may find better merges because we explore all options. Let's see the impact. 
-
-```{r collapse_w_greedy}
-my_sbm %>% 
-  collapse_blocks(sigma = 0.9, 
-                  greedy = TRUE,
-                  num_mcmc_sweeps = 10,
-                  desired_num_blocks = 1,
-                  report_all_steps = TRUE) %>% 
-  visualize_collapse_results() +
-  ggtitle("num_mcmc_sweeps = 10, greedy = TRUE")
+```{r}
+choose_best_collapse_state(my_sbm, raised_sigma_results, heuristic = "dev_from_rolling_mean", verbose = TRUE) %>% 
+  state_to_truth_table()
 ```
 
-Indeed we do see a bit of a smoothing out of the jaggedness of the model. 
-
-## Raising sigma
-
-One problem with these runs that collapse one group at a time is they are slow. As we saw, raising `sigma` can drastically reduce the number of steps needed. Let's try with `sigma = 2`. 
-
-```{r collapse_w_higher_sigma}
-collapse_sigma2 <- my_sbm %>% 
-  collapse_blocks(sigma = 2, 
-                  num_mcmc_sweeps = 10,
-                  desired_num_blocks = 1,
-                  report_all_steps = TRUE)
-
-visualize_collapse_results(collapse_sigma2) +
-  ggtitle("sigma = 2")
-```
-
-As expected, we get a lower-resolution line as fewer steps were taken. Let's overlay this faster collapse result with our `sigma < 1` result.
+So again we are getting extremely good performance. Often a balance between allowing MCMC sweeps and a moderate sigma value will return very good and very fast collapsing results. 
 
 
-```{r compare_sigma_value_collapses}
-bind_rows(
-  collapse_mcmc10 %>% mutate(run = "sigma < 1"),
-  collapse_sigma2 %>% mutate(run = "sigma = 2")
-) %>% 
-  ggplot(aes(x = num_blocks, y = entropy, color = run)) +
-  geom_line()
-```
-
-So interestingly we see that while the runtime was way faster, our path had almost the same entropy values, which got closer as the model collapsed further. This shows that, if you're looking for the best collapse value increasing your sigma can save you lots of time without sacraficing much in the way of model performance. 
 
 ## Collapse Runs
 
-So far we have looked at a single run of agglomerative collapsing, but the recomended algorithm in the paper the algorithm was introduced in, [Piexoto 2014](https://arxiv.org/abs/1310.4378), recomends running a seperate collapse for each number of groups, going from one up to a reasonable stopping point. 
+So far we have looked at a single run of agglomerative collapsing, but the recomended method in the paper the algorithm was introduced in, [Piexoto 2014](https://arxiv.org/abs/1310.4378) is running a seperate collapse for each reasonable number of groups, going from one up to a reasonable stopping point. 
 
 Interestingly, due to the speed advantages of the high sigma values, even running seperate collapses for each target group number can be very fast compared to a single merge that looks at the possible group values. 
 
@@ -263,96 +368,34 @@ The only arguments it has that `collapse_blocks()` does not are:
 
 The parallel argument is particularly valuable as it exploits the fact that each run is independent of the others and thus can be run on seperate threads for significant speedups. 
 
-Lets try it on our model scanning from 1-10 groups. 
+Lets try it on our model scanning from 1-10 groups using sigma of `1.5` and `5` mcmc sweeps for each individual collapse. 
 
 ```{r parallel_collapse_run}
-run_results <- my_sbm %>% 
-  collapse_run(num_final_blocks = 1:10,
-               parallel = TRUE)
-```
-
-```{r collapse_run_vs_collapse_blocks}
-bind_rows(
-  run_results %>% mutate(run = "collapse_run"),
-  collapse_sigma2 %>% mutate(run = "collapse_blocks") %>% filter(num_blocks < 15)
-) %>% 
-  ggplot(aes(x = num_blocks, y = entropy, color = run)) +
-  geom_line()
-```
-
-We see that for the overlaping portion we get better performance than the single group run and a high resolution as well. 
-
-One other property of this run result is it seems smoother than the single `collapse_blocks()` result. This fact can be exploited to find the best partitioning. 
-
-## Deciding the 'best' partition
-
-Finding the "elbow" in graphs for choosing cluster results is an imperfect science. The package has a few built in heuristics to do so and also allows a completely custom function that takes either the entropy value of the runs or the entropy value and the number of groups. These heuristics can be seen using the `visualize_collapse_results()` function and used to select the best value using the `choose_best_collapse_state()` function. 
-
-### Lowest
-
-The simplest and most nieve method to find the best partition would be to simply take the lowest seen entropy. This is not a great idea because we know that entropy is monotonicly increasing as the number of groups decreases. The chances that the fit was so much better than others for the optimal number of groups is low. This is a very fast method to choose though and makes the least assumptions about the behavior of the system. 
-
-```{r lowest_heuristic}
-visualize_collapse_results(run_results, heuristic = 'lowest')
+system.time({
+  run_results <- my_sbm %>% 
+    collapse_run(num_final_blocks = 1:10, sigma = 1.5, num_mcmc_sweeps = 5, parallel = TRUE)
+})
 ```
 
 
 
-## Deviation from rolling mean
+We can use the same collapse viewing and selection functions as we did previously. 
 
-One method that works well for SBM models is looking at a given collapse results difference from the rolling mean of the entropy. Doing this serves to show what points show larger than expected dips in entropy for a single group being added. This is fit with `heuristic = 'dev_from_rolling_mean'`.
-
-
-```{r dev_from_rolling_mean_heuristic}
-visualize_collapse_results(run_results, heuristic = 'dev_from_rolling_mean')
-```
-
-The "best" point intuitively would be the point with the highest peak on the top chart. Here we see that peak occurs at __3__ groups. Which we know to be the true number of groups in this network (because we simulated it).
-
-The nice thing about this metric is that it can be used in real time as we scan up the number of groups meaning the algorithm can stop at the value it needs by detecting a decline in the deviance function. 
-
-
-## Non-Linear Least-Squares residuals
-
-The final included heuristic takes into account the number of groups. It fits a non-linear regression model to the entropy as predicted by the number of groups. The equation it attempts to fit is $\text{entropy} \approx \beta_0 + \beta_1 \log(\text{num_blocks})$. Once this equation is fit each points residual from the fit is recorded. The point that is the farthest below the expected value according to the model is considered the 'best' fit. This is fit with `heuristic = 'nls_residual'`. 
-
-```{r nls_heuristic}
-visualize_collapse_results(run_results, heuristic = 'nls_residual')
+```{r}
+visualize_collapse_results(run_results, heuristic = "dev_from_rolling_mean") +
+  true_num_clusters_line +
+  ggtitle("Collapse run")
 ```
 
 
-## Loading the best fit
-
-So far we have ignored the column `state` in our collapse results. This column is a list of dataframes, each containing the state of the model at a given collapse. This can be used to return the model to the state for the best group partitioning. 
-
-This can be done with the `load_from_state()` function after retrieving the chosen state (e.g. `my_sbm %>% load_from_state(results$state[5])`) but a helper function is included to automate this process. `choose_best_collapse_state()` takes as input the dataframe returned by `collapse_run()` (or `collapse_block(report_all_steps = TRUE)`) and the heuristic used to find the best fit and selects the best result and loads it into the model. 
-
-We can demonstrate with our collapse run results:
-
-```{r selecting_best_partition}
-best_partition <- my_sbm %>% 
-  choose_best_collapse_state(run_results, 
-                             heuristic = 'dev_from_rolling_mean', #default value
-                             verbose = TRUE) # Tells us what state is chosen
+```{r}
+choose_best_collapse_state(my_sbm, run_results, heuristic = "dev_from_rolling_mean", verbose = TRUE) %>% 
+  state_to_truth_table()
 ```
 
-Now our model is loaded with this collapse structure. Last we can visualize how this structure compares to the true groups. 
 
-```{r comparing_partition_w_truth}
-# Merge nodes partition results with true groups
-nodes_w_inferred_block <- best_partition %>% 
-  get_state() %>% 
-  select(id, parent) %>% 
-  right_join(network$nodes, by = 'id')
+So we can get MCMC sweeps and moderate sigma values and maintain rather fast collapsing. The nice thing is every end point is targeted directly so the model has the best chance to find the optimal partition for that given number of blocks. 
 
-visualize_network(edges = network$edges, 
-                  nodes = nodes_w_inferred_block, 
-                  node_color_col = 'block', 
-                  node_shape_col = 'parent',
-                  width = '100%')
-```
-
-We see a perfect match between the color and shape, meaning that every node was perfectly placed into its corresponding latent group. 
 
 ## Effects of other parameters on merge paths
 
@@ -388,7 +431,7 @@ eps_sweep_results %>%
   ggtitle("Collapse results by epsilon value")
 ```
 
-While the results are all within error distance of eachother we do see there seems to be a trend of higher values getting better results, especially with the notable bump in the correct value at the correct 3 groups for one of the lower epsilon runs. 
+While the results are close to eachother, there seems to be a trend of higher epsilon values getting better results.
 
 ## Looking at stability of collapse runs
 
@@ -396,11 +439,12 @@ By simply passing in a groups numbers to check vector with repeates in it we can
 
 ```{r run_stability}
 num_repeats <- 5
-group_nums <- 2:8
+group_nums <- 1:8
 
 repeated_collapse <- collapse_run(
   my_sbm,
   num_final_blocks = rep(group_nums, each = num_repeats),
+  num_mcmc_sweeps = 5,
   parallel = TRUE
 )
 
