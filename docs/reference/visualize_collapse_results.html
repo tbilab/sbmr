@@ -128,7 +128,11 @@ each merger step according to the heuristic provided is also shown." />
 each merger step according to the heuristic provided is also shown.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>visualize_collapse_results</span>(<span class='no'>collapse_results</span>, <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>visualize_collapse_results</span>(
+  <span class='no'>collapse_results</span>,
+  <span class='kw'>use_entropy_value_for_score</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -140,12 +144,18 @@ results as returned from <code>collapse_run</code>, or
 <code><a href='collapse_blocks.html'>collapse_blocks(report_all_steps = TRUE)</a></code>.</p></td>
     </tr>
     <tr>
+      <th>use_entropy_value_for_score</th>
+      <td><p>If set to <code>TRUE</code> then instead of the merge results
+entropy delta being used for the score function the entropy will be.
+Typically the heuristics work better on entropy delta values.</p></td>
+    </tr>
+    <tr>
       <th>heuristic</th>
       <td><p>How the best partitioning is defined. Takes either a
 function that takes one/two arguments: an entropy vector and an optional
 number of blocks vector with each element corresponding to a given
 location, or a string labeling algorithm. Currently only <code>"lowest"</code>,
-<code>"dev_from_rolling_mean"</code>, <code>"delta_ratio"</code>, and <code>"nls_residual"</code> are supported.</p></td>
+<code>"dev_from_rolling_mean"</code>, <code>"delta_ratio"</code>, <code>"trend_deviation"</code>, and <code>"nls_residual"</code> are supported.</p></td>
     </tr>
     </table>
 
@@ -165,10 +175,10 @@ the rolling mean</p>
   <span class='fu'><a href='collapse_run.html'>collapse_run</a></span>(<span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>start_block_num</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>end_block_num</span> <span class='kw'>=</span> <span class='fl'>8</span>)</div><div class='output co'>#&gt; <span class='error'>Error in collapse_run(., sigma = 3, start_block_num = 1, end_block_num = 8): unused arguments (start_block_num = 1, end_block_num = 8)</span></div><div class='input'>
 <span class='co'># =============================================================================</span>
 <span class='co'># Visualize using no heuristic</span>
-<span class='fu'>visualize_collapse_results</span>(<span class='no'>collapse_results</span>)</div><div class='img'><img src='visualize_collapse_results-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>visualize_collapse_results</span>(<span class='no'>collapse_results</span>)</div><div class='output co'>#&gt; <span class='error'>Error in eval(lhs, parent, parent): object 'collapse_results' not found</span></div><div class='input'>
 <span class='co'># =============================================================================</span>
 <span class='co'># Visualize using deviance from rolling average heuristic</span>
-<span class='fu'>visualize_collapse_results</span>(<span class='no'>collapse_results</span>, <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='st'>'dev_from_rolling_mean'</span>)</div><div class='img'><img src='visualize_collapse_results-2.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>visualize_collapse_results</span>(<span class='no'>collapse_results</span>, <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='st'>'dev_from_rolling_mean'</span>)</div><div class='output co'>#&gt; <span class='error'>Error in eval(lhs, parent, parent): object 'collapse_results' not found</span></div><div class='input'>
 <span class='co'># =============================================================================</span>
 <span class='co'># Visualize using custom heuristic</span>
 
@@ -179,7 +189,7 @@ the rolling mean</p>
   -<span class='fu'><a href='https://rdrr.io/r/stats/residuals.html'>residuals</a></span>(<span class='no'>entropy_model</span>)
 }
 
-<span class='fu'>visualize_collapse_results</span>(<span class='no'>collapse_results</span>, <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='no'>nls_score</span>)</div><div class='img'><img src='visualize_collapse_results-3.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>visualize_collapse_results</span>(<span class='no'>collapse_results</span>, <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='no'>nls_score</span>)</div><div class='output co'>#&gt; <span class='error'>Error in eval(lhs, parent, parent): object 'collapse_results' not found</span></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
