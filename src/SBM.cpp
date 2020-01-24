@@ -322,6 +322,11 @@ double SBM::compute_entropy(const int level)
   // Grab all block nodes
   const LevelPtr block_level = get_level(level + 1);
 
+  if (block_level->size() == 0)
+  {
+     throw "Can't compute entropy for network with no block structure.";
+  }
+
   // Now calculate the edge entropy betweeen nodes.
   double edge_entropy = 0.0;
 
@@ -558,6 +563,9 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
   give_every_node_at_level_own_block(node_level);
   give_every_node_at_level_own_block(block_level);
 
+  // Calculate initial entropy for model before merging is done
+  const double initial_entropy = compute_entropy(node_level);
+
   // Grab reference to the block nodes container
   const LevelPtr block_level_ptr = get_level(block_level);
 
@@ -635,6 +643,14 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
   if (!report_all_steps) {
     // Gather info for return
     step_results.push_back(Merge_Step(total_entropy_delta, get_state(), curr_num_blocks));
+    step_results[0].entropy = initial_entropy + total_entropy_delta;
+  } else {
+    // Update the results entropy values with the true entropy rather than the delta provided. 
+    double current_entropy = initial_entropy;
+    for (auto& step_result : step_results) {
+      step_result.entropy = current_entropy + step_result.entropy_delta;
+      current_entropy = step_result.entropy;
+    }
   }
 
   return step_results;

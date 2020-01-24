@@ -171,6 +171,9 @@ class Rcpp_SBM : public SBM {
 
   double compute_entropy(const int level)
   {
+    if (get_level(level + 1)->size() == 0){
+      stop("Can't compute entropy for model with no current block structure.");
+    }
     return SBM::compute_entropy(level);
   }
 
@@ -218,12 +221,12 @@ class Rcpp_SBM : public SBM {
   // =============================================================================
   // Runs multiple MCMC sweeps and keeps track of the results efficiently
   // =============================================================================
-  List mcmc_sweep(const int  level,
-                  const int  num_sweeps,
+  List mcmc_sweep(const int    level,
+                  const int    num_sweeps,
                   const double eps,
-                  const bool variable_num_blocks,
-                  const bool track_pairs,
-                  const bool verbose)
+                  const bool   variable_num_blocks,
+                  const bool   track_pairs,
+                  const bool   verbose)
   {
     // Make sure network has blocks at the level for MCMC sweeps to take place.
     // Warn and initialize groups for user
@@ -285,6 +288,7 @@ class Rcpp_SBM : public SBM {
       entropy_results.push_back(
           List::create(
               _["entropy_delta"] = step.entropy_delta,
+              _["entropy"]       = step.entropy,
               _["state"]         = state_to_df(step.state),
               _["num_blocks"]    = step.num_blocks));
     }
