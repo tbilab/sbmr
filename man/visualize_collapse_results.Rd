@@ -4,18 +4,26 @@
 \alias{visualize_collapse_results}
 \title{Visualize agglomerative collapse results}
 \usage{
-visualize_collapse_results(collapse_results, heuristic = NULL)
+visualize_collapse_results(
+  collapse_results,
+  use_entropy_value_for_score = FALSE,
+  heuristic = NULL
+)
 }
 \arguments{
 \item{collapse_results}{Dataframe of agglomerative merging based collapse
 results as returned from \link{\code{collapse_run}}, or
 \link{\code{collapse_blocks(report_all_steps = TRUE)}}.}
 
+\item{use_entropy_value_for_score}{If set to \code{TRUE} then instead of the merge results
+entropy delta being used for the score function the entropy will be.
+Typically the heuristics work better on entropy delta values.}
+
 \item{heuristic}{How the best partitioning is defined. Takes either a
 function that takes one/two arguments: an entropy vector and an optional
 number of blocks vector with each element corresponding to a given
 location, or a string labeling algorithm. Currently only \code{"lowest"},
-\code{"dev_from_rolling_mean"}, \code{"delta_ratio"}, and \code{"nls_residual"} are supported.}
+\code{"dev_from_rolling_mean"}, \code{"delta_ratio"}, \code{"trend_deviation"}, and \code{"nls_residual"} are supported.}
 }
 \value{
 GGplot object comparing the fit results and each step's deviance from

@@ -48,8 +48,8 @@ the model will try and remove \code{current_num_nodes(1 - 1/sigma)} nodes from
 the model. So a larger sigma means a faster collapse rate.}
 }
 \value{
-Tibble with three columns with rows corresponding to the result of
-each merge step:  \code{entropy}, \code{num_blocks} left in model, and a list column
+Tibble with four columns with rows corresponding to the result of
+each merge step:  \code{entropy_delta} of last merge step, \code{entropy} of model after last merge step, \code{num_blocks} left in model, and a list column
 of \code{state} which is the state dump dataframe for model at end of merge.
 }
 \description{

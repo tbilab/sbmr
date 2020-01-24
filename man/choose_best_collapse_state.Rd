@@ -7,6 +7,7 @@
 choose_best_collapse_state(
   sbm,
   collapse_results,
+  use_entropy_value_for_score = FALSE,
   heuristic = "dev_from_rolling_mean",
   verbose = FALSE
 )
@@ -17,11 +18,15 @@ choose_best_collapse_state(
 \item{collapse_results}{Results of running agglomerative collapse algorithm
 on sbm with \code{\link{collapse_blocks}}.}
 
+\item{use_entropy_value_for_score}{If set to \code{TRUE} then instead of the merge results
+entropy delta being used for the score function the entropy will be.
+Typically the heuristics work better on entropy delta values.}
+
 \item{heuristic}{How the best partitioning is defined. Takes either a
 function that takes one/two arguments: an entropy vector and an optional
 number of blocks vector with each element corresponding to a given
 location, or a string labeling algorithm. Currently only \code{"lowest"},
-\code{"dev_from_rolling_mean"}, \code{"delta_ratio"}, and \code{"nls_residual"} are supported.}
+\code{"dev_from_rolling_mean"}, \code{"delta_ratio"}, \code{"trend_deviation"}, and \code{"nls_residual"} are supported.}
 
 \item{verbose}{Should model tell you what step was chosen (\code{TRUE} or \code{FALSE})?}
 }
