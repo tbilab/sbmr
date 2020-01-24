@@ -23,7 +23,7 @@ TEST_CASE("Generate Node move proposals", "[SBM]")
   // Run multiple trials and of move and see how often a given node is moved
   for (int i = 0; i < num_trials; ++i) {
     // Do move attempt (dry run)
-    NodePtr new_block = my_SBM.propose_move(a1);
+    NodePtr new_block = my_SBM.propose_move(a1, eps);
 
     if (new_block->id == old_block->id)
       num_times_no_move++;
@@ -87,7 +87,7 @@ TEST_CASE("Move proposal returns values are correct (simple unipartite)", "[SBM"
   const NodePtr n4 = unipartite_sbm.get_node_by_id("n4", 0);
   const NodePtr c  = unipartite_sbm.get_node_by_id("c", 1);
 
-  const auto proposal_results = unipartite_sbm.make_proposal_decision(n4, c);
+  const auto proposal_results = unipartite_sbm.make_proposal_decision(n4, c, 0.1);
 
   // Delta from hand calculation
   REQUIRE(proposal_results.entropy_delta == Approx(-0.1117765).epsilon(0.1));
@@ -105,7 +105,7 @@ TEST_CASE("Move proposal returns values are correct (simple bipartite)", "[SBM")
   NodePtr a2  = my_SBM.get_node_by_id("a2");
   NodePtr a11 = my_SBM.get_node_by_id("a11", 1);
 
-  const auto proposal_results = my_SBM.make_proposal_decision(a2, a11);
+  const auto proposal_results = my_SBM.make_proposal_decision(a2, a11, 0.1);
 
   // Delta from hand calculation
   REQUIRE(proposal_results.entropy_delta == Approx(-0.5924696).epsilon(0.1));
@@ -143,7 +143,7 @@ TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
       const NodePtr group_to_move_to = random.sample(my_SBM.get_nodes_of_type_at_level(node_to_move->type, 1));
 
       // Get move proposal report for move
-      const Proposal_Res proposal_vals = my_SBM.make_proposal_decision(node_to_move, group_to_move_to);
+      const Proposal_Res proposal_vals = my_SBM.make_proposal_decision(node_to_move, group_to_move_to, 0.1);
 
       const double reported_entropy_delta = proposal_vals.entropy_delta;
 
@@ -205,7 +205,7 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
       NodePtr group_to_move_to = random.sample(my_SBM.get_nodes_of_type_at_level(node_to_move->type, 1));
 
       // Get move proposal report for move
-      Proposal_Res proposal_vals = my_SBM.make_proposal_decision(node_to_move, group_to_move_to);
+      Proposal_Res proposal_vals = my_SBM.make_proposal_decision(node_to_move, group_to_move_to, 0.1);
 
       double reported_entropy_delta = proposal_vals.entropy_delta;
 
@@ -248,7 +248,7 @@ TEST_CASE("Simple move decision matches brute force calculation", "[SBM]")
   // Grab the new group for the node
   NodePtr b = my_SBM.get_node_by_id("b", 1);
 
-  const double expected_delta = my_SBM.make_proposal_decision(n5, b).entropy_delta;
+  const double expected_delta = my_SBM.make_proposal_decision(n5, b, 0.1).entropy_delta;
 
   n5->set_parent(b);
   const double post_entropy   = my_SBM.compute_entropy(0);
@@ -274,8 +274,7 @@ TEST_CASE("Basic MCMC sweeps", "[SBM]")
     int total_num_changes = 0;
 
     for (int i = 0; i < num_sweeps; i++) {
-      my_SBM.EPS    = eps;
-      int n_changes = my_SBM.mcmc_sweep(0, 1, false, false).sweep_num_nodes_moved[0];
+      int n_changes = my_SBM.mcmc_sweep(0, 1, eps, false, false).sweep_num_nodes_moved[0];
       total_num_changes += n_changes;
     }
 
@@ -297,7 +296,7 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
   double initial_entropy    = my_SBM.compute_entropy(0);
 
   // Run aglomerative merge with best single merge done
-  Merge_Step single_merge = my_SBM.agglomerative_merge(1, 1, 5);
+  Merge_Step single_merge = my_SBM.agglomerative_merge(1, 1, 5, 0.1);
 
   // Make sure that we now have one less block than before for each type
   int new_block_num    = my_SBM.get_level(1)->size();
@@ -311,7 +310,7 @@ TEST_CASE("Agglomerative merge steps", "[SBM]")
   SBM new_SBM = build_simple_SBM();
 
   // Run aglomerative merge with best single merge done
-  Merge_Step double_merge = new_SBM.agglomerative_merge(1, 2, 5);
+  Merge_Step double_merge = new_SBM.agglomerative_merge(1, 2, 5, 0.1);
 
   // Make sure that we now have two fewer blocks per type than before
   REQUIRE(2 == num_initial_blocks - new_SBM.get_level(1)->size());
@@ -329,7 +328,7 @@ TEST_CASE("Agglomerative merging algorithm steps", "[SBM]")
   double initial_entropy    = my_SBM.compute_entropy(0);
 
   // Run full agglomerative merging algorithm till we have just 3 blocks left
-  auto run_results = my_SBM.collapse_blocks(0, 0, 3, 5, 2, false);
+  auto run_results = my_SBM.collapse_blocks(0, 0, 3, 5, 2, 0.1, false);
 
   // Make sure that we now have just 3 blocks left
   REQUIRE(my_SBM.get_level(1)->size() == 3);
@@ -343,7 +342,7 @@ TEST_CASE("One merge at a time agglomerative merging on larger network", "[SBM]"
   const int desired_num_blocks = 6;
 
   // Run full agglomerative merging algorithm
-  const auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, 5, 0.5, true);
+  const auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, 5, 0.5, 0.1, true);
 
   const int num_blocks_removed = my_SBM.get_level(0)->size() - my_SBM.get_level(1)->size();
 
@@ -359,7 +358,7 @@ TEST_CASE("Agglomerative merging on larger network", "[SBM]")
   int desired_num_blocks = 4;
 
   // Run full agglomerative merging algorithm till we have just 3 blocks left
-  auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, 5, 1.5, false);
+  auto run_results = my_SBM.collapse_blocks(0, 0, desired_num_blocks, 5, 1.5, 0.1, false);
 
   // Make sure that we have lumped together at least some blocks
   REQUIRE(my_SBM.get_level(1)->size() < my_SBM.get_level(0)->size());

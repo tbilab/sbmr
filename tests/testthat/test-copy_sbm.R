@@ -64,12 +64,3 @@ test_that("Copying SBM without edges", {
   expect_true({copy_sbm(initial_sbm); TRUE})
 })
 
-test_that("Hyperparameters are copied over", {
-
-  initial_sbm <- create_sbm(eps = 2.5)
-
-  # Copy initial sbm and tell it to match state as well
-  copied_sbm <- copy_sbm(initial_sbm)
-
-  expect_equal(initial_sbm$EPS, 2.5)
-})

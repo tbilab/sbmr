@@ -82,7 +82,7 @@ class SBM : public Network {
   Sampler sampler;
 
   // Parameters that control the mcmc and merging stuffs
-  double EPS = 0.1;
+  // double EPS = 0.1;
 
   // Methods
   // =========================================================================
@@ -95,20 +95,24 @@ class SBM : public Network {
   void merge_blocks(NodePtr block_a, NodePtr block_b);
 
   // Use model state to propose a potential block move for a node.
-  NodePtr propose_move(NodePtr node);
+  NodePtr propose_move(NodePtr node, double eps);
 
   // Make a decision on the proposed new block for node
-  Proposal_Res make_proposal_decision(NodePtr node, NodePtr new_block);
+  Proposal_Res make_proposal_decision(NodePtr node, NodePtr new_block, double eps);
 
   // Runs efficient MCMC sweep algorithm on desired node level
-  MCMC_Sweeps mcmc_sweep(int  level,
-                         int  num_sweeps,
-                         bool variable_num_blocks,
-                         bool track_pairs,
-                         bool verbose = false);
+  MCMC_Sweeps mcmc_sweep(int    level,
+                         int    num_sweeps,
+                         double eps,
+                         bool   variable_num_blocks,
+                         bool   track_pairs,
+                         bool   verbose = false);
 
   // Merge two blocks at a given level based on the probability of doing so
-  Merge_Step agglomerative_merge(int level_of_blocks, int n_merges, int num_checks_per_block);
+  Merge_Step agglomerative_merge(int    level_of_blocks,
+                                 int    n_merges,
+                                 int    num_checks_per_block,
+                                 double eps);
 
   // Run mcmc chain initialization by finding best organization
   // of B' blocks for all B from B = N to B = 1.
@@ -117,6 +121,7 @@ class SBM : public Network {
                                           int    desired_num_blocks,
                                           int    num_checks_per_block,
                                           double sigma,
+                                          double eps,
                                           bool   report_all_steps);
 
 }; // End SBM class declaration

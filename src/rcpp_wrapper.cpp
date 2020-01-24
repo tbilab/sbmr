@@ -220,6 +220,7 @@ class Rcpp_SBM : public SBM {
   // =============================================================================
   List mcmc_sweep(const int  level,
                   const int  num_sweeps,
+                  const double eps,
                   const bool variable_num_blocks,
                   const bool track_pairs,
                   const bool verbose)
@@ -233,6 +234,7 @@ class Rcpp_SBM : public SBM {
 
     MCMC_Sweeps results = SBM::mcmc_sweep(level,
                                           num_sweeps,
+                                          eps,
                                           variable_num_blocks,
                                           track_pairs,
                                           verbose);
@@ -263,6 +265,7 @@ class Rcpp_SBM : public SBM {
                        const int    desired_num_blocks,
                        const int    num_checks_per_block,
                        const double sigma,
+                       const double eps,
                        const bool   report_all_steps)
   {
 
@@ -272,6 +275,7 @@ class Rcpp_SBM : public SBM {
                                                        desired_num_blocks,
                                                        num_checks_per_block,
                                                        sigma,
+                                                       eps,
                                                        report_all_steps);
 
     List entropy_results;
@@ -292,6 +296,7 @@ class Rcpp_SBM : public SBM {
                     const int              num_mcmc_steps,
                     const int              num_checks_per_block,
                     const double           sigma,
+                    const double           eps,
                     const std::vector<int> block_nums)
   {
 
@@ -304,6 +309,7 @@ class Rcpp_SBM : public SBM {
               target_num,
               num_checks_per_block,
               sigma,
+              eps,
               false)[0]);
     }
     return return_to_r;
@@ -320,14 +326,6 @@ class Rcpp_SBM : public SBM {
     SBM::load_from_state(State_Dump(id, parent, level, type_to_int(string_types)));
   }
 
-  void set_epsilon(const double eps)
-  {
-    EPS = eps;
-  }
-  double get_epsilon()
-  {
-    return EPS;
-  }
 };
 
 RCPP_MODULE(SBM)
@@ -335,10 +333,6 @@ RCPP_MODULE(SBM)
   class_<Rcpp_SBM>("SBM")
 
       .constructor()
-
-      .property("EPS",
-                &Rcpp_SBM::get_epsilon, &Rcpp_SBM::set_epsilon,
-                "Epsilon value for ergodicity")
 
       .method("add_node",
               &Rcpp_SBM::add_node,
@@ -410,8 +404,6 @@ sbm$set_node_parent("b2", "b11", 0)
 sbm$set_node_parent("b3", "b12", 0)
 
 
-# Set some model parameters
-sbm$EPS <- 0.1
 
 original_state <- sbm$get_state()
 

@@ -28,8 +28,7 @@
 #'   the model will try and remove `current_num_nodes(1 - 1/sigma)` nodes from
 #'   the model. So a larger sigma means a faster collapse rate.
 #' @param eps Controls randomness of move proposals. Effects both the block
-#'   merging and mcmc sweeps. If value is set to value other than null the SBMs
-#'   current epsilon value will be overridden.
+#'   merging and mcmc sweeps.
 #'
 #' @return Tibble with three columns with rows corresponding to the result of
 #'   each merge step:  `entropy`, `num_blocks` left in model, and a list column
@@ -57,16 +56,10 @@ collapse_blocks <- function(
   num_mcmc_sweeps = 0,
   desired_num_blocks = 1,
   report_all_steps = FALSE,
-  eps = NULL,
+  eps = 0.1,
   num_block_proposals = 5,
   sigma = 2
 ){
-
-  overide_eps <- !is.null(eps)
-  if(overide_eps){
-    old_eps <- sbm$EPS
-    sbm$EPS <- eps
-  }
 
   collapse_results <- sbm$collapse_blocks(
     as.integer(level),
@@ -74,13 +67,9 @@ collapse_blocks <- function(
     as.integer(desired_num_blocks),
     as.integer(num_block_proposals),
     sigma,
+    eps,
     report_all_steps
   )
-
-  # Reset epsilon value
-  if(overide_eps){
-    sbm$EPS <- old_eps
-  }
 
   purrr::map_dfr(
     collapse_results,

@@ -34,12 +34,11 @@ collapse_run <- function(
   num_final_blocks = 1:10,
   num_block_proposals = 5,
   num_mcmc_sweeps = 10,
-  eps = NULL,
+  eps = 0.1,
   parallel = FALSE
 ){
   # Gather info needed to make copy of sbm on other thread
   model_data <- sbm$get_data()
-  model_eps <- sbm$EPS
 
   block_range <- num_final_blocks
 
@@ -51,9 +50,10 @@ collapse_run <- function(
     results <- furrr::future_map_dfr(
       block_range,
       function(desired_num){
-        collapse_blocks(create_sbm(model_data, eps = model_eps),
+        collapse_blocks(create_sbm(model_data),
                         desired_num_blocks = desired_num,
                         sigma = sigma,
+                        eps = eps,
                         num_block_proposals = num_block_proposals,
                         num_mcmc_sweeps = num_mcmc_sweeps)
       }
@@ -63,6 +63,7 @@ collapse_run <- function(
                                          as.integer(num_mcmc_sweeps),
                                          as.integer(num_block_proposals),
                                          sigma,
+                                         eps,
                                          as.integer(block_range))
 
     results <- purrr::map_dfr(

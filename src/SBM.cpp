@@ -5,7 +5,7 @@
 // =============================================================================
 // Propose a potential block move for a node.
 // =============================================================================
-NodePtr SBM::propose_move(const NodePtr node)
+NodePtr SBM::propose_move(const NodePtr node, const double eps)
 {
   PROFILE_FUNCTION();
 
@@ -21,7 +21,7 @@ NodePtr SBM::propose_move(const NodePtr node)
   const int neighbor_block_degree = rand_neighbor->parent->degree;
 
   // Decide if we are going to choose a random block for our node
-  const double ergo_amnt            = EPS * potential_blocks.size();
+  const double ergo_amnt            = eps * potential_blocks.size();
   const double prob_of_random_block = ergo_amnt / (neighbor_block_degree + ergo_amnt);
 
   // Decide where we will get new block from and draw from potential candidates
@@ -32,7 +32,9 @@ NodePtr SBM::propose_move(const NodePtr node)
 // =============================================================================
 // Make a decision on the proposed new block for node
 // =============================================================================
-Proposal_Res SBM::make_proposal_decision(const NodePtr node, const NodePtr new_block)
+Proposal_Res SBM::make_proposal_decision(const NodePtr node,
+                                         const NodePtr new_block,
+                                         const double  eps)
 {
   PROFILE_FUNCTION();
 
@@ -144,10 +146,10 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node, const NodePtr new_b
     // first check if node being moved has any connections to this neighbor
     if (pre.node_to_neighbor != 0) {
       const double prop_edges_to_neighbor = pre.node_to_neighbor / node_degree;
-      const double eps_B                  = EPS * n_possible_neighbors;
+      const double eps_B                  = eps * n_possible_neighbors;
 
-      pre_move_prob += prop_edges_to_neighbor * (pre.new_to_neighbor + EPS) / (pre_neighbor_degree + eps_B);
-      post_move_prob += prop_edges_to_neighbor * (post_old_to_neighbor + EPS) / (post_neighbor_degree + eps_B);
+      pre_move_prob += prop_edges_to_neighbor * (pre.new_to_neighbor + eps) / (pre_neighbor_degree + eps_B);
+      post_move_prob += prop_edges_to_neighbor * (post_old_to_neighbor + eps) / (post_neighbor_degree + eps_B);
     }
   } // End main neighbor loop
 
@@ -158,11 +160,12 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node, const NodePtr new_b
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-MCMC_Sweeps SBM::mcmc_sweep(const int  level,
-                            const int  num_sweeps,
-                            const bool variable_num_blocks,
-                            const bool track_pairs,
-                            const bool verbose)
+MCMC_Sweeps SBM::mcmc_sweep(const int    level,
+                            const int    num_sweeps,
+                            const double eps,
+                            const bool   variable_num_blocks,
+                            const bool   track_pairs,
+                            const bool   verbose)
 {
   PROFILE_FUNCTION();
 
@@ -216,7 +219,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int  level,
       }
 
       // Get a move proposal
-      const NodePtr proposed_new_block = propose_move(curr_node);
+      const NodePtr proposed_new_block = propose_move(curr_node, eps);
 
       // If the proposed block is the nodes current block, we don't need to waste
       // time checking because decision will always result in same state.
@@ -232,7 +235,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int  level,
                   << ",";
       }
       // Calculate acceptance probability based on posterior changes
-      Proposal_Res proposal_results = make_proposal_decision(curr_node, proposed_new_block);
+      Proposal_Res proposal_results = make_proposal_decision(curr_node, proposed_new_block, eps);
 
       // Make movement decision
       const bool move_accepted = proposal_results.prob_of_accept > sampler.draw_unif();
@@ -366,9 +369,10 @@ void SBM::merge_blocks(NodePtr absorbing_block, NodePtr absorbed_block)
 // =============================================================================
 // Merge blocks at a given level based on the best probability of doing so
 // =============================================================================
-Merge_Step SBM::agglomerative_merge(const int block_level,
-                                    const int num_merges_to_make,
-                                    const int num_checks_per_block)
+Merge_Step SBM::agglomerative_merge(const int    block_level,
+                                    const int    num_merges_to_make,
+                                    const int    num_checks_per_block,
+                                    const double eps)
 {
   PROFILE_FUNCTION();
   // Quick check to make sure reasonable request
@@ -416,7 +420,7 @@ Merge_Step SBM::agglomerative_merge(const int block_level,
       // Otherwise, we should sample a given number of blocks to check
       for (int i = 0; i < num_checks_per_block; i++) {
         // Sample a metablock from potentials
-        metablocks_to_search.push_back(propose_move(block.second));
+        metablocks_to_search.push_back(propose_move(block.second, eps));
       }
     }
 
@@ -543,6 +547,7 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
                                              const int    desired_num_blocks,
                                              const int    num_checks_per_block,
                                              const double sigma,
+                                             const double eps,
                                              const bool   report_all_steps)
 {
   PROFILE_FUNCTION();
@@ -585,7 +590,7 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
     // Attempt merge step
     try {
       // Perform next best merge and record results
-      merge_results = agglomerative_merge(block_level, num_merges, num_checks_per_block);
+      merge_results = agglomerative_merge(block_level, num_merges, num_checks_per_block, eps);
     }
     catch (...) {
       std::cerr << "Collapsibility limit of network reached so we break early\n"
@@ -597,7 +602,7 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
 
     if (num_mcmc_steps != 0) {
       // Let model equilibriate with new block layout...
-      const std::vector<double> sweep_entropy_deltas     = mcmc_sweep(node_level, num_mcmc_steps, false, false).sweep_entropy_delta;
+      const std::vector<double> sweep_entropy_deltas     = mcmc_sweep(node_level, num_mcmc_steps, eps, false, false).sweep_entropy_delta;
       double                    mcmc_sweep_delta_changes = 0;
       // Update the step entropy delta with the entropy delta from the sweeps
       for (const double& sweep_delta : sweep_entropy_deltas) {

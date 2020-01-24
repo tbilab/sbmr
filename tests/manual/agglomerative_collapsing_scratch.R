@@ -16,44 +16,62 @@ network <- sim_basic_block_network(
 my_sbm <- create_sbm(network)
 
 # start_entropy <- my_sbm %>% initialize_blocks() %>% compute_entropy()
-
-single_collapse_no_report <- my_sbm %>%
-  collapse_blocks(report_all_steps = FALSE,
-                  sigma = 0.9,
-                  num_mcmc_sweeps = 0,
-                  desired_num_blocks = 2)
-
-my_sbm %>% compute_entropy()
-
 single_collapse <- my_sbm %>%
   collapse_blocks(report_all_steps = TRUE,
                   sigma = 0.9,
                   num_mcmc_sweeps = 0,
                   desired_num_blocks = 2)
 
+
+
+visualize_collapse_results(single_collapse, heuristic = 'delta_ratio') + xlim(0, 25)
+my_sbm <- choose_best_collapse_state(my_sbm, single_collapse, heuristic = 'delta_ratio', verbose = TRUE)
+
+
+window_size <- 2
+
 single_collapse %>%
-  filter(num_blocks < 20) %>%
-  ggplot(aes(x = num_blocks, y = entropy)) +
+  arrange(num_blocks) %>%
+  filter(num_blocks < 25) %>%
+  mutate(
+    rolling_avg = rolling_mean(entropy, window = window_size),
+    rolling_avg_before = dplyr::lag(rolling_avg, 1),
+    rolling_avg_after = dplyr::lead(rolling_avg, window_size),
+    neighbor_ratio = rolling_avg/rolling_avg_after,
+    score = neighbor_ratio
+  ) %>%
+  pivot_longer(c(entropy, score)) %>%
+  ggplot(aes(x = num_blocks, y = value)) +
   geom_line() +
   geom_point() +
-  geom_vline(xintercept = n_blocks, color = 'orangered')
+  geom_vline(xintercept = n_blocks, color = 'orangered') +
+  facet_grid(name~., scales = "free_y")
 
-my_sbm <- choose_best_collapse_state(my_sbm, single_collapse, heuristic =function(e,b){as.numeric(b == n_blocks)}, verbose = TRUE)
 
-entropy_delta <- single_collapse$entropy[single_collapse$num_blocks == 5]
-predicted_entropy <- start_entropy + entropy_delta
-true_entropy <- my_sbm %>% compute_entropy()
+single_collapse %>%
+  filter(num_blocks == n_blocks) %>%
+  pluck('state', 1) %>%
+  filter(level == 0) %>%
+  right_join(network$nodes, by = 'id')%>%
+  rename(inferred = parent) %>% {
+    table(.$inferred, .$block)
+  }
 
 
 collapse_results <- my_sbm %>%
-  collapse_run(num_block_proposals = 10,
+  collapse_run(num_block_proposals = 15,
                sigma = 2,
-               num_mcmc_sweeps = 10,
+               num_mcmc_sweeps = 5,
                num_final_blocks = 1:15,
                parallel = TRUE)
 
-visualize_collapse_results(collapse_results)
-my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, heuristic =function(e,b){as.numeric(b == n_blocks + 1)}, verbose = TRUE)
+
+visualize_collapse_results(collapse_results, heuristic = "delta_ratio") +
+  geom_vline(xintercept = n_blocks, color = 'orangered')
+
+
+my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, heuristic =function(e,b){as.numeric(b == n_blocks)}, verbose = TRUE)
+
 my_sbm %>%
   get_state() %>%
   filter(level == 0) %>%
