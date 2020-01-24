@@ -3,7 +3,7 @@
 #' @param old_sbm Old SBM created with \link{\code{create_sbm}}
 #' @param match_state Should copy also match the current blocking state of old model?
 #'
-#' @return A new deep copy of the original SBM with parameters preserved.
+#' @return A new deep copy of the original SBM.
 #' @export
 #'
 #' @examples
@@ -36,14 +36,8 @@ copy_sbm <- function(old_sbm, match_state = FALSE){
   # Make a new copy by exporting nodes and edges from old
   new_sbm <- create_sbm(
     nodes = if(has_nodes) old_nodes else NULL,
-    edges = if(has_edges) old_edges else NULL,
-    eps = old_sbm$EPS
+    edges = if(has_edges) old_edges else NULL
   )
-
-  # Set free parameters
-  new_sbm$SIGMA <- old_sbm$SIGMA
-  new_sbm$N_CHECKS_PER_block <- old_sbm$N_CHECKS_PER_block
-  new_sbm$GREEDY <- old_sbm$GREEDY
 
   # Update state of new model if needed
   if(match_state){

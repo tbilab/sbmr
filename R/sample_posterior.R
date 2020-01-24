@@ -19,7 +19,7 @@
 #'   more random.
 #' @param greedy If using agglomerative initialization should algorithm search
 #'   every possible merge?
-#' @param n_checks_per_block If not using agglomerative initialization, how many
+#' @param N_CHECKS_PER_BLOCK If not using agglomerative initialization, how many
 #'   options for merging should be explored per block?
 #' @param initialization_mcmc_steps If using agglomerative initialization, how
 #'   many steps of MCMC should be run after merging blocks to allow model to
@@ -42,7 +42,7 @@ sample_posterior <- function(
   starting_partition = "agglomerative",
   epsilon = 0.1,
   greedy = TRUE,
-  n_checks_per_block = 5,
+  N_CHECKS_PER_BLOCK = 5,
   initialization_mcmc_steps = 15,
   verbose = c("initialization"),
   ...

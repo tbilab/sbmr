@@ -1,34 +1,26 @@
-// Inline functions to help out with verbosity of sbm code. 
+// Inline functions to help out with verbosity of sbm code.
 
 #include "Node.h"
 
-inline void process_block_pair(
-    const std::map<NodePtr, int>::iterator con_block_it,
-    const double edges_from_node,
-    const double moved_degree_pre,
-    const double moved_degree_post,
-    double * entropy_pre,
-    double * entropy_post)
+inline double partial_entropy(const double& a,
+                              const double& b,
+                              const double& c)
 {
 
-  const double neighbor_deg = con_block_it->first->degree;
-  const double edge_count_pre = con_block_it->second;
+  if (a == 0 | b == 0 | c == 0) {
+    return 0;
+  }
 
-  // The old and new edge counts we need to compute entropy
-  // If we're looking at the neighbor blocks for the old block we need to
-  // subtract the edges the node contributed, otherwise we need to add.
-  double edge_count_post = edge_count_pre + edges_from_node;
+  return a * std::log(a / (b * c));
+}
 
-  // Calculate entropy contribution pre move
-  double entropy_pre_delta = edge_count_pre > 0 ? edge_count_pre *
-                                                      log(edge_count_pre / (moved_degree_pre * neighbor_deg))
-                                                : 0;
+inline int get_edge_counts(const NodeEdgeMap& node_cons, const NodePtr& neighbor)
+{
+  // Search the node being moved to's connections for the current neighbor
+  const auto count_to_neighbor_it = node_cons.find(neighbor);
 
-  // Calculate entropy contribution post move
-  double entropy_post_delta = edge_count_post > 0 ? edge_count_post *
-                                                        log(edge_count_post / (moved_degree_post * neighbor_deg))
-                                                  : 0;
-
-  (*entropy_pre) += entropy_pre_delta;
-  (*entropy_post) += entropy_post_delta;
+  // If it wasnt found set count to 0, otherwise set it to its value.
+  return count_to_neighbor_it == node_cons.end()
+      ? 0
+      : count_to_neighbor_it->second;
 }

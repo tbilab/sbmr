@@ -12,7 +12,7 @@
           "src/Node.cpp",
           "src/Network.cpp",
           "src/SBM.cpp",
-          "src/helpers.cpp",
+          "src/Block_Consensus.cpp",
           "src/Sampler.cpp",
           "-o",
           "src/debugging/debug.out"

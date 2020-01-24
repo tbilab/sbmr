@@ -12,7 +12,6 @@
 #' @param nodes Optional dataframe that links a node `id` to its `type`, for when model is polypartite.
 #' @param from_col Name of the from column for edges
 #' @param to_col Name of the to column for edges
-#' @param eps Epsilon value for ergodicity of move proposals of nodes.
 #'
 #' @return Instance of SBM class.
 #' @export
@@ -29,8 +28,7 @@ create_sbm <- function(
   edges = NULL,
   nodes = NULL,
   from_col = from,
-  to_col = to,
-  eps = 0.1
+  to_col = to
 ){
   no_nodes <- is.null(nodes)
   no_edges <- is.null(edges)
@@ -72,9 +70,6 @@ create_sbm <- function(
   # Instantiate instance of sbm class
   sbm <- new(SBM)
 
-  # Set all the free parameters
-  sbm$EPS <- eps
-
   # If we have any edges should gather their unique nodes
   if(!no_edges){
     edges_to <- dplyr::pull(edges, !!rlang::enquo(to_col))
@@ -86,7 +81,6 @@ create_sbm <- function(
       id = unique(c(edges_from, edges_to)),
       from_edges = TRUE
     )
-
   }
 
 

@@ -11,13 +11,11 @@ collapse_run(
   num_final_blocks = 1:10,
   num_block_proposals = 5,
   num_mcmc_sweeps = 10,
-  eps = NULL,
+  eps = 0.1,
   parallel = FALSE
 )
 }
 \arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
-
 \item{level}{Level of nodes who's blocks will have their block membership run
 through MCMC proposal-accept routine.}
 
@@ -27,10 +25,11 @@ the model. So a larger sigma means a faster collapse rate.}
 
 \item{num_final_blocks}{Array of integers corresponding to number of blocks to check in run.}
 
-\item{num_block_proposals}{If \code{greedy = FALSE}, this parameter controls how
-many merger proposals are drawn for each block in the model. A larger
-number will increase the exploration of merge potentials but may lead the
-model to local minimums for the same reason greedy mode does.}
+\item{num_block_proposals}{Controls how many merger proposals are drawn for
+each block in the model. A larger number will increase the exploration of
+merge potentials but may lead the model to local minimums. If the number of
+proposals is greater than then number of blocks then all blocks are
+searched exhaustively.}
 
 \item{num_mcmc_sweeps}{How many MCMC sweeps the model does at each
 agglomerative merge step. This allows the model to allow nodes to find
@@ -38,8 +37,7 @@ their most natural resting place in a given collapsed state. Larger values
 will slow down runtime but can potentially lead for more stable results.}
 
 \item{eps}{Controls randomness of move proposals. Effects both the block
-merging and mcmc sweeps. If value is set to value other than null the SBMs
-current epsilon value will be overridden.}
+merging and mcmc sweeps.}
 
 \item{parallel}{Run in parallel using \code{furrr}?}
 }

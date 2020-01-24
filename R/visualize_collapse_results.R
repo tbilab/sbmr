@@ -47,6 +47,7 @@ visualize_collapse_results <- function(collapse_results, heuristic = NULL){
 
   if(!is.null(heuristic)){
     collapse_results <- collapse_results %>%
+      dplyr::arrange(num_blocks) %>%
       dplyr::mutate(
         score = build_score_fn(heuristic)(entropy, num_blocks),
       )

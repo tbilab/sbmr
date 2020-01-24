@@ -41,13 +41,14 @@ choose_best_collapse_state <- function(sbm, collapse_results, heuristic = 'dev_f
 
   # Apply the heuristic on the entropy column and choose the higheset value
   best_state <- collapse_results %>%
+    dplyr::arrange(num_blocks) %>%
     dplyr::mutate(score = build_score_fn(heuristic)(entropy, num_blocks)) %>%
-    dplyr::filter(score == max(score))
+    dplyr::filter(score == max(score, na.rm = TRUE))
 
   if(verbose){
     n <- best_state$num_blocks[1]
     entropy <- best_state$entropy[1]
-    print(glue::glue("Choosing collapse with {n} blocks and an entropy of {entropy}."))
+    print(glue::glue("Choosing collapse with {n} blocks and an entropy of {round(entropy,4)}."))
   }
 
   # Load best state into model and return

@@ -1,16 +1,14 @@
-#include <Rcpp.h>
 #include "SBM.h"
+
+#include <Rcpp.h>
 
 using namespace Rcpp;
 
-
-class Rcpp_SBM : public SBM
-{
-public:
-
+class Rcpp_SBM : public SBM {
+  public:
   // Keeps track of user friendly string types and turns them
   // into c++ friendly integer types
-  int current_type_int = 0;
+  int                             current_type_int = 0;
   std::unordered_map<string, int> type_string_to_int;
   std::unordered_map<int, string> type_int_to_string;
 
@@ -24,10 +22,9 @@ public:
     int node_int_type;
 
     // See if the node's type is in our list
-    auto loc_of_int_type = type_string_to_int.find(type);
+    const auto loc_of_int_type = type_string_to_int.find(type);
 
-    if (loc_of_int_type == type_string_to_int.end())
-    {
+    if (loc_of_int_type == type_string_to_int.end()) {
       // If its a new type, we need to add a new entry for this type to both maps
       type_string_to_int.emplace(type, current_type_int);
       type_int_to_string.emplace(current_type_int, type);
@@ -38,19 +35,16 @@ public:
       // Iterate type integer keeper forward
       current_type_int++;
     }
-    else
-    {
+    else {
       node_int_type = loc_of_int_type->second;
     }
 
     // Check to make sure that this node doesn't already exist in the network
     auto base_level = get_level(level);
-    if (base_level->find(id) != base_level->end())
-    {
+    if (base_level->find(id) != base_level->end()) {
       warning(id + " already exists in network\n");
     }
-    else
-    {
+    else {
       // Add node to model
       SBM::add_node(id, node_int_type, level);
     }
@@ -58,12 +52,10 @@ public:
 
   NodePtr find_node_by_id(const std::string node_id, const int level)
   {
-    try
-    {
+    try {
       return nodes.at(level)->at(node_id);
     }
-    catch (...)
-    {
+    catch (...) {
       stop("Can't find node " + node_id + " at level " + std::to_string(level));
     }
   }
@@ -71,52 +63,44 @@ public:
   void add_edge(const std::string node_a_id, const std::string node_b_id)
   {
     SBM::add_edge(find_node_by_id(node_a_id, 0),
-                        find_node_by_id(node_b_id, 0));
+                  find_node_by_id(node_b_id, 0));
 
     // Add edge to the edges vector
     edges_from.push_back(node_a_id);
     edges_to.push_back(node_b_id);
   }
 
- // Convert the types from integers (cpp friendly) to strings (r friendly)
-  std::vector<string> type_to_string(const std::vector<int> & int_types)
+  // Convert the types from integers (cpp friendly) to strings (r friendly)
+  std::vector<string> type_to_string(const std::vector<int>& int_types)
   {
-   // Convert the type column to the string types
+    // Convert the type column to the string types
     std::vector<string> string_types;
     string_types.reserve(int_types.size());
 
-    for (auto type_it = int_types.begin();
-              type_it != int_types.end();
-              type_it++)
-    {
+    for (const auto& type : int_types) {
       // Convert int to string and push to vector
-      string_types.push_back(type_int_to_string[*type_it]);
+      string_types.push_back(type_int_to_string[type]);
     }
 
     return string_types;
   }
   // Convert the types from strings to integers
-  std::vector<int> type_to_int(const std::vector<string> & string_types)
+  std::vector<int> type_to_int(const std::vector<string>& string_types)
   {
     std::vector<int> int_types;
     int_types.reserve(string_types.size());
 
-    for (auto type_it = string_types.begin();
-         type_it != string_types.end();
-         type_it++)
-    {
-
+    for (const auto& type : string_types) {
       // Make sure that the requested type has been seen by the model already and
       // send message to R if it hasnt.
-      auto loc_of_int_type = type_string_to_int.find(*type_it);
-      if (loc_of_int_type == type_string_to_int.end())
-      {
-        stop((*type_it) + " not found in model");
-      } else {
+      const auto loc_of_int_type = type_string_to_int.find(type);
+      if (loc_of_int_type == type_string_to_int.end()) {
+        stop(type + " not found in model");
+      }
+      else {
         // Convert string to int and push to vector
         int_types.push_back(loc_of_int_type->second);
       }
-
     }
 
     return int_types;
@@ -126,13 +110,12 @@ public:
   {
     // Create and return dump of state as dataframe
     return DataFrame::create(
-        _["id"] = state.id,
-        _["parent"] = state.parent,
-        _["type"] = type_to_string(state.type),
-        _["level"] = state.level,
+        _["id"]               = state.id,
+        _["parent"]           = state.parent,
+        _["type"]             = type_to_string(state.type),
+        _["level"]            = state.level,
         _["stringsAsFactors"] = false);
   }
-
 
   DataFrame get_state()
   {
@@ -142,16 +125,15 @@ public:
   DataFrame get_edges()
   {
     return DataFrame::create(
-      _["from"] = edges_from,
-      _["to"] = edges_to,
-      _["stringsAsFactors"] = false
-    );
+        _["from"]             = edges_from,
+        _["to"]               = edges_to,
+        _["stringsAsFactors"] = false);
   }
 
   List get_data()
   {
     // Grab level 0
-    LevelPtr level_data = get_level(0);
+    const LevelPtr level_data = get_level(0);
 
     // Initialize vectors to hold ids and types of nodes
     std::vector<string> node_ids;
@@ -159,35 +141,32 @@ public:
     node_ids.reserve(level_data->size());
     node_types.reserve(level_data->size());
     // scan through level and fill in vectors
-    for (auto node_it = level_data->begin();
-              node_it != level_data->end();
-              node_it++)
-    {
-      node_ids.push_back(node_it->first);
-      node_types.push_back(type_int_to_string[node_it->second->type]);
+    for (const auto& node : *level_data) {
+      node_ids.push_back(node.first);
+      node_types.push_back(type_int_to_string[node.second->type]);
     }
 
     return List::create(
         _["nodes"] = DataFrame::create(
-            _["id"] = node_ids,
-            _["type"] = node_types,
+            _["id"]               = node_ids,
+            _["type"]             = node_types,
             _["stringsAsFactors"] = false),
         _["edges"] = DataFrame::create(
-            _["from"] = edges_from,
-            _["to"] = edges_to,
+            _["from"]             = edges_from,
+            _["to"]               = edges_to,
             _["stringsAsFactors"] = false));
   }
 
   void set_node_parent(const std::string child_id,
                        const std::string parent_id,
-                       const int level = 0)
+                       const int         level = 0)
   {
     find_node_by_id(child_id, level)->set_parent(find_node_by_id(parent_id, level + 1));
   }
 
   void initialize_blocks(const int num_blocks, const int level)
   {
-   Network::initialize_blocks(num_blocks, level);
+    Network::initialize_blocks(num_blocks, level);
   }
 
   double compute_entropy(const int level)
@@ -196,19 +175,16 @@ public:
   }
 
   // Sets up all the initial values for the node pair tracking structure
-  inline void initialize_pair_tracking_map(std::unordered_map<std::string, Pair_Status> & concensus_pairs,
-                                    const LevelPtr node_map)
+  inline void initialize_pair_tracking_map(std::unordered_map<std::string, Pair_Status>& concensus_pairs,
+                                           const LevelPtr                                node_map)
   {
     for (auto node_a_it = node_map->begin();
          node_a_it != node_map->end();
-         node_a_it++)
-    {
+         node_a_it++) {
       for (auto node_b_it = std::next(node_a_it);
            node_b_it != node_map->end();
-           node_b_it++)
-      {
-        bool in_same_group = node_a_it->second->parent ==
-                             node_b_it->second->parent;
+           node_b_it++) {
+        bool in_same_group = node_a_it->second->parent == node_b_it->second->parent;
 
         // Initialize pair info for group
         concensus_pairs.emplace(
@@ -219,27 +195,22 @@ public:
   }
 
   // Update the concensus pair struct with a single sweep's results
-  inline void update_pair_tracking_map(std::unordered_map<std::string, Pair_Status> &concensus_pairs,
-                                       const std::unordered_set<std::string> &updated_pairs)
+  inline void update_pair_tracking_map(std::unordered_map<std::string, Pair_Status>& concensus_pairs,
+                                       const std::unordered_set<std::string>&        updated_pairs)
   {
-    for (auto pair_it = concensus_pairs.begin();
-         pair_it != concensus_pairs.end();
-         pair_it++)
-    {
-      // Check if this pair was updated on last sweep
-      auto sweep_change_loc = updated_pairs.find(pair_it->first);
-      bool updated_last_sweep = sweep_change_loc != updated_pairs.end();
+    for (auto& pair : concensus_pairs) {
 
-      if (updated_last_sweep)
-      {
+      // Check if this pair was updated on last sweep
+      const bool updated_last_sweep = updated_pairs.find(pair.first) != updated_pairs.end();
+
+      if (updated_last_sweep) {
         // Update the pair connection status
-        (pair_it->second).connected = !(pair_it->second).connected;
+        pair.second.connected = !(pair.second).connected;
       }
 
       // Increment the counts if needed
-      if ((pair_it->second).connected)
-      {
-        (pair_it->second).times_connected++;
+      if (pair.second.connected) {
+        pair.second.times_connected++;
       }
     }
   }
@@ -247,101 +218,106 @@ public:
   // =============================================================================
   // Runs multiple MCMC sweeps and keeps track of the results efficiently
   // =============================================================================
-  List mcmc_sweep(const int level,
-                  const int num_sweeps,
+  List mcmc_sweep(const int  level,
+                  const int  num_sweeps,
+                  const double eps,
                   const bool variable_num_blocks,
-                  const bool track_pairs)
+                  const bool track_pairs,
+                  const bool verbose)
   {
-    // Make sure network has blocks at the level for MCMC sweeps to take place. 
+    // Make sure network has blocks at the level for MCMC sweeps to take place.
     // Warn and initialize groups for user
-    if (get_level(level + 1)->size() == 0)
-    {
+    if (get_level(level + 1)->size() == 0) {
       warning("No blocks present. Initializing one block per node.");
       Network::initialize_blocks(-1, level);
     }
 
     MCMC_Sweeps results = SBM::mcmc_sweep(level,
-                                         num_sweeps,
-                                         variable_num_blocks,
-                                         track_pairs);
+                                          num_sweeps,
+                                          eps,
+                                          variable_num_blocks,
+                                          track_pairs,
+                                          verbose);
 
     // Initialize vectors to hold pair tracking results, if needed.
     std::vector<std::string> node_pair;
-    std::vector<int> times_connected;
-    if (track_pairs)
-    {
+    std::vector<int>         times_connected;
+    if (track_pairs) {
       results.block_consensus.dump_results(node_pair, times_connected);
     }
 
     // package up results into a list
     return List::create(
         _["nodes_moved"] = results.nodes_moved,
-        _["sweep_info"] = DataFrame::create(
-            _["entropy_delta"] = results.sweep_entropy_delta,
-            _["num_nodes_moved"] = results.sweep_num_nodes_moved,
+        _["sweep_info"]  = DataFrame::create(
+            _["entropy_delta"]    = results.sweep_entropy_delta,
+            _["num_nodes_moved"]  = results.sweep_num_nodes_moved,
             _["stringsAsFactors"] = false),
         _["pairing_counts"] = track_pairs ? DataFrame::create(
-                                                _["node_pair"] = node_pair,
-                                                _["times_connected"] = times_connected,
-                                                _["stringsAsFactors"] = false)
+                                  _["node_pair"]        = node_pair,
+                                  _["times_connected"]  = times_connected,
+                                  _["stringsAsFactors"] = false)
                                           : "NA");
   }
 
-  List collapse_blocks(const int node_level,
-                       const int num_mcmc_steps,
-                       int desired_num_blocks,
-                       const bool report_all_steps)
+  List collapse_blocks(const int    node_level,
+                       const int    num_mcmc_steps,
+                       const int    desired_num_blocks,
+                       const int    num_checks_per_block,
+                       const double sigma,
+                       const double eps,
+                       const bool   report_all_steps)
   {
 
     // Perform collapse
-    auto collapse_results = SBM::collapse_blocks(node_level,
-                                                 num_mcmc_steps,
-                                                 desired_num_blocks,
-                                                 report_all_steps);
+    const auto collapse_results = SBM::collapse_blocks(node_level,
+                                                       num_mcmc_steps,
+                                                       desired_num_blocks,
+                                                       num_checks_per_block,
+                                                       sigma,
+                                                       eps,
+                                                       report_all_steps);
 
     List entropy_results;
 
-    for (auto step = collapse_results.begin();
-         step != collapse_results.end();
-         step++)
-    {
+    for (const auto& step : collapse_results) {
+
       entropy_results.push_back(
           List::create(
-              _["entropy"] = step->entropy,
-              _["state"] = state_to_df(step->state),
-              _["num_blocks"] = step->num_blocks));
+              _["entropy_delta"] = step.entropy_delta,
+              _["state"]         = state_to_df(step.state),
+              _["num_blocks"]    = step.num_blocks));
     }
 
     return entropy_results;
   }
 
-  List collapse_run(const int node_level,
-                    const int num_mcmc_steps,
+  List collapse_run(const int              node_level,
+                    const int              num_mcmc_steps,
+                    const int              num_checks_per_block,
+                    const double           sigma,
+                    const double           eps,
                     const std::vector<int> block_nums)
   {
 
-    // const int num_steps = end_num - start_num;
-    // if(num_steps <= 0) stop("End number of blocks for collapse run to be higher than start.");
-
     List return_to_r;
-    for (int target_num : block_nums)
-    {
+    for (const int& target_num : block_nums) {
       return_to_r.push_back(
-        collapse_blocks(
-           node_level,
-           num_mcmc_steps,
-           target_num,
-           false
-        )[0]
-      );
-
+          collapse_blocks(
+              node_level,
+              num_mcmc_steps,
+              target_num,
+              num_checks_per_block,
+              sigma,
+              eps,
+              false)[0]);
     }
     return return_to_r;
   }
 
   void load_from_state(std::vector<string> id,
                        std::vector<string> parent,
-                       std::vector<int> level,
+                       std::vector<int>    level,
                        std::vector<string> string_types)
   {
 
@@ -350,17 +326,6 @@ public:
     SBM::load_from_state(State_Dump(id, parent, level, type_to_int(string_types)));
   }
 
-  void set_epsilon(const double eps) { EPS = eps; }
-  double get_epsilon() { return EPS; }
-
-  void set_sigma(const double sigma) { SIGMA = sigma; }
-  double get_sigma() { return SIGMA; }
-
-  void set_greedy(const bool greedy) { GREEDY = greedy; }
-  bool get_greedy() { return GREEDY; }
-
-  void set_n_checks_per_block(const int n) { N_CHECKS_PER_block = n; }
-  int get_n_checks_per_block() { return N_CHECKS_PER_block; }
 };
 
 RCPP_MODULE(SBM)
@@ -369,27 +334,9 @@ RCPP_MODULE(SBM)
 
       .constructor()
 
-      .property("EPS",
-                &Rcpp_SBM::get_epsilon, &Rcpp_SBM::set_epsilon,
-                "Epsilon value for ergodicity")
-
-
-      .property("GREEDY",
-                &Rcpp_SBM::get_greedy, &Rcpp_SBM::set_greedy,
-                "Perform merging and sweeps in greedy way?")
-
-      .property("SIGMA",
-                &Rcpp_SBM::get_sigma, &Rcpp_SBM::set_sigma,
-                "Sigma value for determining rate of agglomerative merging")
-
-      .property("N_CHECKS_PER_block",
-                &Rcpp_SBM::get_n_checks_per_block, &Rcpp_SBM::set_n_checks_per_block,
-                "If not in greedy mode, how many options do we check per node for moves in agglomerative merging?")
-
       .method("add_node",
               &Rcpp_SBM::add_node,
-              "Add a node to the network. Takes the node id (string), the node type (string), and the node level (int). Use level = 0 for data-level nodes."
-              )
+              "Add a node to the network. Takes the node id (string), the node type (string), and the node level (int). Use level = 0 for data-level nodes.")
       .method("add_edge",
               &Rcpp_SBM::add_edge,
               "Connects two nodes in network (at level 0) by their ids (string).")
@@ -397,8 +344,8 @@ RCPP_MODULE(SBM)
               &Rcpp_SBM::set_node_parent,
               "Sets the parent node (or block) for a given node. Takes child node's id (string), parent node's id (string), and the level of child node (int).")
       .method("initialize_blocks",
-             &Rcpp_SBM::initialize_blocks,
-             "Adds a desired number of blocks and randomly assigns them for a given level. num_blocks = -1 means every node gets their own block")
+              &Rcpp_SBM::initialize_blocks,
+              "Adds a desired number of blocks and randomly assigns them for a given level. num_blocks = -1 means every node gets their own block")
       .method("get_state",
               &Rcpp_SBM::get_state,
               "Exports the current state of the network as dataframe with each node as a row and columns for node id, parent id, node type, and node level.")
@@ -457,10 +404,6 @@ sbm$set_node_parent("b2", "b11", 0)
 sbm$set_node_parent("b3", "b12", 0)
 
 
-# Set some model parameters
-sbm$GREEDY <- TRUE
-sbm$EPS <- 0.1
-sbm$N_CHECKS_PER_block <- 5
 
 original_state <- sbm$get_state()
 

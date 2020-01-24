@@ -8,8 +8,10 @@ mcmc_sweep(
   sbm,
   num_sweeps = 1,
   variable_num_blocks = TRUE,
+  eps = 0.1,
   track_pairs = FALSE,
-  level = 0
+  level = 0,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -22,11 +24,18 @@ proposals.}
 empty blocks removed while sweeping or should number of blocks remain
 constant?}
 
+\item{eps}{Controls randomness of move proposals. Effects both the block
+merging and mcmc sweeps.}
+
 \item{track_pairs}{Return a dataframe with all pairs of nodes along with the
 number of sweeps they shared the same group?}
 
 \item{level}{Level of nodes who's blocks will have their block membership run
 through MCMC proposal-accept routine.}
+
+\item{verbose}{If set to \code{TRUE} then each proposed move for all sweeps will
+have information given on entropy delta, probability of moving, and if the
+move were accepted printed to the console.}
 }
 \value{
 List with two dataframes. The first telling for all sweeps everytime

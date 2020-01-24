@@ -19,20 +19,16 @@
 #'   hierarcichal structure in data or inspection is desired this should be set
 #'   to `TRUE`, otherwise it will slow down collapsing due to increased data
 #'   transfer.
-#' @param greedy Should every possible block merger be considered? If `FALSE`,
-#'   candidates for mergers are drawn by similarity in edges (just as MCMC
-#'   move proposals are). This may lead the model to local minimums by always
-#'   pursuing best possible merges.
-#' @param num_block_proposals If `greedy = FALSE`, this parameter controls how
-#'   many merger proposals are drawn for each block in the model. A larger
-#'   number will increase the exploration of merge potentials but may lead the
-#'   model to local minimums for the same reason greedy mode does.
+#' @param num_block_proposals Controls how many merger proposals are drawn for
+#'   each block in the model. A larger number will increase the exploration of
+#'   merge potentials but may lead the model to local minimums. If the number of
+#'   proposals is greater than then number of blocks then all blocks are
+#'   searched exhaustively.
 #' @param sigma Controls the rate of collapse. At each step of the collapsing
 #'   the model will try and remove `current_num_nodes(1 - 1/sigma)` nodes from
 #'   the model. So a larger sigma means a faster collapse rate.
 #' @param eps Controls randomness of move proposals. Effects both the block
-#'   merging and mcmc sweeps. If value is set to value other than null the SBMs
-#'   current epsilon value will be overridden.
+#'   merging and mcmc sweeps.
 #'
 #' @return Tibble with three columns with rows corresponding to the result of
 #'   each merge step:  `entropy`, `num_blocks` left in model, and a list column
@@ -60,34 +56,20 @@ collapse_blocks <- function(
   num_mcmc_sweeps = 0,
   desired_num_blocks = 1,
   report_all_steps = FALSE,
-  eps = NULL,
-  greedy = FALSE,
+  eps = 0.1,
   num_block_proposals = 5,
   sigma = 2
 ){
-
-  overide_eps <- !is.null(eps)
-  if(overide_eps){
-    old_eps <- sbm$EPS
-    sbm$EPS <- eps
-  }
-
-  # Set free parameters
-  sbm$GREEDY <- greedy
-  sbm$N_CHECKS_PER_block <- num_block_proposals
-  sbm$SIGMA <- sigma
 
   collapse_results <- sbm$collapse_blocks(
     as.integer(level),
     as.integer(num_mcmc_sweeps),
     as.integer(desired_num_blocks),
+    as.integer(num_block_proposals),
+    sigma,
+    eps,
     report_all_steps
   )
-
-  # Reset epsilon value
-  if(overide_eps){
-    sbm$EPS <- old_eps
-  }
 
   purrr::map_dfr(
     collapse_results,

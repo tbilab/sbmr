@@ -1,7 +1,5 @@
 #include "../SBM.h"
 
-
-
 // SBM build_simulated_SBM()
 // {
 //   // This function implements a network built using the bisbmsim package
@@ -67,7 +65,7 @@ SBM build_simple_SBM()
 
   // This function builds a network with the following structure
   /*
-   +----+               +----+
+            +----+               +----+
    +----+   |    |---------------|    |
    |    |   | a1 |-----      ----| b1 |   +----+
    |a11 |---|    |      \  /    -|    |---|    |
@@ -86,7 +84,7 @@ SBM build_simple_SBM()
    |a13 |---|    |       /\      |    |   |b13 |
    |    |   | a4 |------/  \-----| b4 |---|    |
    +----+   |    |               |    |   +----+
-   +----+               +----+
+            +----+               +----+
    */
   SBM my_SBM;
 
@@ -95,44 +93,97 @@ SBM build_simple_SBM()
   NodePtr a2 = my_SBM.add_node("a2", 0);
   NodePtr a3 = my_SBM.add_node("a3", 0);
   NodePtr a4 = my_SBM.add_node("a4", 0);
+
   NodePtr b1 = my_SBM.add_node("b1", 1);
   NodePtr b2 = my_SBM.add_node("b2", 1);
   NodePtr b3 = my_SBM.add_node("b3", 1);
   NodePtr b4 = my_SBM.add_node("b4", 1);
 
   // Add edges
-  my_SBM.add_edge(a1, b1);
   my_SBM.add_edge(a1, b2);
+
   my_SBM.add_edge(a2, b1);
   my_SBM.add_edge(a2, b2);
+
   my_SBM.add_edge(a3, b1);
   my_SBM.add_edge(a3, b2);
   my_SBM.add_edge(a3, b4);
+
   my_SBM.add_edge(a4, b3);
 
   // Make 2 type 0/a blocks
   NodePtr a11 = my_SBM.add_node("a11", 0, 1);
   NodePtr a12 = my_SBM.add_node("a12", 0, 1);
   NodePtr a13 = my_SBM.add_node("a13", 0, 1);
+
   NodePtr b11 = my_SBM.add_node("b11", 1, 1);
   NodePtr b12 = my_SBM.add_node("b12", 1, 1);
   NodePtr b13 = my_SBM.add_node("b13", 1, 1);
 
   // Assign nodes to their blocks
   a1->set_parent(a11);
+
   a2->set_parent(a12);
   a3->set_parent(a12);
+
   a4->set_parent(a13);
+
   b1->set_parent(b11);
   b2->set_parent(b11);
+
   b3->set_parent(b12);
+
   b4->set_parent(b13);
 
   return my_SBM;
 }
 
+// Loads a simple unipartite sbm model with hierarchy added
+SBM build_simple_SBM_unipartite()
+{
+  SBM my_SBM;
 
-SBM build_simulated_SBM()
+  // Add nodes to graph first
+  NodePtr n1 = my_SBM.add_node("n1", 0);
+  NodePtr n2 = my_SBM.add_node("n2", 0);
+  NodePtr n3 = my_SBM.add_node("n3", 0);
+  NodePtr n4 = my_SBM.add_node("n4", 0);
+  NodePtr n5 = my_SBM.add_node("n5", 0);
+  NodePtr n6 = my_SBM.add_node("n6", 0);
+
+  // Add edges
+  my_SBM.add_edge(n1, n2);
+  my_SBM.add_edge(n1, n3);
+  my_SBM.add_edge(n1, n4);
+  my_SBM.add_edge(n1, n5);
+  my_SBM.add_edge(n2, n3);
+  my_SBM.add_edge(n2, n4);
+  my_SBM.add_edge(n2, n5);
+  my_SBM.add_edge(n3, n4);
+  my_SBM.add_edge(n3, n6);
+  my_SBM.add_edge(n4, n5);
+  my_SBM.add_edge(n4, n6);
+  my_SBM.add_edge(n5, n6);
+
+  // Make 3 blocks
+  NodePtr a = my_SBM.add_node("a", 0, 1);
+  NodePtr b = my_SBM.add_node("b", 0, 1);
+  NodePtr c = my_SBM.add_node("c", 0, 1);
+
+  // Assign nodes to their blocks
+  n1->set_parent(a);
+  n2->set_parent(a);
+
+  n3->set_parent(b);
+  n4->set_parent(b);
+
+  n5->set_parent(c);
+  n6->set_parent(c);
+
+  return my_SBM;
+}
+
+SBM build_bipartite_simulated()
 {
   // This function implements a network built using the bisbmsim package
   // produced for the TBI lab and is built using the R script at
@@ -436,6 +487,504 @@ SBM build_simulated_SBM()
   my_SBM.add_edge("a22", "b25");
   my_SBM.add_edge("a24", "b25");
   my_SBM.add_edge("a25", "b25");
+
+  return my_SBM;
+}
+
+// A big ugly but useful simulated dataset with 3 clusters
+// Made with the following script in R using the sbmR package
+// set.seed(42)
+// n_blocks <- 3   # Total number of blocks
+// block_size <- 15 # How many nodes in each block
+// network <- sim_basic_block_network(
+//   n_blocks = n_blocks,
+//   n_nodes_per_block = block_size,
+//   return_edge_propensities = TRUE
+// )
+// network %>%
+//   pluck("nodes") %>%
+//   glue_data("my_SBM.add_node(\"{id}\", 0);")
+// network %>%
+//   pluck("edges") %>%
+//   glue_data("my_SBM.add_edge(\"{from}\", \"{to}\");")
+SBM build_unipartite_simulated()
+{
+  SBM my_SBM;
+
+  my_SBM.add_node("g1_1", 0);
+  my_SBM.add_node("g1_2", 0);
+  my_SBM.add_node("g1_3", 0);
+  my_SBM.add_node("g1_4", 0);
+  my_SBM.add_node("g1_5", 0);
+  my_SBM.add_node("g1_6", 0);
+  my_SBM.add_node("g1_7", 0);
+  my_SBM.add_node("g1_8", 0);
+  my_SBM.add_node("g1_9", 0);
+  my_SBM.add_node("g1_10", 0);
+  my_SBM.add_node("g1_11", 0);
+  my_SBM.add_node("g1_12", 0);
+  my_SBM.add_node("g1_13", 0);
+  my_SBM.add_node("g1_14", 0);
+  my_SBM.add_node("g1_15", 0);
+  my_SBM.add_node("g2_1", 0);
+  my_SBM.add_node("g2_2", 0);
+  my_SBM.add_node("g2_3", 0);
+  my_SBM.add_node("g2_4", 0);
+  my_SBM.add_node("g2_5", 0);
+  my_SBM.add_node("g2_6", 0);
+  my_SBM.add_node("g2_7", 0);
+  my_SBM.add_node("g2_8", 0);
+  my_SBM.add_node("g2_9", 0);
+  my_SBM.add_node("g2_10", 0);
+  my_SBM.add_node("g2_11", 0);
+  my_SBM.add_node("g2_12", 0);
+  my_SBM.add_node("g2_13", 0);
+  my_SBM.add_node("g2_14", 0);
+  my_SBM.add_node("g2_15", 0);
+  my_SBM.add_node("g3_1", 0);
+  my_SBM.add_node("g3_2", 0);
+  my_SBM.add_node("g3_3", 0);
+  my_SBM.add_node("g3_4", 0);
+  my_SBM.add_node("g3_5", 0);
+  my_SBM.add_node("g3_6", 0);
+  my_SBM.add_node("g3_7", 0);
+  my_SBM.add_node("g3_8", 0);
+  my_SBM.add_node("g3_9", 0);
+  my_SBM.add_node("g3_10", 0);
+  my_SBM.add_node("g3_11", 0);
+  my_SBM.add_node("g3_12", 0);
+  my_SBM.add_node("g3_13", 0);
+  my_SBM.add_node("g3_14", 0);
+  my_SBM.add_node("g3_15", 0);
+
+  my_SBM.add_edge("g1_1", "g1_7");
+  my_SBM.add_edge("g1_1", "g1_8");
+  my_SBM.add_edge("g1_1", "g1_10");
+  my_SBM.add_edge("g1_1", "g1_15");
+  my_SBM.add_edge("g1_1", "g3_1");
+  my_SBM.add_edge("g1_1", "g3_14");
+  my_SBM.add_edge("g1_2", "g1_3");
+  my_SBM.add_edge("g1_2", "g1_6");
+  my_SBM.add_edge("g1_2", "g1_9");
+  my_SBM.add_edge("g1_2", "g1_13");
+  my_SBM.add_edge("g1_2", "g1_14");
+  my_SBM.add_edge("g1_2", "g1_15");
+  my_SBM.add_edge("g1_2", "g3_2");
+  my_SBM.add_edge("g1_2", "g3_4");
+  my_SBM.add_edge("g1_2", "g3_6");
+  my_SBM.add_edge("g1_2", "g3_8");
+  my_SBM.add_edge("g1_2", "g3_9");
+  my_SBM.add_edge("g1_3", "g1_4");
+  my_SBM.add_edge("g1_3", "g1_5");
+  my_SBM.add_edge("g1_3", "g1_6");
+  my_SBM.add_edge("g1_3", "g1_10");
+  my_SBM.add_edge("g1_3", "g1_11");
+  my_SBM.add_edge("g1_3", "g1_12");
+  my_SBM.add_edge("g1_3", "g1_13");
+  my_SBM.add_edge("g1_3", "g2_14");
+  my_SBM.add_edge("g1_3", "g2_15");
+  my_SBM.add_edge("g1_3", "g3_12");
+  my_SBM.add_edge("g1_4", "g1_7");
+  my_SBM.add_edge("g1_4", "g1_12");
+  my_SBM.add_edge("g1_4", "g2_11");
+  my_SBM.add_edge("g1_4", "g3_3");
+  my_SBM.add_edge("g1_4", "g3_8");
+  my_SBM.add_edge("g1_4", "g3_14");
+  my_SBM.add_edge("g1_5", "g1_10");
+  my_SBM.add_edge("g1_5", "g1_11");
+  my_SBM.add_edge("g1_5", "g1_12");
+  my_SBM.add_edge("g1_5", "g1_14");
+  my_SBM.add_edge("g1_5", "g2_5");
+  my_SBM.add_edge("g1_5", "g3_1");
+  my_SBM.add_edge("g1_5", "g3_8");
+  my_SBM.add_edge("g1_5", "g3_14");
+  my_SBM.add_edge("g1_6", "g1_7");
+  my_SBM.add_edge("g1_6", "g1_8");
+  my_SBM.add_edge("g1_6", "g1_13");
+  my_SBM.add_edge("g1_6", "g1_14");
+  my_SBM.add_edge("g1_6", "g1_15");
+  my_SBM.add_edge("g1_6", "g3_1");
+  my_SBM.add_edge("g1_6", "g3_3");
+  my_SBM.add_edge("g1_6", "g3_5");
+  my_SBM.add_edge("g1_6", "g3_7");
+  my_SBM.add_edge("g1_6", "g3_10");
+  my_SBM.add_edge("g1_6", "g3_12");
+  my_SBM.add_edge("g1_6", "g3_15");
+  my_SBM.add_edge("g1_7", "g1_9");
+  my_SBM.add_edge("g1_7", "g1_11");
+  my_SBM.add_edge("g1_7", "g1_13");
+  my_SBM.add_edge("g1_7", "g1_15");
+  my_SBM.add_edge("g1_7", "g2_6");
+  my_SBM.add_edge("g1_7", "g2_10");
+  my_SBM.add_edge("g1_7", "g3_3");
+  my_SBM.add_edge("g1_7", "g3_6");
+  my_SBM.add_edge("g1_7", "g3_10");
+  my_SBM.add_edge("g1_7", "g3_11");
+  my_SBM.add_edge("g1_7", "g3_15");
+  my_SBM.add_edge("g1_8", "g1_9");
+  my_SBM.add_edge("g1_8", "g1_12");
+  my_SBM.add_edge("g1_8", "g2_10");
+  my_SBM.add_edge("g1_8", "g3_3");
+  my_SBM.add_edge("g1_8", "g3_10");
+  my_SBM.add_edge("g1_8", "g3_11");
+  my_SBM.add_edge("g1_9", "g1_12");
+  my_SBM.add_edge("g1_9", "g1_13");
+  my_SBM.add_edge("g1_9", "g1_15");
+  my_SBM.add_edge("g1_9", "g3_2");
+  my_SBM.add_edge("g1_9", "g3_5");
+  my_SBM.add_edge("g1_9", "g3_12");
+  my_SBM.add_edge("g1_10", "g1_11");
+  my_SBM.add_edge("g1_10", "g1_12");
+  my_SBM.add_edge("g1_10", "g1_14");
+  my_SBM.add_edge("g1_10", "g1_15");
+  my_SBM.add_edge("g1_10", "g3_7");
+  my_SBM.add_edge("g1_10", "g3_11");
+  my_SBM.add_edge("g1_10", "g3_14");
+  my_SBM.add_edge("g1_10", "g3_15");
+  my_SBM.add_edge("g1_11", "g2_7");
+  my_SBM.add_edge("g1_11", "g2_9");
+  my_SBM.add_edge("g1_11", "g3_2");
+  my_SBM.add_edge("g1_11", "g3_4");
+  my_SBM.add_edge("g1_12", "g1_13");
+  my_SBM.add_edge("g1_12", "g1_14");
+  my_SBM.add_edge("g1_12", "g1_15");
+  my_SBM.add_edge("g1_12", "g2_9");
+  my_SBM.add_edge("g1_12", "g3_5");
+  my_SBM.add_edge("g1_12", "g3_8");
+  my_SBM.add_edge("g1_13", "g2_12");
+  my_SBM.add_edge("g1_13", "g3_3");
+  my_SBM.add_edge("g1_14", "g3_2");
+  my_SBM.add_edge("g1_14", "g3_7");
+  my_SBM.add_edge("g1_15", "g2_8");
+  my_SBM.add_edge("g1_15", "g3_3");
+  my_SBM.add_edge("g1_15", "g3_6");
+  my_SBM.add_edge("g1_15", "g3_9");
+  my_SBM.add_edge("g1_15", "g3_10");
+  my_SBM.add_edge("g1_15", "g3_13");
+  my_SBM.add_edge("g1_15", "g3_14");
+  my_SBM.add_edge("g2_1", "g2_3");
+  my_SBM.add_edge("g2_1", "g2_6");
+  my_SBM.add_edge("g2_1", "g2_7");
+  my_SBM.add_edge("g2_1", "g2_9");
+  my_SBM.add_edge("g2_1", "g2_10");
+  my_SBM.add_edge("g2_1", "g2_11");
+  my_SBM.add_edge("g2_1", "g2_12");
+  my_SBM.add_edge("g2_1", "g2_13");
+  my_SBM.add_edge("g2_1", "g2_14");
+  my_SBM.add_edge("g2_1", "g2_15");
+  my_SBM.add_edge("g2_1", "g3_1");
+  my_SBM.add_edge("g2_1", "g3_2");
+  my_SBM.add_edge("g2_1", "g3_3");
+  my_SBM.add_edge("g2_1", "g3_4");
+  my_SBM.add_edge("g2_1", "g3_5");
+  my_SBM.add_edge("g2_1", "g3_7");
+  my_SBM.add_edge("g2_1", "g3_8");
+  my_SBM.add_edge("g2_1", "g3_9");
+  my_SBM.add_edge("g2_1", "g3_10");
+  my_SBM.add_edge("g2_1", "g3_11");
+  my_SBM.add_edge("g2_1", "g3_13");
+  my_SBM.add_edge("g2_1", "g3_14");
+  my_SBM.add_edge("g2_1", "g3_15");
+  my_SBM.add_edge("g2_2", "g2_4");
+  my_SBM.add_edge("g2_2", "g2_5");
+  my_SBM.add_edge("g2_2", "g2_6");
+  my_SBM.add_edge("g2_2", "g2_7");
+  my_SBM.add_edge("g2_2", "g2_9");
+  my_SBM.add_edge("g2_2", "g2_10");
+  my_SBM.add_edge("g2_2", "g2_11");
+  my_SBM.add_edge("g2_2", "g2_12");
+  my_SBM.add_edge("g2_2", "g3_1");
+  my_SBM.add_edge("g2_2", "g3_2");
+  my_SBM.add_edge("g2_2", "g3_3");
+  my_SBM.add_edge("g2_2", "g3_4");
+  my_SBM.add_edge("g2_2", "g3_5");
+  my_SBM.add_edge("g2_2", "g3_6");
+  my_SBM.add_edge("g2_2", "g3_7");
+  my_SBM.add_edge("g2_2", "g3_8");
+  my_SBM.add_edge("g2_2", "g3_9");
+  my_SBM.add_edge("g2_2", "g3_10");
+  my_SBM.add_edge("g2_2", "g3_11");
+  my_SBM.add_edge("g2_2", "g3_12");
+  my_SBM.add_edge("g2_2", "g3_13");
+  my_SBM.add_edge("g2_2", "g3_14");
+  my_SBM.add_edge("g2_2", "g3_15");
+  my_SBM.add_edge("g2_3", "g2_5");
+  my_SBM.add_edge("g2_3", "g2_6");
+  my_SBM.add_edge("g2_3", "g2_8");
+  my_SBM.add_edge("g2_3", "g2_10");
+  my_SBM.add_edge("g2_3", "g2_11");
+  my_SBM.add_edge("g2_3", "g2_12");
+  my_SBM.add_edge("g2_3", "g2_14");
+  my_SBM.add_edge("g2_3", "g2_15");
+  my_SBM.add_edge("g2_3", "g3_1");
+  my_SBM.add_edge("g2_3", "g3_2");
+  my_SBM.add_edge("g2_3", "g3_3");
+  my_SBM.add_edge("g2_3", "g3_4");
+  my_SBM.add_edge("g2_3", "g3_5");
+  my_SBM.add_edge("g2_3", "g3_6");
+  my_SBM.add_edge("g2_3", "g3_7");
+  my_SBM.add_edge("g2_3", "g3_8");
+  my_SBM.add_edge("g2_3", "g3_9");
+  my_SBM.add_edge("g2_3", "g3_10");
+  my_SBM.add_edge("g2_3", "g3_11");
+  my_SBM.add_edge("g2_3", "g3_13");
+  my_SBM.add_edge("g2_3", "g3_14");
+  my_SBM.add_edge("g2_3", "g3_15");
+  my_SBM.add_edge("g2_4", "g2_5");
+  my_SBM.add_edge("g2_4", "g2_7");
+  my_SBM.add_edge("g2_4", "g2_10");
+  my_SBM.add_edge("g2_4", "g2_11");
+  my_SBM.add_edge("g2_4", "g2_13");
+  my_SBM.add_edge("g2_4", "g2_14");
+  my_SBM.add_edge("g2_4", "g2_15");
+  my_SBM.add_edge("g2_4", "g3_1");
+  my_SBM.add_edge("g2_4", "g3_2");
+  my_SBM.add_edge("g2_4", "g3_3");
+  my_SBM.add_edge("g2_4", "g3_4");
+  my_SBM.add_edge("g2_4", "g3_5");
+  my_SBM.add_edge("g2_4", "g3_6");
+  my_SBM.add_edge("g2_4", "g3_7");
+  my_SBM.add_edge("g2_4", "g3_8");
+  my_SBM.add_edge("g2_4", "g3_9");
+  my_SBM.add_edge("g2_4", "g3_10");
+  my_SBM.add_edge("g2_4", "g3_11");
+  my_SBM.add_edge("g2_4", "g3_12");
+  my_SBM.add_edge("g2_4", "g3_13");
+  my_SBM.add_edge("g2_4", "g3_15");
+  my_SBM.add_edge("g2_5", "g2_7");
+  my_SBM.add_edge("g2_5", "g2_8");
+  my_SBM.add_edge("g2_5", "g2_9");
+  my_SBM.add_edge("g2_5", "g2_12");
+  my_SBM.add_edge("g2_5", "g2_13");
+  my_SBM.add_edge("g2_5", "g2_14");
+  my_SBM.add_edge("g2_5", "g3_1");
+  my_SBM.add_edge("g2_5", "g3_2");
+  my_SBM.add_edge("g2_5", "g3_3");
+  my_SBM.add_edge("g2_5", "g3_4");
+  my_SBM.add_edge("g2_5", "g3_5");
+  my_SBM.add_edge("g2_5", "g3_6");
+  my_SBM.add_edge("g2_5", "g3_7");
+  my_SBM.add_edge("g2_5", "g3_8");
+  my_SBM.add_edge("g2_5", "g3_9");
+  my_SBM.add_edge("g2_5", "g3_11");
+  my_SBM.add_edge("g2_5", "g3_12");
+  my_SBM.add_edge("g2_5", "g3_13");
+  my_SBM.add_edge("g2_5", "g3_14");
+  my_SBM.add_edge("g2_5", "g3_15");
+  my_SBM.add_edge("g2_6", "g2_7");
+  my_SBM.add_edge("g2_6", "g2_8");
+  my_SBM.add_edge("g2_6", "g2_10");
+  my_SBM.add_edge("g2_6", "g2_11");
+  my_SBM.add_edge("g2_6", "g2_13");
+  my_SBM.add_edge("g2_6", "g2_14");
+  my_SBM.add_edge("g2_6", "g2_15");
+  my_SBM.add_edge("g2_6", "g3_1");
+  my_SBM.add_edge("g2_6", "g3_2");
+  my_SBM.add_edge("g2_6", "g3_3");
+  my_SBM.add_edge("g2_6", "g3_4");
+  my_SBM.add_edge("g2_6", "g3_5");
+  my_SBM.add_edge("g2_6", "g3_6");
+  my_SBM.add_edge("g2_6", "g3_7");
+  my_SBM.add_edge("g2_6", "g3_8");
+  my_SBM.add_edge("g2_6", "g3_9");
+  my_SBM.add_edge("g2_6", "g3_12");
+  my_SBM.add_edge("g2_6", "g3_13");
+  my_SBM.add_edge("g2_6", "g3_15");
+  my_SBM.add_edge("g2_7", "g2_8");
+  my_SBM.add_edge("g2_7", "g2_9");
+  my_SBM.add_edge("g2_7", "g2_10");
+  my_SBM.add_edge("g2_7", "g2_12");
+  my_SBM.add_edge("g2_7", "g2_13");
+  my_SBM.add_edge("g2_7", "g2_14");
+  my_SBM.add_edge("g2_7", "g2_15");
+  my_SBM.add_edge("g2_7", "g3_1");
+  my_SBM.add_edge("g2_7", "g3_2");
+  my_SBM.add_edge("g2_7", "g3_3");
+  my_SBM.add_edge("g2_7", "g3_4");
+  my_SBM.add_edge("g2_7", "g3_6");
+  my_SBM.add_edge("g2_7", "g3_7");
+  my_SBM.add_edge("g2_7", "g3_8");
+  my_SBM.add_edge("g2_7", "g3_9");
+  my_SBM.add_edge("g2_7", "g3_10");
+  my_SBM.add_edge("g2_7", "g3_11");
+  my_SBM.add_edge("g2_7", "g3_12");
+  my_SBM.add_edge("g2_7", "g3_13");
+  my_SBM.add_edge("g2_7", "g3_14");
+  my_SBM.add_edge("g2_7", "g3_15");
+  my_SBM.add_edge("g2_8", "g2_9");
+  my_SBM.add_edge("g2_8", "g2_10");
+  my_SBM.add_edge("g2_8", "g2_11");
+  my_SBM.add_edge("g2_8", "g2_12");
+  my_SBM.add_edge("g2_8", "g2_15");
+  my_SBM.add_edge("g2_8", "g3_2");
+  my_SBM.add_edge("g2_8", "g3_3");
+  my_SBM.add_edge("g2_8", "g3_5");
+  my_SBM.add_edge("g2_8", "g3_6");
+  my_SBM.add_edge("g2_8", "g3_7");
+  my_SBM.add_edge("g2_8", "g3_8");
+  my_SBM.add_edge("g2_8", "g3_9");
+  my_SBM.add_edge("g2_8", "g3_10");
+  my_SBM.add_edge("g2_8", "g3_11");
+  my_SBM.add_edge("g2_8", "g3_12");
+  my_SBM.add_edge("g2_8", "g3_13");
+  my_SBM.add_edge("g2_8", "g3_14");
+  my_SBM.add_edge("g2_9", "g2_10");
+  my_SBM.add_edge("g2_9", "g2_11");
+  my_SBM.add_edge("g2_9", "g2_12");
+  my_SBM.add_edge("g2_9", "g2_13");
+  my_SBM.add_edge("g2_9", "g2_14");
+  my_SBM.add_edge("g2_9", "g2_15");
+  my_SBM.add_edge("g2_9", "g3_1");
+  my_SBM.add_edge("g2_9", "g3_2");
+  my_SBM.add_edge("g2_9", "g3_3");
+  my_SBM.add_edge("g2_9", "g3_5");
+  my_SBM.add_edge("g2_9", "g3_6");
+  my_SBM.add_edge("g2_9", "g3_7");
+  my_SBM.add_edge("g2_9", "g3_9");
+  my_SBM.add_edge("g2_9", "g3_10");
+  my_SBM.add_edge("g2_9", "g3_11");
+  my_SBM.add_edge("g2_9", "g3_12");
+  my_SBM.add_edge("g2_9", "g3_13");
+  my_SBM.add_edge("g2_9", "g3_14");
+  my_SBM.add_edge("g2_9", "g3_15");
+  my_SBM.add_edge("g2_10", "g2_11");
+  my_SBM.add_edge("g2_10", "g2_12");
+  my_SBM.add_edge("g2_10", "g2_13");
+  my_SBM.add_edge("g2_10", "g2_14");
+  my_SBM.add_edge("g2_10", "g3_1");
+  my_SBM.add_edge("g2_10", "g3_2");
+  my_SBM.add_edge("g2_10", "g3_5");
+  my_SBM.add_edge("g2_10", "g3_6");
+  my_SBM.add_edge("g2_10", "g3_7");
+  my_SBM.add_edge("g2_10", "g3_9");
+  my_SBM.add_edge("g2_10", "g3_10");
+  my_SBM.add_edge("g2_10", "g3_11");
+  my_SBM.add_edge("g2_10", "g3_12");
+  my_SBM.add_edge("g2_10", "g3_13");
+  my_SBM.add_edge("g2_10", "g3_14");
+  my_SBM.add_edge("g2_10", "g3_15");
+  my_SBM.add_edge("g2_11", "g2_12");
+  my_SBM.add_edge("g2_11", "g2_14");
+  my_SBM.add_edge("g2_11", "g3_1");
+  my_SBM.add_edge("g2_11", "g3_2");
+  my_SBM.add_edge("g2_11", "g3_3");
+  my_SBM.add_edge("g2_11", "g3_4");
+  my_SBM.add_edge("g2_11", "g3_5");
+  my_SBM.add_edge("g2_11", "g3_6");
+  my_SBM.add_edge("g2_11", "g3_7");
+  my_SBM.add_edge("g2_11", "g3_9");
+  my_SBM.add_edge("g2_11", "g3_10");
+  my_SBM.add_edge("g2_11", "g3_11");
+  my_SBM.add_edge("g2_11", "g3_12");
+  my_SBM.add_edge("g2_11", "g3_13");
+  my_SBM.add_edge("g2_11", "g3_14");
+  my_SBM.add_edge("g2_12", "g2_13");
+  my_SBM.add_edge("g2_12", "g2_14");
+  my_SBM.add_edge("g2_12", "g3_1");
+  my_SBM.add_edge("g2_12", "g3_3");
+  my_SBM.add_edge("g2_12", "g3_4");
+  my_SBM.add_edge("g2_12", "g3_5");
+  my_SBM.add_edge("g2_12", "g3_6");
+  my_SBM.add_edge("g2_12", "g3_7");
+  my_SBM.add_edge("g2_12", "g3_8");
+  my_SBM.add_edge("g2_12", "g3_9");
+  my_SBM.add_edge("g2_12", "g3_10");
+  my_SBM.add_edge("g2_12", "g3_11");
+  my_SBM.add_edge("g2_12", "g3_12");
+  my_SBM.add_edge("g2_12", "g3_13");
+  my_SBM.add_edge("g2_12", "g3_14");
+  my_SBM.add_edge("g2_12", "g3_15");
+  my_SBM.add_edge("g2_13", "g3_1");
+  my_SBM.add_edge("g2_13", "g3_2");
+  my_SBM.add_edge("g2_13", "g3_3");
+  my_SBM.add_edge("g2_13", "g3_4");
+  my_SBM.add_edge("g2_13", "g3_5");
+  my_SBM.add_edge("g2_13", "g3_6");
+  my_SBM.add_edge("g2_13", "g3_7");
+  my_SBM.add_edge("g2_13", "g3_8");
+  my_SBM.add_edge("g2_13", "g3_9");
+  my_SBM.add_edge("g2_13", "g3_10");
+  my_SBM.add_edge("g2_13", "g3_11");
+  my_SBM.add_edge("g2_13", "g3_12");
+  my_SBM.add_edge("g2_13", "g3_13");
+  my_SBM.add_edge("g2_13", "g3_14");
+  my_SBM.add_edge("g2_13", "g3_15");
+  my_SBM.add_edge("g2_14", "g3_1");
+  my_SBM.add_edge("g2_14", "g3_2");
+  my_SBM.add_edge("g2_14", "g3_3");
+  my_SBM.add_edge("g2_14", "g3_4");
+  my_SBM.add_edge("g2_14", "g3_5");
+  my_SBM.add_edge("g2_14", "g3_6");
+  my_SBM.add_edge("g2_14", "g3_7");
+  my_SBM.add_edge("g2_14", "g3_8");
+  my_SBM.add_edge("g2_14", "g3_9");
+  my_SBM.add_edge("g2_14", "g3_10");
+  my_SBM.add_edge("g2_14", "g3_11");
+  my_SBM.add_edge("g2_14", "g3_13");
+  my_SBM.add_edge("g2_14", "g3_14");
+  my_SBM.add_edge("g2_14", "g3_15");
+  my_SBM.add_edge("g2_15", "g3_2");
+  my_SBM.add_edge("g2_15", "g3_3");
+  my_SBM.add_edge("g2_15", "g3_4");
+  my_SBM.add_edge("g2_15", "g3_5");
+  my_SBM.add_edge("g2_15", "g3_6");
+  my_SBM.add_edge("g2_15", "g3_8");
+  my_SBM.add_edge("g2_15", "g3_9");
+  my_SBM.add_edge("g2_15", "g3_10");
+  my_SBM.add_edge("g2_15", "g3_11");
+  my_SBM.add_edge("g2_15", "g3_12");
+  my_SBM.add_edge("g2_15", "g3_13");
+  my_SBM.add_edge("g2_15", "g3_14");
+  my_SBM.add_edge("g3_1", "g3_5");
+  my_SBM.add_edge("g3_1", "g3_8");
+  my_SBM.add_edge("g3_1", "g3_10");
+  my_SBM.add_edge("g3_1", "g3_11");
+  my_SBM.add_edge("g3_1", "g3_14");
+  my_SBM.add_edge("g3_2", "g3_3");
+  my_SBM.add_edge("g3_2", "g3_5");
+  my_SBM.add_edge("g3_2", "g3_6");
+  my_SBM.add_edge("g3_2", "g3_7");
+  my_SBM.add_edge("g3_2", "g3_9");
+  my_SBM.add_edge("g3_2", "g3_13");
+  my_SBM.add_edge("g3_2", "g3_14");
+  my_SBM.add_edge("g3_3", "g3_4");
+  my_SBM.add_edge("g3_3", "g3_7");
+  my_SBM.add_edge("g3_3", "g3_8");
+  my_SBM.add_edge("g3_3", "g3_12");
+  my_SBM.add_edge("g3_3", "g3_13");
+  my_SBM.add_edge("g3_4", "g3_5");
+  my_SBM.add_edge("g3_4", "g3_6");
+  my_SBM.add_edge("g3_4", "g3_8");
+  my_SBM.add_edge("g3_4", "g3_9");
+  my_SBM.add_edge("g3_4", "g3_10");
+  my_SBM.add_edge("g3_4", "g3_11");
+  my_SBM.add_edge("g3_4", "g3_12");
+  my_SBM.add_edge("g3_4", "g3_13");
+  my_SBM.add_edge("g3_4", "g3_15");
+  my_SBM.add_edge("g3_5", "g3_6");
+  my_SBM.add_edge("g3_5", "g3_8");
+  my_SBM.add_edge("g3_5", "g3_12");
+  my_SBM.add_edge("g3_6", "g3_8");
+  my_SBM.add_edge("g3_6", "g3_11");
+  my_SBM.add_edge("g3_6", "g3_12");
+  my_SBM.add_edge("g3_6", "g3_13");
+  my_SBM.add_edge("g3_6", "g3_15");
+  my_SBM.add_edge("g3_7", "g3_12");
+  my_SBM.add_edge("g3_7", "g3_15");
+  my_SBM.add_edge("g3_8", "g3_9");
+  my_SBM.add_edge("g3_8", "g3_10");
+  my_SBM.add_edge("g3_8", "g3_11");
+  my_SBM.add_edge("g3_8", "g3_15");
+  my_SBM.add_edge("g3_9", "g3_13");
+  my_SBM.add_edge("g3_9", "g3_14");
+  my_SBM.add_edge("g3_10", "g3_11");
+  my_SBM.add_edge("g3_10", "g3_12");
+  my_SBM.add_edge("g3_10", "g3_13");
+  my_SBM.add_edge("g3_10", "g3_15");
+  my_SBM.add_edge("g3_11", "g3_13");
+  my_SBM.add_edge("g3_11", "g3_15");
+  my_SBM.add_edge("g3_12", "g3_14");
+  my_SBM.add_edge("g3_13", "g3_15");
 
   return my_SBM;
 }

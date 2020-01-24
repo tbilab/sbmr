@@ -15,7 +15,7 @@ results as returned from \link{\code{collapse_run}}, or
 function that takes one/two arguments: an entropy vector and an optional
 number of blocks vector with each element corresponding to a given
 location, or a string labeling algorithm. Currently only \code{"lowest"},
-\code{"dev_from_rolling_mean"}, and \code{"nls_residual"} are supported.}
+\code{"dev_from_rolling_mean"}, \code{"delta_ratio"}, and \code{"nls_residual"} are supported.}
 }
 \value{
 GGplot object comparing the fit results and each step's deviance from
