@@ -15,17 +15,55 @@ network <- sim_basic_block_network(
 
 my_sbm <- create_sbm(network)
 
+# start_entropy <- compute_entropy(my_sbm)
+
 # start_entropy <- my_sbm %>% initialize_blocks() %>% compute_entropy()
 single_collapse <- my_sbm %>%
   collapse_blocks(report_all_steps = TRUE,
-                  sigma = 0.9,
+                  sigma = 1.1,
                   num_mcmc_sweeps = 0,
                   desired_num_blocks = 2)
 
+visualize_collapse_results(single_collapse)
+
+my_sbm <- choose_best_collapse_state(my_sbm, single_collapse, use_entropy_value_for_score = TRUE, heuristic = "trend_deviation", verbose = TRUE)
+
+single_collapse %>%
+  pivot_longer(c(entropy, entropy_delta)) %>%
+  ggplot(aes(x = num_blocks, y = value)) +
+  geom_line() +
+  geom_point() +
+  facet_grid(rows = vars(name), scales = "free_y")
 
 
-visualize_collapse_results(single_collapse, heuristic = 'delta_ratio') + xlim(0, 25)
-my_sbm <- choose_best_collapse_state(my_sbm, single_collapse, heuristic = 'delta_ratio', verbose = TRUE)
+distance_between_line_and_pt <- function(x1,y1,x2,y2,px,py){
+  abs((y2 - y1)*px - (x2 - x1)*py + x2*y1 - y2*x1)/sqrt( (y2-y1)^2 + (x2-x1)^2 )
+}
+
+
+single_collapse %>%
+  arrange(num_blocks) %>%
+  filter(num_blocks < 25) %>%
+  select(value = entropy, k = num_blocks) %>%
+  mutate(
+    distance_to_line = distance_between_line_and_pt(lag(k), lag(value),
+                                                    lead(k), lead(value),
+                                                    k, value)
+  ) %>%
+  pivot_longer(c(value, distance_to_line)) %>%
+  # pivot_longer(c(value, predicted_value)) %>%
+  ggplot(aes(x = k, y = value)) +
+  geom_line(aes(color = name)) +
+  facet_grid(rows = vars(name), scales = "free_y") +
+  geom_vline(xintercept = n_blocks, color = 'orangered')
+  # xlim(0, 25)
+
+single_collapse %>%
+  select(-entropy_delta) %>%
+  visualize_collapse_results(heuristic = 'nls_residual') +
+
+
+my_sbm <- choose_best_collapse_state(my_sbm, single_collapse, heuristic = 'dev_from_rolling_mean', verbose = TRUE)
 
 
 window_size <- 2
