@@ -7,6 +7,9 @@
 #' @param collapse_results Dataframe of agglomerative merging based collapse
 #'   results as returned from \link{\code{collapse_run}}, or
 #'   \link{\code{collapse_blocks(report_all_steps = TRUE)}}.
+#' @param use_entropy_value_for_score If set to `TRUE` then instead of the merge results
+#'   entropy delta being used for the score function the entropy will be.
+#'   Typically the heuristics work better on entropy delta values.
 #' @inheritParams build_score_fn
 #'
 #' @return GGplot object comparing the fit results and each step's deviance from
@@ -43,14 +46,19 @@
 #'
 #' visualize_collapse_results(collapse_results, heuristic = nls_score)
 #'
-visualize_collapse_results <- function(collapse_results, heuristic = NULL){
+visualize_collapse_results <- function(collapse_results, use_entropy_value_for_score = FALSE, heuristic = NULL){
 
   if(!is.null(heuristic)){
+
     collapse_results <- collapse_results %>%
-      dplyr::arrange(num_blocks) %>%
-      dplyr::mutate(
-        score = build_score_fn(heuristic)(entropy, num_blocks),
-      )
+      dplyr::arrange(num_blocks)
+
+    if (use_entropy_value_for_score){
+      collapse_results <- dplyr::mutate(collapse_results, score = build_score_fn(heuristic)(entropy, num_blocks))
+    } else {
+      collapse_results <- dplyr::mutate(collapse_results, score = build_score_fn(heuristic)(entropy_delta, num_blocks))
+    }
+
   }
 
   collapse_results %>%

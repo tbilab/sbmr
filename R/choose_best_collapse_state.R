@@ -2,6 +2,7 @@
 #'
 #' @inheritParams mcmc_sweep
 #' @inheritParams build_score_fn
+#' @inheritParams visualize_collapse_results
 #' @param collapse_results Results of running agglomerative collapse algorithm
 #'   on sbm with \code{\link{collapse_blocks}}.
 #' @param verbose Should model tell you what step was chosen (`TRUE` or `FALSE`)?
@@ -37,13 +38,19 @@
 #'                                      heuristic = nls_score,
 #'                                      verbose = TRUE)
 #'
-choose_best_collapse_state <- function(sbm, collapse_results, heuristic = 'dev_from_rolling_mean', verbose = FALSE){
+choose_best_collapse_state <- function(sbm, collapse_results, use_entropy_value_for_score = FALSE,  heuristic = 'dev_from_rolling_mean', verbose = FALSE){
 
   # Apply the heuristic on the entropy column and choose the higheset value
   best_state <- collapse_results %>%
-    dplyr::arrange(num_blocks) %>%
-    dplyr::mutate(score = build_score_fn(heuristic)(entropy, num_blocks)) %>%
-    dplyr::filter(score == max(score, na.rm = TRUE))
+    dplyr::arrange(num_blocks)
+
+  if (use_entropy_value_for_score){
+    best_state <- dplyr::mutate(best_state, score = build_score_fn(heuristic)(entropy, num_blocks))
+  } else {
+    best_state <- dplyr::mutate(best_state, score = build_score_fn(heuristic)(entropy_delta, num_blocks))
+  }
+
+  best_state <- dplyr::filter(best_state, score == max(score, na.rm = TRUE))
 
   if(verbose){
     n <- best_state$num_blocks[1]
