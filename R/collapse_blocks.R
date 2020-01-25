@@ -55,7 +55,7 @@ collapse_blocks <- function(
   level = 0,
   num_mcmc_sweeps = 0,
   desired_num_blocks = 1,
-  report_all_steps = FALSE,
+  report_all_steps = TRUE,
   eps = 0.1,
   num_block_proposals = 5,
   sigma = 2

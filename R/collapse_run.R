@@ -54,6 +54,7 @@ collapse_run <- function(
                         desired_num_blocks = desired_num,
                         sigma = sigma,
                         eps = eps,
+                        report_all_steps = FALSE,
                         num_block_proposals = num_block_proposals,
                         num_mcmc_sweeps = num_mcmc_sweeps)
       }
