@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Visualize network stucture — visualize_network • sbmR</title>
+<title>Plot network of nodes connected by pairwise block propensity — visualize_propensity_network • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,9 +35,10 @@
 
 
 
-<meta property="og:title" content="Visualize network stucture — visualize_network" />
-<meta property="og:description" content="Creates a simple interactive network visualization that visually encodes node
-membership and type (if present) for a passed network." />
+<meta property="og:title" content="Plot network of nodes connected by pairwise block propensity — visualize_propensity_network" />
+<meta property="og:description" content="Takes the results of mcmc_sweep() with track_pairs = TRUE and plots the
+data as a network where two nodes have an edge between them if their pairwise
+propensity to be in the same block is above some threshold." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -116,81 +117,60 @@ membership and type (if present) for a passed network." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Visualize network stucture</h1>
+    <h1>Plot network of nodes connected by pairwise block propensity</h1>
     
-    <div class="hidden name"><code>visualize_network.Rd</code></div>
+    <div class="hidden name"><code>visualize_propensity_network.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Creates a simple interactive network visualization that visually encodes node
-membership and type (if present) for a passed network.</p>
+    <p>Takes the results of <code><a href='mcmc_sweep.html'>mcmc_sweep()</a></code> with <code>track_pairs = TRUE</code> and plots the
+data as a network where two nodes have an edge between them if their pairwise
+propensity to be in the same block is above some threshold.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>visualize_network</span>(
-  <span class='no'>edges</span>,
-  <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>width</span> <span class='kw'>=</span> <span class='st'>"100%"</span>,
-  <span class='kw'>height</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>node_color_col</span> <span class='kw'>=</span> <span class='st'>"block"</span>,
-  <span class='kw'>node_shape_col</span> <span class='kw'>=</span> <span class='st'>"type"</span>
-)</pre>
+    <pre class="usage"><span class='fu'>visualize_propensity_network</span>(<span class='no'>sweep_results</span>, <span class='kw'>proportion_threshold</span> <span class='kw'>=</span> <span class='fl'>0.2</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>edges</th>
-      <td><p>Dataframe with a from and two column encoding edges between
-string node ids (direction does not matter). A list containing both a
-<code>nodes</code> and <code>edges</code> dataframe can be passed to avoid having to unpack a
-list of nodes and edges to the arguments of the same name. This is helpful
-for the included simulation functions such as
-<code><a href='sim_sbm_network.html'>sim_sbm_network</a></code>.</p></td>
+      <th>sweep_results</th>
+      <td><p>Results from running <code><a href='mcmc_sweep.html'>mcmc_sweep()</a></code> with the argument <code>track_pairs = TRUE</code>.</p></td>
     </tr>
     <tr>
-      <th>nodes</th>
-      <td><p>Optional dataframe that links a node <code>id</code> to its <code>type</code>, for when model is polypartite.</p></td>
-    </tr>
-    <tr>
-      <th>width</th>
-      <td><p>Desired width for output widget.</p></td>
-    </tr>
-    <tr>
-      <th>height</th>
-      <td><p>Desired height for output widget.</p></td>
-    </tr>
-    <tr>
-      <th>node_color_col</th>
-      <td><p>Name of column in the <code>nodes</code> dataframe that should be
-encoded with color of nodes in the plot. If this value is numeric (defined
-as more than 10 unique values that are numbers) the network will color
-nodes on a linear scale from the min value to the highest value.</p></td>
-    </tr>
-    <tr>
-      <th>node_shape_col</th>
-      <td><p>Name of column in the <code>nodes</code> dataframe that should be
-encoded with shape of nodes in the plot</p></td>
+      <th>proportion_threshold</th>
+      <td><p>Threshold of pairwise propensity to consider two nodes linked. Choose carefully!</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>An interactive network plot with force layout.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
+<span class='co'># Simulate network data and initialize model with it</span>
+<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>,<span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>30</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>()
 
-<span class='co'># Simulate a 3 block/cluster network with 15 nodes per block</span>
-<span class='no'>simulated_network</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>15</span>)
+<span class='co'># Run collapsing algorithm</span>
+<span class='no'>collapse_results</span> <span class='kw'>&lt;-</span> <span class='no'>my_sbm</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='collapse_blocks.html'>collapse_blocks</a></span>(<span class='kw'>desired_num_blocks</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>1.1</span>)
 
-<span class='co'># Visualize network with color encoding the blocks</span>
-<span class='fu'>visualize_network</span>(<span class='no'>simulated_network</span>)
+<span class='co'># Choose best collapse state</span>
+<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a></span>(<span class='no'>my_sbm</span>, <span class='no'>collapse_results</span>)
 
-<span class='co'># Visualize network with shape encoding the blocks</span>
-<span class='fu'>visualize_network</span>(<span class='no'>simulated_network</span>, <span class='kw'>node_shape_col</span> <span class='kw'>=</span> <span class='st'>'block'</span>, <span class='kw'>node_color_col</span> <span class='kw'>=</span> <span class='st'>'type'</span>)</div></pre>
+<span class='co'># Run MCMC sweeps and track pairs</span>
+<span class='no'>sweep_results</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='mcmc_sweep.html'>mcmc_sweep</a></span>(<span class='no'>my_sbm</span>, <span class='kw'>num_sweeps</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>0.4</span>, <span class='kw'>track_pairs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='co'># Plot connection propensity network</span>
+<span class='fu'>visualize_propensity_network</span>(<span class='no'>sweep_results</span>, <span class='kw'>proportion_threshold</span> <span class='kw'>=</span> <span class='fl'>0.4</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

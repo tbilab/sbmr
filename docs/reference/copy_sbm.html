@@ -155,7 +155,7 @@
 <span class='no'>copied_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>copy_sbm</span>(<span class='no'>initial_sbm</span>)
 
 <span class='co'># Make sure that the state output matches (minus the parent info)</span>
-<span class='no'>remove_parent</span> <span class='kw'>&lt;-</span> <span class='no'>.</span> <span class='kw'>%&gt;%</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span>(-<span class='no'>parent</span>)
+<span class='no'>remove_parent</span> <span class='kw'>&lt;-</span> <span class='no'>.</span> <span class='kw'>%&gt;%</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/dplyr/man/select.html'>select</a></span>(-<span class='no'>parent</span>)
 
 <span class='co'># Two sbm states will be the same</span>
 <span class='fu'><a href='https://rdrr.io/r/base/all.equal.html'>all.equal</a></span>(<span class='fu'><a href='get_state.html'>get_state</a></span>(<span class='no'>copied_sbm</span>),
