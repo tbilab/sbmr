@@ -36,7 +36,7 @@ First we will generate our simulated network. First we set a seed to make the st
 set.seed(312)
 
 n_blocks <- 4    # Total number of blocks
-block_size <- 75 # How many nodes in each block
+block_size <- 50 # How many nodes in each block
 
 network <- sim_basic_block_network(
   n_blocks = n_blocks,     
@@ -247,32 +247,22 @@ sweep_results$pairing_counts %>%
 
 Another method to investigate these block concensus results is to look at the ECDF of the node connection probabilities. 
 
-A good behavior indicating there are strong clusters in your data is an ECDF that has a large flat section in the middle, indicating that almost all of your node connection propensities are close to zero or close to one. We can look at this for our mcmc results as well. 
+A good behavior indicating there are strong clusters in your data is an ECDF that has a large flat section in the middle, indicating that almost all of your node connection propensities are close to zero or close to one. We can look at this for our mcmc results as well. This functionality is supplied with the function `visualize_propensity_dist()`. 
+
 
 ```{r}
-sweep_results$pairing_counts %>% 
-  ggplot(aes(x = proportion_connected)) +
-  stat_ecdf() +
-  ggtitle("Pairwise block concensus proportion distribution")
+visualize_propensity_dist(sweep_results)
 ```
 
 So we see a very strong flat line from zero all the way to a small bump at around 0.65 and then again a sharp bump right at one. This indicates that a few nodes sometimes split off into other groups. 
 
-A last way of looking at this is to create a new network from our data. This time drawing an edge between two nodes if their pairwise connection probability was above some threshold. Once we have this network we can plot it and see if isolated subgraphs appear in the network. Deciding any threshold is fraught with danger, but if we keep it small we should be in the clear. Let's do that with our results...
+A last way of looking at this is to create a new network from our data. This time drawing an edge between two nodes if their pairwise connection probability was above some threshold. Once we have this network we can plot it and see if isolated subgraphs appear in the network. Deciding any threshold is fraught with danger, but if we keep it small we should be in the clear. This investigation is provided with the function `visualize_propensity_network()`.
 
-
+Let's check our MCMC sweep results with it...
 
 ```{r}
-edges <- pairwise_connections %>% 
-  filter(proportion_connected > 0.6) %>% 
-  select(from = node_a, to = node_b)
-
-nodes <- edges %>% 
-  pivot_longer(c(from, to), values_to="id") %>% 
-  distinct(id) %>% 
-  mutate(block = str_remove(id, "_[0-9]*"))
-
-visualize_network(edges, nodes)
+visualize_propensity_network(sweep_results)
 ```
 
-So we can see that we have perfect separation into our true groups. 
+
+So we can see that we have perfect separation into our true groups using this isolated subgraph investigation. 
