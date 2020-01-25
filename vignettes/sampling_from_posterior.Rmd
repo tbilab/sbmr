@@ -228,6 +228,7 @@ sweep_results <- my_sbm %>%
   mcmc_sweep(num_sweeps = 100, eps = 0.5, track_pairs = TRUE)
 ```
 
+Then we can look at the supplied `pairing_counts` dataframe to see how often pairwise nodes are connected to eachother. 
 
 ```{r}
 sweep_results$pairing_counts %>% 
@@ -244,3 +245,34 @@ sweep_results$pairing_counts %>%
        subtitle = glue::glue("True number of blocks: {n_blocks}"))
 ```
 
+Another method to investigate these block concensus results is to look at the ECDF of the node connection probabilities. 
+
+A good behavior indicating there are strong clusters in your data is an ECDF that has a large flat section in the middle, indicating that almost all of your node connection propensities are close to zero or close to one. We can look at this for our mcmc results as well. 
+
+```{r}
+sweep_results$pairing_counts %>% 
+  ggplot(aes(x = proportion_connected)) +
+  stat_ecdf() +
+  ggtitle("Pairwise block concensus proportion distribution")
+```
+
+So we see a very strong flat line from zero all the way to a small bump at around 0.65 and then again a sharp bump right at one. This indicates that a few nodes sometimes split off into other groups. 
+
+A last way of looking at this is to create a new network from our data. This time drawing an edge between two nodes if their pairwise connection probability was above some threshold. Once we have this network we can plot it and see if isolated subgraphs appear in the network. Deciding any threshold is fraught with danger, but if we keep it small we should be in the clear. Let's do that with our results...
+
+
+
+```{r}
+edges <- pairwise_connections %>% 
+  filter(proportion_connected > 0.6) %>% 
+  select(from = node_a, to = node_b)
+
+nodes <- edges %>% 
+  pivot_longer(c(from, to), values_to="id") %>% 
+  distinct(id) %>% 
+  mutate(block = str_remove(id, "_[0-9]*"))
+
+visualize_network(edges, nodes)
+```
+
+So we can see that we have perfect separation into our true groups. 
