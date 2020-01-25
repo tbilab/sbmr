@@ -27,12 +27,17 @@ for the included simulation functions such as
 
 \item{height}{Desired height for output widget.}
 
-\item{node_color_col}{Name of column in the \code{nodes} dataframe that should be encoded with color of nodes in the plot}
+\item{node_color_col}{Name of column in the \code{nodes} dataframe that should be
+encoded with color of nodes in the plot. If this value is numeric (defined
+as more than 10 unique values that are numbers) the network will color
+nodes on a linear scale from the min value to the highest value.}
 
-\item{node_shape_col}{Name of column in the \code{nodes} dataframe that should be encoded with shape of nodes in the plot}
+\item{node_shape_col}{Name of column in the \code{nodes} dataframe that should be
+encoded with shape of nodes in the plot}
 }
 \description{
-Creates a simple interactive network visualization that visually encodes node membership and type (if present) for a passed network.
+Creates a simple interactive network visualization that visually encodes node
+membership and type (if present) for a passed network.
 }
 \examples{
 

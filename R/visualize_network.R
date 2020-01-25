@@ -1,12 +1,17 @@
 #' Visualize network stucture
 #'
-#' Creates a simple interactive network visualization that visually encodes node membership and type (if present) for a passed network.
+#' Creates a simple interactive network visualization that visually encodes node
+#' membership and type (if present) for a passed network.
 #'
 #' @inheritParams create_sbm
 #' @param width Desired width for output widget.
 #' @param height Desired height for output widget.
-#' @param node_color_col Name of column in the `nodes` dataframe that should be encoded with color of nodes in the plot
-#' @param node_shape_col Name of column in the `nodes` dataframe that should be encoded with shape of nodes in the plot
+#' @param node_color_col Name of column in the `nodes` dataframe that should be
+#'   encoded with color of nodes in the plot. If this value is numeric (defined
+#'   as more than 10 unique values that are numbers) the network will color
+#'   nodes on a linear scale from the min value to the highest value.
+#' @param node_shape_col Name of column in the `nodes` dataframe that should be
+#'   encoded with shape of nodes in the plot
 #'
 #' @return NULL
 #' @export

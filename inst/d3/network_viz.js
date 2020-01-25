@@ -45,9 +45,19 @@ if(!nodes[0][shape_col]){
   nodes.forEach(function(node){node[shape_col] = shape_col});
 }
 
+// Try and detect if color column is a numerical continuous value
+const unique_color_vals = unique(nodes.map(d => d[color_col]));
+const color_is_continuous = (unique_color_vals.length > 10) && converts_to_numeric(unique_color_vals[0]);
+
 // Color encodes the node's block
-const Color = d3.scaleOrdinal(d3.schemeCategory10, unique(nodes.map(d => d[color_col])));
-const color_node = node => Color(node[color_col]);
+const Color = color_is_continuous
+  ? d3.scaleLinear().range(["white", "steelblue"]).domain(d3.extent(unique_color_vals))
+  : d3.scaleOrdinal().range(d3.schemeCategory10).domain(unique_color_vals);
+
+const color_node = node => {
+  const color_val = node[color_col];
+  return Color(color_is_continuous ? +color_val : color_val);
+};
 
 // Shape encodes the node's type
 const Shape = d3.scaleOrdinal()
@@ -87,9 +97,11 @@ const node = svg.append("g")
 // Set color of edges
 context.strokeStyle = 'black';
 
-const lowest_opacity = 0.1;
+const lowest_opacity = 0.05;
 // Scale edge opacity based upon how many edges we have
-context.globalAlpha = Math.max(d3.scaleLinear().domain([0,5000]).range([0.5, lowest_opacity])(links.length), lowest_opacity);
+context.globalAlpha = Math.max(d3.scaleLinear()
+                                 .domain([0,10000])
+                                 .range([0.3, lowest_opacity])(links.length), lowest_opacity);
 
 
 // Kickoff simulation
@@ -143,6 +155,9 @@ function drag(simulation){
       .on("end", dragended);
 }
 
+function converts_to_numeric(val){
+  return !isNaN(+val);
+}
 
 function unique (vals){
   return [...new Set(vals)];
