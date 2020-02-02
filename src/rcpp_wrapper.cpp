@@ -319,6 +319,42 @@ class Rcpp_SBM : public SBM {
     return return_to_r;
   }
 
+  DataFrame get_node_edge_counts_at_level(const std::string id,
+                                       const int         node_level        = 0,
+                                       const int         connections_level = 1)
+  {
+    // Grab reference to node
+    NodePtr node;
+    try
+    {
+      /* code */
+      node = get_node_by_id(id, node_level);
+    }
+    catch(const std::exception& e)
+    {
+      stop("Could not find requested node " + id + " at level " + std::to_string(node_level));
+    }
+
+    // Get edges to desired level
+    const NodeEdgeMap node_connections = node->gather_edges_to_level(connections_level);
+    const int         n_connections    = node_connections.size();
+
+    // Build dataframe with these values
+    std::vector<std::string> connection_id;
+    std::vector<int>         connection_count;
+    connection_id.reserve(n_connections);
+    connection_count.reserve(n_connections);
+
+    for (const auto& connection : node_connections) {
+      connection_id.push_back(connection.first->id);
+      connection_count.push_back(connection.second);
+    }
+
+    return DataFrame::create(_["id"]               = connection_id,
+                             _["count"]            = connection_count,
+                             _["stringsAsFactors"] = false);
+  }
+
   void load_from_state(std::vector<string> id,
                        std::vector<string> parent,
                        std::vector<int>    level,
@@ -356,6 +392,9 @@ RCPP_MODULE(SBM)
       .method("get_edges",
               &Rcpp_SBM::get_edges,
               "Returns a from and to columned dataframe of all the edges added to class")
+      .method("get_node_edge_counts_at_level",
+              &Rcpp_SBM::get_node_edge_counts_at_level,
+              "Returns a dataframe with the requested nodes connection counts to all blocks/nodes at a desired level.")
       .method("get_data",
               &Rcpp_SBM::get_data,
               "Returns data needed to construct sbm again from R")
