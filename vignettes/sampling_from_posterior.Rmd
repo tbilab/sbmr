@@ -129,19 +129,7 @@ num_sweeps <- 20
 
 sweep_results <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps, eps = 0.1, track_pairs = FALSE)
 
-sweep_df <- sweep_results$sweep_info %>% 
-  mutate(sweep = 1:n(),
-         label = 'eps = 0.1') %>% 
-  pivot_longer(entropy_delta:num_nodes_moved)
-
-plot_sweep_results <- function(sweep_results_df){
-   sweep_results_df %>% 
-    ggplot(aes(x = sweep, y = value)) +
-    geom_line() +
-    facet_grid(name~., scales = "free_y")
-}
-
-plot_sweep_results(sweep_df) +
+visualize_mcmc_trace(sweep_results) +
   labs(
     title = glue::glue('Result of {num_sweeps} MCMC sweeps'),
     subtitle = "Entropy Delta of sweep and number of nodes moved for sweep"
@@ -157,18 +145,11 @@ num_sweeps <- 20
 
 sweep_results <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps, eps = 4, track_pairs = FALSE)
 
-sweep_df <- sweep_results$sweep_info %>% 
-  mutate(sweep = 1:n(),
-         label = 'eps = 1') %>% 
-  pivot_longer(entropy_delta:num_nodes_moved)
-
-
-plot_sweep_results(sweep_df) +
+visualize_mcmc_trace(sweep_results) +
   labs(
-    title = glue::glue('Result of {num_sweeps} MCMC sweeps'),
+    title = glue::glue('Result of {num_sweeps} MCMC sweeps, eps = 4'),
     subtitle = "Entropy Delta of sweep and number of nodes moved for sweep"
   )
-
 ```
 
 
