@@ -320,18 +320,16 @@ class Rcpp_SBM : public SBM {
   }
 
   DataFrame get_node_edge_counts_at_level(const std::string id,
-                                       const int         node_level        = 0,
-                                       const int         connections_level = 1)
+                                          const int         node_level        = 0,
+                                          const int         connections_level = 1)
   {
     // Grab reference to node
     NodePtr node;
-    try
-    {
+    try {
       /* code */
       node = get_node_by_id(id, node_level);
     }
-    catch(const std::exception& e)
-    {
+    catch (const std::exception& e) {
       stop("Could not find requested node " + id + " at level " + std::to_string(node_level));
     }
 
@@ -355,6 +353,41 @@ class Rcpp_SBM : public SBM {
                              _["stringsAsFactors"] = false);
   }
 
+  DataFrame get_block_edge_counts(const int level = 1)
+  {
+    // Make sure we have blocks at the level asked for before proceeding
+    if (nodes.count(level) == 0){
+      stop("Model has no blocks at level " + std::to_string(level));
+    }
+
+    // Gather to our block_edge to count map
+    std::map<Edge, int> block_edge_counts = Network::gather_block_counts_at_level(level);
+
+    const int n_pairs = block_edge_counts.size();
+
+    // Initialize some vectors to return results with
+    // Build dataframe with these values
+    std::vector<std::string> block_a;
+    std::vector<std::string> block_b;
+    std::vector<int>         counts;
+    block_a.reserve(n_pairs);
+    block_b.reserve(n_pairs);
+    counts.reserve(n_pairs);
+
+    // Fill in
+    for (const auto& block_edge : block_edge_counts) {
+      block_a.push_back(block_edge.first.node_a->id);
+      block_b.push_back(block_edge.first.node_b->id);
+      counts.push_back(block_edge.second);
+    }
+
+    // Return
+    return DataFrame::create(_["block_a"]          = block_a,
+                             _["block_b"]          = block_b,
+                             _["count"]            = counts,
+                             _["stringsAsFactors"] = false);
+  }
+
   void load_from_state(std::vector<string> id,
                        std::vector<string> parent,
                        std::vector<int>    level,
@@ -365,6 +398,8 @@ class Rcpp_SBM : public SBM {
     // pass the constructed state to load_state function
     SBM::load_from_state(State_Dump(id, parent, level, type_to_int(string_types)));
   }
+
+
 
 };
 
@@ -395,6 +430,9 @@ RCPP_MODULE(SBM)
       .method("get_node_edge_counts_at_level",
               &Rcpp_SBM::get_node_edge_counts_at_level,
               "Returns a dataframe with the requested nodes connection counts to all blocks/nodes at a desired level.")
+      .method("get_block_edge_counts",
+              &Rcpp_SBM::get_block_edge_counts,
+              "Returns a dataframe of counts of edges between all connected pairs of blocks at given level.")
       .method("get_data",
               &Rcpp_SBM::get_data,
               "Returns data needed to construct sbm again from R")
