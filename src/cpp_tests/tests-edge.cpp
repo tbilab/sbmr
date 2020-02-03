@@ -6,24 +6,13 @@ typedef std::shared_ptr<Node> NodePtr;
 
 TEST_CASE("Edge attributes filled in properly", "[Edge]")
 {
-  NodePtr n1 = std::make_shared<Node>("n1", 0, 1);
-  NodePtr n2 = std::make_shared<Node>("n2", 0, 1);
-  NodePtr n3 = std::make_shared<Node>("n3", 0, 1);
-  NodePtr m1 = std::make_shared<Node>("m1", 0, 2);
-  NodePtr m2 = std::make_shared<Node>("m2", 0, 2);
-  NodePtr m3 = std::make_shared<Node>("m3", 0, 2);
-  NodePtr c1 = std::make_shared<Node>("c1", 1, 1);
-  NodePtr c2 = std::make_shared<Node>("c2", 1, 1);
-  NodePtr d1 = std::make_shared<Node>("d1", 1, 2);
-  NodePtr d2 = std::make_shared<Node>("d2", 1, 2);
-
-  n1->set_parent(c1);
-  n2->set_parent(c1);
-  n3->set_parent(c2);
-
-  m1->set_parent(d1);
-  m2->set_parent(d2);
-  m3->set_parent(d2);
+  NodePtr n1 = std::make_shared<Node>("n1", 0);
+  NodePtr n2 = std::make_shared<Node>("n2", 0);
+  NodePtr a1 = std::make_shared<Node>("a1", 1);
+  NodePtr b1 = std::make_shared<Node>("b1", 1);
+ 
+  n1->set_parent(b1);
+  n2->set_parent(a1);
 
   // Build basic edge between two nodes
   const Edge n1_to_n2 = Edge(n1, n2);
@@ -34,4 +23,10 @@ TEST_CASE("Edge attributes filled in properly", "[Edge]")
 
   // Make sure that the construction of the string for the edge id went okay
   REQUIRE(n1_to_n2.pair_id == "n1--n2");
+
+  // Make sure that we can project the edge to the next level and it works properly there as well
+  const Edge edge_at_l1 = n1_to_n2.at_level(1);
+  REQUIRE(edge_at_l1.node_a->id == "a1");
+  REQUIRE(edge_at_l1.node_b->id == "b1");
+  REQUIRE(edge_at_l1.pair_id == "a1--b1");
 }
