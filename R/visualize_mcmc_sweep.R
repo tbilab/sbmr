@@ -28,7 +28,7 @@ visualize_mcmc_trace <- function(sweep_results){
 
   sweep_results$sweep_info %>%
     dplyr::mutate(sweep = 1:n()) %>%
-    dplyr::pivot_longer(entropy_delta:num_nodes_moved) %>%
+    tidyr::pivot_longer(entropy_delta:num_nodes_moved) %>%
       ggplot2::ggplot(ggplot2::aes(x = sweep, y = value)) +
       ggplot2::geom_line() +
       ggplot2::facet_grid(name~., scales = "free_y")
