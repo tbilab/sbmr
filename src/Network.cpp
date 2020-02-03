@@ -151,16 +151,6 @@ NodeVec Network::get_nodes_of_type_at_level(const int type, const int level)
 }
 
 // =============================================================================
-// Adds a edge between two nodes based on their ids
-// =============================================================================
-void Network::add_edge(const string node1_id, const string node2_id)
-{
-  PROFILE_FUNCTION();
-
-  Node::connect_nodes(get_node_by_id(node1_id), get_node_by_id(node2_id));
-};
-
-// =============================================================================
 // Adds a edge between two nodes based on their references
 // =============================================================================
 void Network::add_edge(const NodePtr node1, const NodePtr node2)
@@ -168,6 +158,15 @@ void Network::add_edge(const NodePtr node1, const NodePtr node2)
   PROFILE_FUNCTION();
   Node::connect_nodes(node1, node2);   // Connect nodes to eachother
   edges.push_back(Edge(node1, node2)); // Add edge to edge tracking list
+};
+
+// =============================================================================
+// Adds a edge between two nodes based on their ids
+// =============================================================================
+void Network::add_edge(const string node1_id, const string node2_id)
+{
+  PROFILE_FUNCTION();
+  Network::add_edge(get_node_by_id(node1_id), get_node_by_id(node2_id));
 };
 
 // =============================================================================
