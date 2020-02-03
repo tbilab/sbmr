@@ -15,7 +15,7 @@ network <- sim_basic_block_network(
   return_edge_propensities = TRUE
 )
 
-my_sbm <- create_sbm(network, eps = 0.01) %>%
+sbm <- create_sbm(network) %>%
   initialize_blocks(n_blocks)
 
 # start_entropy <- my_sbm %>% compute_entropy()
