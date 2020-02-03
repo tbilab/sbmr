@@ -24,7 +24,7 @@ TEST_CASE("Edge attributes filled in properly", "[Edge]")
   // Make sure that the construction of the string for the edge id went okay
   REQUIRE(n1_to_n2.pair_id == "n1--n2");
 
-  // Make sure that we can project the edge to the next level and it works properly there as well
+  // Make sure that we can project the edge to the next level and it works properly
   const Edge edge_at_l1 = n1_to_n2.at_level(1);
   REQUIRE(edge_at_l1.node_a->id == "a1");
   REQUIRE(edge_at_l1.node_b->id == "b1");
