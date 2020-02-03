@@ -330,19 +330,31 @@ double SBM::compute_entropy(const int level)
   // Now calculate the edge entropy betweeen nodes.
   double edge_entropy = 0.0;
 
-  for (const auto& block : *block_level) {
-    // First we collapse the nodes edge counts to all it's neighbors
-    const NodeEdgeMap block_edge_counts = block.second->gather_edges_to_level(block.second->level);
-    const int         block_degree      = block.second->degree;
+  // Gather block-to-block edge counts
+  const std::map<Edge, int> block_edges = gather_block_counts_at_level(level + 1);
+  for (const auto& block_edge : block_edges) {
+    const NodePtr block_r = block_edge.first.node_a;
+    const NodePtr block_s = block_edge.first.node_b;
 
-    // Next we loop over this edge counts list
-    for (const auto& neighbor_group_edges : block_edge_counts) {
-      edge_entropy += partial_entropy(neighbor_group_edges.second, (neighbor_group_edges.first)->degree, block_degree);
+    if (block_r == block_s) {
+      // Double self-edge counts (we're looking at half-edges)
+      // and downweight contribution by half as they get seen the proper
+      // number of times as compared to the others which are getting seen
+      // half as much as we would expect due to non-duplicating pairs
+      edge_entropy += partial_entropy(block_edge.second * 2,
+                                      block_r->degree,
+                                      block_s->degree)
+          / 2;
+    }
+    else {
+      edge_entropy += partial_entropy(block_edge.second,
+                                      block_r->degree,
+                                      block_s->degree);
     }
   }
 
   // Add three components together to return
-  return -1 * (n_total_edges + degree_summation + edge_entropy / 2);
+  return -1 * (n_total_edges + degree_summation + edge_entropy);
 }
 
 // =============================================================================
