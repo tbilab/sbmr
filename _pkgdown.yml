@@ -19,7 +19,7 @@ reference:
   - collapse_blocks
   - collapse_run
   - choose_best_collapse_state
-  - compute_entropy
+  - get_entropy
   - sample_posterior
 - title: Visualization
   desc: Functions to visualize the structure of network and/or results of modeling

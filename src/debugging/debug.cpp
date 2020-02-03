@@ -12,7 +12,7 @@ int main(int argc, char** argv)
   SBM my_SBM = build_simple_SBM();
 
   int    num_initial_blocks = my_SBM.get_level(1)->size();
-  double initial_entropy    = my_SBM.compute_entropy(0);
+  double initial_entropy    = my_SBM.get_entropy(0);
 
   // Run greedy aglomerative merge with best single merge done
   Merge_Step single_merge = my_SBM.agglomerative_merge(1, 1);

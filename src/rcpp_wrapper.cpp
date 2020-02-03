@@ -169,12 +169,12 @@ class Rcpp_SBM : public SBM {
     Network::initialize_blocks(num_blocks, level);
   }
 
-  double compute_entropy(const int level)
+  double get_entropy(const int level)
   {
     if (get_level(level + 1)->size() == 0){
       stop("Can't compute entropy for model with no current block structure.");
     }
-    return SBM::compute_entropy(level);
+    return SBM::get_entropy(level);
   }
 
   // Sets up all the initial values for the node pair tracking structure
@@ -439,8 +439,8 @@ RCPP_MODULE(SBM)
       .method("load_from_state",
               &Rcpp_SBM::load_from_state,
               "Takes model state export as given by SBM$get_state() and returns model to specified state. This is useful for resetting model before running various algorithms such as agglomerative merging.")
-      .method("compute_entropy",
-              &Rcpp_SBM::compute_entropy,
+      .method("get_entropy",
+              &Rcpp_SBM::get_entropy,
               "Computes the (degree-corrected) entropy for the network at the specified level (int).")
       .method("mcmc_sweep",
               &Rcpp_SBM::mcmc_sweep,
@@ -489,7 +489,7 @@ sbm$set_node_parent("b3", "b12", 0)
 original_state <- sbm$get_state()
 
 for(i in 1:10){
-  entro_pre <- sbm$compute_entropy(0L)
+  entro_pre <- sbm$get_entropy(0L)
   blocks_moved <- sbm$mcmc_sweep(0L,FALSE)
   print(paste("started with entropy of", entro_pre, "and moved", blocks_moved))
 }
@@ -520,7 +520,7 @@ load_state(sbm, original_state)
 # sbm$get_state()
 # sbm$mcmc_sweep(0L,FALSE)
 # sbm$mcmc_sweep(0L,FALSE)
-# sbm$compute_entropy(0L)
+# sbm$get_entropy(0L)
 
 
 */

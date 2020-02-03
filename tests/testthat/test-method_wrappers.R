@@ -231,13 +231,13 @@ test_that("computing entropy", {
     set_node_parent(child_id = 'node_3', parent_id = 'node_12') %>%
     set_node_parent(child_id = 'node_4', parent_id = 'node_13')
 
-  first_entropy <- my_sbm %>% compute_entropy()
+  first_entropy <- my_sbm %>% get_entropy()
 
   # Change parentage of a node
   my_sbm %>% set_node_parent(child_id = 'node_2', parent_id = 'node_12')
 
   # Record entropy again
-  second_entropy <- my_sbm %>% compute_entropy()
+  second_entropy <- my_sbm %>% get_entropy()
 
   # Entropy should have changed
   expect_false(first_entropy == second_entropy)

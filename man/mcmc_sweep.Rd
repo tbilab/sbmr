@@ -62,7 +62,7 @@ my_sbm <- create_sbm(sim_basic_block_network(n_blocks = n_blocks, n_nodes_per_bl
   initialize_blocks(num_blocks = n_blocks)
 
 # Calculate entropy with random blocks
-compute_entropy(my_sbm)
+get_entropy(my_sbm)
 
 # Run 4 MCMC sweeps
 sweep_results <- my_sbm \%>\% mcmc_sweep(num_sweeps = 4, variable_num_blocks = FALSE)

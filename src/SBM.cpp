@@ -281,7 +281,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int    level,
 // Compute microcononical entropy of current model state
 // Note that this is currently only the degree corrected entropy
 // =============================================================================
-double SBM::compute_entropy(const int level)
+double SBM::get_entropy(const int level)
 {
   PROFILE_FUNCTION();
   //============================================================================
@@ -576,7 +576,7 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
   give_every_node_at_level_own_block(block_level);
 
   // Calculate initial entropy for model before merging is done
-  const double initial_entropy = compute_entropy(node_level);
+  const double initial_entropy = get_entropy(node_level);
 
   // Grab reference to the block nodes container
   const LevelPtr block_level_ptr = get_level(block_level);
