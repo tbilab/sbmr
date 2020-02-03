@@ -11,7 +11,7 @@ class Edge {
       : node_a(a->id < b->id ? a : b), node_b(a->id < b->id ? b : a), pair_id(node_a->id + "--" + node_b->id)
   {
   }
-  inline Edge at_level(const int level)
+  inline Edge at_level(const int level) const
   {
     // Project edge to desired level
     return Edge(node_a->get_parent_at_level(level),
