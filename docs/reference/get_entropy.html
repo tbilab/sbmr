@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create a new instance of an SBM model — create_sbm • sbmR</title>
+<title>Compute entropy for current model state — get_entropy • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,9 +35,9 @@
 
 
 
-<meta property="og:title" content="Create a new instance of an SBM model — create_sbm" />
-<meta property="og:description" content="Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
-can be provided to give information about node type." />
+<meta property="og:title" content="Compute entropy for current model state — get_entropy" />
+<meta property="og:description" content="Computes the (degree-corrected) entropy for the network at the specified
+level (int)." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -116,54 +116,56 @@ can be provided to give information about node type." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create a new instance of an SBM model</h1>
+    <h1>Compute entropy for current model state</h1>
     
-    <div class="hidden name"><code>create_sbm.Rd</code></div>
+    <div class="hidden name"><code>get_entropy.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
-can be provided to give information about node type.</p>
+    <p>Computes the (degree-corrected) entropy for the network at the specified
+level (int).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_sbm</span>(<span class='kw'>edges</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>from_col</span> <span class='kw'>=</span> <span class='no'>from</span>, <span class='kw'>to_col</span> <span class='kw'>=</span> <span class='no'>to</span>)</pre>
+    <pre class="usage"><span class='fu'>get_entropy</span>(<span class='no'>sbm</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>edges</th>
-      <td><p>Dataframe with a from and two column encoding edges between
-string node ids (direction does not matter). A list containing both a
-<code>nodes</code> and <code>edges</code> dataframe can be passed to avoid having to unpack a
-list of nodes and edges to the arguments of the same name. This is helpful
-for the included simulation functions such as
-<code><a href='sim_sbm_network.html'>sim_sbm_network</a></code>.</p></td>
+      <th>sbm</th>
+      <td><p>SBM model object as created by <code><a href='create_sbm.html'>create_sbm()</a></code>.</p></td>
     </tr>
     <tr>
-      <th>nodes</th>
-      <td><p>Optional dataframe that links a node <code>id</code> to its <code>type</code>, for when model is polypartite.</p></td>
-    </tr>
-    <tr>
-      <th>from_col</th>
-      <td><p>Name of the from column for edges</p></td>
-    </tr>
-    <tr>
-      <th>to_col</th>
-      <td><p>Name of the to column for edges</p></td>
+      <th>level</th>
+      <td><p>Level of nodes for which block entropy is accessed. E.g. the
+default value of <code>0</code> will get entropy of model as described by the blocks
+in level <code>1</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Instance of SBM class.</p>
+    <p>Entropy value (numeric).</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Create an simple empty model</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>create_sbm</span>()
+    <pre class="examples"><div class='input'>
+<span class='co'># Build basic network with 3 nodes and two blocks</span>
+<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>() <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='add_node.html'>add_node</a></span>(<span class='st'>'node_1'</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='add_node.html'>add_node</a></span>(<span class='st'>'node_2'</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='add_node.html'>add_node</a></span>(<span class='st'>'node_3'</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='add_node.html'>add_node</a></span>(<span class='st'>'node_11'</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>1</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='add_node.html'>add_node</a></span>(<span class='st'>'node_12'</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>1</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='add_edge.html'>add_edge</a></span>(<span class='st'>'node_1'</span>, <span class='st'>'node_2'</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='add_edge.html'>add_edge</a></span>(<span class='st'>'node_1'</span>, <span class='st'>'node_3'</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='add_edge.html'>add_edge</a></span>(<span class='st'>'node_2'</span>, <span class='st'>'node_3'</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='set_node_parent.html'>set_node_parent</a></span>(<span class='kw'>child_id</span> <span class='kw'>=</span> <span class='st'>'node_1'</span>, <span class='kw'>parent_id</span> <span class='kw'>=</span> <span class='st'>'node_11'</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='set_node_parent.html'>set_node_parent</a></span>(<span class='kw'>child_id</span> <span class='kw'>=</span> <span class='st'>'node_2'</span>, <span class='kw'>parent_id</span> <span class='kw'>=</span> <span class='st'>'node_11'</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='set_node_parent.html'>set_node_parent</a></span>(<span class='kw'>child_id</span> <span class='kw'>=</span> <span class='st'>'node_3'</span>, <span class='kw'>parent_id</span> <span class='kw'>=</span> <span class='st'>'node_12'</span>)
 
-<span class='co'># Create model from simple simulated data</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>create_sbm</span>(<span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>25</span>))</div></pre>
+<span class='co'># Compute entropy of network</span>
+<span class='fu'>get_entropy</span>(<span class='no'>my_sbm</span>)</div><div class='output co'>#&gt; [1] -0.2274113</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

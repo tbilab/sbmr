@@ -42,7 +42,7 @@ network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25)
 
 # Run agglomerative clustering with no intermediate MCMC steps on sbm of simulated data
 collapse_results <- create_sbm(network) \%>\%
-  collapse_run(sigma = 3, start_block_num = 1, end_block_num = 8)
+  collapse_blocks(sigma = 2)
 
 # =============================================================================
 # Visualize using no heuristic

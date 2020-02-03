@@ -21,7 +21,7 @@
 #' my_sbm <- create_sbm(network)
 #'
 #' # Run agglomerative clustering with no intermediate MCMC steps on network
-#' collapse_results <- collapse_run(my_sbm, sigma = 3, start_block_num = 1, end_block_num = 6)
+#' collapse_results <- collapse_run(my_sbm, sigma = 3, num_final_blocks = 1:6)
 #'
 #' # Choose best result with default heuristic
 #' my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, verbose = TRUE)

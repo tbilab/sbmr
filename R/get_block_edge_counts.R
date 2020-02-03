@@ -2,7 +2,8 @@
 #'
 #' Returns a dataframe with all pairs of blocks at the desired level and the number of edges between them. Unconnected blocks are ommitted for space savings.
 #'
-#' @inheritParams get_node_edge_counts_at_level
+#' @seealso \code{\link{get_node_edge_counts}}
+#' @inheritParams get_node_to_block_edge_counts
 #'
 #' @return Dataframe of block pairs (`block_a` and `block_b`) and the number of edges between them (`count`).
 #' @export
