@@ -166,7 +166,8 @@ void Network::add_edge(const string node1_id, const string node2_id)
 void Network::add_edge(const NodePtr node1, const NodePtr node2)
 {
   PROFILE_FUNCTION();
-  Node::connect_nodes(node1, node2);
+  Node::connect_nodes(node1, node2);   // Connect nodes to eachother
+  edges.push_back(Edge(node1, node2)); // Add edge to edge tracking list
 };
 
 // =============================================================================
@@ -396,4 +397,17 @@ void Network::load_from_state(const State_Dump state)
   // Now clean up any potentially childless nodes that got kicked
   // out by this process
   clean_empty_blocks();
+}
+
+
+// Gathers counts of edges between all pairs of connected blocks in network
+std::map<Edge, int> Network::gather_block_counts_at_level(const int level){
+  std::map<Edge, int> block_counts;
+  
+  // Loop through edges and gather at desired level
+  for (auto& edge : edges) {
+    block_counts[edge.at_level(level)]++;
+  }
+
+  return block_counts;
 }
