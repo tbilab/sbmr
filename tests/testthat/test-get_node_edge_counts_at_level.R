@@ -16,7 +16,7 @@ test_that("Correct edge counts returned", {
   # Loop over all nodes and make sure they are not connected to any nodes they
   # shouldnt be and that they have reasonable edge counts
   node_ids %>% purrr::walk(function(node_id){
-    nodes_connections <- sbm %>% get_node_edge_counts_at_level(node_id)
+    nodes_connections <- sbm %>% get_node_to_block_edge_counts(node_id)
 
     expect_true(
       all(nodes_connections$id %in% block_ids)

@@ -25,3 +25,6 @@ sbm <- sim_basic_block_network(n_blocks = 5) \%>\%
 sbm \%>\% get_block_edge_counts(1)
 
 }
+\seealso{
+\code{\link{get_node_edge_counts}}
+}

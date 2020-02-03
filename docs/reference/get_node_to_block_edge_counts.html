@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create a new instance of an SBM model — create_sbm • sbmR</title>
+<title>Get node's edge counts to blocks — get_node_to_block_edge_counts • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,9 +35,10 @@
 
 
 
-<meta property="og:title" content="Create a new instance of an SBM model — create_sbm" />
-<meta property="og:description" content="Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
-can be provided to give information about node type." />
+<meta property="og:title" content="Get node's edge counts to blocks — get_node_to_block_edge_counts" />
+<meta property="og:description" content="For a given node in an SBM, returns a dataframe of each block (or node) that
+the desired node is connected to and how many connections they have to that
+block." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -116,60 +117,70 @@ can be provided to give information about node type." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create a new instance of an SBM model</h1>
+    <h1>Get node's edge counts to blocks</h1>
     
-    <div class="hidden name"><code>create_sbm.Rd</code></div>
+    <div class="hidden name"><code>get_node_to_block_edge_counts.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Build an SBM instance from dataframe of edges. Optionally a nodes dataframe
-can be provided to give information about node type.</p>
+    <p>For a given node in an SBM, returns a dataframe of each block (or node) that
+the desired node is connected to and how many connections they have to that
+block.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>create_sbm</span>(<span class='kw'>edges</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>from_col</span> <span class='kw'>=</span> <span class='no'>from</span>, <span class='kw'>to_col</span> <span class='kw'>=</span> <span class='no'>to</span>)</pre>
+    <pre class="usage"><span class='fu'>get_node_to_block_edge_counts</span>(
+  <span class='no'>sbm</span>,
+  <span class='no'>node_id</span>,
+  <span class='kw'>connection_level</span> <span class='kw'>=</span> <span class='fl'>1L</span>,
+  <span class='kw'>node_level</span> <span class='kw'>=</span> <span class='fl'>0L</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>edges</th>
-      <td><p>Dataframe with a from and two column encoding edges between
-string node ids (direction does not matter). A list containing both a
-<code>nodes</code> and <code>edges</code> dataframe can be passed to avoid having to unpack a
-list of nodes and edges to the arguments of the same name. This is helpful
-for the included simulation functions such as
-<code><a href='sim_sbm_network.html'>sim_sbm_network</a></code>.</p></td>
+      <th>sbm</th>
+      <td><p>SBM model object as created by <code><a href='create_sbm.html'>create_sbm()</a></code>.</p></td>
     </tr>
     <tr>
-      <th>nodes</th>
-      <td><p>Optional dataframe that links a node <code>id</code> to its <code>type</code>, for when model is polypartite.</p></td>
+      <th>node_id</th>
+      <td><p>String identifying the node that edge counts are desired for</p></td>
     </tr>
     <tr>
-      <th>from_col</th>
-      <td><p>Name of the from column for edges</p></td>
-    </tr>
-    <tr>
-      <th>to_col</th>
-      <td><p>Name of the to column for edges</p></td>
+      <th>connection_level</th>
+      <td><p>Level of blocks to get connections to. E.g. <code>1</code> = node block level, <code>0</code> = connections to other nodes.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Instance of SBM class.</p>
+    <p>Dataframe with two columns: <code>id</code> for the id of the node/block connected to, and <code>count</code> for the number of connections between.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code><a href='get_block_edge_counts.html'>get_block_edge_counts</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Create an simple empty model</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>create_sbm</span>()
+    <pre class="examples"><div class='input'>
+<span class='co'># Initialize a random network and assign random blocks</span>
+<span class='no'>sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>5</span>) <span class='kw'>%&gt;%</span>
+<span class='fu'><a href='create_sbm.html'>create_sbm</a></span>() <span class='kw'>%&gt;%</span>
+<span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='fl'>5</span>)
 
-<span class='co'># Create model from simple simulated data</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>create_sbm</span>(<span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>25</span>))</div></pre>
+<span class='co'># Gather edge counts for a node in the network</span>
+<span class='no'>sbm</span> <span class='kw'>%&gt;%</span> <span class='fu'>get_node_to_block_edge_counts</span>(<span class='st'>"g1_1"</span>)</div><div class='output co'>#&gt;      id count
+#&gt; 1 0-1_0     1
+#&gt; 2 0-1_2     3
+#&gt; 3 0-1_3     1
+#&gt; 4 0-1_1     4
+#&gt; 5 0-1_4     4</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

@@ -25,9 +25,9 @@
 #' visualize_mcmc_trace(sweep_results)
 #'
 visualize_mcmc_trace <- function(sweep_results){
-
+  N <- nrow(sweep_results$sweep_info)
   sweep_results$sweep_info %>%
-    dplyr::mutate(sweep = 1:n()) %>%
+    dplyr::mutate(sweep = 1:N) %>%
     tidyr::pivot_longer(entropy_delta:num_nodes_moved) %>%
       ggplot2::ggplot(ggplot2::aes(x = sweep, y = value)) +
       ggplot2::geom_line() +

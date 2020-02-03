@@ -12,6 +12,8 @@ reference:
   - initialize_blocks
   - get_state
   - load_from_state
+  - get_block_edge_counts
+  - get_node_to_block_edge_counts
 - title: Modeling
   desc: Function to fit or investigate fit of SBM model
   contents:
@@ -34,5 +36,4 @@ reference:
   contents:
   - build_score_fn
   - rolling_mean
-  - get_combination_indices
   - sbmR-package

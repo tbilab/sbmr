@@ -17,8 +17,8 @@
 #' @export
 #'
 #' @examples
-#' # Create an empty model with modified epsilon parameter
-#' my_sbm <- create_sbm(eps = 0.4)
+#' # Create an simple empty model
+#' my_sbm <- create_sbm()
 #'
 #' # Create model from simple simulated data
 #' my_sbm <- create_sbm(sim_basic_block_network(n_blocks = 2, n_nodes_per_block = 25))

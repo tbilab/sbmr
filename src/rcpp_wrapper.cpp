@@ -319,7 +319,7 @@ class Rcpp_SBM : public SBM {
     return return_to_r;
   }
 
-  DataFrame get_node_edge_counts_at_level(const std::string id,
+  DataFrame get_node_to_block_edge_counts(const std::string id,
                                           const int         node_level        = 0,
                                           const int         connections_level = 1)
   {
@@ -427,8 +427,8 @@ RCPP_MODULE(SBM)
       .method("get_edges",
               &Rcpp_SBM::get_edges,
               "Returns a from and to columned dataframe of all the edges added to class")
-      .method("get_node_edge_counts_at_level",
-              &Rcpp_SBM::get_node_edge_counts_at_level,
+      .method("get_node_to_block_edge_counts",
+              &Rcpp_SBM::get_node_to_block_edge_counts,
               "Returns a dataframe with the requested nodes connection counts to all blocks/nodes at a desired level.")
       .method("get_block_edge_counts",
               &Rcpp_SBM::get_block_edge_counts,
