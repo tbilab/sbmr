@@ -169,12 +169,12 @@ class Rcpp_SBM : public SBM {
     Network::initialize_blocks(num_blocks, level);
   }
 
-  double compute_entropy(const int level)
+  double get_entropy(const int level)
   {
     if (get_level(level + 1)->size() == 0){
       stop("Can't compute entropy for model with no current block structure.");
     }
-    return SBM::compute_entropy(level);
+    return SBM::get_entropy(level);
   }
 
   // Sets up all the initial values for the node pair tracking structure
@@ -319,6 +319,75 @@ class Rcpp_SBM : public SBM {
     return return_to_r;
   }
 
+  DataFrame get_node_to_block_edge_counts(const std::string id,
+                                          const int         node_level        = 0,
+                                          const int         connections_level = 1)
+  {
+    // Grab reference to node
+    NodePtr node;
+    try {
+      /* code */
+      node = get_node_by_id(id, node_level);
+    }
+    catch (const std::exception& e) {
+      stop("Could not find requested node " + id + " at level " + std::to_string(node_level));
+    }
+
+    // Get edges to desired level
+    const NodeEdgeMap node_connections = node->gather_edges_to_level(connections_level);
+    const int         n_connections    = node_connections.size();
+
+    // Build dataframe with these values
+    std::vector<std::string> connection_id;
+    std::vector<int>         connection_count;
+    connection_id.reserve(n_connections);
+    connection_count.reserve(n_connections);
+
+    for (const auto& connection : node_connections) {
+      connection_id.push_back(connection.first->id);
+      connection_count.push_back(connection.second);
+    }
+
+    return DataFrame::create(_["id"]               = connection_id,
+                             _["count"]            = connection_count,
+                             _["stringsAsFactors"] = false);
+  }
+
+  DataFrame get_block_edge_counts(const int level = 1)
+  {
+    // Make sure we have blocks at the level asked for before proceeding
+    if (nodes.count(level) == 0){
+      stop("Model has no blocks at level " + std::to_string(level));
+    }
+
+    // Gather to our block_edge to count map
+    std::map<Edge, int> block_edge_counts = Network::gather_block_counts_at_level(level);
+
+    const int n_pairs = block_edge_counts.size();
+
+    // Initialize some vectors to return results with
+    // Build dataframe with these values
+    std::vector<std::string> block_a;
+    std::vector<std::string> block_b;
+    std::vector<int>         counts;
+    block_a.reserve(n_pairs);
+    block_b.reserve(n_pairs);
+    counts.reserve(n_pairs);
+
+    // Fill in
+    for (const auto& block_edge : block_edge_counts) {
+      block_a.push_back(block_edge.first.node_a->id);
+      block_b.push_back(block_edge.first.node_b->id);
+      counts.push_back(block_edge.second);
+    }
+
+    // Return
+    return DataFrame::create(_["block_a"]          = block_a,
+                             _["block_b"]          = block_b,
+                             _["count"]            = counts,
+                             _["stringsAsFactors"] = false);
+  }
+
   void load_from_state(std::vector<string> id,
                        std::vector<string> parent,
                        std::vector<int>    level,
@@ -329,6 +398,8 @@ class Rcpp_SBM : public SBM {
     // pass the constructed state to load_state function
     SBM::load_from_state(State_Dump(id, parent, level, type_to_int(string_types)));
   }
+
+
 
 };
 
@@ -356,14 +427,20 @@ RCPP_MODULE(SBM)
       .method("get_edges",
               &Rcpp_SBM::get_edges,
               "Returns a from and to columned dataframe of all the edges added to class")
+      .method("get_node_to_block_edge_counts",
+              &Rcpp_SBM::get_node_to_block_edge_counts,
+              "Returns a dataframe with the requested nodes connection counts to all blocks/nodes at a desired level.")
+      .method("get_block_edge_counts",
+              &Rcpp_SBM::get_block_edge_counts,
+              "Returns a dataframe of counts of edges between all connected pairs of blocks at given level.")
       .method("get_data",
               &Rcpp_SBM::get_data,
               "Returns data needed to construct sbm again from R")
       .method("load_from_state",
               &Rcpp_SBM::load_from_state,
               "Takes model state export as given by SBM$get_state() and returns model to specified state. This is useful for resetting model before running various algorithms such as agglomerative merging.")
-      .method("compute_entropy",
-              &Rcpp_SBM::compute_entropy,
+      .method("get_entropy",
+              &Rcpp_SBM::get_entropy,
               "Computes the (degree-corrected) entropy for the network at the specified level (int).")
       .method("mcmc_sweep",
               &Rcpp_SBM::mcmc_sweep,
@@ -412,7 +489,7 @@ sbm$set_node_parent("b3", "b12", 0)
 original_state <- sbm$get_state()
 
 for(i in 1:10){
-  entro_pre <- sbm$compute_entropy(0L)
+  entro_pre <- sbm$get_entropy(0L)
   blocks_moved <- sbm$mcmc_sweep(0L,FALSE)
   print(paste("started with entropy of", entro_pre, "and moved", blocks_moved))
 }
@@ -443,7 +520,7 @@ load_state(sbm, original_state)
 # sbm$get_state()
 # sbm$mcmc_sweep(0L,FALSE)
 # sbm$mcmc_sweep(0L,FALSE)
-# sbm$compute_entropy(0L)
+# sbm$get_entropy(0L)
 
 
 */

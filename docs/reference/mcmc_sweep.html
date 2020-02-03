@@ -203,7 +203,7 @@ new groups in that sweep. If <code>track_pairs = TRUE</code>, then an additional
   <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='kw'>num_blocks</span> <span class='kw'>=</span> <span class='no'>n_blocks</span>)
 
 <span class='co'># Calculate entropy with random blocks</span>
-<span class='fu'><a href='compute_entropy.html'>compute_entropy</a></span>(<span class='no'>my_sbm</span>)</div><div class='output co'>#&gt; [1] 752.6645</div><div class='input'>
+<span class='fu'><a href='get_entropy.html'>get_entropy</a></span>(<span class='no'>my_sbm</span>)</div><div class='output co'>#&gt; [1] 752.6645</div><div class='input'>
 <span class='co'># Run 4 MCMC sweeps</span>
 <span class='no'>sweep_results</span> <span class='kw'>&lt;-</span> <span class='no'>my_sbm</span> <span class='kw'>%&gt;%</span> <span class='fu'>mcmc_sweep</span>(<span class='kw'>num_sweeps</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>variable_num_blocks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 

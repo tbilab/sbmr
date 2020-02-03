@@ -306,24 +306,39 @@ TEST_CASE("Counting edges", "[Network]")
   REQUIRE(b21->degree == 6);
   REQUIRE(b22->degree == 3);
 
+  // Gather edges between all blocks at level one
+  const auto level_1_counts = my_net.gather_block_counts_at_level(1);
+
+  REQUIRE(level_1_counts.size() > 1);
+
   // Check num edges between blocks
   auto a11_edges = a11->gather_edges_to_level(1);
   REQUIRE(a11_edges[b11] == 2);
+  REQUIRE(level_1_counts.at(Edge(a11, b11)) == 2);
   REQUIRE(a11_edges[b12] == 0);
   REQUIRE(a11_edges[b13] == 0);
 
   auto a12_edges = a12->gather_edges_to_level(1);
   REQUIRE(a12_edges[b11] == 2);
+  REQUIRE(level_1_counts.at(Edge(a12, b11)) == 2);
+
   REQUIRE(a12_edges[b12] == 1);
+  REQUIRE(level_1_counts.at(Edge(a12, b12)) == 1);
+
   REQUIRE(a12_edges[b13] == 1);
+  REQUIRE(level_1_counts.at(Edge(a12, b13)) == 1);
 
   auto a13_edges = a13->gather_edges_to_level(1);
   REQUIRE(a13_edges[b11] == 0);
   REQUIRE(a13_edges[b12] == 1);
+  REQUIRE(level_1_counts.at(Edge(a13, b12)) == 1);
+
   REQUIRE(a13_edges[b13] == 2);
+  REQUIRE(level_1_counts.at(Edge(a13, b13)) == 2);
 
   // Direction shouldn't matter
   REQUIRE(a11->gather_edges_to_level(1)[b11] == b11->gather_edges_to_level(1)[a11]);
+  REQUIRE(level_1_counts.at(Edge(a13, b13)) == level_1_counts.at(Edge(b13, a13)));
 
   // Direction shouldn't matter
   REQUIRE(a11->gather_edges_to_level(1)[b12] == b12->gather_edges_to_level(1)[a11]);

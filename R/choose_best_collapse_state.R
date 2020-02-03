@@ -21,7 +21,7 @@
 #' my_sbm <- create_sbm(network)
 #'
 #' # Run agglomerative clustering with no intermediate MCMC steps on network
-#' collapse_results <- collapse_run(my_sbm, sigma = 3, start_block_num = 1, end_block_num = 6)
+#' collapse_results <- collapse_run(my_sbm, sigma = 3, num_final_blocks = 1:6)
 #'
 #' # Choose best result with default heuristic
 #' my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, verbose = TRUE)
@@ -44,7 +44,15 @@ choose_best_collapse_state <- function(sbm, collapse_results, use_entropy_value_
   best_state <- collapse_results %>%
     dplyr::arrange(num_blocks)
 
-  if (use_entropy_value_for_score){
+  missing_entropy_delta <- !("entropy_delta" %in% colnames(best_state))
+
+  if(missing_entropy_delta & !use_entropy_value_for_score){
+    best_state <- best_state %>%
+      dplyr::mutate(entropy_delta = dplyr::lag(entropy) - entropy) %>%
+      dplyr::filter(!is.na(entropy_delta))
+  }
+
+  if (use_entropy_value_for_score | missing_entropy_delta){
     best_state <- dplyr::mutate(best_state, score = build_score_fn(heuristic)(entropy, num_blocks))
   } else {
     best_state <- dplyr::mutate(best_state, score = build_score_fn(heuristic)(entropy_delta, num_blocks))

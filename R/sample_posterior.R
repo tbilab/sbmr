@@ -74,7 +74,7 @@ sample_posterior <- function(
 
 
   # for(i in 1:10){
-  #   entro_pre <- sbm$compute_entropy(0L)
+  #   entro_pre <- sbm$get_entropy(0L)
   #   blocks_moved <- sbm$mcmc_sweep(0L,FALSE)
   #   print(paste("started with entropy of", entro_pre, "and moved", blocks_moved))
   # }

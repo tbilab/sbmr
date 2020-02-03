@@ -28,8 +28,8 @@
 #'   set_node_parent(child_id = 'node_3', parent_id = 'node_12')
 #'
 #' # Compute entropy of network
-#' compute_entropy(my_sbm)
+#' get_entropy(my_sbm)
 #'
-compute_entropy <- function(sbm, level = 0){
-  sbm$compute_entropy(as.integer(level))
+get_entropy <- function(sbm, level = 0){
+  sbm$get_entropy(as.integer(level))
 }

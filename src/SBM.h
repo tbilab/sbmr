@@ -89,7 +89,7 @@ class SBM : public Network {
   // =========================================================================
 
   // Compute microcononical entropy of current model state at a level
-  double compute_entropy(int level);
+  double get_entropy(int level);
 
   // Merge two blocks, placing all nodes that were under block_b under
   // block_a and deleting from model.
