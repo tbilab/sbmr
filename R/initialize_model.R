@@ -1,11 +1,3 @@
-initialize_model <- function(x){
-  UseMethod("initialize_model")
-}
-
-initialize_model.default <- function(x){
-  cat("Default initialize model generic.")
-}
-
 #' Initialize model for sbm_network object
 #'
 #' Takes data from sbm_network object and uses it to initialize an `SBM` class
@@ -19,6 +11,26 @@ initialize_model.default <- function(x){
 #' @export
 #'
 #' @examples
+#' network <- sim_basic_block_network(
+#'   n_blocks = 3,
+#'   n_nodes_per_block = 40
+#' )
+#'
+#' sbm_net <- new_sbm_network(edges = network$edges, nodes = network$nodes)
+#' sbm_net
+#'
+#' sbm_net <- sbm_net %>% initialize_model()
+#' sbm_net
+#'
+initialize_model <- function(x, warn_if_overwriting = TRUE){
+  UseMethod("initialize_model")
+}
+
+initialize_model.default <- function(x){
+  cat("Default initialize model generic.")
+}
+
+#' @export
 initialize_model.sbm_network <- function(x, warn_if_overwriting = TRUE){
 
   has_model_already <- !is.null(x$model)
