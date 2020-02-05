@@ -1,6 +1,6 @@
 #' Print network
 #'
-#' @inheritParams initialize_model
+#' @inheritParams initialize_model.sbm_network
 #'
 #' @return Output of the number of nodes and edges in model along with
 #'   indication of if a model has been initialized
@@ -25,9 +25,9 @@ print.sbm_network <- function(x){
 
   N <- attr(x, "n_nodes")
   E <- attr(x, "n_edges")
-  cat(glue::glue("SBM Network with {N} nodes and {E} edges."))
+  cat(glue::glue("SBM Network with {N} nodes and {E} edges."), "\n")
 
   if (!is.null(x$model)){
-    cat("The network has an initialized model object.")
+    cat("The network has an initialized model object.", "\n")
   }
 }
