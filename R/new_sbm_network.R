@@ -15,6 +15,8 @@
 #' @param bipartite_edges Do the passed edges reflect a bipartite struture? I.e.
 #'   are nodes in from `from` column of a different type to those in the `to`
 #'   column?
+#' @param setup_model Should an SBM model object be added? Set to `FALSE` if
+#'   network is just being visualized or described.
 #' @param show_warnings Do you want to be warned when minor problems are
 #'   detected by function? Usefull to disable when not running in an interactive
 #'   mode etc.
@@ -47,6 +49,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                             edges_from_col = from,
                             edges_to_col = to,
                             bipartite_edges = FALSE,
+                            setup_model = TRUE,
                             show_warnings = interactive()){
   # Setup some tidy eval stuff for the column names
   to_column <- rlang::enquo(edges_to_col)
@@ -68,7 +71,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
     from_node_type <- if (bipartite_edges) "from_node" else "node"
 
     # Break edges down to unique nodes and assign appropriate types
-    unique_two_nodes <- edges %>%
+    unique_to_nodes <- edges %>%
       dplyr::distinct(!!to_column) %>%
       dplyr::transmute(
         id = !!to_column,
@@ -83,10 +86,10 @@ new_sbm_network <- function(edges = dplyr::tibble(),
       )
 
     # Combine and count duplicates
-    all_unique <- dplyr::bind_rows(unique_two_nodes, unique_from_nodes) %>%
+    all_unique <- dplyr::bind_rows(unique_to_nodes, unique_from_nodes) %>%
       dplyr::group_by(id) %>%
       dplyr::summarise(type = dplyr::first(type),
-                       n_types = length(unique(type))) %>%
+                       n_types = dplyr::n()) %>%
       dplyr::ungroup()
 
     # Check for nodes that have multiple types
@@ -150,7 +153,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
     nodes <- validate_nodes(nodes)
 
     # Let user know if their bipartite edge setting was unneccesary
-    if (bipartite_edges) {
+    if (bipartite_edges & show_warnings) {
       warning("bipartite_edges setting ignored due to nodes dataframe being provided.")
     }
   }
@@ -182,8 +185,8 @@ new_sbm_network <- function(edges = dplyr::tibble(),
     nodes <- nodes[nodes$id != unconnected_nodes]
   }
 
-  # Build final structure
-  structure(
+  # Build object
+  x <- structure(
     list(
       nodes = nodes,
       edges = edges
@@ -194,4 +197,12 @@ new_sbm_network <- function(edges = dplyr::tibble(),
     from_column = from_column,
     to_column = to_column
   )
+
+  # Initialize a model if requested
+  if (setup_model) {
+    x <- initialize_model(x)
+  }
+
+  # Return
+  x
 }
