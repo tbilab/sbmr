@@ -8,8 +8,7 @@
 #'   occuring
 #' @inheritParams sim_sbm_network
 #'
-#' @return An edge dataframe with node ids for edges in the `from` and
-#'   `to` columns
+#' @return A `sbm_network`/`list` that as `nodes` and `edges` member tibbles.
 #' @export
 #'
 #' @examples
@@ -28,6 +27,5 @@ sim_random_network <- function(n_nodes = 5, prob_of_edge = 0.7, allow_self_edges
     ),
     edge_dist = purrr::rbernoulli,
     allow_self_edges = allow_self_edges
-  )$edges %>%
-    dplyr::select(-edges)
+  )
 }
