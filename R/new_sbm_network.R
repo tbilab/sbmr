@@ -1,9 +1,34 @@
+#' Builds a new sbm_network object from data
+#'
+#' Constructs an object with the `sbm_network` class. Takes as input at a
+#' minumum an edge dataframe and will also accept a nodes dataframe that can
+#' contain addition information about the nodes in the network. A helper for
+#' allowing bipartite structure is provided which will treat either side of
+#' passed edges dataframe as two different types of nodes.
+#'
+#' @param edges Dataframe with a from and two column encoding edges between
+#'   string node ids (direction does not matter).
+#' @param nodes Optional dataframe that links a node `id` to its `type`, for
+#'   when model is polypartite.
+#' @param edges_from_col Name of the from column for edges
+#' @param edges_to_col Name of the to column for edges
+#' @param bipartite_edges Do the passed edges reflect a bipartite struture? I.e.
+#'   are nodes in from `from` column of a different type to those in the `to`
+#'   column?
+#' @param show_warnings Do you want to be warned when minor problems are
+#'   detected by function? Usefull to disable when not running in an interactive
+#'   mode etc.
+#'
+#' @return
+#' @export
+#'
+#' @examples
 new_sbm_network <- function(edges = dplyr::tibble(),
                             nodes = NULL,
-                            edges_to_col = to,
                             edges_from_col = from,
+                            edges_to_col = to,
                             bipartite_edges = FALSE,
-                            show_warnings = FALSE){
+                            show_warnings = interactive()){
   # Setup some tidy eval stuff for the column names
   to_column <- rlang::enquo(edges_to_col)
   from_column <- rlang::enquo(edges_from_col)
@@ -90,8 +115,8 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                  rlang::as_name(to_column)))
     }
 
-    # Return edge dataframe making sure the from and two columns being named just that
-    edges %>% dplyr::rename(from = !!from_column, to = !!to_column)
+    # Return edge dataframe
+    edges
   }
 
   # First validate our edges
@@ -104,10 +129,16 @@ new_sbm_network <- function(edges = dplyr::tibble(),
   } else {
     # Otherwise just make sure they are properly formatted
     nodes <- validate_nodes(nodes)
+
+    # Let user know if their bipartite edge setting was unneccesary
+    if (bipartite_edges) {
+      warning("bipartite_edges setting ignored due to nodes dataframe being provided.")
+    }
   }
 
   # Next, make sure data fits together properly and report on any unconnected nodes
-  unique_edge_ids <- unique(c(edges$from, edges$to))
+  unique_edge_ids <- unique(c(edges[[rlang::as_name(from_column)]],
+                              edges[[rlang::as_name(to_column)]]))
   unique_node_ids <- unique(nodes$id)
   edge_nodes_not_in_nodes <- not_in(unique_edge_ids, unique_node_ids)
   nodes_not_in_edges <- not_in(unique_node_ids,  unique_edge_ids)
@@ -140,6 +171,8 @@ new_sbm_network <- function(edges = dplyr::tibble(),
     ),
     class = "sbm_network",
     n_nodes = nrow(nodes),
-    n_edges = nrow(edges)
+    n_edges = nrow(edges),
+    from_column = from_column,
+    to_column = to_column
   )
 }
