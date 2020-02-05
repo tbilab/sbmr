@@ -11,6 +11,35 @@ test_that("Correct numbers of nodes and edges are returned", {
 })
 
 
+test_that("Properly builds a missing nodes dataframe",{
+  edges <- dplyr::tribble(
+    ~from, ~to,
+    "a1",  "b1",
+    "a1",  "b2",
+    "a1",  "b3",
+    "a2",  "b1",
+    "a2",  "b4",
+    "a3",  "b1"
+  )
+
+  sbm_net <- new_sbm_network(edges = edges)
+
+  expect_equal(
+    sbm_net$nodes,
+    nodes <- dplyr::tribble(
+      ~id, ~type,
+      "a1", "node",
+      "a2", "node",
+      "a3", "node",
+      "b1", "node",
+      "b2", "node",
+      "b3", "node",
+      "b4", "node"
+    )
+  )
+})
+
+
 test_that("Throws error for poorly formed nodes dataframe",{
   edges <- dplyr::tribble(
     ~from, ~to,
@@ -122,6 +151,7 @@ test_that("Throws warning for discarded unconnected nodes",{
   )
 
 })
+
 
 test_that("Throws warning for overridden bipartite_edges argument",{
   edges <- dplyr::tribble(
