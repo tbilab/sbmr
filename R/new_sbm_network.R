@@ -23,6 +23,25 @@
 #' @export
 #'
 #' @examples
+#'
+#' # Build small object from simple edge dataframe
+#' small_edges <- dplyr::tribble(
+#'   ~a_node, ~b_node,
+#'   "a1"   , "b1"   ,
+#'   "a1"   , "b2"   ,
+#'   "a1"   , "b3"   ,
+#'   "a2"   , "b1"   ,
+#'   "a2"   , "b4"   ,
+#'   "a3"   , "b1"
+#' )
+#'
+#' new_sbm_network(small_edges, edges_from_col = a_node, edges_to_col = b_node)
+#'
+#' # Build larger object from a simulated dataset
+#' network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 40)
+#'
+#' new_sbm_network(edges = network$edges, nodes = network$nodes)
+#'
 new_sbm_network <- function(edges = dplyr::tibble(),
                             nodes = NULL,
                             edges_from_col = from,
