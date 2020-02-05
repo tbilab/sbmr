@@ -17,6 +17,7 @@
 #'   column?
 #' @param setup_model Should an SBM model object be added? Set to `FALSE` if
 #'   network is just being visualized or described.
+#' @param default_node_type What should nodes that the type is generated for be called?
 #' @param show_warnings Do you want to be warned when minor problems are
 #'   detected by function? Usefull to disable when not running in an interactive
 #'   mode etc.
@@ -50,6 +51,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                             edges_to_col = to,
                             bipartite_edges = FALSE,
                             setup_model = TRUE,
+                            default_node_type = "node",
                             show_warnings = interactive()){
   # Setup some tidy eval stuff for the column names
   to_column <- rlang::enquo(edges_to_col)
@@ -67,8 +69,8 @@ new_sbm_network <- function(edges = dplyr::tibble(),
   # Constructs a properly formed nodes dataframe from just edges
   build_nodes_from_edges <- function(edges){
     # Check how we should type our nodes
-    to_node_type <- if (bipartite_edges) "to_node" else "node"
-    from_node_type <- if (bipartite_edges) "from_node" else "node"
+    to_node_type <- if (bipartite_edges) "to_node" else default_node_type
+    from_node_type <- if (bipartite_edges) "from_node" else default_node_type
 
     # Break edges down to unique nodes and assign appropriate types
     unique_to_nodes <- edges %>%
@@ -88,13 +90,13 @@ new_sbm_network <- function(edges = dplyr::tibble(),
     # Combine and count duplicates
     all_unique <- dplyr::bind_rows(unique_to_nodes, unique_from_nodes) %>%
       dplyr::group_by(id) %>%
-      dplyr::summarise(type = dplyr::first(type),
-                       n_types = dplyr::n()) %>%
+      dplyr::summarise(n_types = length(unique(type)),
+                       type = dplyr::first(type) ) %>%
       dplyr::ungroup()
 
     # Check for nodes that have multiple types
     multi_type_nodes <- all_unique$n_types > 1
-    if (any(all_unique$n_types > 1 )) {
+    if (any(all_unique$n_types > 1)) {
       stop("Bipartite edge structure was requested but some nodes appeared in both from and two columns of supplied edges.")
     }
 
@@ -112,7 +114,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
     # Make sure nodes have a type column. If it's missing, just add a constant type
     missing_type <- not_in("type", colnames(nodes))
     if(missing_type){
-      nodes$type <- "node"
+      nodes$type <- default_node_type
     }
 
     nodes
