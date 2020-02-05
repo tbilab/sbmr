@@ -56,6 +56,8 @@ new_sbm_network <- function(edges = dplyr::tibble(),
   # Setup some tidy eval stuff for the column names
   to_column <- rlang::enquo(edges_to_col)
   from_column <- rlang::enquo(edges_from_col)
+  to_col_string <- rlang::as_name(to_column)
+  from_col_string <- rlang::as_name(from_column)
 
   # Get an idea of what kind of data we were given to drive logic
   missing_nodes <- is.null(nodes)
@@ -69,8 +71,8 @@ new_sbm_network <- function(edges = dplyr::tibble(),
   # Constructs a properly formed nodes dataframe from just edges
   build_nodes_from_edges <- function(edges){
     # Check how we should type our nodes
-    to_node_type <- if (bipartite_edges) "to_node" else default_node_type
-    from_node_type <- if (bipartite_edges) "from_node" else default_node_type
+    to_node_type <- if (bipartite_edges) to_col_string else default_node_type
+    from_node_type <- if (bipartite_edges) from_col_string else default_node_type
 
     # Break edges down to unique nodes and assign appropriate types
     unique_to_nodes <- edges %>%
@@ -131,12 +133,12 @@ new_sbm_network <- function(edges = dplyr::tibble(),
     # Make sure both the from and two columns exist
     if(!col_exists(from_column, edges)) {
       stop(paste("Edges data does not have the specified from column:",
-                 rlang::as_name(from_column)))
+                 from_col_string))
     }
 
     if(!col_exists(to_column, edges)) {
       stop(paste("Edges data does not have the specified to column:",
-                 rlang::as_name(to_column)))
+                 to_col_string))
     }
 
     # Return edge dataframe
@@ -161,8 +163,8 @@ new_sbm_network <- function(edges = dplyr::tibble(),
   }
 
   # Next, make sure data fits together properly and report on any unconnected nodes
-  unique_edge_ids <- unique(c(edges[[rlang::as_name(from_column)]],
-                              edges[[rlang::as_name(to_column)]]))
+  unique_edge_ids <- unique(c(dplyr::pull(edges, !!from_column),
+                              dplyr::pull(edges, !!to_column)))
   unique_node_ids <- unique(nodes$id)
   edge_nodes_not_in_nodes <- not_in(unique_edge_ids, unique_node_ids)
   nodes_not_in_edges <- not_in(unique_node_ids,  unique_edge_ids)
