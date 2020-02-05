@@ -53,6 +53,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                             setup_model = TRUE,
                             default_node_type = "node",
                             show_warnings = interactive()){
+
   # Setup some tidy eval stuff for the column names
   to_column <- rlang::enquo(edges_to_column)
   from_column <- rlang::enquo(edges_from_column)
@@ -192,10 +193,8 @@ new_sbm_network <- function(edges = dplyr::tibble(),
 
   # Build object
   x <- structure(
-    list(
-      nodes = nodes,
-      edges = edges
-    ),
+    list(nodes = nodes,
+         edges = edges),
     class = "sbm_network",
     n_nodes = nrow(nodes),
     n_edges = nrow(edges),
