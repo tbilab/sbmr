@@ -91,6 +91,38 @@ test_that("Throws error for poorly edges dataframe missing required columns",{
 })
 
 
+test_that("Throws warning for discarded unconnected nodes",{
+  edges <- dplyr::tribble(
+    ~from, ~to,
+    "a1"   , "b1"   ,
+    "a1"   , "b2"   ,
+    "a1"   , "b3"   ,
+    "a2"   , "b1"   ,
+    "a2"   , "b4"   ,
+    "a3"   , "b1"
+  )
+
+  nodes <- dplyr::tribble(
+    ~id, ~type,
+    "a1", "node",
+    "a2", "node",
+    "a3", "node",
+    "b1", "node",
+    "b2", "node",
+    "b3", "node",
+    "b4", "node",
+    "c1", "node",
+    "c2", "node"
+  )
+
+  expect_warning(
+    new_sbm_network(edges = edges, nodes = nodes, show_warnings = TRUE),
+    "Node(s) c1, c2 are not seen in any of the edges and have been removed from data.",
+    fixed = TRUE
+  )
+
+})
+
 test_that("Throws warning for overridden bipartite_edges argument",{
   edges <- dplyr::tribble(
     ~from, ~to,
