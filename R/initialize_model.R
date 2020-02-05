@@ -4,8 +4,8 @@
 #' model object.
 #'
 #' @param x Object of class `sbm_network`.
-#' @param warn_if_overwriting Should function warn if it is initializing a model
-#'   over an existing one?
+#' @param show_messages Should function inform of its actions such as when a
+#'   model already exists so no changes are made?
 #'
 #' @return
 #' @export
@@ -31,11 +31,25 @@ initialize_model.default <- function(x){
 }
 
 #' @export
-initialize_model.sbm_network <- function(x, warn_if_overwriting = TRUE){
+initialize_model.sbm_network <- function(x, show_messages = TRUE, show_warnings = TRUE){
 
   has_model_already <- !is.null(x$model)
-  if (warn_if_overwriting & has_model_already) {
-    warning("Object already has model object. Overwriting.")
+  has_state_already <- !is.null(attr(x, "state"))
+
+  if (has_model_already){
+    model_is_stale <- tryCatch(
+      error = function(err) TRUE,
+      {
+        x$model$get_state()
+        FALSE
+      })
+
+    # If an error was triggered trying to access the object then we know
+    # it is stale and needs to be rebuilt
+    if(has_model_already & !model_is_stale){
+      if(show_messages) message("Object already has model initialized. No changes made")
+      return(x)
+    }
   }
 
   # Instantiate instance of sbm class
@@ -54,6 +68,23 @@ initialize_model.sbm_network <- function(x, warn_if_overwriting = TRUE){
       from_nodes[i],
       to_nodes[i]
     )
+  }
+
+  if (has_state_already) {
+    if(show_messages) message("Reloading saved model state.")
+
+    # Reload using saved state to get model back to working condition
+    previous_state <- attr(x, "state")
+
+    # Reload state using the s4 method for doing so exposed by rcpp
+    sbm$load_from_state(previous_state$id,
+                        previous_state$parent,
+                        previous_state$level,
+                        previous_state$type)
+  } else {
+    if(show_messages) message("New SBM model object initialized.")
+    # Update object state with newly created state
+    attr(x, "state") <- sbm$get_state()
   }
 
   # Assign sbm object to name model in sbm_network object
