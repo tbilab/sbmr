@@ -10,7 +10,88 @@ test_that("Correct numbers of nodes and edges are returned", {
   expect_equal(attr(sbm_net, "n_edges"), nrow(network$edges))
 })
 
-test_that("Throws messagse for mismatched bipartite edges and nodes", {
+
+test_that("Throws error for poorly formed nodes dataframe",{
+  edges <- dplyr::tribble(
+    ~from, ~to,
+    "a1"   , "b1"   ,
+    "a1"   , "b2"   ,
+    "a1"   , "b3"   ,
+    "a2"   , "b1"   ,
+    "a2"   , "b4"   ,
+    "a3"   , "b1"
+  )
+
+  nodes <- dplyr::tribble(
+    ~name, ~type,
+    "a1", "node",
+    "a2", "node",
+    "a3", "node",
+    "b1", "node",
+    "b2", "node",
+    "b3", "node",
+    "b4", "node"
+  )
+
+  expect_error(
+    new_sbm_network(edges = edges, nodes = nodes),
+    "Nodes dataframe needs an id column.",
+    fixed = TRUE
+  )
+
+})
+
+
+test_that("Throws error for empty edges dataframe",{
+  edges <- dplyr::tribble(
+    ~from, ~to
+  )
+
+  nodes <- dplyr::tribble(
+    ~id, ~type,
+    "a1", "node",
+    "a2", "node",
+    "a3", "node",
+    "b1", "node",
+    "b2", "node",
+    "b3", "node",
+    "b4", "node"
+  )
+
+  expect_error(
+    new_sbm_network(edges = edges, nodes = nodes),
+    "No edges provided",
+    fixed = TRUE
+  )
+})
+
+
+test_that("Throws error for poorly edges dataframe missing required columns",{
+  edges <- dplyr::tribble(
+    ~a_node, ~b_node,
+    "a1",  "b1",
+    "a1",  "b2",
+    "a1",  "b3",
+    "a2",  "b1",
+    "a2",  "b4",
+    "a3",  "b1"
+  )
+
+  expect_error(
+    new_sbm_network(edges = edges, edges_from_column = a_node, edges_to_column = node_b),
+    "Edges data does not have the specified to column: node_b",
+    fixed = TRUE
+  )
+
+  expect_error(
+    new_sbm_network(edges = edges, edges_from_column = node_a, edges_to_column = b_node),
+    "Edges data does not have the specified from column: node_a",
+    fixed = TRUE
+  )
+})
+
+
+test_that("Throws warning for overridden bipartite_edges argument",{
   edges <- dplyr::tribble(
     ~from, ~to,
     "a1"   , "b1"   ,
@@ -40,6 +121,7 @@ test_that("Throws messagse for mismatched bipartite edges and nodes", {
 
 })
 
+
 test_that("Throws messages for mismatched bipartite edges and nodes", {
   edges <- dplyr::tribble(
     ~from, ~to,
@@ -57,6 +139,27 @@ test_that("Throws messages for mismatched bipartite edges and nodes", {
     fixed = TRUE
   )
 })
+
+
+test_that("Bipartite node structure respects the column names in types", {
+  edges <- dplyr::tribble(
+    ~a_node, ~b_node,
+    "a1"   , "b1"   ,
+    "a1"   , "b2"   ,
+    "a1"   , "b3"   ,
+    "a2"   , "b1"   ,
+    "a3"   , "b1"
+  )
+
+  sbm_net <- new_sbm_network(edges = edges,
+                             bipartite_edges = TRUE,
+                             edges_from_col = a_node,
+                             edges_to_col = b_node)
+
+  unique_types <- unique(sbm_net$nodes$type)
+  expect_true(all(unique_types %in% c('a_node', 'b_node')))
+})
+
 
 test_that("Default node type can change", {
   edges <- dplyr::tribble(
@@ -84,6 +187,7 @@ test_that("Model is instantiated if requested", {
   sbm_net <- new_sbm_network(edges = network$edges, nodes = network$nodes)
   testthat::expect_false(is.null(sbm_net$model))
 })
+
 
 test_that("Model is not instantiated if requested", {
   network <- sim_basic_block_network(
