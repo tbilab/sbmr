@@ -118,5 +118,8 @@ sim_sbm_network <- function(
       dplyr::select(-edges)
   }
 
-  list(nodes = nodes, edges = edges)
+  structure(
+    list(nodes = nodes, edges = edges),
+    class = c("sbm_network", "list")
+  )
 }
