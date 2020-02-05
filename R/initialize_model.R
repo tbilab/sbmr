@@ -48,5 +48,5 @@ initialize_model.sbm_network <- function(x, warn_if_overwriting = TRUE){
   x$model <- sbm
 
   # Give back sbm_network object
-  sbm_net
+  x
 }
