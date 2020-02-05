@@ -16,8 +16,7 @@ occuring}
 themselves?}
 }
 \value{
-An edge dataframe with node ids for edges in the \code{from} and
-\code{to} columns
+A \code{sbm_network}/\code{list} that as \code{nodes} and \code{edges} member tibbles.
 }
 \description{
 Generate an edge dataframe from an \href{https://en.wikipedia.org/wiki/Erd\%C5\%91s\%E2\%80\%93R\%C3\%A9nyi_model}{Erdos-Renyi network.} An edge will occur
