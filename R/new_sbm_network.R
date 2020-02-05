@@ -2,6 +2,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                             nodes = NULL,
                             edges_to_col = to,
                             edges_from_col = from,
+                            bipartite_edges = FALSE,
                             show_warnings = FALSE){
   # Setup some tidy eval stuff for the column names
   to_column <- rlang::enquo(edges_to_col)
@@ -18,15 +19,40 @@ new_sbm_network <- function(edges = dplyr::tibble(),
 
   # Constructs a properly formed nodes dataframe from just edges
   build_nodes_from_edges <- function(edges){
-    edges_to <- dplyr::pull(edges, !!to_column)
-    edges_from <- dplyr::pull(edges, !!from_column)
+    # Check how we should type our nodes
+    to_node_type <- if (bipartite_edges) "to_node" else "node"
+    from_node_type <- if (bipartite_edges) "from_node" else "node"
 
-    # Break edges down to unique nodes. from_edges is used to find out if a node
-    # isnt present in the edges but is in the optional nodes dataframe
-    dplyr::tibble(
-      id = unique(c(edges_from, edges_to)),
-      from_edges = TRUE
-    )
+    # Break edges down to unique nodes and assign appropriate types
+    unique_two_nodes <- edges %>%
+      dplyr::distinct(!!to_column) %>%
+      dplyr::transmute(
+        id = !!to_column,
+        type = to_node_type
+      )
+
+    unique_from_nodes <- edges %>%
+      dplyr::distinct(!!from_column) %>%
+      dplyr::transmute(
+        id = !!from_column,
+        type = from_node_type
+      )
+
+    # Combine and count duplicates
+    all_unique <- dplyr::bind_rows(unique_two_nodes, unique_from_nodes) %>%
+      dplyr::group_by(id) %>%
+      dplyr::summarise(type = dplyr::first(type),
+                       n_types = length(unique(type))) %>%
+      dplyr::ungroup()
+
+    # Check for nodes that have multiple types
+    multi_type_nodes <- all_unique$n_types > 1
+    if (any(all_unique$n_types > 1 )) {
+      stop("Bipartite edge structure was requested but some nodes appeared in both from and two columns of supplied edges.")
+    }
+
+    # Return built nodes, removing the n_types column
+    all_unique %>% dplyr::select(-n_types)
   }
 
   # Make sure nodes dataframe is properly formatted
@@ -112,6 +138,8 @@ new_sbm_network <- function(edges = dplyr::tibble(),
       nodes = nodes,
       edges = edges
     ),
-    class = "sbm_network"
+    class = "sbm_network",
+    n_nodes = nrow(nodes),
+    n_edges = nrow(edges)
   )
 }
