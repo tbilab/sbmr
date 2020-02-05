@@ -10,8 +10,8 @@
 #'   string node ids (direction does not matter).
 #' @param nodes Optional dataframe that links a node `id` to its `type`, for
 #'   when model is polypartite.
-#' @param edges_from_col Name of the from column for edges
-#' @param edges_to_col Name of the to column for edges
+#' @param edges_from_column Name of the from column for edges
+#' @param edges_to_column Name of the to column for edges
 #' @param bipartite_edges Do the passed edges reflect a bipartite struture? I.e.
 #'   are nodes in from `from` column of a different type to those in the `to`
 #'   column?
@@ -38,7 +38,7 @@
 #'   "a3"   , "b1"
 #' )
 #'
-#' new_sbm_network(small_edges, edges_from_col = a_node, edges_to_col = b_node)
+#' new_sbm_network(small_edges, edges_from_column = a_node, edges_to_column = b_node)
 #'
 #' # Build larger object from a simulated dataset
 #' network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 40)
@@ -47,15 +47,15 @@
 #'
 new_sbm_network <- function(edges = dplyr::tibble(),
                             nodes = NULL,
-                            edges_from_col = from,
-                            edges_to_col = to,
+                            edges_from_column = from,
+                            edges_to_column = to,
                             bipartite_edges = FALSE,
                             setup_model = TRUE,
                             default_node_type = "node",
                             show_warnings = interactive()){
   # Setup some tidy eval stuff for the column names
-  to_column <- rlang::enquo(edges_to_col)
-  from_column <- rlang::enquo(edges_from_col)
+  to_column <- rlang::enquo(edges_to_column)
+  from_column <- rlang::enquo(edges_from_column)
   to_col_string <- rlang::as_name(to_column)
   from_col_string <- rlang::as_name(from_column)
 
