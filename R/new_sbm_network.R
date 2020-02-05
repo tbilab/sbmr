@@ -165,6 +165,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
   # Next, make sure data fits together properly and report on any unconnected nodes
   unique_edge_ids <- unique(c(dplyr::pull(edges, !!from_column),
                               dplyr::pull(edges, !!to_column)))
+
   unique_node_ids <- unique(nodes$id)
   edge_nodes_not_in_nodes <- not_in(unique_edge_ids, unique_node_ids)
   nodes_not_in_edges <- not_in(unique_node_ids,  unique_edge_ids)
@@ -186,7 +187,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
     }
 
     # If any nodes were unconnected by edges, remove them
-    nodes <- nodes[nodes$id != unconnected_nodes]
+    nodes <- dplyr::filter(nodes, not_in(id, unconnected_nodes))
   }
 
   # Build object
