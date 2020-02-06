@@ -81,11 +81,12 @@ collapse_blocks.sbm_network <- function(sbm,
                                         num_block_proposals = 5,
                                         level = 0,
                                         report_all_steps = TRUE){
-
-  # We call initialize_model here in case this is being called in another thread using
+  # We call verify_model here in case this is being called in another thread using
   # the collapse_run function. In that case the pointer to the s4 class will be stale
   # and we will need to re-create the model class.
-  collapse_results <- initialize_model(sbm)$model$collapse_blocks(
+  sbm <- verify_model(sbm)
+
+  collapse_results <- sbm$model$collapse_blocks(
     as.integer(level),
     as.integer(num_mcmc_sweeps),
     as.integer(desired_num_blocks),

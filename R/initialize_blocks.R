@@ -49,6 +49,7 @@ initialize_blocks.default <- function(sbm, num_blocks = -1, level = 0){
 #' @export
 initialize_blocks.sbm_network <- function(sbm, num_blocks = -1, level = 0){
   if(num_blocks < -1) stop(paste("Can't initialize", num_blocks, "blocks."))
+  sbm <- verify_model(sbm)
 
   sbm$model$initialize_blocks(as.integer(num_blocks), as.integer(level))
 

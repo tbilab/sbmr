@@ -76,7 +76,7 @@ collapse_run.sbm_network <- function(sbm,
       }
     )
   } else {
-    collapse_results <- sbm$model$collapse_run(as.integer(level),
+    collapse_results <- verify_model(sbm)$model$collapse_run(as.integer(level),
                                          as.integer(num_mcmc_sweeps),
                                          as.integer(num_block_proposals),
                                          sigma,

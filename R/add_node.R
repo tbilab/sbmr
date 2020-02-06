@@ -46,8 +46,11 @@ add_node.sbm_network <- function(sbm, id, type = NULL){
     message(glue::glue("{id} node was already in network. No action taken."))
   }
 
+  # Before we start modifying the model object, first verify it
+  sbm <- verify_model(sbm)
+
   # Add node to s4 model class
-  sbm$add_node(id, type, 0L)
+  sbm$model$add_node(id, type, 0L)
 
   # Update state with new nodes [inefficient]
   attr(sbm, "state") <- sbm$model$get_state()

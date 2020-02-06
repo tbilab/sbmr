@@ -33,7 +33,7 @@ get_node_to_block_edge_counts.default <- function(sbm, node_id, connection_level
 #' @export
 get_node_to_block_edge_counts.sbm_network <- function(sbm, node_id, connection_level = 1L){
   # Call the exported method from the rcpp wrapper class.
-  sbm$model$get_node_to_block_edge_counts(node_id,
+  verify_model(sbm)$model$get_node_to_block_edge_counts(node_id,
                                     as.integer(node_level),
                                     as.integer(connection_level))
 }
