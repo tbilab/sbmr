@@ -1,7 +1,7 @@
-#' Initialize model for sbm_network object
+#' Verify model for sbm_network object exists
 #'
-#' Takes data from sbm_network object and uses it to initialize an `SBM` class
-#' model object.
+#' Takes data from sbm_network object and checks S4 `SBM` class model object
+#' exists and is usable. If it isn't it is created.
 #'
 #' @param x Object of class `sbm_network`.
 #' @param show_messages Should function inform of its actions such as when a
@@ -19,19 +19,19 @@
 #' sbm_net <- new_sbm_network(edges = network$edges, nodes = network$nodes)
 #' sbm_net
 #'
-#' sbm_net <- sbm_net %>% initialize_model()
+#' sbm_net <- sbm_net %>% verify_model()
 #' sbm_net
 #'
-initialize_model <- function(x, show_messages = TRUE){
-  UseMethod("initialize_model")
+verify_model <- function(x, show_messages = TRUE){
+  UseMethod("verify_model")
 }
 
-initialize_model.default <- function(x){
+verify_model.default <- function(x){
   cat("Default initialize model generic.")
 }
 
 #' @export
-initialize_model.sbm_network <- function(x, show_messages = TRUE){
+verify_model.sbm_network <- function(x, show_messages = TRUE){
 
   has_model_already <- !is.null(x$model)
   has_state_already <- !is.null(attr(x, "state"))
