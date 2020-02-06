@@ -53,18 +53,18 @@ verify_model.sbm_network <- function(x, show_messages = FALSE){
   }
 
   # Instantiate instance of sbm class
-  sbm <- new(SBM)
+  sbm_model <- new(SBM)
 
   # Fill in all the needed nodes
   for(i in 1:attr(x, "n_nodes")){
-    sbm$add_node(x$nodes$id[i], x$nodes$type[i], 0L)
+    sbm_model$add_node(x$nodes$id[i], x$nodes$type[i], 0L)
   }
 
   # Fill in the edges
   from_nodes <- dplyr::pull(x$edges, !!attr(x, "from_column"))
   to_nodes <- dplyr::pull(x$edges, !!attr(x, "to_column"))
   for(i in 1:attr(x, "n_edges")){
-    sbm$add_edge(
+    sbm_model$add_edge(
       from_nodes[i],
       to_nodes[i]
     )
@@ -77,18 +77,18 @@ verify_model.sbm_network <- function(x, show_messages = FALSE){
     previous_state <- attr(x, "state")
 
     # Reload state using the s4 method for doing so exposed by rcpp
-    sbm$load_from_state(previous_state$id,
+    sbm_model$load_from_state(previous_state$id,
                         previous_state$parent,
                         previous_state$level,
                         previous_state$type)
   } else {
     if(show_messages) message("New SBM model object initialized.")
     # Update object state with newly created state
-    attr(x, "state") <- sbm$get_state()
+    attr(x, "state") <- sbm_model$get_state()
   }
 
-  # Assign sbm object to name model in sbm_network object
-  x$model <- sbm
+  # Assign sbm_model object to name model in sbm_network object
+  x$model <- sbm_model
 
   # Give back sbm_network object
   x
