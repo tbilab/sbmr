@@ -53,21 +53,24 @@ add_edge.sbm_network <- function(sbm,
   # Make sure these nodes exist already. If not add them
   from_node_missing <- not_in(from_node, sbm$nodes$id)
   if(from_node_missing){
-    add_node(sbm, id = from_node, type = from_node_type)
+    sbm <- add_node(sbm, id = from_node, type = from_node_type)
   }
 
   to_node_missing <- not_in(to_node, sbm$nodes$id)
   if(to_node_missing){
-    add_node(sbm, id = to_node, type = to_node_type)
+    sbm <- add_node(sbm, id = to_node, type = to_node_type)
   }
 
   # Add edge to tracked data
   sbm$edges <- dplyr::bind_rows(sbm$edges,
-                                dplyr::tibble(!!sbm$from_column := from_node,
-                                              !!sbm$to_column := to_node_type))
-
+                                dplyr::tibble(!!attr(sbm, 'from_column') := from_node,
+                                              !!attr(sbm, 'to_column') := to_node))
   # Add edge to SBM s4 class
-  sbm$add_edge(from_node, to_node)
+  verify_model(sbm)$model$add_edge(from_node, to_node)
+
+  # Update edge counts attribute
+  attr(sbm, 'n_edges') <- attr(sbm, 'n_edges') + 1
+
   sbm
 }
 
