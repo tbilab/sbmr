@@ -21,6 +21,9 @@
 #' @param verbose If set to `TRUE` then each proposed move for all sweeps will
 #'   have information given on entropy delta, probability of moving, and if the
 #'   move were accepted printed to the console.
+#' @param return_sbm_network Should the updated `sbm_network` object that was
+#'   provided to function be returned in the results under `sbm_network`? If set
+#'   to `FALSE` the new state after the sweep will not be maintained.
 #'
 #' @return List with two dataframes. The first telling for all sweeps everytime
 #'   a node was moved and what group it was moved to. The second telling for
@@ -56,7 +59,8 @@ mcmc_sweep <- function(sbm,
                        variable_num_blocks = TRUE,
                        track_pairs = FALSE,
                        level = 0,
-                       verbose = FALSE){
+                       verbose = FALSE,
+                       return_sbm_network = TRUE){
   UseMethod("mcmc_sweep")
 }
 
@@ -66,7 +70,8 @@ mcmc_sweep.default <- function(sbm,
                                variable_num_blocks = TRUE,
                                track_pairs = FALSE,
                                level = 0,
-                               verbose = FALSE){
+                               verbose = FALSE,
+                               return_sbm_network = TRUE){
   cat("mcmc_sweep generic")
 }
 
@@ -77,7 +82,8 @@ mcmc_sweep.sbm_network <- function(sbm,
                                    variable_num_blocks = TRUE,
                                    track_pairs = FALSE,
                                    level = 0,
-                                   verbose = FALSE){
+                                   verbose = FALSE,
+                                   return_sbm_network = TRUE){
   sbm <- verify_model(sbm)
 
   results <- sbm$model$mcmc_sweep(as.integer(level),
@@ -87,14 +93,21 @@ mcmc_sweep.sbm_network <- function(sbm,
                                   track_pairs,
                                   verbose)
 
+
   if (track_pairs) {
     # Clean up pair connections results
-    results$pairing_counts <-  results$pairing_counts %>%
+    results$pairing_counts <- results$pairing_counts %>%
       tidyr::separate(node_pair, into = c("node_a", "node_b"), sep = "--") %>%
       dplyr::mutate(proportion_connected = times_connected/num_sweeps)
   } else {
     # Remove the empty pair counts results
     results['pairing_counts'] <- NULL
+  }
+
+  if(return_sbm_network){
+    # Update state attribute of s3 object
+    attr(sbm, 'state') <- sbm$model$get_state()
+    results$sbm_network <- sbm
   }
 
   results
