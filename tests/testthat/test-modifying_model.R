@@ -53,13 +53,31 @@ test_that("Add edge", {
   net <- sim_random_network(n_nodes = 5, prob_of_edge = 1)
 
   start_num_edges <- attr(net, 'n_edges')
-  net <- net %>% add_edge('new_from_node', 'new_to_node')
+  # Gives a message about new nodes on default
+  expect_message({
+    net <- net %>% add_edge('new_from_node', 'new_to_node')
+  })
 
   # Make sure we have two nodes added to our model
   expect_equal(attr(net, 'n_nodes'), 7)
 
   # And one edge
   expect_equal(attr(net, 'n_edges'), start_num_edges + 1)
+
+  # Messages can be turned off
+  # Gives a message about new nodes on default
+  expect_silent({
+    net <- net %>% add_edge('new_from_node2', 'new_to_node2', show_messages = FALSE)
+  })
+
+  pre_addition_edges <- attr(net, 'n_edges')
+
+  # Adding an edge between two existing nodes works without message
+  expect_silent({
+    net <- net %>% add_edge('new_from_node2', 'new_to_node2')
+  })
+
+  expect_equal(attr(net, 'n_edges'), pre_addition_edges + 1)
 })
 
 
