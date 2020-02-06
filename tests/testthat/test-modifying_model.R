@@ -46,42 +46,23 @@ test_that("Add Node", {
     ),
     fixed = TRUE
   )
-
-
-
-   # # Add node using piped and assigned formula
-  # my_sbm2 <- my_sbm %>% add_node('node_7', type = 'test_node')
-  # expect_equal(my_sbm2 %>% get_state() %>% nrow(), 7)
-  #
-  # # Add a node at a block level
-  # my_sbm %>% add_node('node_11', level = 1, type = 'test_node')
-  # expect_equal(sum(get_state(my_sbm)$level), 1)
-  #
-  # # Add another node at the metablock level
-  # my_sbm %>% add_node('node_21', level = 2, type = 'test_node')
-  # expect_equal(sum(get_state(my_sbm)$level), 3)
 })
-#
-#
-# test_that("Add edge", {
-#   # Start with network with couple nodes
-#   my_sbm <- create_sbm() %>%
-#     add_node('node_1') %>%
-#     add_node('node_2')
-#
-#   expect_equal(my_sbm %>% get_state() %>% nrow(), 2)
-#
-#   # Add edge between those two nodes
-#   my_sbm %>% add_edge('node_1', 'node_2')
-#
-#   # This should thrown a nice helpful error message, but it doesn't.
-#   expect_error(
-#     add_edge(my_sbm, 'node_4', 'node_2'),
-#     "Can't find node node_4 at level 0",
-#     fixed = TRUE
-#   )
-# })
-#
+
+test_that("Add edge", {
+  # Start with network with 5 nodes all fully connected
+  net <- sim_random_network(n_nodes = 5, prob_of_edge = 1)
+
+  start_num_edges <- attr(net, 'n_edges')
+  net <- net %>% add_edge('new_from_node', 'new_to_node')
+
+  # Make sure we have two nodes added to our model
+  expect_equal(attr(net, 'n_nodes'), 7)
+
+  # And one edge
+  expect_equal(attr(net, 'n_edges'), start_num_edges + 1)
+})
+
+
 #
 # test_that("Set node parent", {
 #   # Start with network with couple nodes, one at block level
