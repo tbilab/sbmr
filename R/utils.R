@@ -48,7 +48,14 @@ get_combination_indices <- function(n, repeats = FALSE){
 }
 
 
-# Determin if an object is of the class list, not the type
+# Determine if an object is of the class list, not the type
 is_list_class <- function(x){
   "list" %in% class(x)
 }
+
+# Syntax sugar
+not_in <- function(a, b){
+  !(a %in% b)
+}
+
+
