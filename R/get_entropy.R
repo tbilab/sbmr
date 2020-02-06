@@ -28,15 +28,15 @@
 #' # Compute entropy of network
 #' get_entropy(my_sbm)
 #'
-get_entropy <- function(x){
+get_entropy <- function(sbm){
   UseMethod("get_entropy")
 }
 
-get_entropy.default <- function(x){
+get_entropy.default <- function(sbm){
   cat("get_entropy generic")
 }
 
 #' @export
-get_entropy.sbm_network <- function(x){
+get_entropy.sbm_network <- function(sbm){
   verify_model(sbm)$model$get_entropy(0L)
 }
