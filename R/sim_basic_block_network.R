@@ -50,7 +50,6 @@ sim_basic_block_network <- function(
   block_pair_inds <- get_combination_indices(n_blocks, repeats = TRUE)
   n_pairs <- length(block_pair_inds$a)
 
-
   edge_propensities <- dplyr::tibble(
     block_1 = blocks$block[block_pair_inds$a],
     block_2 = blocks$block[block_pair_inds$b],
@@ -58,7 +57,7 @@ sim_basic_block_network <- function(
   )
 
   # Pass the constructed dataframes to the main sbm simulation function and remove edges
-  sim_results <- sim_sbm_network(
+  simulated_sbm_network <- sim_sbm_network(
     block_info = blocks,
     edge_propensities = edge_propensities,
     edge_dist = purrr::rbernoulli,
@@ -67,9 +66,10 @@ sim_basic_block_network <- function(
   )
 
   if (return_edge_propensities){
-    sim_results$edge_propensities <- edge_propensities
+    # Add a value for the edge propensities to object if desired
+    simulated_sbm_network$edge_propensities <- edge_propensities
   }
 
-  sim_results
+  simulated_sbm_network
 }
 
