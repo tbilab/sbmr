@@ -4,7 +4,12 @@
 \alias{sim_random_network}
 \title{Simulate completely random network}
 \usage{
-sim_random_network(n_nodes = 5, prob_of_edge = 0.7, allow_self_edges = FALSE)
+sim_random_network(
+  n_nodes = 5,
+  prob_of_edge = 0.7,
+  allow_self_edges = FALSE,
+  setup_model = FALSE
+)
 }
 \arguments{
 \item{n_nodes}{Total number of unique nodes to simulate}
@@ -14,6 +19,9 @@ occuring}
 
 \item{allow_self_edges}{Should nodes be allowed to have edges to
 themselves?}
+
+\item{setup_model}{Should an SBM model object be added? Set to \code{FALSE} if
+network is just being visualized or described.}
 }
 \value{
 A \code{sbm_network}/\code{list} that as \code{nodes} and \code{edges} member tibbles.

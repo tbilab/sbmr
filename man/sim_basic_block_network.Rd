@@ -12,7 +12,8 @@ sim_basic_block_network(
   edge_dist = purrr::rbernoulli,
   allow_self_edges = FALSE,
   keep_edge_counts = FALSE,
-  return_edge_propensities = FALSE
+  return_edge_propensities = FALSE,
+  setup_model = FALSE
 )
 }
 \arguments{
@@ -42,6 +43,9 @@ want to set this to \code{TRUE}.}
 \item{return_edge_propensities}{If set to \code{TRUE} the returned list will
 also include the simulated edge propensities dataframe. This can be
 used for recreating draws using \code{\link{sim_sbm_network()}}.}
+
+\item{setup_model}{Should an SBM model object be added? Set to \code{FALSE} if
+network is just being visualized or described.}
 }
 \value{
 A list with a \code{nodes} dataframe (containing a node's \code{id} and \code{block}
