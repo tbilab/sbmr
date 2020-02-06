@@ -4,7 +4,7 @@
 #' the desired node is connected to and how many connections they have to that
 #' block.
 #'
-#' @family modeling
+#' @family advanced
 #'
 #' @seealso \code{\link{get_block_edge_counts}}
 #' @inheritParams add_node
