@@ -24,6 +24,15 @@
 #'   set_node_parent(child_id = 'node_1', parent_id = 'node_11')
 #'
 set_node_parent <- function(sbm, child_id, parent_id, level = 0){
+  UseMethod("set_node_parent")
+}
+
+set_node_parent.default <- function(sbm, child_id, parent_id, level = 0){
+  cat("set_node_parent generic")
+}
+
+#' @export
+set_node_parent.sbm_network <- function(sbm, child_id, parent_id, level = 0){
 
   # Grab current state of model
   state <- attr(sbm, 'state')
@@ -66,3 +75,4 @@ set_node_parent <- function(sbm, child_id, parent_id, level = 0){
 
   sbm
 }
+
