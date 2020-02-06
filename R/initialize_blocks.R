@@ -9,7 +9,7 @@
 #' `num_blocks * <num_types>` due to some block nodes never being assigned to a
 #' child node.
 #'
-#' @family modeling
+#' @family advanced
 #'
 #' @inheritParams set_node_parent
 #' @param num_blocks Total number of blocks to initialize for each unique node
@@ -40,19 +40,35 @@
 #' my_sbm %>% initialize_blocks(num_blocks = 2)
 #' get_num_blocks(my_sbm)
 #'
-initialize_blocks <- function(sbm, num_blocks = -1, level = 0){
+initialize_blocks <- function(sbm, num_blocks = NULL, level = 0){
   UseMethod("initialize_blocks")
 }
 
-initialize_blocks.default <- function(sbm, num_blocks = -1, level = 0){
+initialize_blocks.default <- function(sbm, num_blocks = NULL, level = 0){
   cat("Block initialization generic.")
 }
 
 #' @export
-initialize_blocks.sbm_network <- function(sbm, num_blocks = -1, level = 0){
-  if(num_blocks < -1) stop(paste("Can't initialize", num_blocks, "blocks."))
+initialize_blocks.sbm_network <- function(sbm, num_blocks = NULL, level = 0){
+  # Make sure we have an SBM object to work with
   sbm <- verify_model(sbm)
 
+  one_block_per_node <- is.null(num_blocks)
+  num_nodes_at_level <- sum(attr(sbm, 'state')$level == level)
+
+  # Check all the possible error conditions
+  if(one_block_per_node){
+    num_blocks <- -1
+  } else
+  if(num_blocks < 1){
+    stop(glue::glue("Can't initialize {num_blocks} blocks."))
+  } else
+  if(num_blocks > num_nodes_at_level){
+    stop(glue::glue("Network only has {num_nodes_at_level} nodes at level {level}. ",
+                    "Can't initialize {num_blocks} blocks."))
+  }
+
+  # Send message to RCPP class to initialize proper number of nodes
   sbm$model$initialize_blocks(as.integer(num_blocks), as.integer(level))
 
   # Update state attribute
