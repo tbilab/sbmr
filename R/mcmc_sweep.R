@@ -50,14 +50,42 @@
 #' # Get idea of node-pair similarity by looking at how often every pair of nodes is connected over sweeps
 #' my_sbm %>% mcmc_sweep(num_sweeps = 4, track_pairs = TRUE)
 #'
-mcmc_sweep <- function(sbm, num_sweeps = 1, variable_num_blocks = TRUE, eps = 0.1, track_pairs = FALSE, level = 0, verbose = FALSE){
+mcmc_sweep <- function(sbm,
+                       num_sweeps = 1,
+                       eps = 0.1,
+                       variable_num_blocks = TRUE,
+                       track_pairs = FALSE,
+                       level = 0,
+                       verbose = FALSE){
+  set_generic("mcmc_sweep")
+}
 
-  results <- sbm$mcmc_sweep(as.integer(level),
-                 as.integer(num_sweeps),
-                 eps,
-                 variable_num_blocks,
-                 track_pairs,
-                 verbose)
+mcmc_sweep.default <- function(sbm,
+                               num_sweeps = 1,
+                               eps = 0.1,
+                               variable_num_blocks = TRUE,
+                               track_pairs = FALSE,
+                               level = 0,
+                               verbose = FALSE){
+  cat("mcmc_sweep generic")
+}
+
+#' @export
+mcmc_sweep.sbm_network <- function(sbm,
+                                   num_sweeps = 1,
+                                   eps = 0.1,
+                                   variable_num_blocks = TRUE,
+                                   track_pairs = FALSE,
+                                   level = 0,
+                                   verbose = FALSE){
+  sbm <- verify_model(sbm)
+
+  results <- sbm$model$mcmc_sweep(as.integer(level),
+                                  as.integer(num_sweeps),
+                                  eps,
+                                  variable_num_blocks,
+                                  track_pairs,
+                                  verbose)
 
   if (track_pairs) {
     # Clean up pair connections results
@@ -71,3 +99,4 @@ mcmc_sweep <- function(sbm, num_sweeps = 1, variable_num_blocks = TRUE, eps = 0.
 
   results
 }
+
