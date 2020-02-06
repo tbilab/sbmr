@@ -27,18 +27,34 @@
 #' # Choose best result
 #' my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, verbose = TRUE)
 #'
-collapse_run <- function(
-  sbm,
-  level = 0,
-  sigma = 2,
-  num_final_blocks = 1:10,
-  num_block_proposals = 5,
-  num_mcmc_sweeps = 10,
-  eps = 0.1,
-  parallel = FALSE
-){
-  # Gather info needed to make copy of sbm on other thread
-  model_data <- sbm$get_data()
+collapse_run <- function(sbm,
+                         num_final_blocks = 1:10,
+                         num_mcmc_sweeps = 10,
+                         sigma = 2,
+                         eps = 0.1,
+                         num_block_proposals = 5,
+                         parallel = FALSE){
+  set_generic("collapse_run")
+}
+
+collapse_run.default <- function(sbm,
+                                 num_final_blocks = 1:10,
+                                 num_mcmc_sweeps = 10,
+                                 sigma = 2,
+                                 eps = 0.1,
+                                 num_block_proposals = 5,
+                                 parallel = FALSE){
+  cat("collapse_run generic")
+}
+
+#' @export
+collapse_run.sbm_network <- function(sbm,
+                                     num_final_blocks = 1:10,
+                                     num_mcmc_sweeps = 10,
+                                     sigma = 2,
+                                     eps = 0.1,
+                                     num_block_proposals = 5,
+                                     parallel = FALSE){
 
   block_range <- num_final_blocks
 
@@ -50,7 +66,7 @@ collapse_run <- function(
     results <- furrr::future_map_dfr(
       block_range,
       function(desired_num){
-        collapse_blocks(create_sbm(model_data),
+        collapse_blocks(sbm,
                         desired_num_blocks = desired_num,
                         sigma = sigma,
                         eps = eps,
@@ -60,7 +76,7 @@ collapse_run <- function(
       }
     )
   } else {
-    collapse_results <- sbm$collapse_run(as.integer(level),
+    collapse_results <- sbm$model$collapse_run(as.integer(level),
                                          as.integer(num_mcmc_sweeps),
                                          as.integer(num_block_proposals),
                                          sigma,
@@ -72,10 +88,11 @@ collapse_run <- function(
       ~dplyr::tibble(entropy = .$entropy,
                      num_blocks = .$num_blocks)
     ) %>%
-    dplyr::mutate(state = purrr::map(collapse_results, 'state'))
+      dplyr::mutate(state = purrr::map(collapse_results, 'state'))
   }
 
-   results
+  results
 }
+
 
 
