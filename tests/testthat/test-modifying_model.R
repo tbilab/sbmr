@@ -131,7 +131,7 @@ test_that("Set node parent", {
 test_that("Randomly initializing blocks in network", {
   # Default value is 1 block per node
   expect_equal(
-    sim_random_network(n_nodes = 5) %>%
+    sim_random_network(n_nodes = 5, prob_of_edge = 1) %>%
       initialize_blocks() %>%
       get_num_blocks(),
     5
@@ -139,7 +139,7 @@ test_that("Randomly initializing blocks in network", {
 
   # Can also specify number of blocks
   expect_equal(
-    sim_random_network(n_nodes = 5) %>%
+    sim_random_network(n_nodes = 5, prob_of_edge = 1) %>%
       initialize_blocks(num_blocks = 3) %>%
       get_num_blocks(),
     3
@@ -147,20 +147,20 @@ test_that("Randomly initializing blocks in network", {
 
   # Can't request more blocks than nodes
   expect_error(
-    sim_random_network(n_nodes = 5) %>%
+    sim_random_network(n_nodes = 5, prob_of_edge = 1) %>%
       initialize_blocks(num_blocks = 10),
     "Network only has 5 nodes at level 0. Can't initialize 10 blocks"
   )
 
   # Can't request negative numbers of blocks
   expect_error(
-    sim_random_network(n_nodes = 5) %>%
+    sim_random_network(n_nodes = 5, prob_of_edge = 1) %>%
       initialize_blocks(num_blocks = -2),
     "Can't initialize -2 blocks."
   )
 
   # Can build blocks at multiple levels
-  net <- sim_random_network(n_nodes = 5) %>%
+  net <- sim_random_network(n_nodes = 5, prob_of_edge = 1) %>%
     initialize_blocks() %>%
     initialize_blocks(level = 1)
 
@@ -174,41 +174,5 @@ test_that("Randomly initializing blocks in network", {
     sum(model_state$level == 2),
     5
   )
-
 })
 
-
-# test_that("computing entropy", {
-#   # Start with nodes 3 nodes attached to 2 blocks
-#   my_sbm <- create_sbm() %>%
-#     add_node('node_1') %>%
-#     add_node('node_2') %>%
-#     add_node('node_3') %>%
-#     add_node('node_4') %>%
-#     add_node('node_11', level = 1) %>%
-#     add_node('node_12', level = 1) %>%
-#     add_node('node_13', level = 1) %>%
-#     add_edge('node_1', 'node_2') %>%
-#     add_edge('node_1', 'node_3') %>%
-#     add_edge('node_1', 'node_4') %>%
-#     add_edge('node_2', 'node_3') %>%
-#     add_edge('node_2', 'node_4') %>%
-#     add_edge('node_3', 'node_4') %>%
-#     add_edge('node_4', 'node_1') %>%
-#     set_node_parent(child_id = 'node_1', parent_id = 'node_11') %>%
-#     set_node_parent(child_id = 'node_2', parent_id = 'node_11') %>%
-#     set_node_parent(child_id = 'node_3', parent_id = 'node_12') %>%
-#     set_node_parent(child_id = 'node_4', parent_id = 'node_13')
-#
-#   first_entropy <- my_sbm %>% get_entropy()
-#
-#   # Change parentage of a node
-#   my_sbm %>% set_node_parent(child_id = 'node_2', parent_id = 'node_12')
-#
-#   # Record entropy again
-#   second_entropy <- my_sbm %>% get_entropy()
-#
-#   # Entropy should have changed
-#   expect_false(first_entropy == second_entropy)
-# })
-#
