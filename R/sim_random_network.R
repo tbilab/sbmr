@@ -13,7 +13,10 @@
 #'
 #' @examples
 #' sim_random_network(n_nodes = 4, prob_of_edge = 0.9)
-sim_random_network <- function(n_nodes = 5, prob_of_edge = 0.7, allow_self_edges = FALSE){
+sim_random_network <- function(n_nodes = 5,
+                               prob_of_edge = 0.7,
+                               allow_self_edges = FALSE,
+                               setup_model = FALSE){
 
   sim_sbm_network(
     block_info = dplyr::tibble(
@@ -26,6 +29,7 @@ sim_random_network <- function(n_nodes = 5, prob_of_edge = 0.7, allow_self_edges
       propensity = prob_of_edge
     ),
     edge_dist = purrr::rbernoulli,
-    allow_self_edges = allow_self_edges
+    allow_self_edges = allow_self_edges,
+    setup_model = setup_model
   )
 }

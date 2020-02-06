@@ -36,7 +36,8 @@ sim_basic_block_network <- function(
   edge_dist = purrr::rbernoulli,
   allow_self_edges = FALSE,
   keep_edge_counts = FALSE,
-  return_edge_propensities = FALSE){
+  return_edge_propensities = FALSE,
+  setup_model = FALSE){
 
   # Build blocks option with a constant number of nodes per block
   blocks <- dplyr::tibble(
@@ -62,7 +63,8 @@ sim_basic_block_network <- function(
     edge_propensities = edge_propensities,
     edge_dist = purrr::rbernoulli,
     allow_self_edges = allow_self_edges,
-    keep_edge_counts = keep_edge_counts
+    keep_edge_counts = keep_edge_counts,
+    setup_model = setup_model
   )
 
   if (return_edge_propensities){
