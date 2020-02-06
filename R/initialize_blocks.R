@@ -39,7 +39,21 @@
 #' get_num_blocks(my_sbm)
 #'
 initialize_blocks <- function(sbm, num_blocks = -1, level = 0){
+  UseMethod("initialize_blocks")
+}
+
+initialize_blocks.default <- function(sbm, num_blocks = -1, level = 0){
+  cat("Block initialization generic.")
+}
+
+#' @export
+initialize_blocks.sbm_network <- function(sbm, num_blocks = -1, level = 0){
   if(num_blocks < -1) stop(paste("Can't initialize", num_blocks, "blocks."))
-  sbm$initialize_blocks(as.integer(num_blocks), as.integer(level))
+
+  sbm$model$initialize_blocks(as.integer(num_blocks), as.integer(level))
+
+  # Update state attribute
+  attr(x, "state") <- sbm$model$get_state()
+
   sbm
 }
