@@ -1,6 +1,6 @@
 #' Print network
 #'
-#' @inheritParams initialize_model
+#' @inheritParams verify_model
 #'
 #' @return Output of the number of nodes and edges in model along with
 #'   indication of if a model has been initialized

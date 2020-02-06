@@ -2,7 +2,7 @@
 #'
 #' Saves an SBM Network object to local disk for use accross sessions without instantiating again. Opened with \code{\link{load_sbm_network}}
 #'
-#' @inheritParams initialize_model
+#' @inheritParams verify_model
 #' @param loc Location on computer of saved model `.rds` file.
 #'
 #' @return Saved `.rds` file on disk at specified location.

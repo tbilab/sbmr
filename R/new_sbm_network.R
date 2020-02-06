@@ -201,7 +201,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
 
   # Initialize a model if requested
   if (setup_model) {
-    x <- initialize_model(x,show_messages = FALSE)
+    x <- verify_model(x,show_messages = FALSE)
   }
 
   # Return
