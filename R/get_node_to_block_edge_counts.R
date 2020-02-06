@@ -22,13 +22,19 @@
 #' # Gather edge counts for a node in the network
 #' sbm %>% get_node_to_block_edge_counts("g1_1")
 #'
-get_node_to_block_edge_counts <- function(sbm,
-                                          node_id,
-                                          connection_level = 1L,
-                                          node_level = 0L){
+get_node_to_block_edge_counts <- function(sbm, node_id, connection_level = 1L){
+  set_generic("get_node_to_block_edge_counts")
+}
 
-   # Call the exported method from the rcpp wrapper class.
-  sbm$get_node_to_block_edge_counts(node_id,
+get_node_to_block_edge_counts.default <- function(sbm, node_id, connection_level = 1L){
+  cat("get_node_to_block_edge_counts generic")
+}
+
+#' @export
+get_node_to_block_edge_counts.sbm_network <- function(sbm, node_id, connection_level = 1L){
+  # Call the exported method from the rcpp wrapper class.
+  sbm$model$get_node_to_block_edge_counts(node_id,
                                     as.integer(node_level),
                                     as.integer(connection_level))
 }
+
