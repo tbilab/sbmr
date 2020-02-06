@@ -18,7 +18,7 @@
 #' sbm %>% get_block_edge_counts(1)
 #'
 get_block_edge_counts <- function(sbm, level = 1){
-  set_generic("get_block_edge_counts")
+  UseMethod("get_block_edge_counts")
 }
 
 get_block_edge_counts.default <- function(sbm, level = 1){

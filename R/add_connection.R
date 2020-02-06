@@ -30,7 +30,7 @@ add_edge <- function(sbm,
                      from_node_type = NULL,
                      to_node_type = NULL,
                      type_warning = TRUE){
-  set_generic("add_edge")
+  UseMethod("add_edge")
 }
 
 add_edge.default <- function(sbm,

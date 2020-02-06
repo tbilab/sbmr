@@ -3,7 +3,7 @@
 #' Add a node to the network. Takes the node id (string), the node type
 #' (string), and the node level (int).
 #'
-#' @param sbm SBM model object as created by \code{\link{create_sbm()}}.
+#' @param sbm `sbm_network` object as created by \code{\link{new_sbm_network()}}.
 #' @param id Unique identifying name for node.
 #' @param type Type of node (string). This is used to distinguish multipartite networks. E.g. "person", or "publication", etc..
 #'
@@ -19,7 +19,7 @@
 #' get_state(my_sbm)
 #'
 add_node <- function(sbm, id, type = NULL){
-  set_generic("add_node")
+  UseMethod("add_node")
 }
 
 add_node.default <- function(sbm, id, type = NULL){

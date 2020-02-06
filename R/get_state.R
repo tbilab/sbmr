@@ -23,7 +23,7 @@
 #' my_sbm %>% get_state()
 #'
 get_state <- function(x){
-  set_generic("get_state")
+  UseMethod("get_state")
 }
 
 get_state.default <- function(x){

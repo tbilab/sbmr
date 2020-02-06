@@ -27,7 +27,7 @@
 #' get_entropy(my_sbm)
 #'
 get_entropy <- function(x){
-  set_generic("get_entropy")
+  UseMethod("get_entropy")
 }
 
 get_entropy.default <- function(x){

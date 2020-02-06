@@ -34,7 +34,7 @@ collapse_run <- function(sbm,
                          eps = 0.1,
                          num_block_proposals = 5,
                          parallel = FALSE){
-  set_generic("collapse_run")
+  UseMethod("collapse_run")
 }
 
 collapse_run.default <- function(sbm,

@@ -57,7 +57,7 @@ mcmc_sweep <- function(sbm,
                        track_pairs = FALSE,
                        level = 0,
                        verbose = FALSE){
-  set_generic("mcmc_sweep")
+  UseMethod("mcmc_sweep")
 }
 
 mcmc_sweep.default <- function(sbm,

@@ -23,7 +23,7 @@
 #' sbm %>% get_node_to_block_edge_counts("g1_1")
 #'
 get_node_to_block_edge_counts <- function(sbm, node_id, connection_level = 1L){
-  set_generic("get_node_to_block_edge_counts")
+  UseMethod("get_node_to_block_edge_counts")
 }
 
 get_node_to_block_edge_counts.default <- function(sbm, node_id, connection_level = 1L){

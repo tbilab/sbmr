@@ -58,7 +58,7 @@ collapse_blocks <- function(sbm,
                             num_block_proposals = 5,
                             level = 0,
                             report_all_steps = TRUE){
-  set_generic("collapse_blocks")
+  UseMethod("collapse_blocks")
 }
 
 collapse_blocks.default <- function(sbm,
