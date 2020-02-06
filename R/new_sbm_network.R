@@ -63,9 +63,6 @@ new_sbm_network <- function(edges = dplyr::tibble(),
   # Get an idea of what kind of data we were given to drive logic
   missing_nodes <- is.null(nodes)
 
-  # Syntax sugar
-  not_in <- function(a, b) !(a %in% b)
-
   # Checks if a column exists in a dataframe
   col_exists <- function(col_quo, df) rlang::as_name(col_quo) %in% colnames(df)
 
