@@ -80,6 +80,7 @@ test_that("Add edge", {
   expect_equal(attr(net, 'n_edges'), pre_addition_edges + 1)
 })
 
+
 test_that("Set node parent", {
   # Start with bipartite network with 6 nodes
   net <- dplyr::tribble(
@@ -127,87 +128,56 @@ test_that("Set node parent", {
 })
 
 
-# test_that("Initializing a single block per node", {
-#   # Default parameters should create a single block per node
-#   my_sbm <- create_sbm() %>%
-#     add_node('node_1') %>%
-#     add_node('node_2') %>%
-#     add_node('node_3') %>%
-#     initialize_blocks()
-#
-#   expect_equal(get_num_blocks(my_sbm),3)
-#
-# })
-#
-#
-# test_that("Randomly assigning initial blocks", {
-#   n_samples <- 10 # due to stochastic sampling need to try a few times and make sure average works as expected
-#   n_blocks <- 3;
-#   n_nodes_each_type <- 10;
-#   max_n_types <- 5
-#
-#   get_num_initialized_blocks <- function(my_nodes){
-#     # Default parameters should create a single block per node
-#     create_sbm(nodes = my_nodes) %>%
-#       initialize_blocks(num_blocks = n_blocks) %>%
-#       get_state() %>%
-#       dplyr::filter(level == 1) %>%
-#       nrow()
-#   }
-#
-#   # Loop over a range of number of types and make sure desired number of blocks is made
-#   1:max_n_types %>%
-#     purrr::walk(function(n_types){
-#       types <- letters[1:n_types]
-#
-#       # Setup some nodes
-#       my_nodes <- dplyr::tibble(
-#         type = rep(types, each = n_nodes_each_type),
-#         id = paste0(type, 1:(n_nodes_each_type*n_types))
-#       )
-#
-#       num_blocks_per_sample <- 1:n_samples %>%
-#         purrr::map_int(~get_num_initialized_blocks(my_nodes))
-#
-#       expect_true(any(num_blocks_per_sample == n_blocks*n_types))
-#     })
-# })
-#
-#
-# test_that("Loading from state dump", {
-#
-#   # Start with nodes 3 nodes attached to 2 blocks
-#   my_sbm <- create_sbm() %>%
-#     add_node('node_1') %>%
-#     add_node('node_2') %>%
-#     add_node('node_3') %>%
-#     add_node('node_11', level = 1) %>%
-#     add_node('node_12', level = 1) %>%
-#     set_node_parent(child_id = 'node_1', parent_id = 'node_11') %>%
-#     set_node_parent(child_id = 'node_2', parent_id = 'node_11') %>%
-#     set_node_parent(child_id = 'node_3', parent_id = 'node_12')
-#
-#   # Grab state
-#   initial_state <- my_sbm %>% get_state()
-#
-#   # Modify state by adding a new block and attaching node 3 to it
-#   my_sbm %>%
-#     add_node('node_13', level = 1) %>%
-#     set_node_parent('node_3', parent_id = 'node_13')
-#
-#   intermediate_state <- my_sbm %>% get_state()
-#
-#   # Make sure initial and intermediate are not equal
-#   testthat::expect_false(isTRUE(all.equal(intermediate_state, initial_state)))
-#
-#   # Now restore model state using initial snapshot
-#   my_sbm %>% load_from_state(initial_state)
-#   final_state <- my_sbm %>% get_state()
-#
-#   expect_equal(initial_state, final_state)
-# })
-#
-#
+test_that("Randomly initializing blocks in network", {
+  # Default value is 1 block per node
+  expect_equal(
+    sim_random_network(n_nodes = 5) %>%
+      initialize_blocks() %>%
+      get_num_blocks(),
+    5
+  )
+
+  # Can also specify number of blocks
+  expect_equal(
+    sim_random_network(n_nodes = 5) %>%
+      initialize_blocks(num_blocks = 3) %>%
+      get_num_blocks(),
+    3
+  )
+
+  # Can't request more blocks than nodes
+  expect_error(
+    sim_random_network(n_nodes = 5) %>%
+      initialize_blocks(num_blocks = 10),
+    "Network only has 5 nodes at level 0. Can't initialize 10 blocks"
+  )
+
+  # Can't request negative numbers of blocks
+  expect_error(
+    sim_random_network(n_nodes = 5) %>%
+      initialize_blocks(num_blocks = -2),
+    "Can't initialize -2 blocks."
+  )
+
+  # Can build blocks at multiple levels
+  net <- sim_random_network(n_nodes = 5) %>%
+    initialize_blocks() %>%
+    initialize_blocks(level = 1)
+
+  model_state <- get_state(net)
+
+  # There should now be fifteen total nodes in state
+  expect_equal(nrow(model_state), 15)
+
+  # With five total blocks sitting at level 2
+  expect_equal(
+    sum(model_state$level == 2),
+    5
+  )
+
+})
+
+
 # test_that("computing entropy", {
 #   # Start with nodes 3 nodes attached to 2 blocks
 #   my_sbm <- create_sbm() %>%
