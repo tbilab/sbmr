@@ -4,14 +4,19 @@
 \alias{add_node}
 \title{Add a new node to network}
 \usage{
-add_node(sbm, id, type = NULL)
+add_node(sbm, id, type = NULL, show_messages = TRUE)
 }
 \arguments{
-\item{sbm}{\code{sbm_network} object as created by \code{\link{new_sbm_network()}}.}
+\item{sbm}{\code{sbm_network} object as created by
+\code{\link{new_sbm_network()}}.}
 
 \item{id}{Unique identifying name for node.}
 
-\item{type}{Type of node (string). This is used to distinguish multipartite networks. E.g. "person", or "publication", etc..}
+\item{type}{Type of node (string). This is used to distinguish multipartite
+networks. E.g. "person", or "publication", etc..}
+
+\item{show_messages}{Should function inform of its actions such as when a
+model already exists so no changes are made?}
 }
 \value{
 \code{sbm_network} object  with node added.

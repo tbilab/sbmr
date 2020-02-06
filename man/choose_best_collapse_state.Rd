@@ -13,7 +13,8 @@ choose_best_collapse_state(
 )
 }
 \arguments{
-\item{sbm}{\code{sbm_network} object as created by \code{\link{new_sbm_network()}}.}
+\item{sbm}{\code{sbm_network} object as created by
+\code{\link{new_sbm_network()}}.}
 
 \item{collapse_results}{Results of running agglomerative collapse algorithm
 on sbm with \code{\link{collapse_blocks}}.}

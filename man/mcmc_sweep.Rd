@@ -16,7 +16,8 @@ mcmc_sweep(
 )
 }
 \arguments{
-\item{sbm}{\code{sbm_network} object as created by \code{\link{new_sbm_network()}}.}
+\item{sbm}{\code{sbm_network} object as created by
+\code{\link{new_sbm_network()}}.}
 
 \item{num_sweeps}{Number of times all nodes are passed through for move
 proposals.}

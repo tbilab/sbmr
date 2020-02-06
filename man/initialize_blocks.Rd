@@ -7,7 +7,8 @@
 initialize_blocks(sbm, num_blocks = -1, level = 0)
 }
 \arguments{
-\item{sbm}{\code{sbm_network} object as created by \code{\link{new_sbm_network()}}.}
+\item{sbm}{\code{sbm_network} object as created by
+\code{\link{new_sbm_network()}}.}
 
 \item{num_blocks}{Total number of blocks to initialize for each unique node
 type. If set to \code{-1}, then a single block is made for every node.}
