@@ -98,9 +98,6 @@ collapse_blocks.sbm_network <- function(sbm,
     report_all_steps
   )
 
-  # Reset state back to pre-collapse [inefficient]
-  sbm$model$set_state(attr(sbm, "state"))
-
   purrr::map_dfr(
     collapse_results,
     ~dplyr::tibble(entropy = .$entropy,
