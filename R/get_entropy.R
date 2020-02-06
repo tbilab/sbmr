@@ -1,12 +1,8 @@
 #' Compute entropy for current model state
 #'
-#' Computes the (degree-corrected) entropy for the network at the specified
-#' level (int).
+#' Computes the (degree-corrected) entropy for the network at the node level.
 #'
 #' @inheritParams add_node
-#' @param level Level of nodes for which block entropy is accessed. E.g. the
-#'   default value of `0` will get entropy of model as described by the blocks
-#'   in level `1`.
 #'
 #' @return Entropy value (numeric).
 #' @export
@@ -30,6 +26,15 @@
 #' # Compute entropy of network
 #' get_entropy(my_sbm)
 #'
-get_entropy <- function(sbm, level = 0){
-  sbm$get_entropy(as.integer(level))
+get_entropy <- function(x){
+  set_generic("get_entropy")
+}
+
+get_entropy.default <- function(x){
+  cat("get_entropy generic")
+}
+
+#' @export
+get_entropy.sbm_network <- function(x){
+  sbm$model$get_entropy(0L)
 }
