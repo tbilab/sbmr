@@ -59,5 +59,5 @@ save_sbm_network.sbm_network <- function(x, loc){
 load_sbm_network <- function(loc){
   x <- readr::read_rds(loc)
 
-  initialize_model(x)
+  verify_model(x)
 }
