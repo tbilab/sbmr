@@ -36,16 +36,10 @@ sbm \%>\% get_node_to_block_edge_counts("g1_1")
 \seealso{
 \code{\link{get_block_edge_counts}}
 
-Other modeling: 
-\code{\link{choose_best_collapse_state}()},
-\code{\link{collapse_blocks}()},
-\code{\link{collapse_run}()},
-\code{\link{get_block_edge_counts}()},
-\code{\link{get_entropy}()},
-\code{\link{get_num_blocks}()},
-\code{\link{get_state}()},
+Other advanced: 
+\code{\link{add_edge}()},
+\code{\link{add_node}()},
 \code{\link{initialize_blocks}()},
-\code{\link{mcmc_sweep}()},
-\code{\link{sample_posterior}()}
+\code{\link{set_node_parent}()}
 }
-\concept{modeling}
+\concept{advanced}

@@ -37,6 +37,8 @@ get_state(my_sbm)
 \seealso{
 Other advanced: 
 \code{\link{add_edge}()},
+\code{\link{get_node_to_block_edge_counts}()},
+\code{\link{initialize_blocks}()},
 \code{\link{set_node_parent}()}
 }
 \concept{advanced}

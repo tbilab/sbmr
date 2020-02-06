@@ -39,6 +39,8 @@ my_sbm \%>\%
 \seealso{
 Other advanced: 
 \code{\link{add_edge}()},
-\code{\link{add_node}()}
+\code{\link{add_node}()},
+\code{\link{get_node_to_block_edge_counts}()},
+\code{\link{initialize_blocks}()}
 }
 \concept{advanced}

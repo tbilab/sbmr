@@ -4,7 +4,11 @@
 \alias{get_entropy}
 \title{Compute entropy for current model state}
 \usage{
-get_entropy(x)
+get_entropy(sbm)
+}
+\arguments{
+\item{sbm}{\code{sbm_network} object as created by
+\code{\link{new_sbm_network()}}.}
 }
 \value{
 Entropy value (numeric).
@@ -38,10 +42,8 @@ Other modeling:
 \code{\link{collapse_blocks}()},
 \code{\link{collapse_run}()},
 \code{\link{get_block_edge_counts}()},
-\code{\link{get_node_to_block_edge_counts}()},
 \code{\link{get_num_blocks}()},
 \code{\link{get_state}()},
-\code{\link{initialize_blocks}()},
 \code{\link{mcmc_sweep}()},
 \code{\link{sample_posterior}()}
 }

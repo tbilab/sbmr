@@ -4,7 +4,7 @@
 \alias{initialize_blocks}
 \title{Assign blocks for all nodes}
 \usage{
-initialize_blocks(sbm, num_blocks = -1, level = 0)
+initialize_blocks(sbm, num_blocks = NULL, level = 0)
 }
 \arguments{
 \item{sbm}{\code{sbm_network} object as created by
@@ -53,16 +53,10 @@ get_num_blocks(my_sbm)
 
 }
 \seealso{
-Other modeling: 
-\code{\link{choose_best_collapse_state}()},
-\code{\link{collapse_blocks}()},
-\code{\link{collapse_run}()},
-\code{\link{get_block_edge_counts}()},
-\code{\link{get_entropy}()},
+Other advanced: 
+\code{\link{add_edge}()},
+\code{\link{add_node}()},
 \code{\link{get_node_to_block_edge_counts}()},
-\code{\link{get_num_blocks}()},
-\code{\link{get_state}()},
-\code{\link{mcmc_sweep}()},
-\code{\link{sample_posterior}()}
+\code{\link{set_node_parent}()}
 }
-\concept{modeling}
+\concept{advanced}
