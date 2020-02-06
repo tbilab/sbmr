@@ -7,25 +7,26 @@
 mcmc_sweep(
   sbm,
   num_sweeps = 1,
-  variable_num_blocks = TRUE,
   eps = 0.1,
+  variable_num_blocks = TRUE,
   track_pairs = FALSE,
   level = 0,
-  verbose = FALSE
+  verbose = FALSE,
+  return_sbm_network = TRUE
 )
 }
 \arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
+\item{sbm}{\code{sbm_network} object as created by \code{\link{new_sbm_network()}}.}
 
 \item{num_sweeps}{Number of times all nodes are passed through for move
 proposals.}
 
+\item{eps}{Controls randomness of move proposals. Effects both the block
+merging and mcmc sweeps.}
+
 \item{variable_num_blocks}{Should the model allow new blocks to be created or
 empty blocks removed while sweeping or should number of blocks remain
 constant?}
-
-\item{eps}{Controls randomness of move proposals. Effects both the block
-merging and mcmc sweeps.}
 
 \item{track_pairs}{Return a dataframe with all pairs of nodes along with the
 number of sweeps they shared the same group?}
@@ -36,6 +37,10 @@ through MCMC proposal-accept routine.}
 \item{verbose}{If set to \code{TRUE} then each proposed move for all sweeps will
 have information given on entropy delta, probability of moving, and if the
 move were accepted printed to the console.}
+
+\item{return_sbm_network}{Should the updated \code{sbm_network} object that was
+provided to function be returned in the results under \code{sbm_network}? If set
+to \code{FALSE} the new state after the sweep will not be maintained.}
 }
 \value{
 List with two dataframes. The first telling for all sweeps everytime

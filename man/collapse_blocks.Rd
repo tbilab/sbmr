@@ -6,33 +6,28 @@
 \usage{
 collapse_blocks(
   sbm,
-  level = 0,
-  num_mcmc_sweeps = 0,
   desired_num_blocks = 1,
-  report_all_steps = TRUE,
+  num_mcmc_sweeps = 0,
+  sigma = 2,
   eps = 0.1,
   num_block_proposals = 5,
-  sigma = 2
+  level = 0,
+  report_all_steps = TRUE
 )
 }
 \arguments{
-\item{level}{Level of nodes who's blocks will have their block membership run
-through MCMC proposal-accept routine.}
+\item{desired_num_blocks}{How many blocks should this given merge drop down
+to. If the network has more than one node type this number is multiplied by
+the total number of types.}
 
 \item{num_mcmc_sweeps}{How many MCMC sweeps the model does at each
 agglomerative merge step. This allows the model to allow nodes to find
 their most natural resting place in a given collapsed state. Larger values
 will slow down runtime but can potentially lead for more stable results.}
 
-\item{desired_num_blocks}{How many blocks should this given merge drop down
-to. If the network has more than one node type this number is multiplied by
-the total number of types.}
-
-\item{report_all_steps}{Should the model state be provided for every merge
-step or just the final one? If collapsing is being used to infer
-hierarcichal structure in data or inspection is desired this should be set
-to \code{TRUE}, otherwise it will slow down collapsing due to increased data
-transfer.}
+\item{sigma}{Controls the rate of collapse. At each step of the collapsing
+the model will try and remove \code{current_num_nodes(1 - 1/sigma)} nodes from
+the model. So a larger sigma means a faster collapse rate.}
 
 \item{eps}{Controls randomness of move proposals. Effects both the block
 merging and mcmc sweeps.}
@@ -43,9 +38,14 @@ merge potentials but may lead the model to local minimums. If the number of
 proposals is greater than then number of blocks then all blocks are
 searched exhaustively.}
 
-\item{sigma}{Controls the rate of collapse. At each step of the collapsing
-the model will try and remove \code{current_num_nodes(1 - 1/sigma)} nodes from
-the model. So a larger sigma means a faster collapse rate.}
+\item{level}{Level of nodes who's blocks will have their block membership run
+through MCMC proposal-accept routine.}
+
+\item{report_all_steps}{Should the model state be provided for every merge
+step or just the final one? If collapsing is being used to infer
+hierarcichal structure in data or inspection is desired this should be set
+to \code{TRUE}, otherwise it will slow down collapsing due to increased data
+transfer.}
 }
 \value{
 Tibble with four columns with rows corresponding to the result of

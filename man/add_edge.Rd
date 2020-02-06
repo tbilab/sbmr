@@ -4,17 +4,32 @@
 \alias{add_edge}
 \title{Add edge between two nodes in network}
 \usage{
-add_edge(sbm, a_node, b_node)
+add_edge(
+  sbm,
+  from_node,
+  to_node,
+  from_node_type = NULL,
+  to_node_type = NULL,
+  type_warning = TRUE
+)
 }
 \arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
+\item{sbm}{\code{sbm_network} object as created by \code{\link{new_sbm_network()}}.}
 
-\item{a_node}{Id of first node in edge}
+\item{from_node}{Id of first node in edge}
 
-\item{b_node}{Id of second node in edge}
+\item{to_node}{Id of second node in edge}
+
+\item{from_node_type}{Type of \code{from_node}}
+
+\item{to_node_type}{Type of \code{to_node}}
+
+\item{type_warning}{If node types are not specified the model will issue a
+warning and use the first node in networks type for both. To hide this
+warning for unipartite networks set this to \code{TRUE}.}
 }
 \value{
-SBM model object modified with edge added. \emph{Note that object is modified in place as well.}
+\code{sbm_network} object edge added.
 }
 \description{
 Connects two nodes in network (at level 0) by their ids (string).

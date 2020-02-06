@@ -4,21 +4,13 @@
 \alias{get_entropy}
 \title{Compute entropy for current model state}
 \usage{
-get_entropy(sbm, level = 0)
-}
-\arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
-
-\item{level}{Level of nodes for which block entropy is accessed. E.g. the
-default value of \code{0} will get entropy of model as described by the blocks
-in level \code{1}.}
+get_entropy(x)
 }
 \value{
 Entropy value (numeric).
 }
 \description{
-Computes the (degree-corrected) entropy for the network at the specified
-level (int).
+Computes the (degree-corrected) entropy for the network at the node level.
 }
 \examples{
 

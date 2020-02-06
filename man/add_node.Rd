@@ -4,19 +4,17 @@
 \alias{add_node}
 \title{Add a new node to network}
 \usage{
-add_node(sbm, id, type = "node", level = 0)
+add_node(sbm, id, type = NULL)
 }
 \arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
+\item{sbm}{\code{sbm_network} object as created by \code{\link{new_sbm_network()}}.}
 
 \item{id}{Unique identifying name for node.}
 
 \item{type}{Type of node (string). This is used to distinguish multipartite networks. E.g. "person", or "publication", etc..}
-
-\item{level}{Level in node hierarchy. Level \code{0} indicates node is at the data level, levels greater than \code{0} are block nodes.}
 }
 \value{
-SBM model object modified with node added. \emph{Note that object is modified in place as well.}
+\code{sbm_network} object  with node added.
 }
 \description{
 Add a node to the network. Takes the node id (string), the node type

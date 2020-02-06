@@ -6,38 +6,34 @@
 \usage{
 collapse_run(
   sbm,
-  level = 0,
-  sigma = 2,
   num_final_blocks = 1:10,
-  num_block_proposals = 5,
   num_mcmc_sweeps = 10,
+  sigma = 2,
   eps = 0.1,
+  num_block_proposals = 5,
   parallel = FALSE
 )
 }
 \arguments{
-\item{level}{Level of nodes who's blocks will have their block membership run
-through MCMC proposal-accept routine.}
-
-\item{sigma}{Controls the rate of collapse. At each step of the collapsing
-the model will try and remove \code{current_num_nodes(1 - 1/sigma)} nodes from
-the model. So a larger sigma means a faster collapse rate.}
-
 \item{num_final_blocks}{Array of integers corresponding to number of blocks to check in run.}
-
-\item{num_block_proposals}{Controls how many merger proposals are drawn for
-each block in the model. A larger number will increase the exploration of
-merge potentials but may lead the model to local minimums. If the number of
-proposals is greater than then number of blocks then all blocks are
-searched exhaustively.}
 
 \item{num_mcmc_sweeps}{How many MCMC sweeps the model does at each
 agglomerative merge step. This allows the model to allow nodes to find
 their most natural resting place in a given collapsed state. Larger values
 will slow down runtime but can potentially lead for more stable results.}
 
+\item{sigma}{Controls the rate of collapse. At each step of the collapsing
+the model will try and remove \code{current_num_nodes(1 - 1/sigma)} nodes from
+the model. So a larger sigma means a faster collapse rate.}
+
 \item{eps}{Controls randomness of move proposals. Effects both the block
 merging and mcmc sweeps.}
+
+\item{num_block_proposals}{Controls how many merger proposals are drawn for
+each block in the model. A larger number will increase the exploration of
+merge potentials but may lead the model to local minimums. If the number of
+proposals is greater than then number of blocks then all blocks are
+searched exhaustively.}
 
 \item{parallel}{Run in parallel using \code{furrr}?}
 }

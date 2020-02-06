@@ -7,7 +7,7 @@
 get_block_edge_counts(sbm, level = 1)
 }
 \arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
+\item{sbm}{\code{sbm_network} object as created by \code{\link{new_sbm_network()}}.}
 }
 \value{
 Dataframe of block pairs (\code{block_a} and \code{block_b}) and the number of edges between them (\code{count}).

@@ -4,15 +4,10 @@
 \alias{get_node_to_block_edge_counts}
 \title{Get node's edge counts to blocks}
 \usage{
-get_node_to_block_edge_counts(
-  sbm,
-  node_id,
-  connection_level = 1L,
-  node_level = 0L
-)
+get_node_to_block_edge_counts(sbm, node_id, connection_level = 1L)
 }
 \arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
+\item{sbm}{\code{sbm_network} object as created by \code{\link{new_sbm_network()}}.}
 
 \item{node_id}{String identifying the node that edge counts are desired for}
 
