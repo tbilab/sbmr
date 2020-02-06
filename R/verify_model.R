@@ -22,7 +22,7 @@
 #' sbm_net <- sbm_net %>% verify_model()
 #' sbm_net
 #'
-verify_model <- function(x, show_messages = TRUE){
+verify_model <- function(x, show_messages = FALSE){
   UseMethod("verify_model")
 }
 
@@ -31,7 +31,7 @@ verify_model.default <- function(x){
 }
 
 #' @export
-verify_model.sbm_network <- function(x, show_messages = TRUE){
+verify_model.sbm_network <- function(x, show_messages = FALSE){
 
   has_model_already <- !is.null(x$model)
   has_state_already <- !is.null(attr(x, "state"))
