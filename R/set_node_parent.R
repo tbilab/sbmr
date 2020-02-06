@@ -9,7 +9,7 @@
 #' @param level Level of child node. This will almost always stay at default
 #'   value of `0`.
 #'
-#' @return SBM model object modified with node hierarchy modified. \emph{Note that object is modified in place as well.}
+#' @return `sbm_network` object
 #' @export
 #'
 #' @examples
@@ -56,10 +56,10 @@ set_node_parent.sbm_network <- function(sbm, child_id, parent_id, level = 0){
 
   # Build parent entry in state if need be
   if(parent_missing){
-    new_parent_entry <- tibble(id = parent_id,
-                               parent = "none",
-                               type = child_type,
-                               level = child_level + 1)
+    new_parent_entry <- dplyr::tibble(id = parent_id,
+                                      parent = "none",
+                                      type = child_type,
+                                      level = child_level + 1)
 
     state <- dplyr::bind_rows(state,new_parent_entry)
   }
