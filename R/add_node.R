@@ -6,9 +6,8 @@
 #' @param sbm SBM model object as created by \code{\link{create_sbm()}}.
 #' @param id Unique identifying name for node.
 #' @param type Type of node (string). This is used to distinguish multipartite networks. E.g. "person", or "publication", etc..
-#' @param level Level in node hierarchy. Level `0` indicates node is at the data level, levels greater than `0` are block nodes.
 #'
-#' @return SBM model object modified with node added. \emph{Note that object is modified in place as well.}
+#' @return `sbm_network` object  with node added.
 #' @export
 #'
 #' @examples
@@ -19,7 +18,37 @@
 #'
 #' get_state(my_sbm)
 #'
-add_node <- function(sbm, id, type = "node", level = 0){
-  sbm$add_node(id, type, as.integer(level))
+add_node <- function(sbm, id, type = NULL){
+  set_generic("add_node")
+}
+
+add_node.default <- function(sbm, id, type = NULL){
+  cat("add_node generic")
+}
+
+#' @export
+add_node.sbm_network <- function(sbm, id, type = NULL){
+
+  node_not_in_network <- not_in(id, sbm_nodes$id)
+  if(node_not_in_network){
+
+    type_missing <- is.null(type)
+
+    if(type_missing){
+      type <- sbm$nodes$type[1]
+      warning(glue::glue("{id} node not in network but has no specified type. Defaulting to {from_node_type}"))
+    }
+
+    # Add node to nodes list
+    sbm$nodes <- dplyr::bind_rows(sbm$nodes,
+                                  dplyr::tibble(id = id, type = type))
+  } else {
+    message(glue::glue("{id} node was already in network. No action taken."))
+  }
+
+  # Add node to s4 model class
+  sbm$add_node(id, type, 0L)
+
   sbm
 }
+
