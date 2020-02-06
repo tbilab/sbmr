@@ -32,10 +32,10 @@ add_node.default <- function(sbm, id, type = NULL, show_messages = TRUE){
 #' @export
 add_node.sbm_network <- function(sbm, id, type = NULL, show_messages = TRUE){
 
+  type_missing <- is.null(type)
   node_not_in_network <- not_in(id, sbm$nodes$id)
-  if(node_not_in_network){
 
-    type_missing <- is.null(type)
+  if(node_not_in_network){
 
     if(type_missing){
       type <- sbm$nodes$type[1]
@@ -62,6 +62,21 @@ add_node.sbm_network <- function(sbm, id, type = NULL, show_messages = TRUE){
     attr(sbm, "n_nodes") <- attr(sbm, "n_nodes") + 1
 
   } else {
+
+    if (!type_missing) {
+      # If type was requested, make the node that exists has that requested
+      # type. If it doesn't give error to the user.
+      node_index <- which(sbm$nodes$id == id)
+      prev_type <- sbm$nodes$type[node_index]
+      if(prev_type != type){
+        stop(glue::glue("{id} node was already in network with type {prev_type}.",
+                        "Replacing with type with {type} would invalidate model state.",
+                        "Try rebuilding model or using different node id"))
+      }
+
+
+    }
+
     if(show_messages){
       message(glue::glue("{id} node was already in network. No action taken."))
     }

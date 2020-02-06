@@ -26,11 +26,30 @@ test_that("Add Node", {
   # We should have a no nodes added
   expect_equal(attr(net, 'n_nodes'), 6)
 
-  # # Add a node using piped in place testing
-  # my_sbm %>% add_node('node_6', type = 'test_node')
-  # expect_equal(my_sbm %>% get_state() %>% nrow(), 6)
-  #
-  # # Add node using piped and assigned formula
+  # Adding an new node with a specified type should work with no messages
+  expect_silent({
+    net <- net %>% add_node('new_test_node', type = "test_node", show_messages = TRUE)
+  })
+
+  # One more node should be added
+  expect_equal(attr(net, 'n_nodes'), 7)
+
+  # If we try and add a node that has the same name as a previous node but a
+  # different type, a error should sound
+  expect_error({
+      net <- net %>% add_node('new_node', type = "test_node", show_messages = TRUE)
+    },
+    glue::glue(
+      "new_node node was already in network with type node.",
+      "Replacing with type with test_node would invalidate model state.",
+      "Try rebuilding model or using different node id"
+    ),
+    fixed = TRUE
+  )
+
+
+
+   # # Add node using piped and assigned formula
   # my_sbm2 <- my_sbm %>% add_node('node_7', type = 'test_node')
   # expect_equal(my_sbm2 %>% get_state() %>% nrow(), 7)
   #
