@@ -1,5 +1,7 @@
 #' Run Agglomerative Merging to target a range of block numbers
 #'
+#' @family modeling
+#'
 #' @inheritParams collapse_blocks
 #' @param num_final_blocks Array of integers corresponding to number of blocks to check in run.
 #' @param parallel Run in parallel using `furrr`?

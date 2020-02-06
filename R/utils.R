@@ -18,6 +18,8 @@ NULL
 #' of all combinations (order does _not_ matter) of elements of vector of length
 #' `n`.
 #'
+#' @family helpers
+#'
 #' @param n Number of elements in vector to get combinations of
 #' @param repeats Do we allow repeats in pairs? E.g. should a-a, b-b, etc. be allowed in generated pairs?
 #'

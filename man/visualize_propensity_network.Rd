@@ -39,3 +39,11 @@ sweep_results <- mcmc_sweep(my_sbm, num_sweeps = 100, eps = 0.4, track_pairs = T
 visualize_propensity_network(sweep_results, proportion_threshold = 0.4)
 
 }
+\seealso{
+Other visualizations: 
+\code{\link{visualize_collapse_results}()},
+\code{\link{visualize_mcmc_trace}()},
+\code{\link{visualize_network}()},
+\code{\link{visualize_propensity_dist}()}
+}
+\concept{visualizations}

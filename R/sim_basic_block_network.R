@@ -7,6 +7,8 @@
 #' The default values will draw propensity values for bernouli edges with an
 #' average of a 50% chance of edge.
 #'
+#' @family simulations
+#'
 #' @param n_blocks How many blocks to simulate
 #' @param n_nodes_per_block How many nodes in each block
 #' @param propensity_drawer Function that takes a single size argumenet and

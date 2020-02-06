@@ -32,3 +32,11 @@ sbm_net <- new_sbm_network(small_edges, edges_from_col = a_node, edges_to_col = 
 print(sbm_net)
 
 }
+\seealso{
+Other helpers: 
+\code{\link{build_score_fn}()},
+\code{\link{get_combination_indices}()},
+\code{\link{rolling_mean}()},
+\code{\link{verify_model}()}
+}
+\concept{helpers}

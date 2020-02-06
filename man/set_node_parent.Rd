@@ -18,7 +18,7 @@ set_node_parent(sbm, child_id, parent_id, level = 0)
 value of \code{0}.}
 }
 \value{
-SBM model object modified with node hierarchy modified. \emph{Note that object is modified in place as well.}
+\code{sbm_network} object
 }
 \description{
 Sets the parent node (or block) for a given node. Takes child node's id
@@ -36,3 +36,9 @@ my_sbm \%>\%
   set_node_parent(child_id = 'node_1', parent_id = 'node_11')
 
 }
+\seealso{
+Other advanced: 
+\code{\link{add_edge}()},
+\code{\link{add_node}()}
+}
+\concept{advanced}

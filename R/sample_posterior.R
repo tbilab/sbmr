@@ -2,6 +2,8 @@
 #'
 #' Function is currently under construction
 #'
+#' @family modeling
+#'
 #' @param ... Additional arguments to \code{\link{new_sbm_network}}
 #'
 #' @return

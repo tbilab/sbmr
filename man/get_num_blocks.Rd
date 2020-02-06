@@ -20,3 +20,17 @@ network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 40, setup_m
 get_num_blocks(network)
 
 }
+\seealso{
+Other modeling: 
+\code{\link{choose_best_collapse_state}()},
+\code{\link{collapse_blocks}()},
+\code{\link{collapse_run}()},
+\code{\link{get_block_edge_counts}()},
+\code{\link{get_entropy}()},
+\code{\link{get_node_to_block_edge_counts}()},
+\code{\link{get_state}()},
+\code{\link{initialize_blocks}()},
+\code{\link{mcmc_sweep}()},
+\code{\link{sample_posterior}()}
+}
+\concept{modeling}

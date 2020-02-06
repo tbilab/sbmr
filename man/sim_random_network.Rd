@@ -33,3 +33,9 @@ between two nodes with a uniform common probability.
 \examples{
 sim_random_network(n_nodes = 4, prob_of_edge = 0.9)
 }
+\seealso{
+Other simulations: 
+\code{\link{sim_basic_block_network}()},
+\code{\link{sim_sbm_network}()}
+}
+\concept{simulations}

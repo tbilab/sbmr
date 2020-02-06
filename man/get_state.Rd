@@ -27,3 +27,17 @@ my_sbm <- create_sbm() \%>\%
 my_sbm \%>\% get_state()
 
 }
+\seealso{
+Other modeling: 
+\code{\link{choose_best_collapse_state}()},
+\code{\link{collapse_blocks}()},
+\code{\link{collapse_run}()},
+\code{\link{get_block_edge_counts}()},
+\code{\link{get_entropy}()},
+\code{\link{get_node_to_block_edge_counts}()},
+\code{\link{get_num_blocks}()},
+\code{\link{initialize_blocks}()},
+\code{\link{mcmc_sweep}()},
+\code{\link{sample_posterior}()}
+}
+\concept{modeling}

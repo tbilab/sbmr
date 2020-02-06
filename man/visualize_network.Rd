@@ -43,3 +43,11 @@ visualize_network(simulated_network)
 visualize_network(simulated_network, node_shape_col = 'block', node_color_col = 'type')
 
 }
+\seealso{
+Other visualizations: 
+\code{\link{visualize_collapse_results}()},
+\code{\link{visualize_mcmc_trace}()},
+\code{\link{visualize_propensity_dist}()},
+\code{\link{visualize_propensity_network}()}
+}
+\concept{visualizations}

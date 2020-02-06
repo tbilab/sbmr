@@ -68,4 +68,9 @@ sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 10)
 }
 \seealso{
 \code{\link{sim_sbm_network}} \code{\link{sim_random_network}}
+
+Other simulations: 
+\code{\link{sim_random_network}()},
+\code{\link{sim_sbm_network}()}
 }
+\concept{simulations}

@@ -2,6 +2,8 @@
 #'
 #' Returns a dataframe with all pairs of blocks at the desired level and the number of edges between them. Unconnected blocks are ommitted for space savings.
 #'
+#' @family modeling
+#'
 #' @seealso \code{\link{get_node_edge_counts}}
 #' @inheritParams get_node_to_block_edge_counts
 #'

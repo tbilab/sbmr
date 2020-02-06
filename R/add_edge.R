@@ -2,6 +2,7 @@
 #'
 #' Connects two nodes in network (at level 0) by their ids (string).
 #'
+#' @family advanced
 #' @inheritParams add_node
 #' @param from_node Id of first node in edge
 #' @param to_node Id of second node in edge

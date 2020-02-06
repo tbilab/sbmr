@@ -3,6 +3,8 @@
 #' Creates a simple interactive network visualization that visually encodes node
 #' membership and type (if present) for a passed network.
 #'
+#' @family visualizations
+#'
 #' @inheritParams verify_model
 #' @param width Desired width for output widget.
 #' @param height Desired height for output widget.

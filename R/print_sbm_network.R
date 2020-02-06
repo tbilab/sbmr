@@ -1,5 +1,7 @@
 #' Print network
 #'
+#' @family helpers
+#'
 #' @inheritParams verify_model
 #'
 #' @return Output of the number of nodes and edges in model along with

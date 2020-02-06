@@ -50,3 +50,9 @@ my_sbm <- create_sbm() \%>\%
 my_sbm \%>\% add_edge('node_1', 'node_2')
 
 }
+\seealso{
+Other advanced: 
+\code{\link{add_node}()},
+\code{\link{set_node_parent}()}
+}
+\concept{advanced}

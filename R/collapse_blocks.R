@@ -6,6 +6,8 @@
 #' equilibriate block. See the `agglomerative_merging.Rmd` vignette for more
 #' complete discussion of options/behavior.
 #'
+#' @family modeling
+#'
 #' @inheritParams mcmc_sweep
 #' @param num_mcmc_sweeps How many MCMC sweeps the model does at each
 #'   agglomerative merge step. This allows the model to allow nodes to find

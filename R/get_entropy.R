@@ -2,6 +2,8 @@
 #'
 #' Computes the (degree-corrected) entropy for the network at the node level.
 #'
+#' @family modeling
+#'
 #' @inheritParams add_node
 #'
 #' @return Entropy value (numeric).

@@ -65,3 +65,11 @@ nls_score <- function(e, k){
 visualize_collapse_results(collapse_results, heuristic = nls_score)
 
 }
+\seealso{
+Other visualizations: 
+\code{\link{visualize_mcmc_trace}()},
+\code{\link{visualize_network}()},
+\code{\link{visualize_propensity_dist}()},
+\code{\link{visualize_propensity_network}()}
+}
+\concept{visualizations}

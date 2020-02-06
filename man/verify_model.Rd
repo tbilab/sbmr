@@ -32,3 +32,11 @@ sbm_net <- sbm_net \%>\% verify_model()
 sbm_net
 
 }
+\seealso{
+Other helpers: 
+\code{\link{build_score_fn}()},
+\code{\link{get_combination_indices}()},
+\code{\link{print.sbm_network}()},
+\code{\link{rolling_mean}()}
+}
+\concept{helpers}

@@ -32,3 +32,11 @@ sweep_results <- create_sbm(network) \%>\%
 visualize_propensity_dist(sweep_results)
 
 }
+\seealso{
+Other visualizations: 
+\code{\link{visualize_collapse_results}()},
+\code{\link{visualize_mcmc_trace}()},
+\code{\link{visualize_network}()},
+\code{\link{visualize_propensity_network}()}
+}
+\concept{visualizations}

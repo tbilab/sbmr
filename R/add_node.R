@@ -3,6 +3,8 @@
 #' Add a node to the network. Takes the node id (string), the node type
 #' (string), and the node level (int).
 #'
+#' @family advanced
+#'
 #' @param sbm `sbm_network` object as created by
 #'   \code{\link{new_sbm_network()}}.
 #' @param id Unique identifying name for node.

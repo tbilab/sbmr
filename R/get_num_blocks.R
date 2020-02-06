@@ -1,8 +1,8 @@
 #' Get number of blocks currently in model
 #'
-#'
 #' Returns the number of blocks/clusters in the currenet model state.
 #'
+#' @family modeling
 #' @inheritParams verify_model
 #'
 #' @return Number of clusters in current model state

@@ -3,6 +3,8 @@
 #' Generate an edge dataframe from an \href{https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93R%C3%A9nyi_model}{Erdos-Renyi network.} An edge will occur
 #' between two nodes with a uniform common probability.
 #'
+#' @family simulations
+#'
 #' @param n_nodes Total number of unique nodes to simulate
 #' @param prob_of_edge Probability of any given edges between two nodes
 #'   occuring

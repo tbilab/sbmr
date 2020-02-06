@@ -34,3 +34,9 @@ my_sbm <- create_sbm() \%>\%
 get_state(my_sbm)
 
 }
+\seealso{
+Other advanced: 
+\code{\link{add_edge}()},
+\code{\link{set_node_parent}()}
+}
+\concept{advanced}

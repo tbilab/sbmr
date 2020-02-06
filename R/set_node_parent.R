@@ -3,6 +3,8 @@
 #' Sets the parent node (or block) for a given node. Takes child node's id
 #' (string), parent node's id (string), and the level of child node (int).
 #'
+#' @family advanced
+#'
 #' @inheritParams add_node
 #' @param child_id Id of node for which parent is being added
 #' @param parent_id Id of parent node

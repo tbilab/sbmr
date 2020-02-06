@@ -9,6 +9,8 @@
 #' `num_blocks * <num_types>` due to some block nodes never being assigned to a
 #' child node.
 #'
+#' @family modeling
+#'
 #' @inheritParams set_node_parent
 #' @param num_blocks Total number of blocks to initialize for each unique node
 #'   type. If set to `-1`, then a single block is made for every node.

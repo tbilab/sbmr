@@ -3,6 +3,8 @@
 #' Takes data from sbm_network object and checks S4 `SBM` class model object
 #' exists and is usable. If it isn't it is created.
 #'
+#' @family helpers
+#'
 #' @param x Object of class `sbm_network`.
 #' @param show_messages Should function inform of its actions such as when a
 #'   model already exists so no changes are made?

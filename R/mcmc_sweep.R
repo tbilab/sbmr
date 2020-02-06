@@ -7,6 +7,9 @@
 #' random order. Takes the level that the sweep should take place on (int) and
 #' if new blocks blocks can be proposed and empty blocks removed (boolean).
 #'
+#'
+#' @family modeling
+#'
 #' @inheritParams add_node
 #' @inheritParams collapse_blocks
 #' @param num_sweeps Number of times all nodes are passed through for move

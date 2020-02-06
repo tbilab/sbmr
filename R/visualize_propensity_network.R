@@ -4,6 +4,9 @@
 #' data as a network where two nodes have an edge between them if their pairwise
 #' propensity to be in the same block is above some threshold.
 #'
+#'
+#' @family visualizations
+#'
 #' @inheritParams  visualize_propensity_dist
 #' @param proportion_threshold Threshold of pairwise propensity to consider two nodes linked. Choose carefully!
 #'

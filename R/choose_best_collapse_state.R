@@ -1,11 +1,15 @@
 #' Choose and load best model state from agglomerative collapsing algorithm
 #'
+#' @family modeling
+#'
 #' @inheritParams mcmc_sweep
 #' @inheritParams build_score_fn
 #' @inheritParams visualize_collapse_results
 #' @param collapse_results Results of running agglomerative collapse algorithm
 #'   on sbm with \code{\link{collapse_blocks}}.
 #' @param verbose Should model tell you what step was chosen (`TRUE` or `FALSE`)?
+#'
+#'
 #'
 #' @return SBM model updated to match state from the merge step with 'best'
 #'   partitioning.

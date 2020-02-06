@@ -4,6 +4,8 @@
 #' and columns for node id, parent id, node type, and node level. Can also be
 #' accomplished by `attr(sbm, 'state')`.
 #'
+#' @family modeling
+#'
 #' @inheritParams add_node
 #'
 #' @return A dataframe describing the current state of the network: \describe{

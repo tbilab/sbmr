@@ -6,6 +6,8 @@
 #' allowing bipartite structure is provided which will treat either side of
 #' passed edges dataframe as two different types of nodes.
 #'
+#' @family sbm_network_generators
+#'
 #' @param edges Dataframe with a from and two column encoding edges between
 #'   string node ids (direction does not matter).
 #' @param nodes Optional dataframe that links a node `id` to its `type`, for

@@ -3,6 +3,8 @@
 #' A simple line plot showing both the entropy delta and the number of nodes
 #' moved for each sweep.
 #'
+#' @family visualizations
+#'
 #' @param sweep_results Results of running `sbmR::mcmc_sweep()`
 #'
 #' @return GGplot line plot with x-axis as sweep number and y-axes as sweep

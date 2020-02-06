@@ -30,3 +30,11 @@ dplyr::tibble(
 )
 
 }
+\seealso{
+Other helpers: 
+\code{\link{build_score_fn}()},
+\code{\link{print.sbm_network}()},
+\code{\link{rolling_mean}()},
+\code{\link{verify_model}()}
+}
+\concept{helpers}

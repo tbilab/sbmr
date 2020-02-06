@@ -6,6 +6,8 @@
 #' `propensity` of edge between two edges, and a distribution function
 #' who's main parameter the `propensity` value defines are needed.
 #'
+#' @family simulations
+#'
 #' @inheritParams new_sbm_network
 #' @param block_info A dataframe/tibble with two columns: `block`: the id of the
 #'   block, and `n_nodes`: the number of nodes to simulate from that block.

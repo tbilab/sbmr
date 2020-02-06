@@ -46,3 +46,11 @@ build_score_fn("dev_from_rolling_mean")(entropy, num_blocks)
 build_score_fn("lowest")(entropy, num_blocks)
 
 }
+\seealso{
+Other helpers: 
+\code{\link{get_combination_indices}()},
+\code{\link{print.sbm_network}()},
+\code{\link{rolling_mean}()},
+\code{\link{verify_model}()}
+}
+\concept{helpers}

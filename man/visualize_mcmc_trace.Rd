@@ -33,3 +33,11 @@ sweep_results <- my_sbm \%>\% mcmc_sweep(num_sweeps = 25, variable_num_blocks = 
 visualize_mcmc_trace(sweep_results)
 
 }
+\seealso{
+Other visualizations: 
+\code{\link{visualize_collapse_results}()},
+\code{\link{visualize_network}()},
+\code{\link{visualize_propensity_dist}()},
+\code{\link{visualize_propensity_network}()}
+}
+\concept{visualizations}

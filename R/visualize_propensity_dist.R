@@ -4,6 +4,9 @@
 #' empirical CDF of the pairwise probability/proportion of two nodes residing in
 #' the same block over the given MCMC sweeps.
 #'
+#'
+#' @family visualizations
+#'
 #' @param sweep_results Results from running \code{\link{mcmc_sweep()}} with the argument `track_pairs = TRUE`.
 #'
 #' @return GGplot2 plot containing ECDF of the pairwise propensities of residing in same block for MCMC sweeps.

@@ -41,3 +41,11 @@ rolled_mean_window_5 <- rolling_mean(my_vec, window = 5)
 plot(rolled_mean_window_5)
 
 }
+\seealso{
+Other helpers: 
+\code{\link{build_score_fn}()},
+\code{\link{get_combination_indices}()},
+\code{\link{print.sbm_network}()},
+\code{\link{verify_model}()}
+}
+\concept{helpers}

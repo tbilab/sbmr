@@ -71,3 +71,9 @@ edge_propensities <- dplyr::tribble(
 sim_sbm_network(block_info, edge_propensities, edge_dist = purrr::rbernoulli)
 
 }
+\seealso{
+Other simulations: 
+\code{\link{sim_basic_block_network}()},
+\code{\link{sim_random_network}()}
+}
+\concept{simulations}

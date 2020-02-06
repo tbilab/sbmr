@@ -29,3 +29,9 @@ save_sbm_network(sbm_net, temp)
 loaded_sbm_net <- load_sbm_network(tmp)
 
 }
+\seealso{
+Other sbm_network_generators: 
+\code{\link{load_sbm_network}()},
+\code{\link{new_sbm_network}()}
+}
+\concept{sbm_network_generators}

@@ -70,3 +70,9 @@ network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 40)
 new_sbm_network(edges = network$edges, nodes = network$nodes)
 
 }
+\seealso{
+Other sbm_network_generators: 
+\code{\link{load_sbm_network}()},
+\code{\link{save_sbm_network}()}
+}
+\concept{sbm_network_generators}
