@@ -1,19 +1,46 @@
 # Scratch work for the building the sbm_network s3 class
 
-library(sbmR)
+# library(sbmR)
 # library(sloop)
-network <- sim_basic_block_network(
-  n_blocks = 3,
-  n_nodes_per_block = 40
-)
+# network <- sim_basic_block_network(
+#   n_blocks = 3,
+#   n_nodes_per_block = 40
+# )
+#
+# sbm_net <- new_sbm_network(edges = network$edges, nodes = network$nodes)
+# sbm_net
+#
+# x <- sbm_net
 
-sbm_net <- new_sbm_network(edges = network$edges, nodes = network$nodes)
-sbm_net
+network <- sim_basic_block_network(n_blocks = 3,
+                                   n_nodes_per_block = 40,
+                                   setup_model = TRUE) %>%
+  initialize_blocks(num_blocks = 5)
+
+get_num_blocks(network)
+
+visualize_network(network, node_color_col = 'block', node_shape_col = 'type')
+
+pre_mode_address <- lobstr::obj_addr(sbm_net$model)
+pre_sweep_state <- sbm_net$model$get_state()
+pre_sweep_attr_state <- attr(sbm_net, 'state')
+mcmc_results <- sbm_net %>% mcmc_sweep(num_sweeps = 25)
+# Load up returned sbm_network from results
+sbm_net <- mcmc_results$sbm_network
+
+post_mode_address <- lobstr::obj_addr(sbm_net$model)
+post_sweep_state <- sbm_net$model$get_state()
+post_sweep_attr_state <- attr(sbm_net, 'state')
+
+dplyr::all_equal(pre_sweep_attr_state,
+                 post_sweep_attr_state)
+
+dplyr::all_equal(pre_sweep_state,
+                 post_sweep_state)
 
 sbm_net <- sbm_net %>% initialize_model()
-sbm_net
 
-sbm_net$model
+
 
 
 small_edges <- dplyr::tribble(
@@ -28,19 +55,15 @@ small_edges <- dplyr::tribble(
 
 sbm_net <- new_sbm_network(small_edges, edges_from_col = a_node, edges_to_col = b_node)
 sbm_net
+
+
+
 sbm_net <- sbm_net %>% initialize_model()
 sbm_net
 
 
-check_for_model_obj.sbm_network <- function(sbm_net, build_if_missing = TRUE){
-  #  Check if the model object just hasnt been created at all
-  missing_model <- is.null(sbm_net$model)
 
-  if(missing_model){
-    if (!build_if_missing) stop("SBM Network is missing model object.")
-  }
 
-}
 
 
 
