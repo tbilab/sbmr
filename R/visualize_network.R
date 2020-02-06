@@ -3,7 +3,7 @@
 #' Creates a simple interactive network visualization that visually encodes node
 #' membership and type (if present) for a passed network.
 #'
-#' @inheritParams new_sbm_network
+#' @inheritParams verify_model
 #' @param width Desired width for output widget.
 #' @param height Desired height for output widget.
 #' @param node_color_col Name of column in the `nodes` dataframe that should be
@@ -29,20 +29,34 @@
 #' # Visualize network with shape encoding the blocks
 #' visualize_network(simulated_network, node_shape_col = 'block', node_color_col = 'type')
 #'
-visualize_network <- function(edges, nodes = NULL, width = "100%", height = NULL, node_color_col = 'block', node_shape_col = 'type') {
+visualize_network <- function(sbm,
+                              node_color_col = 'block',
+                              node_shape_col = 'type',
+                              width = "100%",
+                              height = NULL){
+  UseMethod("visualize_network")
+}
 
-  # CHeck if we were passed a list of edges and nodes or the edges and nodes seperately
-  if(is_list_class(edges)){
-    data_for_d3 <- edges
-  } else {
-    data_for_d3 <- list(
-      edges = edges,
-      nodes = nodes
-    )
-  }
+visualize_network.default <- function(sbm,
+                                      node_color_col = 'block',
+                                      node_shape_col = 'type',
+                                      width = "100%",
+                                      height = NULL){
+  cat("visualize_network generic")
+}
+
+#' @export
+visualize_network.sbm_network <- function(sbm,
+                                          node_color_col = 'block',
+                                          node_shape_col = 'type',
+                                          width = "100%",
+                                          height = NULL){
 
   r2d3::r2d3(
-    data = data_for_d3,
+    data = list(
+      edges = sbm$edges,
+      nodes = sbm$nodes
+    ),
     options = list(
       color_col = node_color_col,
       shape_col = node_shape_col
@@ -53,3 +67,4 @@ visualize_network <- function(edges, nodes = NULL, width = "100%", height = NULL
     height = height
   )
 }
+
