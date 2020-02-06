@@ -50,18 +50,42 @@
 #' collapse_results %>%
 #'   dplyr::select(-state)
 #'
-collapse_blocks <- function(
-  sbm,
-  level = 0,
-  num_mcmc_sweeps = 0,
-  desired_num_blocks = 1,
-  report_all_steps = TRUE,
-  eps = 0.1,
-  num_block_proposals = 5,
-  sigma = 2
-){
+collapse_blocks <- function(sbm,
+                            desired_num_blocks = 1,
+                            num_mcmc_sweeps = 0,
+                            sigma = 2,
+                            eps = 0.1,
+                            num_block_proposals = 5,
+                            level = 0,
+                            report_all_steps = TRUE){
+  set_generic("collapse_blocks")
+}
 
-  collapse_results <- sbm$collapse_blocks(
+collapse_blocks.default <- function(sbm,
+                                    desired_num_blocks = 1,
+                                    num_mcmc_sweeps = 0,
+                                    sigma = 2,
+                                    eps = 0.1,
+                                    num_block_proposals = 5,
+                                    level = 0,
+                                    report_all_steps = TRUE){
+  cat("collapse_blocks generic")
+}
+
+#' @export
+collapse_blocks.sbm_network <- function(sbm,
+                                        desired_num_blocks = 1,
+                                        num_mcmc_sweeps = 0,
+                                        sigma = 2,
+                                        eps = 0.1,
+                                        num_block_proposals = 5,
+                                        level = 0,
+                                        report_all_steps = TRUE){
+
+  # We call initialize_model here in case this is being called in another thread using
+  # the collapse_run function. In that case the pointer to the s4 class will be stale
+  # and we will need to re-create the model class.
+  collapse_results <- initialize_model(sbm)$model$collapse_blocks(
     as.integer(level),
     as.integer(num_mcmc_sweeps),
     as.integer(desired_num_blocks),
@@ -70,6 +94,9 @@ collapse_blocks <- function(
     eps,
     report_all_steps
   )
+
+  # Reset state back to pre-collapse [inefficient]
+  sbm$model$set_state(attr(sbm, "state"))
 
   purrr::map_dfr(
     collapse_results,
