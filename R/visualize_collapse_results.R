@@ -19,14 +19,14 @@
 #' @export
 #'
 #' @examples
+#'
 #' set.seed(42)
 #'
-#' # Start with a random network of two blocks with 25 nodes each
-#' network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25)
+#' # Start with a random network
+#' net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 35)
 #'
 #' # Run agglomerative clustering with no intermediate MCMC steps on sbm of simulated data
-#' collapse_results <- create_sbm(network) %>%
-#'   collapse_blocks(sigma = 2)
+#' collapse_results <- collapse_blocks(net, sigma = 1.5)
 #'
 #' # =============================================================================
 #' # Visualize using no heuristic
@@ -40,7 +40,7 @@
 #' # Visualize using custom heuristic
 #'
 #' # Score heuristic that fits a nonlinear model to observed values and chooses by
-#' # largest negative residual
+#' # largest negative residual (built into package as heuristic = "nls_residual")
 #' nls_score <- function(e, k){
 #'   entropy_model <- nls(e ~ a + b * log(k), start = list(a = max(e), b = -25))
 #'   -residuals(entropy_model)

@@ -43,7 +43,6 @@
 #'                                      verbose = TRUE)
 #'
 choose_best_collapse_state <- function(sbm, collapse_results, use_entropy_value_for_score = FALSE,  heuristic = 'dev_from_rolling_mean', verbose = FALSE){
-
   # Apply the heuristic on the entropy column and choose the higheset value
   best_state <- collapse_results %>%
     dplyr::arrange(num_blocks)
@@ -71,5 +70,6 @@ choose_best_collapse_state <- function(sbm, collapse_results, use_entropy_value_
   }
 
   # Load best state into model and return
-  sbm %>% load_from_state(best_state$state[[1]])
+  attr(sbm, 'state') <- best_state$state[[1]]
+  sbm %>% verify_model()
 }

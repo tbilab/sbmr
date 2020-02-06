@@ -14,14 +14,12 @@
 #'
 #' @examples
 #'
-#' network <- sim_basic_block_network(
-#'   n_blocks = 3,
-#'   n_nodes_per_block = 25
-#' )
+#' # Simulate a model
+#' net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) %>%
+#'   initialize_blocks(3)
+#'
 #' # Initialize model with random groups and run 75 MCMC sweeps
-#' sweep_results <- create_sbm(network) %>%
-#'   initialize_blocks(3) %>%
-#'   mcmc_sweep(num_sweeps = 75, track_pairs = TRUE)
+#' sweep_results <- net %>% mcmc_sweep(num_sweeps = 75, track_pairs = TRUE)
 #'
 #' # Plot results
 #' visualize_propensity_dist(sweep_results)

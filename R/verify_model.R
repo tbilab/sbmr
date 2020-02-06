@@ -13,16 +13,15 @@
 #' @export
 #'
 #' @examples
-#' network <- sim_basic_block_network(
-#'   n_blocks = 3,
-#'   n_nodes_per_block = 40
-#' )
 #'
-#' sbm_net <- new_sbm_network(edges = network$edges, nodes = network$nodes)
-#' sbm_net
+#' # Setup network without model initialized
+#' net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 20, setup_model = FALSE)
 #'
-#' sbm_net <- sbm_net %>% verify_model()
-#' sbm_net
+#' net
+#'
+#' # Run verify model and the model should now be initialized
+#' net <- net %>% verify_model()
+#' net
 #'
 verify_model <- function(x, show_messages = FALSE){
   UseMethod("verify_model")
