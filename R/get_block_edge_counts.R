@@ -18,5 +18,17 @@
 #' sbm %>% get_block_edge_counts(1)
 #'
 get_block_edge_counts <- function(sbm, level = 1){
-  sbm$get_block_edge_counts(as.integer(level))
+  set_generic("get_block_edge_counts")
 }
+
+get_block_edge_counts.default <- function(sbm, level = 1){
+  cat("get_block_edge_counts generic")
+}
+
+#' @export
+get_block_edge_counts.sbm_network <- function(sbm, level = 1){
+  sbm$model$get_block_edge_counts(as.integer(level))
+}
+
+
+
