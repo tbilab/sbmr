@@ -22,7 +22,7 @@
 #' sbm_net <- sbm_net %>% initialize_model()
 #' sbm_net
 #'
-initialize_model <- function(x, warn_if_overwriting = TRUE){
+initialize_model <- function(x, show_messages = TRUE){
   UseMethod("initialize_model")
 }
 
@@ -31,7 +31,7 @@ initialize_model.default <- function(x){
 }
 
 #' @export
-initialize_model.sbm_network <- function(x, show_messages = TRUE, show_warnings = TRUE){
+initialize_model.sbm_network <- function(x, show_messages = TRUE){
 
   has_model_already <- !is.null(x$model)
   has_state_already <- !is.null(attr(x, "state"))
