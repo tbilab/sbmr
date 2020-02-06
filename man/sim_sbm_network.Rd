@@ -9,7 +9,8 @@ sim_sbm_network(
   edge_propensities,
   edge_dist = rpois,
   allow_self_edges = FALSE,
-  keep_edge_counts = TRUE
+  keep_edge_counts = TRUE,
+  setup_model = FALSE
 )
 }
 \arguments{
@@ -35,11 +36,12 @@ themselves?}
 \item{keep_edge_counts}{Should the edge counts stay on returned
 edges? If edges distribution is a binary yes or no then you will likely
 want to set this to \code{TRUE}.}
+
+\item{setup_model}{Should an SBM model object be added? Set to \code{FALSE} if
+network is just being visualized or described.}
 }
 \value{
-A list with a \code{nodes} dataframe (containing a node's \code{id} and \code{block}
-membership) and a \code{edges} dataframe (containing \code{from} and \code{to} nodes along
-with the total number of \code{edges} as drawn from \code{edge_dist}.)
+\code{sbm_network} object.
 }
 \description{
 Simulates nodes and edges from a network where edge edges are derived

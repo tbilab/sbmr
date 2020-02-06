@@ -5,25 +5,14 @@
 \title{Visualize network stucture}
 \usage{
 visualize_network(
-  edges,
-  nodes = NULL,
-  width = "100\%",
-  height = NULL,
+  sbm,
   node_color_col = "block",
-  node_shape_col = "type"
+  node_shape_col = "type",
+  width = "100\%",
+  height = NULL
 )
 }
 \arguments{
-\item{edges}{Dataframe with a from and two column encoding edges between
-string node ids (direction does not matter).}
-
-\item{nodes}{Optional dataframe that links a node \code{id} to its \code{type}, for
-when model is polypartite.}
-
-\item{width}{Desired width for output widget.}
-
-\item{height}{Desired height for output widget.}
-
 \item{node_color_col}{Name of column in the \code{nodes} dataframe that should be
 encoded with color of nodes in the plot. If this value is numeric (defined
 as more than 10 unique values that are numbers) the network will color
@@ -31,6 +20,10 @@ nodes on a linear scale from the min value to the highest value.}
 
 \item{node_shape_col}{Name of column in the \code{nodes} dataframe that should be
 encoded with shape of nodes in the plot}
+
+\item{width}{Desired width for output widget.}
+
+\item{height}{Desired height for output widget.}
 }
 \description{
 Creates a simple interactive network visualization that visually encodes node
