@@ -24,6 +24,45 @@
 #'   set_node_parent(child_id = 'node_1', parent_id = 'node_11')
 #'
 set_node_parent <- function(sbm, child_id, parent_id, level = 0){
-  sbm$set_node_parent(child_id, parent_id, as.integer(level))
+
+  # Grab current state of model
+  state <- attr(sbm, 'state')
+
+  # Check if child is missing and throw error if so
+  child_missing <- not_in(child_id, state$id)
+  if(child_missing){
+    stop(glue::glue("The child node ({child_id}) does not exist in model."))
+  }
+
+  # Get basic info about child
+  child_index <- which(state$id == child_id)
+  child_type <- state$type[child_index]
+  child_level <- state$level[child_index]
+
+  # Modify the child's entry to have the new parent
+  state$parent[child_index] <- parent_id
+
+  # Check if the requested node parent is in the state currently...
+  parent_missing <- not_in(parent_id, state$id)
+
+  # Build parent entry in state if need be
+  if(parent_missing){
+    new_parent_entry <- tibble(id = parent_id,
+                               parent = "none",
+                               type = child_type,
+                               level = child_level + 1)
+
+    state <- dplyr::bind_rows(state,new_parent_entry)
+  }
+
+  # Force model to rebuild with the new state
+  sbm$model$load_from_state(state$id,
+                            state$parent,
+                            state$level,
+                            state$type)
+
+  # Make sure state attribute is updated
+  attr(sbm, 'state') <- state
+
   sbm
 }
