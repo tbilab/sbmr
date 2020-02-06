@@ -3,7 +3,7 @@
 #' Creates a simple interactive network visualization that visually encodes node
 #' membership and type (if present) for a passed network.
 #'
-#' @inheritParams create_sbm
+#' @inheritParams new_sbm_network
 #' @param width Desired width for output widget.
 #' @param height Desired height for output widget.
 #' @param node_color_col Name of column in the `nodes` dataframe that should be
