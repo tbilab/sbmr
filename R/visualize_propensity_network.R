@@ -16,7 +16,7 @@
 #' @examples
 #'
 #' set.seed(42)
-#' Simulate network data and initialize model with it
+#' # Simulate network data and initialize model with it
 #' net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 30) %>%
 #'   collapse_blocks(desired_num_blocks = 1, sigma = 1.1) %>%
 #'   choose_best_collapse_state(verbose = TRUE) %>%
