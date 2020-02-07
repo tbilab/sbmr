@@ -35,7 +35,7 @@ visualize_mcmc_trace.default <- function(sbm){
 #' @export
 visualize_mcmc_trace.sbm_network <- function(sbm){
 
-  sweep_results <- get_mcmc_sweep_results(sbm)
+  sweep_results <- get_sweep_results(sbm)
 
   N <- nrow(sweep_results$sweep_info)
   sweep_results$sweep_info %>%

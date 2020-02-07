@@ -36,10 +36,8 @@ visualize_propensity_network.default <- function(sbm, proportion_threshold = 0.2
 #' @export
 visualize_propensity_network.sbm_network <- function(sbm, proportion_threshold = 0.2){
 
-  sweep_results <- get_mcmc_sweep_results(sbm)
-
   # Make sure we have propensity counts before proceeding
-  pair_counts <- get_mcmc_pair_counts(sweep_results)
+  pair_counts <- get_sweep_pair_counts(sbm)
 
   edges <- pair_counts %>%
     dplyr::filter(proportion_connected > proportion_threshold) %>%

@@ -36,12 +36,11 @@ visualize_propensity_dist.default <- function(sbm){
 #' @export
 visualize_propensity_dist.sbm_network <- function(sbm){
 
-  sweep_results <- get_mcmc_sweep_results(sbm)
+  pair_counts <- get_sweep_pair_counts(sbm)
 
-  n_sweeps <- nrow(sweep_results$sweep_info)
+  n_sweeps <- round(pair_counts$times_connected[1]/pair_counts$proportion_connected[1])
 
-  get_mcmc_pair_counts(sweep_results) %>%
-    ggplot2::ggplot(ggplot2::aes(x = proportion_connected)) +
+  ggplot2::ggplot(pair_counts, ggplot2::aes(x = proportion_connected)) +
     ggplot2::stat_ecdf() +
     ggplot2::labs(
       title = "Pairwise block concensus proportion distribution",
