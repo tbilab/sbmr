@@ -23,19 +23,18 @@
 #'
 #' set.seed(42)
 #'
-#' # Start with a random network
-#' net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 35)
-#'
-#' # Run agglomerative clustering with no intermediate MCMC steps on sbm of simulated data
-#' collapse_results <- collapse_blocks(net, sigma = 1.5)
+#' # Start with a random networ and run agglomerative clustering with no
+#' # intermediate MCMC steps on sbm of simulated data
+#' net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 35) %>%
+#'   collapse_blocks(sigma = 1.5)
 #'
 #' # =============================================================================
 #' # Visualize using no heuristic
-#' visualize_collapse_results(collapse_results)
+#' visualize_collapse_results(net)
 #'
 #' # =============================================================================
 #' # Visualize using deviance from rolling average heuristic
-#' visualize_collapse_results(collapse_results, heuristic = 'dev_from_rolling_mean')
+#' visualize_collapse_results(net, heuristic = 'dev_from_rolling_mean')
 #'
 #' # =============================================================================
 #' # Visualize using custom heuristic
@@ -47,7 +46,7 @@
 #'   -residuals(entropy_model)
 #' }
 #'
-#' visualize_collapse_results(collapse_results, heuristic = nls_score)
+#' visualize_collapse_results(net, heuristic = nls_score)
 #'
 visualize_collapse_results <- function(sbm,
                                        use_entropy_value_for_score = FALSE,
