@@ -6,9 +6,8 @@
 #' @param num_final_blocks Array of integers corresponding to number of blocks to check in run.
 #' @param parallel Run in parallel using `furrr`?
 #'
-#' @return Tibble with three columns with rows corresponding to the result of
-#'   each merge step:  `entropy`, `num_blocks` left in model, and a list column
-#'   of `state` which is the state dump dataframe for model at end of merge.
+#' @inherit new_sbm_network return
+#'
 #' @export
 #'
 #' @examples

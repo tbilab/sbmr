@@ -9,7 +9,7 @@
 #' @param show_messages Should function inform of its actions such as when a
 #'   model already exists so no changes are made?
 #'
-#' @return
+#' @inherit new_sbm_network return
 #' @export
 #'
 #' @examples

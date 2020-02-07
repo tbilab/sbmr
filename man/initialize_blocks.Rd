@@ -17,8 +17,8 @@ type. If set to \code{-1}, then a single block is made for every node.}
 value of \code{0}.}
 }
 \value{
-SBM model object modified with new block nodes and node hierarchy
-modified. \emph{Note that object is modified in place as well.}
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Initializes blocks for a given level of network. When \code{num_blocks = -1} (the

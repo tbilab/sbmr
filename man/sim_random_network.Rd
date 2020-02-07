@@ -24,7 +24,8 @@ themselves?}
 network is just being visualized or described.}
 }
 \value{
-A \code{sbm_network}/\code{list} that as \code{nodes} and \code{edges} member tibbles.
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Generate an edge dataframe from an \href{https://en.wikipedia.org/wiki/Erd\%C5\%91s\%E2\%80\%93R\%C3\%A9nyi_model}{Erdos-Renyi network.} An edge will occur

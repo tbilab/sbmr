@@ -10,7 +10,7 @@
 #'   occuring
 #' @inheritParams sim_sbm_network
 #'
-#' @return A `sbm_network`/`list` that as `nodes` and `edges` member tibbles.
+#' @inherit new_sbm_network return
 #' @export
 #'
 #' @examples

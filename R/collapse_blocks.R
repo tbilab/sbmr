@@ -32,9 +32,7 @@
 #' @param eps Controls randomness of move proposals. Effects both the block
 #'   merging and mcmc sweeps.
 #'
-#' @return Tibble with four columns with rows corresponding to the result of
-#'   each merge step:  `entropy_delta` of last merge step, `entropy` of model after last merge step, `num_blocks` left in model, and a list column
-#'   of `state` which is the state dump dataframe for model at end of merge.
+#' @inherit new_sbm_network return
 #' @export
 #'
 #' @examples

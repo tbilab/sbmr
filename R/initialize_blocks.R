@@ -15,8 +15,9 @@
 #' @param num_blocks Total number of blocks to initialize for each unique node
 #'   type. If set to `-1`, then a single block is made for every node.
 #'
-#' @return SBM model object modified with new block nodes and node hierarchy
-#'   modified. \emph{Note that object is modified in place as well.}
+#'
+#' @inherit new_sbm_network return
+#'
 #' @export
 #'
 #' @examples

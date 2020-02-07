@@ -19,7 +19,8 @@ networks. E.g. "person", or "publication", etc..}
 model already exists so no changes are made?}
 }
 \value{
-\code{sbm_network} object  with node added.
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Add a node to the network. Takes the node id (string), the node type

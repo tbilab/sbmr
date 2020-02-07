@@ -28,8 +28,8 @@ location, or a string labeling algorithm. Currently only \code{"lowest"},
 \item{verbose}{Should model tell you what step was chosen (\code{TRUE} or \code{FALSE})?}
 }
 \value{
-SBM model updated to match state from the merge step with 'best'
-partitioning.
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Choose and load best model state from agglomerative collapsing algorithm
@@ -57,6 +57,8 @@ my_sbm <- choose_best_collapse_state(net,
 
 }
 \seealso{
+visualize_collapse_results
+
 Other modeling: 
 \code{\link{collapse_blocks}()},
 \code{\link{collapse_run}()},

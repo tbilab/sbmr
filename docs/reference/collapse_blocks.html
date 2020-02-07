@@ -195,9 +195,8 @@ transfer.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Tibble with four columns with rows corresponding to the result of
-each merge step:  <code>entropy_delta</code> of last merge step, <code>entropy</code> of model after last merge step, <code>num_blocks</code> left in model, and a list column
-of <code>state</code> which is the state dump dataframe for model at end of merge.</p>
+    <p>An S3 object of class <code>sbm_network</code>. For details see
+<a href='new_sbm_network.html'>new_sbm_network</a> section "Class structure."</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other modeling: 
@@ -235,7 +234,7 @@ of <code>state</code> which is the state dump dataframe for model at end of merg
 <span class='co'># We can visualize the collapse results</span>
 <span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='visualize_collapse_results.html'>visualize_collapse_results</a></span>()</div><div class='img'><img src='collapse_blocks-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># We can choose best result with default heuristic</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a></span>(<span class='no'>net</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 2115.2267.</div><div class='input'>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a></span>(<span class='no'>net</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 2116.9537.</div><div class='input'>
 <span class='co'># Setting sigma to a higher value means faster collapsing at the cost of less accuracy</span>
 <span class='no'>net</span> <span class='kw'>%&gt;%</span>
   <span class='fu'>collapse_blocks</span>(<span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>2</span>) <span class='kw'>%&gt;%</span>

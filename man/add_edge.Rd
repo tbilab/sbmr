@@ -34,7 +34,8 @@ warning and use the first node in networks type for both. To hide this
 warning for unipartite networks set this to \code{TRUE}.}
 }
 \value{
-\code{sbm_network} object edge added.
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Connects two nodes in network (at level 0) by their ids (string).

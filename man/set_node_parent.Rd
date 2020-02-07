@@ -18,7 +18,8 @@ set_node_parent(sbm, child_id, parent_id, level = 0)
 value of \code{0}.}
 }
 \value{
-\code{sbm_network} object
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Sets the parent node (or block) for a given node. Takes child node's id

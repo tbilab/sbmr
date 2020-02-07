@@ -41,7 +41,8 @@ want to set this to \code{TRUE}.}
 network is just being visualized or described.}
 }
 \value{
-\code{sbm_network} object.
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Simulates nodes and edges from a network where edge edges are derived

@@ -12,7 +12,7 @@
 #'   networks. E.g. "person", or "publication", etc..
 #' @inheritParams verify_model
 #'
-#' @return `sbm_network` object  with node added.
+#' @inherit new_sbm_network return
 #' @export
 #'
 #' @examples

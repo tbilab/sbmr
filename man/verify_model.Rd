@@ -13,7 +13,8 @@ verify_model(x, show_messages = FALSE)
 model already exists so no changes are made?}
 }
 \value{
-
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Takes data from sbm_network object and checks S4 \code{SBM} class model object

@@ -11,7 +11,7 @@
 #' @param level Level of child node. This will almost always stay at default
 #'   value of `0`.
 #'
-#' @return `sbm_network` object
+#' @inherit new_sbm_network return
 #' @export
 #'
 #' @examples

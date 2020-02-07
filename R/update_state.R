@@ -7,7 +7,7 @@
 #' @inheritParams verify_model
 #' @param state_df A state dataframe with `id`, `parent`, `level`, and `type` columns for all nodes in network (along with block nodes).
 #'
-#' @return Updated `sbm_network` object
+#' @inherit new_sbm_network return
 #' @export
 #'
 #' @examples

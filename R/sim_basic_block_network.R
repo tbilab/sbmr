@@ -7,6 +7,10 @@
 #' The default values will draw propensity values for bernouli edges with an
 #' average of a 50% chance of edge.
 #'
+#' If `return_edge_propensities == TRUE`: an `$edge_propensities` slot is added
+#' to the returned `sbm_network` object containing a dataframe that shows the
+#' randomly drawn edge propensities between blocks.
+#'
 #' @family simulations
 #'
 #' @param n_blocks How many blocks to simulate
@@ -21,12 +25,8 @@
 #'
 #' @seealso \code{\link{sim_sbm_network}} \code{\link{sim_random_network}}
 #'
-#' @return A list with a `nodes` dataframe (containing a node's `id` and `block`
-#'   membership), an `edges` dataframe (containing `from` and `to` nodes along
-#'   with the total number of `edges` as drawn from `edge_dist`), and if
-#'   `return_edge_propensities == TRUE`: `edge_propensities`
-#'   dataframe that shows the randomly drawn edge propensities between
-#'   blocks.
+#' @inherit new_sbm_network return
+#'
 #' @export
 #'
 #' @examples

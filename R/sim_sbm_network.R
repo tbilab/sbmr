@@ -28,7 +28,7 @@
 #'   edges? If edges distribution is a binary yes or no then you will likely
 #'   want to set this to `TRUE`.
 #'
-#' @return `sbm_network` object.
+#' @inherit new_sbm_network return
 #' @export
 #'
 #' @examples

@@ -8,41 +8,35 @@
 #'
 #' @section Class structure:
 #'
-#' The `sbm_network` class is an S3 class with two minimum components:
+#'   The `sbm_network` class is an S3 class with two minimum components:
 #'
-#' \describe{
-#' \item{`$edges`}{Edges that the network is built out of.
-#' This is simply the passed `edges` input to the function.}
-#' \item{`$nodes`}{Nodes that the edges connect. This is either the passed `nodes` input or
-#' is created from the `edges` input automatically by listing the unique node
-#' ids seen in the edges.}
-#' }
+#'   \describe{ \item{`$edges`}{Edges that the network is built out of. This is
+#'   simply the passed `edges` input to the function.} \item{`$nodes`}{Nodes
+#'   that the edges connect. This is either the passed `nodes` input or is
+#'   created from the `edges` input automatically by listing the unique node ids
+#'   seen in the edges.} }
 #'
 #'
-#' If the method \code{\link{mcmc_sweep}} has been run on the `sbm_network`
-#' object then a `$sweep_result` slot will be added. For more info see
-#' \code{\link{mcmc_sweep}}.
+#'   If the method \code{\link{mcmc_sweep}} has been run on the `sbm_network`
+#'   object then a `$sweep_result` slot will be added. For more info see
+#'   \code{\link{mcmc_sweep}}.
 #'
-#' If either of the methods \code{\link{collapse_groups}} or
-#' \code{\link{collapse_run}} have been applied to the `sbm_network` object then
-#' the slot `$collapse_result` will be append.
+#'   If either of the methods \code{\link{collapse_groups}} or
+#'   \code{\link{collapse_run}} have been applied to the `sbm_network` object
+#'   then the slot `$collapse_result` will be append.
 #'
-#' A few attributes are contained by the class as well:
+#'   A few attributes are contained by the class as well:
 #'
-#' \describe{
-#'   \item{`n_nodes`}{Number of unique nodes in the current model. Equivalent to
-#' `nrow(sbm_network$nodes)`.}
-#' \item{`n_edges`}{Number of edges in the current model. Equivalent to
-#' `nrow(sbm_network$edges)`.}
-#' \item{`from_column`}{Raw quosure representing the
-#' `edges_from_column` argument. This is kept so
-#' bipartite network types can be inferred and no modification of the passed
-#' `edges` dataframe needs to take place.}
-#' \item{`to_column`}{Same as `from_column`}
-#' \item{`model`}{ S4 class that is exported by the C++ code used to implement all the modeling algorithms. Most
-#' of the time the user should not have to interact with this object and thus it
-#' can be ignored.}
-#' }
+#'   \describe{ \item{`n_nodes`}{Number of unique nodes in the current model.
+#'   Equivalent to `nrow(sbm_network$nodes)`.} \item{`n_edges`}{Number of edges
+#'   in the current model. Equivalent to `nrow(sbm_network$edges)`.}
+#'   \item{`from_column`}{Raw quosure representing the `edges_from_column`
+#'   argument. This is kept so bipartite network types can be inferred and no
+#'   modification of the passed `edges` dataframe needs to take place.}
+#'   \item{`to_column`}{Same as `from_column`} \item{`model`}{ S4 class that is
+#'   exported by the C++ code used to implement all the modeling algorithms.
+#'   Most of the time the user should not have to interact with this object and
+#'   thus it can be ignored.} }
 #'
 #'
 #' @family model_setup
@@ -58,12 +52,14 @@
 #'   column?
 #' @param setup_model Should an SBM model object be added? Set to `FALSE` if
 #'   network is just being visualized or described.
-#' @param default_node_type What should nodes that the type is generated for be called?
+#' @param default_node_type What should nodes that the type is generated for be
+#'   called?
 #' @param show_warnings Do you want to be warned when minor problems are
 #'   detected by function? Usefull to disable when not running in an interactive
 #'   mode etc.
 #'
-#' @return An S3 object of class `sbm_network` containing data (`$edges` and `$nodes`) and internal model object (`$model`).
+#' @return An S3 object of class `sbm_network`. For details see
+#'   \link{new_sbm_network} section "Class structure."
 #' @export
 #'
 #' @examples

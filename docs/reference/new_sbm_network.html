@@ -177,7 +177,8 @@ network is just being visualized or described.</p></td>
     </tr>
     <tr>
       <th>default_node_type</th>
-      <td><p>What should nodes that the type is generated for be called?</p></td>
+      <td><p>What should nodes that the type is generated for be
+called?</p></td>
     </tr>
     <tr>
       <th>show_warnings</th>
@@ -189,7 +190,8 @@ mode etc.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An S3 object of class <code>sbm_network</code> containing data (<code>$edges</code> and <code>$nodes</code>) and internal model object (<code>$model</code>).</p>
+    <p>An S3 object of class <code>sbm_network</code>. For details see
+new_sbm_network section "Class structure."</p>
     <h2 class="hasAnchor" id="class-structure"><a class="anchor" href="#class-structure"></a>Class structure</h2>
 
     
@@ -197,35 +199,31 @@ mode etc.</p></td>
 
 <p>The <code>sbm_network</code> class is an S3 class with two minimum components:</p>
 <dl class='dl-horizontal'>
-<dt><code>$edges</code></dt><dd><p>Edges that the network is built out of.
-This is simply the passed <code>edges</code> input to the function.</p></dd>
-<dt><code>$nodes</code></dt><dd><p>Nodes that the edges connect. This is either the passed <code>nodes</code> input or
-is created from the <code>edges</code> input automatically by listing the unique node
-ids seen in the edges.</p></dd>
-
+<dt><code>$edges</code></dt><dd><p>Edges that the network is built out of. This is
+simply the passed <code>edges</code> input to the function.</p></dd> <dt><code>$nodes</code></dt><dd><p>Nodes
+that the edges connect. This is either the passed <code>nodes</code> input or is
+created from the <code>edges</code> input automatically by listing the unique node ids
+seen in the edges.</p></dd> 
 </dl>
 
 <p>If the method <code><a href='mcmc_sweep.html'>mcmc_sweep</a></code> has been run on the <code>sbm_network</code>
 object then a <code>$sweep_result</code> slot will be added. For more info see
 <code><a href='mcmc_sweep.html'>mcmc_sweep</a></code>.</p>
 <p>If either of the methods <code>collapse_groups</code> or
-<code><a href='collapse_run.html'>collapse_run</a></code> have been applied to the <code>sbm_network</code> object then
-the slot <code>$collapse_result</code> will be append.</p>
+<code><a href='collapse_run.html'>collapse_run</a></code> have been applied to the <code>sbm_network</code> object
+then the slot <code>$collapse_result</code> will be append.</p>
 <p>A few attributes are contained by the class as well:</p>
 <dl class='dl-horizontal'>
-<dt><code>n_nodes</code></dt><dd><p>Number of unique nodes in the current model. Equivalent to
-<code><a href='https://rdrr.io/r/base/nrow.html'>nrow(sbm_network$nodes)</a></code>.</p></dd>
-<dt><code>n_edges</code></dt><dd><p>Number of edges in the current model. Equivalent to
-<code><a href='https://rdrr.io/r/base/nrow.html'>nrow(sbm_network$edges)</a></code>.</p></dd>
-<dt><code>from_column</code></dt><dd><p>Raw quosure representing the
-<code>edges_from_column</code> argument. This is kept so
-bipartite network types can be inferred and no modification of the passed
-<code>edges</code> dataframe needs to take place.</p></dd>
-<dt><code>to_column</code></dt><dd><p>Same as <code>from_column</code></p></dd>
-<dt><code>model</code></dt><dd><p>S4 class that is exported by the C++ code used to implement all the modeling algorithms. Most
-of the time the user should not have to interact with this object and thus it
-can be ignored.</p></dd>
-
+<dt><code>n_nodes</code></dt><dd><p>Number of unique nodes in the current model.
+Equivalent to <code><a href='https://rdrr.io/r/base/nrow.html'>nrow(sbm_network$nodes)</a></code>.</p></dd> <dt><code>n_edges</code></dt><dd><p>Number of edges
+in the current model. Equivalent to <code><a href='https://rdrr.io/r/base/nrow.html'>nrow(sbm_network$edges)</a></code>.</p></dd>
+<dt><code>from_column</code></dt><dd><p>Raw quosure representing the <code>edges_from_column</code>
+argument. This is kept so bipartite network types can be inferred and no
+modification of the passed <code>edges</code> dataframe needs to take place.</p></dd>
+<dt><code>to_column</code></dt><dd><p>Same as <code>from_column</code></p></dd> <dt><code>model</code></dt><dd><p>S4 class that is
+exported by the C++ code used to implement all the modeling algorithms.
+Most of the time the user should not have to interact with this object and
+thus it can be ignored.</p></dd> 
 </dl>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

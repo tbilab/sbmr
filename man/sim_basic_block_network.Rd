@@ -48,12 +48,8 @@ used for recreating draws using \code{\link{sim_sbm_network()}}.}
 network is just being visualized or described.}
 }
 \value{
-A list with a \code{nodes} dataframe (containing a node's \code{id} and \code{block}
-membership), an \code{edges} dataframe (containing \code{from} and \code{to} nodes along
-with the total number of \code{edges} as drawn from \code{edge_dist}), and if
-\code{return_edge_propensities == TRUE}: \code{edge_propensities}
-dataframe that shows the randomly drawn edge propensities between
-blocks.
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Simulates a simple block structured network with a desired number of constant
@@ -62,6 +58,11 @@ drawn from a passed function that must return a numeric value that will be
 used as the propensity parameter for drawing edge counts from a node pair.
 The default values will draw propensity values for bernouli edges with an
 average of a 50\% chance of edge.
+}
+\details{
+If \code{return_edge_propensities == TRUE}: an \verb{$edge_propensities} slot is added
+to the returned \code{sbm_network} object containing a dataframe that shows the
+randomly drawn edge propensities between blocks.
 }
 \examples{
 

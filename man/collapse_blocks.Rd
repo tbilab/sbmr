@@ -48,9 +48,8 @@ to \code{TRUE}, otherwise it will slow down collapsing due to increased data
 transfer.}
 }
 \value{
-Tibble with four columns with rows corresponding to the result of
-each merge step:  \code{entropy_delta} of last merge step, \code{entropy} of model after last merge step, \code{num_blocks} left in model, and a list column
-of \code{state} which is the state dump dataframe for model at end of merge.
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Performs agglomerative merging on network, starting with each block has a

@@ -38,9 +38,8 @@ searched exhaustively.}
 \item{parallel}{Run in parallel using \code{furrr}?}
 }
 \value{
-Tibble with three columns with rows corresponding to the result of
-each merge step:  \code{entropy}, \code{num_blocks} left in model, and a list column
-of \code{state} which is the state dump dataframe for model at end of merge.
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Run Agglomerative Merging to target a range of block numbers

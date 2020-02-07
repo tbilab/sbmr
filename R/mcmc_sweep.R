@@ -25,11 +25,8 @@
 #'   have information given on entropy delta, probability of moving, and if the
 #'   move were accepted printed to the console.
 #'
-#' @return List with two dataframes. The first telling for all sweeps everytime
-#'   a node was moved and what group it was moved to. The second telling for
-#'   each sweep the entropy delta and total number of nodes that were moved to
-#'   new groups in that sweep. If `track_pairs = TRUE`, then an additional
-#'   `pairing_counts` dataframe is added to output.
+#' @inherit new_sbm_network return
+#'
 #' @export
 #'
 #' @examples

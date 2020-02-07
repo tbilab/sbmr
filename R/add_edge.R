@@ -12,7 +12,8 @@
 #'   warning and use the first node in networks type for both. To hide this
 #'   warning for unipartite networks set this to `TRUE`.
 #'
-#' @return `sbm_network` object edge added.
+#' @inherit new_sbm_network return
+#'
 #' @export
 #'
 #' @examples
