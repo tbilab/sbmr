@@ -11,13 +11,13 @@
 #' @export
 #'
 #' @examples
-#' # Initialize a random network and assign random blocks
-#' sbm <- sim_basic_block_network(n_blocks = 5) %>%
-#'   create_sbm() %>%
-#'   initialize_blocks(5)
 #'
-#' # Gather edge counts for all level 1 block pairs
-#' sbm %>% get_block_edge_counts(1)
+#' # A small simulated network with random block assignment
+#' net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 10) %>%
+#'   initialize_blocks(3)
+#'
+#' # Get counts of connections from each given block to the others
+#' net %>% get_block_edge_counts()
 #'
 get_block_edge_counts <- function(sbm, level = 1){
   UseMethod("get_block_edge_counts")
