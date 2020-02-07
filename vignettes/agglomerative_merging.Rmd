@@ -37,7 +37,6 @@ library(tidyverse)
 
 The data we are using will come from the included simulation function, `sim_basic_block_network()`.
 
-
 ```{r simulate_data}
 set.seed(42) # seed for reproducability
 
@@ -65,16 +64,6 @@ We can also visualise the simulated data directly using the `visualize_network()
 visualize_network(network)
 ```
 
-### Model
-
-Now that we have our network we can initialize an SBM model with it. 
-
-```{r setup_model}
-# Setup SBM model
-my_sbm <- create_sbm(network)
-my_sbm %>% get_state() %>% head()
-```
-
 
 ## Single merge run
 
@@ -95,16 +84,18 @@ To perform the complete merge we put our `sigma < 1` and our `num_mcmc_sweeps = 
 
 
 ```{r default_collapse_blocks}
-collapse_results <- my_sbm %>% 
+network <- network %>% 
   collapse_blocks(sigma = 0.9, report_all_steps = TRUE)
 
-head(collapse_results)
+network %>% 
+  get_collapse_results() %>% 
+  head()
 ```
 
 The results of the collapse function are a column with entropy of the model at a given state, entropy delta caused by that move, and the number of groups in the model at that state. We can plot these using the included `visualize_collapse_results()` function to check for patterns. 
 
 ```{r plot_default_collapse}
-visualize_collapse_results(collapse_results)
+visualize_collapse_results(network)
 ```
 
 Right away we see a sharp leveling off of the entropy/ entropy delta after we get to the true number of groups. This shows that the model effectively found the true partitioning and then as soon as it was forced to merge non-member nodes together the performance got much worse.
@@ -126,32 +117,10 @@ We can check out what a given heuristic looks like on our data by simply telling
 axis_limits <- xlim(0,20)
 true_num_clusters_line <- geom_vline(xintercept = n_blocks, color = 'orangered')
 
-visualize_collapse_results(collapse_results, heuristic = "delta_ratio") +
+visualize_collapse_results(network, heuristic = "delta_ratio") +
   axis_limits +
   true_num_clusters_line +
   ggtitle("Delta ratio heuristic score")
-```
-
-```{r}
-get_state(my_sbm) %>%
-  filter(level == 0) %>%
-  right_join(network$nodes, by = 'id') %>%
-  rename(inferred = parent) %>% {
-    table(.$inferred, .$block)
-  } %>% 
-  as.data.frame.matrix() %>% 
-  mutate(inferred = rownames(.)) %>% 
-  pivot_longer(-inferred, values_to = "count", names_to = "truth") %>% 
-  ggplot(aes(x = truth, y = inferred)) +
-  geom_tile(aes(fill = count), color = "white") +
-  geom_text(aes(label = count), color = "white", size = 8) +
-  guides(fill = FALSE) +
-  labs(
-    x = "True Group",
-    y = "Inferred group",
-    title = "Performance of single-step merging algorithm",
-    subtitle = "Delta-ratio heuristic used for optimal cut"
-  )
 ```
 
 
@@ -163,7 +132,7 @@ This heueristic fits a non-linear regression model to the entropy as predicted b
  
 
 ```{r}
-visualize_collapse_results(collapse_results, heuristic = "nls_residual") +
+visualize_collapse_results(network, heuristic = "nls_residual") +
   axis_limits +
   true_num_clusters_line +
   ggtitle("NLS residual heuristic score")
@@ -172,7 +141,7 @@ visualize_collapse_results(collapse_results, heuristic = "nls_residual") +
 __Deviation from rolling mean__
 
 ```{r}
-visualize_collapse_results(collapse_results, heuristic = "dev_from_rolling_mean") +
+visualize_collapse_results(network, heuristic = "dev_from_rolling_mean") +
   axis_limits +
   true_num_clusters_line +
   ggtitle("Deviation from rolling mean")
@@ -185,7 +154,8 @@ The deviation from the rolling mean function works similar to the NLS fit but us
 The function `choose_best_collapse_state()` will take a collapse results object and your model and use your heuristic of choice to find the best partitioning and then set the model to that. The same heuristics work for the `visualize_collapse_results()` and `choose_best_collapse_state()` functions. Lets choose our results using the deviation from rolling mean hueristic...
 
 ```{r}
-my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, heuristic = "dev_from_rolling_mean", verbose = TRUE)
+network <- network %>% 
+  choose_best_collapse_state(heuristic = "delta_ratio", verbose = TRUE)
 ```
 
 So, as expected, the chosen best fit is the correct `n_blocks` blocks. 
@@ -195,38 +165,23 @@ So, as expected, the chosen best fit is the correct `n_blocks` blocks.
 Since we have the true groups for our nodes we can check to see how well the merging did. To do that we just need to merge our results and the raw network data and look at the contingency table of truth to inferred groups. 
 
 ```{r}
-state_to_truth_table <- function(sbm){
-  sbm %>%
-    get_state() %>%
+state_to_truth_table <- function(net){
+  right_join(get_state(net),
+             net$nodes,
+             by = 'id') %>% 
     filter(level == 0) %>%
-    right_join(network$nodes, by = 'id') %>%
     rename(inferred = parent) %>% {
       table(.$inferred, .$block)
     }
 }
 
-state_to_truth_table(my_sbm)
+state_to_truth_table(network)
 ```
 
 
 
 
 So we can see that the merging algorithm perfectly separated our nodes into their true groups. 
-
-We can also look at the results by plotting the network itself and encoding true blocks in node color and inferred blocks in node shape. 
-
-```{r}
-nodes_w_inferred_block <- get_state(my_sbm) %>%
-  filter(level == 0) %>%
-  right_join(network$nodes, by = 'id') 
-
-visualize_network(edges = network$edges, 
-                  nodes = nodes_w_inferred_block, 
-                  node_color_col = 'block', 
-                  node_shape_col = 'parent',
-                  width = '100%')
-```
-
 
 
 ### Allowing for node shuffling
@@ -241,12 +196,12 @@ Let's try our above merging run with 5 MCMC sweeps after each step.
 
 
 ```{r collapse_w_shuffle}
-collapse_mcmc10 <- my_sbm %>% 
+network <- network %>% 
   collapse_blocks(sigma = 0.9, 
                   num_mcmc_sweeps = 5,
                   report_all_steps = TRUE)
 
-visualize_collapse_results(collapse_mcmc10, heuristic = 'dev_from_rolling_mean') +
+visualize_collapse_results(network, heuristic = 'dev_from_rolling_mean') +
   axis_limits +
   true_num_clusters_line +
   ggtitle("num_mcmc_sweeps = 10")
@@ -255,7 +210,8 @@ visualize_collapse_results(collapse_mcmc10, heuristic = 'dev_from_rolling_mean')
 Now that we have allowed node shuffling the nice monotonicly decreasing entropy as the number of groups increases has gone away because our mcmc sweeps have the potential to improve the model fit more than the previous merge harmed it. We still however see a strong indicator of where our true number of blocks is. Let's select that value and see how the model performed. 
 
 ```{r}
-choose_best_collapse_state(my_sbm, collapse_mcmc10, heuristic = "dev_from_rolling_mean", verbose = TRUE) %>% 
+network %>% 
+  choose_best_collapse_state(heuristic = "dev_from_rolling_mean", verbose = TRUE) %>% 
   state_to_truth_table()
 ```
 
@@ -342,7 +298,7 @@ Let's try setting sigma to `1.5` and seeing how both the collapse performs and h
 First time the normal exhaustive collapse...
 ```{r}
 full_collapse_time <- system.time({
-  full_collapse_results <- collapse_blocks(my_sbm, sigma = 0.9, report_all_steps = TRUE)
+  network <- collapse_blocks(network, sigma = 0.9, report_all_steps = TRUE)
 })
 
 full_collapse_time
@@ -353,7 +309,7 @@ Now raise sigma to 1.5 and time...
 
 ```{r}
 raised_sigma_collapse_time <- system.time({
-  raised_sigma_results <- collapse_blocks(my_sbm, sigma = 1.5, report_all_steps = TRUE)
+  network <- collapse_blocks(network, sigma = 1.5, report_all_steps = TRUE)
 })
 
 raised_sigma_collapse_time
@@ -364,7 +320,7 @@ Just by increasing sigma to 1.5 we have sped up the collapsing by `r round(full_
 Speed isn't important if the model isnt working properly, however. So let's see how the collapse worked.
 
 ```{r}
-visualize_collapse_results(raised_sigma_results, heuristic = "dev_from_rolling_mean") +
+visualize_collapse_results(network, heuristic = "dev_from_rolling_mean") +
   axis_limits +
   true_num_clusters_line +
   ggtitle("Collapse with sigma = 1.5")
@@ -373,12 +329,13 @@ visualize_collapse_results(raised_sigma_results, heuristic = "dev_from_rolling_m
 So even with this speedup we are finding the proper number of clusters. Let's see if the separation is good. 
 
 ```{r}
-choose_best_collapse_state(my_sbm, raised_sigma_results, heuristic = "dev_from_rolling_mean", verbose = TRUE) %>% 
+network %>% 
+  choose_best_collapse_state(heuristic = "dev_from_rolling_mean", 
+                             verbose = TRUE) %>% 
   state_to_truth_table()
 ```
 
 So again we are getting extremely good performance. Often a balance between allowing MCMC sweeps and a moderate sigma value will return very good and very fast collapsing results. 
-
 
 
 ## Collapse Runs
@@ -400,8 +357,11 @@ Lets try it on our model scanning from 1-10 groups using sigma of `1.5` and `5` 
 
 ```{r parallel_collapse_run}
 system.time({
-  run_results <- my_sbm %>% 
-    collapse_run(num_final_blocks = 1:10, sigma = 1.5, num_mcmc_sweeps = 5, parallel = TRUE)
+  network <- network %>% 
+    collapse_run(num_final_blocks = 1:10, 
+                 sigma = 1.5,
+                 num_mcmc_sweeps = 5,
+                 parallel = TRUE)
 })
 ```
 
@@ -410,14 +370,16 @@ system.time({
 We can use the same collapse viewing and selection functions as we did previously. 
 
 ```{r}
-visualize_collapse_results(run_results, heuristic = "nls_residual") +
+network %>% 
+  visualize_collapse_results(heuristic = "nls_residual") +
   true_num_clusters_line +
   ggtitle("Collapse run")
 ```
 
 
 ```{r}
-choose_best_collapse_state(my_sbm, run_results, heuristic = "nls_residual", verbose = TRUE) %>% 
+network %>% 
+  choose_best_collapse_state(heuristic = "nls_residual", verbose = TRUE) %>% 
   state_to_truth_table()
 ```
 
@@ -442,18 +404,19 @@ eps_sweep_results <- purrr::map_dfr(
   eps_vals, 
   function(eps){
     collapse_run(
-      my_sbm,
+      network,
       num_final_blocks = 1:8,
       eps = eps,
       parallel = TRUE
     ) %>% 
-      mutate(eps = eps)
+      get_collapse_results() %>% 
+      mutate(epsilon = eps)
   }
 )
 
 eps_sweep_results %>% 
-  ggplot(aes(x = num_blocks, y = entropy, color = eps)) +
-  geom_line(aes(group = eps)) +
+  ggplot(aes(x = num_blocks, y = entropy, color = epsilon)) +
+  geom_line(aes(group = epsilon)) +
   geom_point() +
   scale_y_log10() +
   ggtitle("Collapse results by epsilon value")
@@ -469,14 +432,15 @@ By simply passing in a groups numbers to check vector with repeates in it we can
 num_repeats <- 5
 group_nums <- 1:8
 
-repeated_collapse <- collapse_run(
-  my_sbm,
-  num_final_blocks = rep(group_nums, each = num_repeats),
-  num_mcmc_sweeps = 5,
-  parallel = TRUE
-)
+network <- network %>% 
+  collapse_run(
+    num_final_blocks = rep(group_nums, each = num_repeats),
+    num_mcmc_sweeps = 5,
+    parallel = TRUE
+  )
 
-repeated_collapse %>% 
+network %>% 
+  get_collapse_results() %>% 
   ggplot(aes(x = num_blocks, y = entropy)) +
   geom_smooth(size = 0, method = 'loess', span = 0.75, fill = 'steelblue') +
   geom_jitter(alpha = 0.5, height = 0, width = 0.2)  +
