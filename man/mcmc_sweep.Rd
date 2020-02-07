@@ -38,10 +38,6 @@ through MCMC proposal-accept routine.}
 \item{verbose}{If set to \code{TRUE} then each proposed move for all sweeps will
 have information given on entropy delta, probability of moving, and if the
 move were accepted printed to the console.}
-
-\item{return_sbm_network}{Should the updated \code{sbm_network} object that was
-provided to function be returned in the results under \code{sbm_network}? If set
-to \code{FALSE} the new state after the sweep will not be maintained.}
 }
 \value{
 List with two dataframes. The first telling for all sweeps everytime

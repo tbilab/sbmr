@@ -5,25 +5,15 @@
 \title{Visualize agglomerative collapse results}
 \usage{
 visualize_collapse_results(
-  collapse_results,
+  sbm,
   use_entropy_value_for_score = FALSE,
   heuristic = NULL
 )
 }
 \arguments{
-\item{collapse_results}{Dataframe of agglomerative merging based collapse
-results as returned from \link{\code{collapse_run}}, or
-\link{\code{collapse_blocks(report_all_steps = TRUE)}}.}
-
-\item{use_entropy_value_for_score}{If set to \code{TRUE} then instead of the merge results
-entropy delta being used for the score function the entropy will be.
-Typically the heuristics work better on entropy delta values.}
-
-\item{heuristic}{How the best partitioning is defined. Takes either a
-function that takes one/two arguments: an entropy vector and an optional
-number of blocks vector with each element corresponding to a given
-location, or a string labeling algorithm. Currently only \code{"lowest"},
-\code{"dev_from_rolling_mean"}, \code{"delta_ratio"}, \code{"trend_deviation"}, and \code{"nls_residual"} are supported.}
+\item{use_entropy_value_for_score}{If set to \code{TRUE} then instead of the merge
+results entropy delta being used for the score function the entropy will
+be. Typically the heuristics work better on entropy delta values.}
 }
 \value{
 GGplot object comparing the fit results and each step's deviance from
@@ -34,15 +24,20 @@ Plots entropy against number of blocks left for a collapse run. If
 \code{heuristic} is set to value other than \code{NULL} a second plot of the score for
 each merger step according to the heuristic provided is also shown.
 }
+\details{
+Either \link{\code{collapse_run}}, or
+\link{\code{collapse_blocks(report_all_steps = TRUE)}} must be run prior to
+calling this function.
+}
 \examples{
+
 set.seed(42)
 
-# Start with a random network of two blocks with 25 nodes each
-network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25)
+# Start with a random network
+net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 35)
 
 # Run agglomerative clustering with no intermediate MCMC steps on sbm of simulated data
-collapse_results <- create_sbm(network) \%>\%
-  collapse_blocks(sigma = 2)
+collapse_results <- collapse_blocks(net, sigma = 1.5)
 
 # =============================================================================
 # Visualize using no heuristic
@@ -56,7 +51,7 @@ visualize_collapse_results(collapse_results, heuristic = 'dev_from_rolling_mean'
 # Visualize using custom heuristic
 
 # Score heuristic that fits a nonlinear model to observed values and chooses by
-# largest negative residual
+# largest negative residual (built into package as heuristic = "nls_residual")
 nls_score <- function(e, k){
   entropy_model <- nls(e ~ a + b * log(k), start = list(a = max(e), b = -25))
   -residuals(entropy_model)

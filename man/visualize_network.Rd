@@ -31,16 +31,14 @@ membership and type (if present) for a passed network.
 }
 \examples{
 
-set.seed(42)
-
 # Simulate a 3 block/cluster network with 15 nodes per block
-simulated_network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 15)
+net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 15)
 
 # Visualize network with color encoding the blocks
-visualize_network(simulated_network)
+visualize_network(net)
 
 # Visualize network with shape encoding the blocks
-visualize_network(simulated_network, node_shape_col = 'block', node_color_col = 'type')
+visualize_network(net, node_shape_col = 'block', node_color_col = 'type')
 
 }
 \seealso{

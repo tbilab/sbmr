@@ -4,11 +4,9 @@
 \alias{visualize_propensity_network}
 \title{Plot network of nodes connected by pairwise block propensity}
 \usage{
-visualize_propensity_network(sweep_results, proportion_threshold = 0.2)
+visualize_propensity_network(sbm, proportion_threshold = 0.2)
 }
 \arguments{
-\item{sweep_results}{Results from running \code{\link{mcmc_sweep()}} with the argument \code{track_pairs = TRUE}.}
-
 \item{proportion_threshold}{Threshold of pairwise propensity to consider two nodes linked. Choose carefully!}
 }
 \value{
@@ -23,14 +21,13 @@ propensity to be in the same block is above some threshold.
 
 set.seed(42)
 # Simulate network data and initialize model with it
-my_sbm <- sim_basic_block_network(n_blocks = 3,n_nodes_per_block = 30) \%>\%
-  create_sbm()
+net <- sim_basic_block_network(n_blocks = 3,n_nodes_per_block = 30)
 
 # Run collapsing algorithm
-collapse_results <- my_sbm \%>\% collapse_blocks(desired_num_blocks = 1, sigma = 1.1)
+collapse_results <- net \%>\% collapse_blocks(desired_num_blocks = 1, sigma = 1.1)
 
 # Choose best collapse state
-my_sbm <- choose_best_collapse_state(my_sbm, collapse_results)
+my_sbm <- choose_best_collapse_state(net, collapse_results, verbose = TRUE)
 
 # Run MCMC sweeps and track pairs
 sweep_results <- mcmc_sweep(my_sbm, num_sweeps = 100, eps = 0.4, track_pairs = TRUE)

@@ -6,7 +6,6 @@
 \usage{
 choose_best_collapse_state(
   sbm,
-  collapse_results,
   use_entropy_value_for_score = FALSE,
   heuristic = "dev_from_rolling_mean",
   verbose = FALSE
@@ -16,12 +15,9 @@ choose_best_collapse_state(
 \item{sbm}{\code{sbm_network} object as created by
 \code{\link{new_sbm_network()}}.}
 
-\item{collapse_results}{Results of running agglomerative collapse algorithm
-on sbm with \code{\link{collapse_blocks}}.}
-
-\item{use_entropy_value_for_score}{If set to \code{TRUE} then instead of the merge results
-entropy delta being used for the score function the entropy will be.
-Typically the heuristics work better on entropy delta values.}
+\item{use_entropy_value_for_score}{If set to \code{TRUE} then instead of the merge
+results entropy delta being used for the score function the entropy will
+be. Typically the heuristics work better on entropy delta values.}
 
 \item{heuristic}{How the best partitioning is defined. Takes either a
 function that takes one/two arguments: an entropy vector and an optional

@@ -31,7 +31,13 @@ Generate an edge dataframe from an \href{https://en.wikipedia.org/wiki/Erd\%C5\%
 between two nodes with a uniform common probability.
 }
 \examples{
-sim_random_network(n_nodes = 4, prob_of_edge = 0.9)
+
+# Basic random network
+sim_random_network(n_nodes = 10, prob_of_edge = 0.5)
+
+# Simulate a fully connected network by setting probability of edge to 1
+sim_random_network(n_nodes = 10, prob_of_edge = 1)
+
 }
 \seealso{
 Other simulations: 

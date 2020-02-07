@@ -64,7 +64,25 @@ The default values will draw propensity values for bernouli edges with an
 average of a 50\% chance of edge.
 }
 \examples{
-sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 10)
+
+sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 40)
+
+sim_basic_block_network(n_blocks = 8, n_nodes_per_block = 20)
+
+# Can save the generating edge propensities as well
+net <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 20, return_edge_propensities = TRUE)
+net$edge_propensities
+
+
+right_skewed_beta <- function(n) rbeta(n, 1, 5)
+
+# Distribution that draws propensities can be customized
+net <- sim_basic_block_network(n_blocks = 4,
+                               n_nodes_per_block = 20,
+                               return_edge_propensities = TRUE,
+                               propensity_drawer = right_skewed_beta)
+net$edge_propensities
+
 }
 \seealso{
 \code{\link{sim_sbm_network}} \code{\link{sim_random_network}}
