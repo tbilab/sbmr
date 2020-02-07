@@ -54,7 +54,10 @@
 #'   "b4", "node"
 #' )
 #'
-#' new_sbm_network(edges = edges, nodes = nodes, edges_from_column = a_node, edges_to_column = b_node)
+#' new_sbm_network(edges = edges,
+#'                 nodes = nodes,
+#'                 edges_from_column = a_node,
+#'                 edges_to_column = b_node)
 #'
 #' # Can build a bipartite network just from an edge list
 #' new_sbm_network(edges, bipartite_edges = TRUE,
@@ -84,7 +87,6 @@
 #'
 #' new_sbm_network(edges = edges_tripartite,
 #'                 nodes = nodes_tripartite)
-#'
 #'
 new_sbm_network <- function(edges = dplyr::tibble(),
                             nodes = NULL,
