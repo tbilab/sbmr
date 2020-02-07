@@ -4,7 +4,7 @@
 \alias{print.sbm_network}
 \title{Print network}
 \usage{
-\method{print}{sbm_network}(x)
+\method{print}{sbm_network}(x, rows_for_preview = 5)
 }
 \arguments{
 \item{x}{Object of class \code{sbm_network}.}
@@ -17,15 +17,16 @@ indication of if a model has been initialized
 Print network
 }
 \examples{
+
 # Build small object from simple edge dataframe
 small_edges <- dplyr::tribble(
   ~a_node, ~b_node,
-  "a1"   , "b1"   ,
-  "a1"   , "b2"   ,
-  "a1"   , "b3"   ,
-  "a2"   , "b1"   ,
-  "a2"   , "b4"   ,
-  "a3"   , "b1"
+     "a1",    "b1",
+     "a1",    "b2",
+     "a1",    "b3",
+     "a2",    "b1",
+     "a2",    "b4",
+     "a3",    "b1"
 )
 
 sbm_net <- new_sbm_network(small_edges, edges_from_col = a_node, edges_to_col = b_node)
@@ -36,6 +37,8 @@ print(sbm_net)
 Other helpers: 
 \code{\link{build_score_fn}()},
 \code{\link{get_combination_indices}()},
+\code{\link{get_sweep_pair_counts}()},
+\code{\link{get_sweep_results}()},
 \code{\link{rolling_mean}()},
 \code{\link{verify_model}()}
 }

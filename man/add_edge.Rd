@@ -41,13 +41,26 @@ Connects two nodes in network (at level 0) by their ids (string).
 }
 \examples{
 
-# Create SBM and add two nodes
-my_sbm <- create_sbm() \%>\%
-  add_node('node_1') \%>\%
-  add_node('node_2')
+# Start with network with 5 nodes all fully connected
+net <- sim_random_network(n_nodes = 5, prob_of_edge = 1)
 
-# Add edge between two nodes
-my_sbm \%>\% add_edge('node_1', 'node_2')
+# Fully connected network will have 10 edges
+attr(net, 'n_edges')
+
+# Add a new edge between two non-yet-seen nodes
+net <- net \%>\% add_edge('new_from_node', 'new_to_node')
+
+# We have two nodes added to our model
+attr(net, 'n_nodes')
+
+# And one edge
+attr(net, 'n_edges')
+
+# adding an edge between two nodes already in the network
+net <- net \%>\% add_edge('new_from_node', 'new_to_node')
+
+# Another edge will be added
+attr(net, 'n_edges')
 
 }
 \seealso{
@@ -55,6 +68,7 @@ Other advanced:
 \code{\link{add_node}()},
 \code{\link{get_node_to_block_edge_counts}()},
 \code{\link{initialize_blocks}()},
-\code{\link{set_node_parent}()}
+\code{\link{set_node_parent}()},
+\code{\link{update_state}()}
 }
 \concept{advanced}

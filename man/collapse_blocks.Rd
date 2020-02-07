@@ -64,15 +64,22 @@ complete discussion of options/behavior.
 set.seed(42)
 
 # Start with a random network of two blocks with 25 nodes each
-my_sbm <- sim_basic_block_network(n_blocks = 2, n_nodes_per_block = 25) \%>\%
-  create_sbm()
+net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) \%>\%
+  collapse_blocks(sigma = 1.2)
 
-# Run agglomerative clustering with no intermediate MCMC steps on network
-collapse_results <- collapse_blocks(my_sbm, num_mcmc_sweeps = 0)
+# We can look directly at the collapse results
+net \%>\% get_collapse_results()
 
-# Investigate number of nodes at each step
-collapse_results \%>\%
-  dplyr::select(-state)
+# We can visualize the collapse results
+net \%>\% visualize_collapse_results()
+
+# We can choose best result with default heuristic
+net <- choose_best_collapse_state(net, verbose = TRUE)
+
+# Setting sigma to a higher value means faster collapsing at the cost of less accuracy
+net \%>\%
+  collapse_blocks(sigma = 2) \%>\%
+  visualize_collapse_results()
 
 }
 \seealso{
@@ -83,7 +90,6 @@ Other modeling:
 \code{\link{get_entropy}()},
 \code{\link{get_num_blocks}()},
 \code{\link{get_state}()},
-\code{\link{mcmc_sweep}()},
-\code{\link{sample_posterior}()}
+\code{\link{mcmc_sweep}()}
 }
 \concept{modeling}

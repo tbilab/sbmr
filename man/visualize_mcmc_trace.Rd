@@ -16,16 +16,13 @@ moved for each sweep. \code{sbmR::mcmc_sweep()} must be run on object before thi
 }
 \examples{
 
-set.seed(42)
-# Start with a random network and assign randomly blocks
-net <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 15) \%>\%
-  initialize_blocks(num_blocks = 5)
-
-# Run 25 MCMC sweeps
-sweep_results <- net \%>\% mcmc_sweep(num_sweeps = 25, variable_num_blocks = FALSE)
+# Simulate a model and run mcmc sweeps on it
+net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) \%>\%
+  initialize_blocks(3) \%>\%
+  mcmc_sweep(num_sweeps = 75, track_pairs = TRUE)
 
 # Plot results
-visualize_mcmc_trace(sweep_results)
+visualize_mcmc_trace(net)
 
 }
 \seealso{

@@ -58,22 +58,28 @@ if new blocks blocks can be proposed and empty blocks removed (boolean).
 
 set.seed(42)
 
-# Start with a random network and assign randomly to 4 blocks
-n_blocks <- 3
-my_sbm <- create_sbm(sim_basic_block_network(n_blocks = n_blocks, n_nodes_per_block = 15)) \%>\%
-  initialize_blocks(num_blocks = n_blocks)
+# Start with a small simulated network with random block assignments
+net <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 15) \%>\%
+  initialize_blocks(num_blocks = 4)
 
 # Calculate entropy with random blocks
-get_entropy(my_sbm)
+get_entropy(net)
 
-# Run 4 MCMC sweeps
-sweep_results <- my_sbm \%>\% mcmc_sweep(num_sweeps = 4, variable_num_blocks = FALSE)
+# Run some MCMC sweeps
+net <- mcmc_sweep(net, num_sweeps = 25, variable_num_blocks = FALSE)
 
-# Look at the per-sweep level information
-sweep_results$sweep_info
+# Entropy after sweeps
+get_entropy(net)
 
-# Get idea of node-pair similarity by looking at how often every pair of nodes is connected over sweeps
-my_sbm \%>\% mcmc_sweep(num_sweeps = 4, track_pairs = TRUE)
+# Per-sweep level information
+get_sweep_results(net)
+
+# Use track_pairs = TRUE to get an idea of node-pair similarity by looking at
+# how often every pair of nodes is connected over sweeps
+net \%>\%
+  mcmc_sweep(num_sweeps = 25, track_pairs = TRUE) \%>\%
+  get_sweep_pair_counts()
+
 
 }
 \seealso{
@@ -84,7 +90,6 @@ Other modeling:
 \code{\link{get_block_edge_counts}()},
 \code{\link{get_entropy}()},
 \code{\link{get_num_blocks}()},
-\code{\link{get_state}()},
-\code{\link{sample_posterior}()}
+\code{\link{get_state}()}
 }
 \concept{modeling}

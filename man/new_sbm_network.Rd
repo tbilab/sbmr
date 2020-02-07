@@ -52,7 +52,7 @@ passed edges dataframe as two different types of nodes.
 \examples{
 
 # Build small object from simple edge dataframe
-small_edges <- dplyr::tribble(
+edges <- dplyr::tribble(
   ~a_node, ~b_node,
   "a1"   , "b1"   ,
   "a1"   , "b2"   ,
@@ -62,12 +62,53 @@ small_edges <- dplyr::tribble(
   "a3"   , "b1"
 )
 
-new_sbm_network(small_edges, edges_from_column = a_node, edges_to_column = b_node)
+new_sbm_network(edges, edges_from_column = a_node, edges_to_column = b_node)
 
-# Build larger object from a simulated dataset
-network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 40)
+# Builds network from nodes and edges
+nodes <- dplyr::tribble(
+  ~id, ~type,
+  "a1", "node",
+  "a2", "node",
+  "a3", "node",
+  "b1", "node",
+  "b2", "node",
+  "b3", "node",
+  "b4", "node"
+)
 
-new_sbm_network(edges = network$edges, nodes = network$nodes)
+new_sbm_network(edges = edges,
+                nodes = nodes,
+                edges_from_column = a_node,
+                edges_to_column = b_node)
+
+# Can build a bipartite network just from an edge list
+new_sbm_network(edges, bipartite_edges = TRUE,
+                edges_from_column = a_node,
+                edges_to_column = b_node)
+
+# Or if adding a node dataframe as well, arbitrary polypartite structure is possible
+edges_tripartite <- dplyr::tribble(
+  ~from,    ~to,
+     "a1", "b1",
+     "a1", "b2",
+     "a2", "b1",
+     "b1", "c1",
+     "b2", "c1",
+     "b2", "c2"
+)
+
+nodes_tripartite <- dplyr::tribble(
+  ~id, ~type,
+  "a1", "a",
+  "a2", "a",
+  "b1", "b",
+  "b2", "b",
+  "c1", "c",
+  "c2", "c"
+)
+
+new_sbm_network(edges = edges_tripartite,
+                nodes = nodes_tripartite)
 
 }
 \seealso{

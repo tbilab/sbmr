@@ -19,12 +19,24 @@ accomplished by \code{attr(sbm, 'state')}.
 }
 \examples{
 
-# Build a bipartite network with 1 node and one block for each type
-my_sbm <- create_sbm() \%>\%
-  add_node('a1', type = 'a') \%>\%
-  add_node('b1', type = 'b')
+# Small edge list to build network
+edges <- dplyr::tribble(
+  ~from, ~to,
+  "a1"   , "b1"   ,
+  "a1"   , "b2"   ,
+  "a1"   , "b3"   ,
+  "a2"   , "b1"   ,
+  "a2"   , "b4"   ,
+  "a3"   , "b1"
+)
 
-my_sbm \%>\% get_state()
+# A small simulated network with no blocks
+net <- new_sbm_network(edges)
+
+get_state(net)
+
+# Add some blocks and state will reflect
+net \%>\% initialize_blocks(2) \%>\% get_state()
 
 }
 \seealso{
@@ -35,7 +47,6 @@ Other modeling:
 \code{\link{get_block_edge_counts}()},
 \code{\link{get_entropy}()},
 \code{\link{get_num_blocks}()},
-\code{\link{mcmc_sweep}()},
-\code{\link{sample_posterior}()}
+\code{\link{mcmc_sweep}()}
 }
 \concept{modeling}

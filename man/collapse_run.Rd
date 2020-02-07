@@ -46,22 +46,27 @@ of \code{state} which is the state dump dataframe for model at end of merge.
 Run Agglomerative Merging to target a range of block numbers
 }
 \examples{
+
 set.seed(42)
 
 # Start with a random network of two blocks with 25 nodes each
-network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25)
+net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) \%>\%
+  collapse_run(num_final_blocks = 1:5, sigma = 1.5)
 
-# Create SBM from simulated data
-my_sbm <- create_sbm(network)
+# Collapse runs can be done in parallel
+\dontrun{
+  net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) \%>\%
+    collapse_run(num_final_blocks = 1:5, sigma = 1.5, parallel = TRUE)
+}
 
-# Run agglomerative clustering with no intermediate MCMC steps on network
-collapse_results <- collapse_run(my_sbm, sigma = 3, num_final_blocks = 1:6)
+# We can look directly at the collapse results
+net \%>\% get_collapse_results()
 
-# Visualize results of collapsing
-visualize_collapse_results(collapse_results)
+# We can visualize the collapse results
+net \%>\% visualize_collapse_results()
 
-# Choose best result
-my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, verbose = TRUE)
+# We can choose best result with default heuristic
+net <- choose_best_collapse_state(net, verbose = TRUE)
 
 }
 \seealso{
@@ -72,7 +77,6 @@ Other modeling:
 \code{\link{get_entropy}()},
 \code{\link{get_num_blocks}()},
 \code{\link{get_state}()},
-\code{\link{mcmc_sweep}()},
-\code{\link{sample_posterior}()}
+\code{\link{mcmc_sweep}()}
 }
 \concept{modeling}
