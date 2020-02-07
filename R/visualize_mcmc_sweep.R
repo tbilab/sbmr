@@ -40,7 +40,9 @@ visualize_mcmc_trace.sbm_network <- function(sbm){
   N <- nrow(sweep_results$sweep_info)
   sweep_results$sweep_info %>%
     dplyr::mutate(sweep = 1:N) %>%
-    tidyr::pivot_longer(entropy_delta:num_nodes_moved) %>%
+    dplyr::rename(`entropy delta` = entropy_delta,
+                  `number of nodes moved` = num_nodes_moved) %>%
+    tidyr::pivot_longer(c(`entropy delta`,`number of nodes moved`)) %>%
     ggplot2::ggplot(ggplot2::aes(x = sweep, y = value)) +
     ggplot2::geom_line() +
     ggplot2::facet_grid(name~., scales = "free_y")
