@@ -60,6 +60,8 @@ not_in <- function(a, b){
   !(a %in% b)
 }
 
+
+# Internal helpers to access potentially unavailable attributes inside sbm_network object.
 get_collapse_results <- function(x){
   collapse_results <- x$collapse_results
   if(is.null(collapse_results)) {
