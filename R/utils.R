@@ -65,6 +65,7 @@ get_collapse_results <- function(x){
   if(is.null(collapse_results)) {
     stop("Need to run collapse_groups() or collapse_run() on network before visualizing.")
   }
+  collapse_results
 }
 
 get_mcmc_sweep_results <- function(x){
