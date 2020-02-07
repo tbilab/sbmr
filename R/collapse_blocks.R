@@ -95,7 +95,7 @@ collapse_blocks.sbm_network <- function(sbm,
   # and we will need to re-create the model class.
   sbm <- verify_model(sbm)
 
-  collapse_results <- sbm$model$collapse_blocks(
+  collapse_results <- attr(sbm, 'model')$collapse_blocks(
     as.integer(level),
     as.integer(num_mcmc_sweeps),
     as.integer(desired_num_blocks),

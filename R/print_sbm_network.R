@@ -39,7 +39,7 @@ print.sbm_network <- function(x, rows_for_preview = 5){
   print(head(x$edges, rows_for_preview))
   cat("...", "\n","\n")
 
-  if (!is.null(x$model)){
+  if (!is.null(attr(x, 'model'))){
     cat(glue::glue("Model", "\n",
                    "Currently has {get_num_blocks(x)} blocks",
                    "\n"))

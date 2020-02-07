@@ -26,7 +26,7 @@ test_that("State tracking returns the correct state", {
   net <- new_sbm_network(edges = edges, nodes = nodes)
 
   expect_equal(
-    dplyr::as_tibble(net$model$get_state()),
+    dplyr::as_tibble(attr(net, 'model')$get_state()),
     dplyr::tribble(
        ~id, ~parent,  ~type, ~level,
       "a1",  "none", "node",      0L,
@@ -39,7 +39,7 @@ test_that("State tracking returns the correct state", {
     )
   )
 
-  expect_equal(net$model$get_state(), attr(net, 'state'))
+  expect_equal(attr(net, 'model')$get_state(), attr(net, 'state'))
 })
 
 
@@ -83,7 +83,7 @@ test_that("State updating method", {
 
   # before updating state the state should not equal the desired new state
   expect_false( isTRUE(dplyr::all_equal(new_state, attr(net, 'state'))))
-  expect_false( isTRUE(dplyr::all_equal(new_state, net$model$get_state())))
+  expect_false( isTRUE(dplyr::all_equal(new_state, attr(net, 'model')$get_state())))
 
   # Update state using update_state() method
 
@@ -91,7 +91,7 @@ test_that("State updating method", {
 
   # Now the states should be identical
   expect_true( dplyr::all_equal(new_state, attr(net, 'state')))
-  expect_true( dplyr::all_equal(new_state, net$model$get_state()))
+  expect_true( dplyr::all_equal(new_state, attr(net, 'model')$get_state()))
 
 })
 
@@ -103,13 +103,13 @@ test_that("No costly duplication of S4 class is done when assigning s3 class cop
     initialize_blocks(num_blocks = 5)
 
   # Take snapshot of model and state before sweep
-  pre_sweep_model_address <- lobstr::obj_addr(net$model)
+  pre_sweep_model_address <- lobstr::obj_addr(attr(net, 'model'))
 
   # Run MCMC sweep
   net_after_sweeps <- net %>% mcmc_sweep(num_sweeps = 25)
 
   # Take snapshot after sweep
-  post_sweep_model_address <- lobstr::obj_addr(net_after_sweeps$model)
+  post_sweep_model_address <- lobstr::obj_addr(attr(net_after_sweeps,'model'))
 
   # Addresses should be equal
   expect_equal(pre_sweep_model_address, post_sweep_model_address)

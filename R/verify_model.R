@@ -34,14 +34,14 @@ verify_model.default <- function(x){
 #' @export
 verify_model.sbm_network <- function(x, show_messages = FALSE){
 
-  has_model_already <- !is.null(x$model)
+  has_model_already <- !is.null(attr(x, 'model'))
   has_state_already <- !is.null(attr(x, "state"))
 
   if (has_model_already){
     model_is_stale <- tryCatch(
       error = function(err) TRUE,
       {
-        x$model$get_state()
+        attr(x, 'model')$get_state()
         FALSE
       })
 
@@ -89,7 +89,7 @@ verify_model.sbm_network <- function(x, show_messages = FALSE){
   }
 
   # Assign sbm_model object to name model in sbm_network object
-  x$model <- sbm_model
+  attr(x, 'model') <- sbm_model
 
   # Give back sbm_network object
   x

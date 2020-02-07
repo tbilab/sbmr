@@ -79,7 +79,7 @@ set_node_parent.sbm_network <- function(sbm, child_id, parent_id, level = 0){
   }
 
   # Force model to rebuild with the new state
-  sbm$model$load_from_state(state$id,
+  attr(sbm, 'model')$load_from_state(state$id,
                             state$parent,
                             state$level,
                             state$type)

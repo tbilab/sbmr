@@ -42,7 +42,7 @@ get_node_to_block_edge_counts.sbm_network <- function(sbm, node_id, connection_l
     as.integer()
 
   # Call the exported method from the rcpp wrapper class.
-  verify_model(sbm)$model$get_node_to_block_edge_counts(node_id,
+  attr(verify_model(sbm), 'model')$get_node_to_block_edge_counts(node_id,
                                                         node_level,
                                                         as.integer(connection_level))
 }

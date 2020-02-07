@@ -50,14 +50,14 @@
 #'
 #' # before updating state the state should not equal the desired new state
 #' dplyr::all_equal(new_state, attr(net, 'state'))
-#' dplyr::all_equal(new_state, net$model$get_state())
+#' dplyr::all_equal(new_state, attr(net, 'model')$get_state())
 #'
 #' # Update state using update_state() method
 #' net <- net %>% update_state(new_state)
 #'
 #' # Now the states should be identical
 #' dplyr::all_equal(new_state, attr(net, 'state'))
-#' dplyr::all_equal(new_state, net$model$get_state())
+#' dplyr::all_equal(new_state, attr(net, 'model')$get_state())
 #'
 update_state <- function(sbm, state_df){
 
@@ -73,7 +73,7 @@ update_state.sbm_network <- function(sbm, state_df){
 
   attr(sbm, 'state') <- state_df
 
-  sbm$model$load_from_state(state_df$id,
+  attr(sbm, 'model')$load_from_state(state_df$id,
                             state_df$parent,
                             state_df$level,
                             state_df$type)

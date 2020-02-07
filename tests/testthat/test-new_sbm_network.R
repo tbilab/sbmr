@@ -247,7 +247,7 @@ test_that("Model is instantiated if requested", {
   )
 
   sbm_net <- new_sbm_network(edges = network$edges, nodes = network$nodes)
-  testthat::expect_false(is.null(sbm_net$model))
+  testthat::expect_false(is.null(attr(sbm_net, 'model')))
 })
 
 
@@ -258,7 +258,7 @@ test_that("Model is not instantiated if requested", {
   )
 
   sbm_net <- new_sbm_network(edges = network$edges, nodes = network$nodes, setup_model = FALSE)
-  testthat::expect_true(is.null(sbm_net$model))
+  testthat::expect_true(is.null(attr(sbm_net, 'model')))
 })
 
 

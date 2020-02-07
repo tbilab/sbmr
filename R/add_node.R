@@ -65,10 +65,10 @@ add_node.sbm_network <- function(sbm, id, type = NULL, show_messages = TRUE){
     sbm <- verify_model(sbm)
 
     # Add node to s4 model class
-    sbm$model$add_node(id, type, 0L)
+    attr(sbm, 'model')$add_node(id, type, 0L)
 
     # Update state with new nodes [inefficient]
-    attr(sbm, "state") <- sbm$model$get_state()
+    attr(sbm, "state") <- attr(sbm, 'model')$get_state()
 
     # Update number of nodes
     attr(sbm, "n_nodes") <- attr(sbm, "n_nodes") + 1

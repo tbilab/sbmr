@@ -91,7 +91,7 @@ mcmc_sweep.sbm_network <- function(sbm,
                                    verbose = FALSE){
   sbm <- verify_model(sbm)
 
-  results <- sbm$model$mcmc_sweep(as.integer(level),
+  results <- attr(sbm, 'model')$mcmc_sweep(as.integer(level),
                                   as.integer(num_sweeps),
                                   eps,
                                   variable_num_blocks,
@@ -110,7 +110,7 @@ mcmc_sweep.sbm_network <- function(sbm,
   }
 
   # Update state attribute of s3 object
-  attr(sbm, 'state') <- sbm$model$get_state()
+  attr(sbm, 'state') <- attr(sbm, 'model')$get_state()
 
   # Fill in the mcmc_sweeps property slot
   sbm$mcmc_sweeps <- results

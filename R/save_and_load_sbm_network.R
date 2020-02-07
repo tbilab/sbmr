@@ -31,7 +31,7 @@ save_sbm_network.default <- function(x){
 #' @export
 save_sbm_network.sbm_network <- function(x, loc){
   # Remove the s4 model object
-  x$model <- NULL
+  attr(x, 'model') <- NULL
 
   # Write object to RDS
   readr::write_rds(x, loc)

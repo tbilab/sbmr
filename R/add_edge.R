@@ -83,7 +83,7 @@ add_edge.sbm_network <- function(sbm,
                                 dplyr::tibble(!!attr(sbm, 'from_column') := from_node,
                                               !!attr(sbm, 'to_column') := to_node))
   # Add edge to SBM s4 class
-  verify_model(sbm)$model$add_edge(from_node, to_node)
+  attr(verify_model(sbm), 'model')$add_edge(from_node, to_node)
 
   # Update edge counts attribute
   attr(sbm, 'n_edges') <- attr(sbm, 'n_edges') + 1

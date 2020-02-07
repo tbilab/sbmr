@@ -36,5 +36,5 @@ get_entropy.default <- function(sbm){
 
 #' @export
 get_entropy.sbm_network <- function(sbm){
-  verify_model(sbm)$model$get_entropy(0L)
+  attr(verify_model(sbm), 'model')$get_entropy(0L)
 }
