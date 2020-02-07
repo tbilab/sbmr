@@ -20,25 +20,39 @@
 #' @export
 #'
 #' @examples
-#' # Helper function to get number of blocks in a model
-#' get_num_blocks <- function(sbm){sum(get_state(sbm)$level == 1)}
 #'
-#' # Initialize a simple bipartite network with 6 total nodes (3 of each type)
-#' my_nodes <- dplyr::tibble(
-#'   id = c("a1", "a2", "a3", "b1", "b2", "b3"),
-#'   type = c("a", "a", "a", "b", "b", "b")
+#' # Small edge list to build network
+#' edges <- dplyr::tribble(
+#'   ~from, ~to,
+#'   "a1"   , "b1"   ,
+#'   "a1"   , "b2"   ,
+#'   "a1"   , "b3"   ,
+#'   "a2"   , "b1"   ,
+#'   "a2"   , "b4"   ,
+#'   "a3"   , "b1"
 #' )
-#' my_sbm <- create_sbm(nodes = my_nodes)
+#'
+#' # A small simulated network
+#' net <- new_sbm_network(edges)
 #'
 #' # Default values of function will give every node its own block
-#' my_sbm %>% initialize_blocks()
-#' get_num_blocks(my_sbm)
+#' net %>%
+#'   initialize_blocks() %>%
+#'   get_num_blocks()
 #'
 #' # You can also decide to have a given number of blocks randomly assigned Here
 #' # four blocks result because two random blocks are made for each of the two
 #' # types
-#' my_sbm %>% initialize_blocks(num_blocks = 2)
-#' get_num_blocks(my_sbm)
+#' net %>%
+#'   initialize_blocks(num_blocks = 2) %>%
+#'   get_num_blocks()
+#'
+#' # If you have a polypartite network each set of node types will get their own
+#' # set of `num_blocks` randomly assigned
+#' new_sbm_network(edges, bipartite_edges = TRUE) %>%
+#'   initialize_blocks(num_blocks = 2) %>%
+#'   get_num_blocks()
+#'
 #'
 initialize_blocks <- function(sbm, num_blocks = NULL, level = 0){
   UseMethod("initialize_blocks")
