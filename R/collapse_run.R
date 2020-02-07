@@ -93,7 +93,9 @@ collapse_run.sbm_network <- function(sbm,
       dplyr::mutate(state = purrr::map(collapse_results, 'state'))
   }
 
-  results
+  sbm$collapse_results <- results
+
+  sbm
 }
 
 

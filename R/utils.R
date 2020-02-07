@@ -60,4 +60,29 @@ not_in <- function(a, b){
   !(a %in% b)
 }
 
+get_collapse_results <- function(x){
+  collapse_results <- x$collapse_results
+  if(is.null(collapse_results)) {
+    stop("Need to run collapse_groups() or collapse_run() on network before visualizing.")
+  }
+}
 
+get_mcmc_sweep_results <- function(x){
+  sweep_results <- x$mcmc_sweeps
+  if(is.null(sweep_results)){
+    stop("mcmc_sweep() must be run on network before results can be visualized.")
+  }
+
+  sweep_results
+}
+
+get_mcmc_pair_counts <- function(sweep_results){
+  pair_counts <- sweep_results$pairing_counts
+
+  # Make sure we have propensity counts before proceeding
+  if(is.null(pair_counts)){
+    stop("Sweep results do not contain pairwise propensities. Try rerunning MCMC sweep with track_pairs = TRUE.")
+  }
+
+  pair_counts
+}

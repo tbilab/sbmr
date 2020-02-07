@@ -31,14 +31,23 @@
 #' # Plot connection propensity network
 #' visualize_propensity_network(sweep_results, proportion_threshold = 0.4)
 #'
-visualize_propensity_network <- function(sweep_results, proportion_threshold = 0.2){
+visualize_propensity_network <- function(sbm, proportion_threshold = 0.2){
+  UseMethod("visualize_propensity_network")
+}
+
+visualize_propensity_network.default <- function(sbm, proportion_threshold = 0.2){
+  cat("visualize_propensity_network generic")
+}
+
+#' @export
+visualize_propensity_network.sbm_network <- function(sbm, proportion_threshold = 0.2){
+
+  sweep_results <- get_mcmc_sweep_results(sbm)
 
   # Make sure we have propensity counts before proceeding
-  if(is.null(sweep_results$pairing_counts)){
-    stop("Sweep results do not contain pairwise propensities. Try rerunning MCMC sweep with track_pairs = TRUE.")
-  }
+  pair_counts <- get_mcmc_pair_counts(sweep_results)
 
-  edges <- sweep_results$pairing_counts %>%
+  edges <- pair_counts %>%
     dplyr::filter(proportion_connected > proportion_threshold) %>%
     dplyr::select(from = node_a, to = node_b)
 
@@ -47,7 +56,7 @@ visualize_propensity_network <- function(sweep_results, proportion_threshold = 0
   }
 
   # Get all unique nodes and their avg non-zero pairwise connection proportions
-  nodes <- sweep_results$pairing_counts %>%
+  nodes <- pair_counts %>%
     tidyr::pivot_longer(c(node_a, node_b), values_to="id") %>%
     dplyr::group_by(id) %>%
     dplyr::summarise(avg_prop_connection = mean(proportion_connected[proportion_connected > 0])) %>%
@@ -55,4 +64,6 @@ visualize_propensity_network <- function(sweep_results, proportion_threshold = 0
 
   new_sbm_network(edges = edges, nodes = nodes, setup_model = FALSE) %>%
     visualize_network(node_color_col = "avg_prop_connection")
+
 }
+

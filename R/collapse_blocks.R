@@ -98,13 +98,14 @@ collapse_blocks.sbm_network <- function(sbm,
     report_all_steps
   )
 
-  purrr::map_dfr(
-    collapse_results,
+  sbm$collapse_results <-collapse_results %>% purrr::map_dfr(
     ~dplyr::tibble(entropy = .$entropy,
                    entropy_delta = .$entropy_delta,
                    num_blocks = .$num_blocks)
   ) %>%
     dplyr::mutate(state = purrr::map(collapse_results, 'state'))
+
+  sbm
 }
 
 

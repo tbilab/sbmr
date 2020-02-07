@@ -5,10 +5,7 @@
 #' @inheritParams mcmc_sweep
 #' @inheritParams build_score_fn
 #' @inheritParams visualize_collapse_results
-#' @param collapse_results Results of running agglomerative collapse algorithm
-#'   on sbm with \code{\link{collapse_blocks}}.
 #' @param verbose Should model tell you what step was chosen (`TRUE` or `FALSE`)?
-#'
 #'
 #'
 #' @return SBM model updated to match state from the merge step with 'best'
@@ -42,7 +39,28 @@
 #'                                      heuristic = nls_score,
 #'                                      verbose = TRUE)
 #'
-choose_best_collapse_state <- function(sbm, collapse_results, use_entropy_value_for_score = FALSE,  heuristic = 'dev_from_rolling_mean', verbose = FALSE){
+choose_best_collapse_state <- function(sbm,
+                                       use_entropy_value_for_score = FALSE,
+                                       heuristic = 'dev_from_rolling_mean',
+                                       verbose = FALSE){
+  UseMethod("choose_best_collapse_state")
+}
+
+choose_best_collapse_state.default <- function(sbm,
+                                               use_entropy_value_for_score = FALSE,
+                                               heuristic = 'dev_from_rolling_mean',
+                                               verbose = FALSE){
+  cat("choose_best_collapse_state generic")
+}
+
+#' @export
+choose_best_collapse_state.sbm_network <- function(sbm,
+                                                   use_entropy_value_for_score = FALSE,
+                                                   heuristic = 'dev_from_rolling_mean',
+                                                   verbose = FALSE){
+
+  collapse_results <- get_collapse_results(sbm)
+
   # Apply the heuristic on the entropy column and choose the higheset value
   best_state <- collapse_results %>%
     dplyr::arrange(num_blocks)
@@ -73,3 +91,4 @@ choose_best_collapse_state <- function(sbm, collapse_results, use_entropy_value_
   attr(sbm, 'state') <- best_state$state[[1]]
   sbm %>% verify_model()
 }
+

@@ -4,15 +4,16 @@
 #' `heuristic` is set to value other than `NULL` a second plot of the score for
 #' each merger step according to the heuristic provided is also shown.
 #'
+#' Either \link{\code{collapse_run}}, or
+#' \link{\code{collapse_blocks(report_all_steps = TRUE)}} must be run prior to
+#' calling this function.
+#'
 #' @family visualizations
 #'
-#' @param collapse_results Dataframe of agglomerative merging based collapse
-#'   results as returned from \link{\code{collapse_run}}, or
-#'   \link{\code{collapse_blocks(report_all_steps = TRUE)}}.
-#' @param use_entropy_value_for_score If set to `TRUE` then instead of the merge results
-#'   entropy delta being used for the score function the entropy will be.
-#'   Typically the heuristics work better on entropy delta values.
-#' @inheritParams build_score_fn
+#' @param use_entropy_value_for_score If set to `TRUE` then instead of the merge
+#'   results entropy delta being used for the score function the entropy will
+#'   be. Typically the heuristics work better on entropy delta values.
+#' @inheritParams verify_model
 #'
 #' @return GGplot object comparing the fit results and each step's deviance from
 #'   the rolling mean
@@ -48,7 +49,23 @@
 #'
 #' visualize_collapse_results(collapse_results, heuristic = nls_score)
 #'
-visualize_collapse_results <- function(collapse_results, use_entropy_value_for_score = FALSE, heuristic = NULL){
+visualize_collapse_results <- function(sbm,
+                                       use_entropy_value_for_score = FALSE,
+                                       heuristic = NULL){
+  UseMethod("visualize_collapse_results")
+}
+
+visualize_collapse_results.default <- function(sbm,
+                                               use_entropy_value_for_score = FALSE,
+                                               heuristic = NULL){
+  cat("visualize_collapse_results generic")
+}
+
+#' @export
+visualize_collapse_results.sbm_network <- function(sbm,
+                                                   use_entropy_value_for_score = FALSE,
+                                                   heuristic = NULL){
+  collapse_results <- get_collapse_results(sbm)
 
   if(!is.null(heuristic)){
 
@@ -60,7 +77,6 @@ visualize_collapse_results <- function(collapse_results, use_entropy_value_for_s
     } else {
       collapse_results <- dplyr::mutate(collapse_results, score = build_score_fn(heuristic)(entropy_delta, num_blocks))
     }
-
   }
 
   collapse_results %>%
