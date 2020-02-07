@@ -79,7 +79,8 @@ collapse_run.sbm_network <- function(sbm,
                         eps = eps,
                         report_all_steps = FALSE,
                         num_block_proposals = num_block_proposals,
-                        num_mcmc_sweeps = num_mcmc_sweeps)
+                        num_mcmc_sweeps = num_mcmc_sweeps) %>%
+          get_collapse_results()
       }
     )
   } else {
