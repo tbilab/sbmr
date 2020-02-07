@@ -16,13 +16,13 @@
 #'
 #' @examples
 #'
-#' # Initialize a random network and assign random blocks
-#' sbm <- sim_basic_block_network(n_blocks = 5) %>%
-#' create_sbm() %>%
-#' initialize_blocks(5)
+#' # A small simulated network with random block assignment
+#' net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 10) %>%
+#'   initialize_blocks(3)
 #'
-#' # Gather edge counts for a node in the network
-#' sbm %>% get_node_to_block_edge_counts("g1_1")
+#' # Get a random node's edge counts to blocks
+#' node_id <- sample(net$nodes$id, 1)
+#' net %>% get_node_to_block_edge_counts(node_id, connection_level = 1)
 #'
 get_node_to_block_edge_counts <- function(sbm, node_id, connection_level = 1L){
   UseMethod("get_node_to_block_edge_counts")
