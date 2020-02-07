@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Visualize agglomerative collapse results — visualize_collapse_results • sbmR</title>
+<title>Verify model for sbm_network object exists — verify_model • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,10 +35,9 @@
 
 
 
-<meta property="og:title" content="Visualize agglomerative collapse results — visualize_collapse_results" />
-<meta property="og:description" content="Plots entropy against number of blocks left for a collapse run. If
-heuristic is set to value other than NULL a second plot of the score for
-each merger step according to the heuristic provided is also shown." />
+<meta property="og:title" content="Verify model for sbm_network object exists — verify_model" />
+<meta property="og:description" content="Takes data from sbm_network object and checks S4 SBM class model object
+exists and is usable. If it isn't it is created." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -117,85 +116,107 @@ each merger step according to the heuristic provided is also shown." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Visualize agglomerative collapse results</h1>
+    <h1>Verify model for sbm_network object exists</h1>
     
-    <div class="hidden name"><code>visualize_collapse_results.Rd</code></div>
+    <div class="hidden name"><code>verify_model.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Plots entropy against number of blocks left for a collapse run. If
-<code>heuristic</code> is set to value other than <code>NULL</code> a second plot of the score for
-each merger step according to the heuristic provided is also shown.</p>
+    <p>Takes data from sbm_network object and checks S4 <code>SBM</code> class model object
+exists and is usable. If it isn't it is created.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>visualize_collapse_results</span>(
-  <span class='no'>sbm</span>,
-  <span class='kw'>use_entropy_value_for_score</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+    <pre class="usage"><span class='fu'>verify_model</span>(<span class='no'>x</span>, <span class='kw'>show_messages</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>use_entropy_value_for_score</th>
-      <td><p>If set to <code>TRUE</code> then instead of the merge
-results entropy delta being used for the score function the entropy will
-be. Typically the heuristics work better on entropy delta values.</p></td>
+      <th>x</th>
+      <td><p>Object of class <code>sbm_network</code>.</p></td>
+    </tr>
+    <tr>
+      <th>show_messages</th>
+      <td><p>Should function inform of its actions such as when a
+model already exists so no changes are made?</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>GGplot object comparing the fit results and each step's deviance from
-the rolling mean</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    
 
-    <p>Either <code>collapse_run</code>, or
-<code><a href='collapse_blocks.html'>collapse_blocks(report_all_steps = TRUE)</a></code> must be run prior to
-calling this function.</p>
+
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other visualizations: 
-<code><a href='visualize_mcmc_trace.html'>visualize_mcmc_trace</a>()</code>,
-<code><a href='visualize_network.html'>visualize_network</a>()</code>,
-<code><a href='visualize_propensity_dist.html'>visualize_propensity_dist</a>()</code>,
-<code><a href='visualize_propensity_network.html'>visualize_propensity_network</a>()</code></p></div>
+    <div class='dont-index'><p>Other helpers: 
+<code><a href='build_score_fn.html'>build_score_fn</a>()</code>,
+<code><a href='get_combination_indices.html'>get_combination_indices</a>()</code>,
+<code><a href='get_sweep_pair_counts.html'>get_sweep_pair_counts</a>()</code>,
+<code><a href='get_sweep_results.html'>get_sweep_results</a>()</code>,
+<code><a href='print.sbm_network.html'>print.sbm_network</a>()</code>,
+<code><a href='rolling_mean.html'>rolling_mean</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
+<span class='co'># Setup network without model initialized</span>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>setup_model</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
-<span class='co'># Start with a random networ and run agglomerative clustering with no</span>
-<span class='co'># intermediate MCMC steps on sbm of simulated data</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>35</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='collapse_blocks.html'>collapse_blocks</a></span>(<span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>1.5</span>)
-
-<span class='co'># =============================================================================</span>
-<span class='co'># Visualize using no heuristic</span>
-<span class='fu'>visualize_collapse_results</span>(<span class='no'>net</span>)</div><div class='img'><img src='visualize_collapse_results-1.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># =============================================================================</span>
-<span class='co'># Visualize using deviance from rolling average heuristic</span>
-<span class='fu'>visualize_collapse_results</span>(<span class='no'>net</span>, <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='st'>'dev_from_rolling_mean'</span>)</div><div class='img'><img src='visualize_collapse_results-2.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># =============================================================================</span>
-<span class='co'># Visualize using custom heuristic</span>
-
-<span class='co'># Score heuristic that fits a nonlinear model to observed values and chooses by</span>
-<span class='co'># largest negative residual (built into package as heuristic = "nls_residual")</span>
-<span class='no'>nls_score</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>e</span>, <span class='no'>k</span>){
-  <span class='no'>entropy_model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/nls.html'>nls</a></span>(<span class='no'>e</span> ~ <span class='no'>a</span> + <span class='no'>b</span> * <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='no'>k</span>), <span class='kw'>start</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span>(<span class='no'>e</span>), <span class='kw'>b</span> <span class='kw'>=</span> -<span class='fl'>25</span>))
-  -<span class='fu'><a href='https://rdrr.io/r/stats/residuals.html'>residuals</a></span>(<span class='no'>entropy_model</span>)
-}
-
-<span class='fu'>visualize_collapse_results</span>(<span class='no'>net</span>, <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='no'>nls_score</span>)</div><div class='img'><img src='visualize_collapse_results-3.png' alt='' width='700' height='433' /></div><div class='input'>
-</div></pre>
+<span class='no'>net</span></div><div class='output co'>#&gt; SBM Network with 60 nodes of a single type and 903 edges. 
+#&gt;  
+#&gt; Nodes: <span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt;   id    block type 
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1    node 
+#&gt; </span><span style='color: #555555;'>2</span><span> g1_2  g1    node 
+#&gt; </span><span style='color: #555555;'>3</span><span> g1_3  g1    node 
+#&gt; </span><span style='color: #555555;'>4</span><span> g1_4  g1    node 
+#&gt; </span><span style='color: #555555;'>5</span><span> g1_5  g1    node 
+#&gt; ... 
+#&gt;  
+#&gt; Edges: </span><span style='color: #555555;'># A tibble: 5 x 2</span><span>
+#&gt;   from  to   
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1_2 
+#&gt; </span><span style='color: #555555;'>2</span><span> g1_1  g1_3 
+#&gt; </span><span style='color: #555555;'>3</span><span> g1_1  g1_6 
+#&gt; </span><span style='color: #555555;'>4</span><span> g1_1  g1_7 
+#&gt; </span><span style='color: #555555;'>5</span><span> g1_1  g1_10
+#&gt; ... 
+#&gt;  </div><div class='input'>
+<span class='co'># Run verify model and the model should now be initialized</span>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'>verify_model</span>()
+<span class='no'>net</span></div><div class='output co'>#&gt; SBM Network with 60 nodes of a single type and 903 edges. 
+#&gt;  
+#&gt; Nodes: </span><span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt;   id    block type 
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1    node 
+#&gt; </span><span style='color: #555555;'>2</span><span> g1_2  g1    node 
+#&gt; </span><span style='color: #555555;'>3</span><span> g1_3  g1    node 
+#&gt; </span><span style='color: #555555;'>4</span><span> g1_4  g1    node 
+#&gt; </span><span style='color: #555555;'>5</span><span> g1_5  g1    node 
+#&gt; ... 
+#&gt;  
+#&gt; Edges: </span><span style='color: #555555;'># A tibble: 5 x 2</span><span>
+#&gt;   from  to   
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1_2 
+#&gt; </span><span style='color: #555555;'>2</span><span> g1_1  g1_3 
+#&gt; </span><span style='color: #555555;'>3</span><span> g1_1  g1_6 
+#&gt; </span><span style='color: #555555;'>4</span><span> g1_1  g1_7 
+#&gt; </span><span style='color: #555555;'>5</span><span> g1_1  g1_10
+#&gt; ... 
+#&gt;  
+#&gt; Model
+#&gt; Currently has 0 blocks</div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
       <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>

@@ -62,11 +62,6 @@ is created from the \code{edges} input automatically by listing the unique node
 ids seen in the edges.}
 }
 
-Often a third value \verb{$model} is present as well. This is an S4 class that is
-exported by the C++ code used to implement all the modeling algorithms. Most
-of the time the user should not have to interact with this object and thus it
-can be ignored.
-
 If the method \code{\link{mcmc_sweep}} has been run on the \code{sbm_network}
 object then a \verb{$sweep_result} slot will be added. For more info see
 \code{\link{mcmc_sweep}}.
@@ -87,6 +82,9 @@ A few attributes are contained by the class as well:
 bipartite network types can be inferred and no modification of the passed
 \code{edges} dataframe needs to take place.}
 \item{\code{to_column}}{Same as \code{from_column}}
+\item{\code{model}}{ S4 class that is exported by the C++ code used to implement all the modeling algorithms. Most
+of the time the user should not have to interact with this object and thus it
+can be ignored.}
 }
 }
 
@@ -153,8 +151,8 @@ new_sbm_network(edges = edges_tripartite,
 
 }
 \seealso{
-Other sbm_network_generators: 
+Other model_setup: 
 \code{\link{load_sbm_network}()},
 \code{\link{save_sbm_network}()}
 }
-\concept{sbm_network_generators}
+\concept{model_setup}

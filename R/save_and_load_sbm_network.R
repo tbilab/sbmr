@@ -2,7 +2,7 @@
 #'
 #' Saves an SBM Network object to local disk for use accross sessions without instantiating again. Opened with \code{\link{load_sbm_network}}
 #'
-#' @family sbm_network_generators
+#' @family model_setup
 #' @inheritParams verify_model
 #' @param loc Location on computer of saved model `.rds` file.
 #'
@@ -41,7 +41,7 @@ save_sbm_network.sbm_network <- function(x, loc){
 #'
 #' Loads an SBM Network object that was saved by \code{\link{save_sbm_network}}
 #'
-#' @family sbm_network_generators
+#' @family model_setup
 #'
 #' @param loc Location on computer of saved model `.rds` file.
 #'

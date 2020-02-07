@@ -2,18 +2,9 @@ destination: docs
 reference:
 - title: Model Setup
   contents:
-  - ends_with('sbm')
-- title: Network
-  desc: Functions for manipulating underlying network structure of SBM model
-  contents:
-  - add_node
-  - add_edge
-  - set_node_parent
-  - initialize_blocks
-  - get_state
-  - load_from_state
-  - get_block_edge_counts
-  - get_node_to_block_edge_counts
+  - new_sbm_network
+  - save_sbm_network
+  - load_sbm_network
 - title: Modeling
   desc: Function to fit or investigate fit of SBM model
   contents:
@@ -21,8 +12,6 @@ reference:
   - collapse_blocks
   - collapse_run
   - choose_best_collapse_state
-  - get_entropy
-  - sample_posterior
 - title: Visualization
   desc: Functions to visualize the structure of network and/or results of modeling
   contents:
@@ -31,9 +20,23 @@ reference:
   desc: Functions to generate networks using the stochastic block model. Usefull for testing etc..
   contents:
   - starts_with('sim_')
+- title: Property getters
+  desc: Extract various properties from the model
+  contents:
+  - starts_with('get_')
+- title: Low-level model manipulation
+  desc: Functions that are used to modify the model at a low-level. These are usually reserved for more advanced use-cases.
+  contents:
+  - starts_with('add_')
+  - set_node_parent
+  - initialize_blocks
+  - update_state
+  - verify_model
 - title: Helper Functions
   desc: Various small functions used for internals of package
   contents:
   - build_score_fn
   - rolling_mean
   - sbmR-package
+  - print.sbm_network
+

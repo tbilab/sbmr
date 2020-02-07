@@ -19,11 +19,6 @@
 #' }
 #'
 #'
-#' Often a third value `$model` is present as well. This is an S4 class that is
-#' exported by the C++ code used to implement all the modeling algorithms. Most
-#' of the time the user should not have to interact with this object and thus it
-#' can be ignored.
-#'
 #' If the method \code{\link{mcmc_sweep}} has been run on the `sbm_network`
 #' object then a `$sweep_result` slot will be added. For more info see
 #' \code{\link{mcmc_sweep}}.
@@ -44,10 +39,13 @@
 #' bipartite network types can be inferred and no modification of the passed
 #' `edges` dataframe needs to take place.}
 #' \item{`to_column`}{Same as `from_column`}
+#' \item{`model`}{ S4 class that is exported by the C++ code used to implement all the modeling algorithms. Most
+#' of the time the user should not have to interact with this object and thus it
+#' can be ignored.}
 #' }
 #'
 #'
-#' @family sbm_network_generators
+#' @family model_setup
 #'
 #' @param edges Dataframe with a from and two column encoding edges between
 #'   string node ids (direction does not matter).

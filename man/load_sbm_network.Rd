@@ -28,8 +28,8 @@ loaded_sbm_net <- load_sbm_network(tmp)
 
 }
 \seealso{
-Other sbm_network_generators: 
+Other model_setup: 
 \code{\link{new_sbm_network}()},
 \code{\link{save_sbm_network}()}
 }
-\concept{sbm_network_generators}
+\concept{model_setup}

@@ -131,7 +131,8 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>sbm</th>
-      <td><p>SBM model object as created by <code><a href='create_sbm.html'>create_sbm()</a></code>.</p></td>
+      <td><p><code>sbm_network</code> object as created by
+<code><a href='new_sbm_network.html'>new_sbm_network()</a></code>.</p></td>
     </tr>
     </table>
 
@@ -140,31 +141,30 @@
     <p>Dataframe of block pairs (<code>block_a</code> and <code>block_b</code>) and the number of edges between them (<code>count</code>).</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code>get_node_edge_counts</code></p></div>
+    <div class='dont-index'><p><code>get_node_edge_counts</code></p>
+<p>Other modeling: 
+<code><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a>()</code>,
+<code><a href='collapse_blocks.html'>collapse_blocks</a>()</code>,
+<code><a href='collapse_run.html'>collapse_run</a>()</code>,
+<code><a href='get_entropy.html'>get_entropy</a>()</code>,
+<code><a href='get_num_blocks.html'>get_num_blocks</a>()</code>,
+<code><a href='get_state.html'>get_state</a>()</code>,
+<code><a href='mcmc_sweep.html'>mcmc_sweep</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Initialize a random network and assign random blocks</span>
-<span class='no'>sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>5</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>() <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='fl'>5</span>)
+    <pre class="examples"><div class='input'>
+<span class='co'># A small simulated network with random block assignment</span>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>10</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='fl'>3</span>)
 
-<span class='co'># Gather edge counts for all level 1 block pairs</span>
-<span class='no'>sbm</span> <span class='kw'>%&gt;%</span> <span class='fu'>get_block_edge_counts</span>(<span class='fl'>1</span>)</div><div class='output co'>#&gt;    block_a block_b count
-#&gt; 1    0-1_0   0-1_0     1
-#&gt; 2    0-1_0   0-1_1     5
-#&gt; 3    0-1_0   0-1_2     5
-#&gt; 4    0-1_0   0-1_3     4
-#&gt; 5    0-1_0   0-1_4     3
-#&gt; 6    0-1_1   0-1_1    13
-#&gt; 7    0-1_1   0-1_2    20
-#&gt; 8    0-1_1   0-1_3    17
-#&gt; 9    0-1_1   0-1_4    22
-#&gt; 10   0-1_2   0-1_2     7
-#&gt; 11   0-1_2   0-1_3    10
-#&gt; 12   0-1_2   0-1_4    19
-#&gt; 13   0-1_3   0-1_3     4
-#&gt; 14   0-1_3   0-1_4    10
-#&gt; 15   0-1_4   0-1_4     6</div><div class='input'>
+<span class='co'># Get counts of connections from each given block to the others</span>
+<span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'>get_block_edge_counts</span>()</div><div class='output co'>#&gt;   block_a block_b count
+#&gt; 1   0-1_0   0-1_0    15
+#&gt; 2   0-1_0   0-1_1    52
+#&gt; 3   0-1_0   0-1_2    34
+#&gt; 4   0-1_1   0-1_1    32
+#&gt; 5   0-1_1   0-1_2    56
+#&gt; 6   0-1_2   0-1_2    12</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

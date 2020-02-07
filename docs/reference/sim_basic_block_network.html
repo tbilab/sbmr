@@ -142,7 +142,8 @@ average of a 50% chance of edge.</p>
   <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='no'><a href='https://purrr.tidyverse.org/reference/rbernoulli.html'>rbernoulli</a></span>,
   <span class='kw'>allow_self_edges</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>keep_edge_counts</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>return_edge_propensities</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>return_edge_propensities</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>setup_model</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -189,6 +190,11 @@ want to set this to <code>TRUE</code>.</p></td>
 also include the simulated edge propensities dataframe. This can be
 used for recreating draws using <code><a href='sim_sbm_network.html'>sim_sbm_network()</a></code>.</p></td>
     </tr>
+    <tr>
+      <th>setup_model</th>
+      <td><p>Should an SBM model object be added? Set to <code>FALSE</code> if
+network is just being visualized or described.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -201,41 +207,94 @@ dataframe that shows the randomly drawn edge propensities between
 blocks.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='sim_sbm_network.html'>sim_sbm_network</a></code> <code><a href='sim_random_network.html'>sim_random_network</a></code></p></div>
+    <div class='dont-index'><p><code><a href='sim_sbm_network.html'>sim_sbm_network</a></code> <code><a href='sim_random_network.html'>sim_random_network</a></code></p>
+<p>Other simulations: 
+<code><a href='sim_random_network.html'>sim_random_network</a>()</code>,
+<code><a href='sim_sbm_network.html'>sim_sbm_network</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>sim_basic_block_network</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt; $nodes
-#&gt; <span style='color: #555555;'># A tibble: 40 x 2</span><span>
-#&gt;    id    block
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> g1_1  g1   
-#&gt; </span><span style='color: #555555;'> 2</span><span> g1_2  g1   
-#&gt; </span><span style='color: #555555;'> 3</span><span> g1_3  g1   
-#&gt; </span><span style='color: #555555;'> 4</span><span> g1_4  g1   
-#&gt; </span><span style='color: #555555;'> 5</span><span> g1_5  g1   
-#&gt; </span><span style='color: #555555;'> 6</span><span> g1_6  g1   
-#&gt; </span><span style='color: #555555;'> 7</span><span> g1_7  g1   
-#&gt; </span><span style='color: #555555;'> 8</span><span> g1_8  g1   
-#&gt; </span><span style='color: #555555;'> 9</span><span> g1_9  g1   
-#&gt; </span><span style='color: #555555;'>10</span><span> g1_10 g1   
-#&gt; </span><span style='color: #555555;'># … with 30 more rows</span><span>
-#&gt; 
-#&gt; $edges
-#&gt; </span><span style='color: #555555;'># A tibble: 501 x 2</span><span>
-#&gt;    from  to   
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> g1_1  g1_5 
-#&gt; </span><span style='color: #555555;'> 2</span><span> g1_1  g1_6 
-#&gt; </span><span style='color: #555555;'> 3</span><span> g1_1  g1_7 
-#&gt; </span><span style='color: #555555;'> 4</span><span> g1_1  g1_8 
-#&gt; </span><span style='color: #555555;'> 5</span><span> g1_1  g1_9 
-#&gt; </span><span style='color: #555555;'> 6</span><span> g1_1  g2_1 
-#&gt; </span><span style='color: #555555;'> 7</span><span> g1_1  g2_2 
-#&gt; </span><span style='color: #555555;'> 8</span><span> g1_1  g2_3 
-#&gt; </span><span style='color: #555555;'> 9</span><span> g1_1  g2_5 
-#&gt; </span><span style='color: #555555;'>10</span><span> g1_1  g2_7 
-#&gt; </span><span style='color: #555555;'># … with 491 more rows</span><span>
-#&gt; </div></span></pre>
+    <pre class="examples"><div class='input'>
+<span class='fu'>sim_basic_block_network</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>40</span>)</div><div class='output co'>#&gt; SBM Network with 160 nodes of a single type and 9902 edges. 
+#&gt;  
+#&gt; Nodes: <span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt;   id    block type 
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1    node 
+#&gt; </span><span style='color: #555555;'>2</span><span> g1_2  g1    node 
+#&gt; </span><span style='color: #555555;'>3</span><span> g1_3  g1    node 
+#&gt; </span><span style='color: #555555;'>4</span><span> g1_4  g1    node 
+#&gt; </span><span style='color: #555555;'>5</span><span> g1_5  g1    node 
+#&gt; ... 
+#&gt;  
+#&gt; Edges: </span><span style='color: #555555;'># A tibble: 5 x 2</span><span>
+#&gt;   from  to   
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1_3 
+#&gt; </span><span style='color: #555555;'>2</span><span> g1_1  g1_5 
+#&gt; </span><span style='color: #555555;'>3</span><span> g1_1  g1_7 
+#&gt; </span><span style='color: #555555;'>4</span><span> g1_1  g1_8 
+#&gt; </span><span style='color: #555555;'>5</span><span> g1_1  g1_9 
+#&gt; ... 
+#&gt;  </div><div class='input'>
+<span class='fu'>sim_basic_block_network</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>8</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>20</span>)</div><div class='output co'>#&gt; SBM Network with 160 nodes of a single type and 4092 edges. 
+#&gt;  
+#&gt; Nodes: </span><span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt;   id    block type 
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1    node 
+#&gt; </span><span style='color: #555555;'>2</span><span> g1_2  g1    node 
+#&gt; </span><span style='color: #555555;'>3</span><span> g1_3  g1    node 
+#&gt; </span><span style='color: #555555;'>4</span><span> g1_4  g1    node 
+#&gt; </span><span style='color: #555555;'>5</span><span> g1_5  g1    node 
+#&gt; ... 
+#&gt;  
+#&gt; Edges: </span><span style='color: #555555;'># A tibble: 5 x 2</span><span>
+#&gt;   from  to   
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1_3 
+#&gt; </span><span style='color: #555555;'>2</span><span> g1_1  g1_4 
+#&gt; </span><span style='color: #555555;'>3</span><span> g1_1  g1_5 
+#&gt; </span><span style='color: #555555;'>4</span><span> g1_1  g1_6 
+#&gt; </span><span style='color: #555555;'>5</span><span> g1_1  g1_7 
+#&gt; ... 
+#&gt;  </div><div class='input'>
+<span class='co'># Can save the generating edge propensities as well</span>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'>sim_basic_block_network</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>return_edge_propensities</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='no'>net</span>$<span class='no'>edge_propensities</span></div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 10 x 3</span><span>
+#&gt;    block_1 block_2 propensity
+#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 1</span><span> g1      g1          0.453 
+#&gt; </span><span style='color: #555555;'> 2</span><span> g1      g2          0.915 
+#&gt; </span><span style='color: #555555;'> 3</span><span> g1      g3          0.268 
+#&gt; </span><span style='color: #555555;'> 4</span><span> g1      g4          0.176 
+#&gt; </span><span style='color: #555555;'> 5</span><span> g2      g2          0.730 
+#&gt; </span><span style='color: #555555;'> 6</span><span> g2      g3          0.823 
+#&gt; </span><span style='color: #555555;'> 7</span><span> g2      g4          0.361 
+#&gt; </span><span style='color: #555555;'> 8</span><span> g3      g3          0.083</span><span style='text-decoration: underline;'>6</span><span>
+#&gt; </span><span style='color: #555555;'> 9</span><span> g3      g4          0.638 
+#&gt; </span><span style='color: #555555;'>10</span><span> g4      g4          0.546 </div><div class='input'>
+
+<span class='no'>right_skewed_beta</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>n</span>) <span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span>(<span class='no'>n</span>, <span class='fl'>1</span>, <span class='fl'>5</span>)
+
+<span class='co'># Distribution that draws propensities can be customized</span>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'>sim_basic_block_network</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>,
+                               <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>20</span>,
+                               <span class='kw'>return_edge_propensities</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+                               <span class='kw'>propensity_drawer</span> <span class='kw'>=</span> <span class='no'>right_skewed_beta</span>)
+<span class='no'>net</span>$<span class='no'>edge_propensities</span></div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 10 x 3</span><span>
+#&gt;    block_1 block_2 propensity
+#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 1</span><span> g1      g1          0.163 
+#&gt; </span><span style='color: #555555;'> 2</span><span> g1      g2          0.398 
+#&gt; </span><span style='color: #555555;'> 3</span><span> g1      g3          0.148 
+#&gt; </span><span style='color: #555555;'> 4</span><span> g1      g4          0.291 
+#&gt; </span><span style='color: #555555;'> 5</span><span> g2      g2          0.147 
+#&gt; </span><span style='color: #555555;'> 6</span><span> g2      g3          0.016</span><span style='text-decoration: underline;'>9</span><span>
+#&gt; </span><span style='color: #555555;'> 7</span><span> g2      g4          0.159 
+#&gt; </span><span style='color: #555555;'> 8</span><span> g3      g3          0.017</span><span style='text-decoration: underline;'>9</span><span>
+#&gt; </span><span style='color: #555555;'> 9</span><span> g3      g4          0.048</span><span style='text-decoration: underline;'>6</span><span>
+#&gt; </span><span style='color: #555555;'>10</span><span> g4      g4          0.446 </div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

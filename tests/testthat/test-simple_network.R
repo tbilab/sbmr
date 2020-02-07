@@ -12,7 +12,6 @@ test_that("Proper number of edges happens", {
       mean()
   }
 
-
   # Calculate the expected number of edges. This is divided by two because we
   # only draw unique combos of blocks so if we have edges for nodes a->b we wont
   # also have b->a.

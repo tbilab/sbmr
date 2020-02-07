@@ -126,7 +126,6 @@
 
     <pre class="usage"><span class='fu'>choose_best_collapse_state</span>(
   <span class='no'>sbm</span>,
-  <span class='no'>collapse_results</span>,
   <span class='kw'>use_entropy_value_for_score</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='st'>"dev_from_rolling_mean"</span>,
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
@@ -137,18 +136,14 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>sbm</th>
-      <td><p>SBM model object as created by <code><a href='create_sbm.html'>create_sbm()</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>collapse_results</th>
-      <td><p>Results of running agglomerative collapse algorithm
-on sbm with <code><a href='collapse_blocks.html'>collapse_blocks</a></code>.</p></td>
+      <td><p><code>sbm_network</code> object as created by
+<code><a href='new_sbm_network.html'>new_sbm_network()</a></code>.</p></td>
     </tr>
     <tr>
       <th>use_entropy_value_for_score</th>
-      <td><p>If set to <code>TRUE</code> then instead of the merge results
-entropy delta being used for the score function the entropy will be.
-Typically the heuristics work better on entropy delta values.</p></td>
+      <td><p>If set to <code>TRUE</code> then instead of the merge
+results entropy delta being used for the score function the entropy will
+be. Typically the heuristics work better on entropy delta values.</p></td>
     </tr>
     <tr>
       <th>heuristic</th>
@@ -168,21 +163,26 @@ location, or a string labeling algorithm. Currently only <code>"lowest"</code>,
 
     <p>SBM model updated to match state from the merge step with 'best'
 partitioning.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other modeling: 
+<code><a href='collapse_blocks.html'>collapse_blocks</a>()</code>,
+<code><a href='collapse_run.html'>collapse_run</a>()</code>,
+<code><a href='get_block_edge_counts.html'>get_block_edge_counts</a>()</code>,
+<code><a href='get_entropy.html'>get_entropy</a>()</code>,
+<code><a href='get_num_blocks.html'>get_num_blocks</a>()</code>,
+<code><a href='get_state.html'>get_state</a>()</code>,
+<code><a href='mcmc_sweep.html'>mcmc_sweep</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
 
 <span class='co'># Start with a random network of two blocks with 25 nodes each</span>
-<span class='no'>network</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>25</span>)
-
-<span class='co'># Create SBM from simulated data</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>(<span class='no'>network</span>)
-
-<span class='co'># Run agglomerative clustering with no intermediate MCMC steps on network</span>
-<span class='no'>collapse_results</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='collapse_run.html'>collapse_run</a></span>(<span class='no'>my_sbm</span>, <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>num_final_blocks</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>6</span>)
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>25</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='collapse_blocks.html'>collapse_blocks</a></span>(<span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>2</span>)
 
 <span class='co'># Choose best result with default heuristic</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>my_sbm</span>, <span class='no'>collapse_results</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 5 blocks and an entropy of 1869.9999.</div><div class='input'>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>net</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 2 blocks and an entropy of 2234.5951.</div><div class='input'>
 <span class='co'># Score heuristic that fits a nonlinear model to observed values and chooses by largest negative residual</span>
 <span class='no'>nls_score</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>e</span>, <span class='no'>k</span>){
   <span class='no'>entropy_model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/nls.html'>nls</a></span>(<span class='no'>e</span> ~ <span class='no'>a</span> + <span class='no'>b</span> * <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='no'>k</span>), <span class='kw'>start</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span>(<span class='no'>e</span>), <span class='kw'>b</span> <span class='kw'>=</span> -<span class='fl'>25</span>))
@@ -190,10 +190,9 @@ partitioning.</p>
 }
 
 <span class='co'># Choose result using custom heuristic function</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>my_sbm</span>,
-                                     <span class='no'>collapse_results</span>,
+<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>net</span>,
                                      <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='no'>nls_score</span>,
-                                     <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 5 blocks and an entropy of 1869.9999.</div><div class='input'>
+                                     <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 6 blocks and an entropy of 2137.4844.</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -201,6 +200,7 @@ partitioning.</p>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

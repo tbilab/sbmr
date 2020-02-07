@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get node's edge counts to blocks — get_node_to_block_edge_counts • sbmR</title>
+<title>Get collapse results from model — get_collapse_results • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,10 +35,10 @@
 
 
 
-<meta property="og:title" content="Get node's edge counts to blocks — get_node_to_block_edge_counts" />
-<meta property="og:description" content="For a given node in an SBM, returns a dataframe of each block (or node) that
-the desired node is connected to and how many connections they have to that
-block." />
+<meta property="og:title" content="Get collapse results from model — get_collapse_results" />
+<meta property="og:description" content="Retrieves the dataframe recording the results of running either
+collapse_groups() or collapse_run() on
+sbm_network object." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -117,70 +117,59 @@ block." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get node's edge counts to blocks</h1>
+    <h1>Get collapse results from model</h1>
     
-    <div class="hidden name"><code>get_node_to_block_edge_counts.Rd</code></div>
+    <div class="hidden name"><code>get_collapse_results.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>For a given node in an SBM, returns a dataframe of each block (or node) that
-the desired node is connected to and how many connections they have to that
-block.</p>
+    <p>Retrieves the dataframe recording the results of running either
+<code>collapse_groups()</code> or <code><a href='collapse_run.html'>collapse_run()</a></code> on
+<code>sbm_network</code> object.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_node_to_block_edge_counts</span>(<span class='no'>sbm</span>, <span class='no'>node_id</span>, <span class='kw'>connection_level</span> <span class='kw'>=</span> <span class='fl'>1L</span>)</pre>
+    <pre class="usage"><span class='fu'>get_collapse_results</span>(<span class='no'>sbm</span>)</pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>sbm</th>
-      <td><p><code>sbm_network</code> object as created by
-<code><a href='new_sbm_network.html'>new_sbm_network()</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>node_id</th>
-      <td><p>String identifying the node that edge counts are desired for</p></td>
-    </tr>
-    <tr>
-      <th>connection_level</th>
-      <td><p>Level of blocks to get connections to. E.g. <code>1</code> = node block level, <code>0</code> = connections to other nodes.</p></td>
-    </tr>
-    </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Dataframe with two columns: <code>id</code> for the id of the node/block connected to, and <code>count</code> for the number of connections between.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+    
 
-    <div class='dont-index'><p><code><a href='get_block_edge_counts.html'>get_block_edge_counts</a></code></p>
-<p>Other advanced: 
-<code><a href='add_edge.html'>add_edge</a>()</code>,
-<code><a href='add_node.html'>add_node</a>()</code>,
-<code><a href='initialize_blocks.html'>initialize_blocks</a>()</code>,
-<code><a href='set_node_parent.html'>set_node_parent</a>()</code>,
-<code><a href='update_state.html'>update_state</a>()</code></p></div>
+
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='co'># A small simulated network with random block assignment</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>10</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='fl'>3</span>)
+<span class='co'># Start with a random network of two blocks with 25 nodes each and</span>
+<span class='co'># run agglomerative clustering with no intermediate MCMC steps on network</span>
+<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>25</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='collapse_blocks.html'>collapse_blocks</a></span>(<span class='kw'>num_mcmc_sweeps</span> <span class='kw'>=</span> <span class='fl'>0</span>)
 
-<span class='co'># Get a random node's edge counts to blocks</span>
-<span class='no'>node_id</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='no'>net</span>$<span class='no'>nodes</span>$<span class='no'>id</span>, <span class='fl'>1</span>)
-<span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'>get_node_to_block_edge_counts</span>(<span class='no'>node_id</span>, <span class='kw'>connection_level</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt;      id count
-#&gt; 1 0-1_1     7
-#&gt; 2 0-1_2     5
-#&gt; 3 0-1_0     7</div><div class='input'>
-</div></pre>
+<span class='co'># Look at the results of the collapse directly</span>
+<span class='fu'>get_collapse_results</span>(<span class='no'>my_sbm</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 16 x 4</span><span>
+#&gt;    entropy entropy_delta num_blocks state             
+#&gt;      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;list&gt;</span><span>            
+#&gt; </span><span style='color: #555555;'> 1</span><span>    706.         52.9          44 </span><span style='color: #555555;'>&lt;df[,4] [138 × 4]&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 2</span><span>    766.         59.8          36 </span><span style='color: #555555;'>&lt;df[,4] [122 × 4]&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 3</span><span>    811.         45.5          30 </span><span style='color: #555555;'>&lt;df[,4] [110 × 4]&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 4</span><span>    846.         35.2          25 </span><span style='color: #555555;'>&lt;df[,4] [100 × 4]&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 5</span><span>    887.         41.1          19 </span><span style='color: #555555;'>&lt;df[,4] [88 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'> 6</span><span>    915.         27.3          15 </span><span style='color: #555555;'>&lt;df[,4] [80 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'> 7</span><span>    927.         12.2          12 </span><span style='color: #555555;'>&lt;df[,4] [74 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'> 8</span><span>    932.          5.39         11 </span><span style='color: #555555;'>&lt;df[,4] [72 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'> 9</span><span>    943.         10.8           9 </span><span style='color: #555555;'>&lt;df[,4] [68 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'>10</span><span>    954.         10.5           7 </span><span style='color: #555555;'>&lt;df[,4] [64 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'>11</span><span>    958.          4.39          6 </span><span style='color: #555555;'>&lt;df[,4] [62 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'>12</span><span>    960.          2.37          5 </span><span style='color: #555555;'>&lt;df[,4] [60 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'>13</span><span>    969.          8.73          4 </span><span style='color: #555555;'>&lt;df[,4] [58 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'>14</span><span>    973.          3.70          3 </span><span style='color: #555555;'>&lt;df[,4] [56 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'>15</span><span>    984.         11.7           2 </span><span style='color: #555555;'>&lt;df[,4] [54 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'>16</span><span>   </span><span style='text-decoration: underline;'>1</span><span>013.         28.9           1 </span><span style='color: #555555;'>&lt;df[,4] [52 × 4]&gt;</span><span> </div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

@@ -134,71 +134,21 @@
       <tr>
         
         <td>
-          <p><code><a href="copy_sbm.html">copy_sbm()</a></code> </p>
+          <p><code><a href="new_sbm_network.html">new_sbm_network()</a></code> </p>
         </td>
-        <td><p>Copy existing SBM object</p></td>
+        <td><p>Builds a new sbm_network object from data</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="create_sbm.html">create_sbm()</a></code> </p>
+          <p><code><a href="save_sbm_network.html">save_sbm_network()</a></code> </p>
         </td>
-        <td><p>Create a new instance of an SBM model</p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-network" class="hasAnchor"><a href="#section-network" class="anchor"></a>Network</h2>
-          <p class="section-desc"><p>Functions for manipulating underlying network structure of SBM model</p></p>
-        </th>
-      </tr>
-      <tr>
-        
-        <td>
-          <p><code><a href="add_node.html">add_node()</a></code> </p>
-        </td>
-        <td><p>Add a new node to network</p></td>
+        <td><p>Save sbm_network object</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="add_edge.html">add_edge()</a></code> </p>
+          <p><code><a href="load_sbm_network.html">load_sbm_network()</a></code> </p>
         </td>
-        <td><p>Add edge between two nodes in network</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="set_node_parent.html">set_node_parent()</a></code> </p>
-        </td>
-        <td><p>Set the parent of a node</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="initialize_blocks.html">initialize_blocks()</a></code> </p>
-        </td>
-        <td><p>Assign blocks for all nodes</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_state.html">get_state()</a></code> </p>
-        </td>
-        <td><p>Dump state of model to dataframe</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="load_from_state.html">load_from_state()</a></code> </p>
-        </td>
-        <td><p>Load model state from state dump</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_block_edge_counts.html">get_block_edge_counts()</a></code> </p>
-        </td>
-        <td><p>Get counts between blocks at a level</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_node_to_block_edge_counts.html">get_node_to_block_edge_counts()</a></code> </p>
-        </td>
-        <td><p>Get node's edge counts to blocks</p></td>
+        <td><p>Load sbm_network object</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -231,18 +181,6 @@
           <p><code><a href="choose_best_collapse_state.html">choose_best_collapse_state()</a></code> </p>
         </td>
         <td><p>Choose and load best model state from agglomerative collapsing algorithm</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_entropy.html">get_entropy()</a></code> </p>
-        </td>
-        <td><p>Compute entropy for current model state</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sample_posterior.html">sample_posterior()</a></code> </p>
-        </td>
-        <td><p>Sample from model posterior</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -311,6 +249,112 @@
     </tbody><tbody>
       <tr>
         <th colspan="2">
+          <h2 id="section-property-getters" class="hasAnchor"><a href="#section-property-getters" class="anchor"></a>Property getters</h2>
+          <p class="section-desc"><p>Extract various properties from the model</p></p>
+        </th>
+      </tr>
+      <tr>
+        
+        <td>
+          <p><code><a href="get_block_edge_counts.html">get_block_edge_counts()</a></code> </p>
+        </td>
+        <td><p>Get counts between blocks at a level</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_collapse_results.html">get_collapse_results()</a></code> </p>
+        </td>
+        <td><p>Get collapse results from model</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_combination_indices.html">get_combination_indices()</a></code> </p>
+        </td>
+        <td><p>Get Combination Indices</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_entropy.html">get_entropy()</a></code> </p>
+        </td>
+        <td><p>Compute entropy for current model state</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_node_to_block_edge_counts.html">get_node_to_block_edge_counts()</a></code> </p>
+        </td>
+        <td><p>Get node's edge counts to blocks</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_num_blocks.html">get_num_blocks()</a></code> </p>
+        </td>
+        <td><p>Get number of blocks currently in model</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_state.html">get_state()</a></code> </p>
+        </td>
+        <td><p>Dump state of current SBM model to dataframe</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_sweep_pair_counts.html">get_sweep_pair_counts()</a></code> </p>
+        </td>
+        <td><p>Get pairwise group sharing counts from model</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_sweep_results.html">get_sweep_results()</a></code> </p>
+        </td>
+        <td><p>Get mcmc sweep results</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-low-level-model-manipulation" class="hasAnchor"><a href="#section-low-level-model-manipulation" class="anchor"></a>Low-level model manipulation</h2>
+          <p class="section-desc"><p>Functions that are used to modify the model at a low-level. These are usually reserved for more advanced use-cases.</p></p>
+        </th>
+      </tr>
+      <tr>
+        
+        <td>
+          <p><code><a href="add_edge.html">add_edge()</a></code> </p>
+        </td>
+        <td><p>Add edge between two nodes in network</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="add_node.html">add_node()</a></code> </p>
+        </td>
+        <td><p>Add a new node to network</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="set_node_parent.html">set_node_parent()</a></code> </p>
+        </td>
+        <td><p>Set the parent of a node</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="initialize_blocks.html">initialize_blocks()</a></code> </p>
+        </td>
+        <td><p>Assign blocks for all nodes</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="update_state.html">update_state()</a></code> </p>
+        </td>
+        <td><p>Update SBM model state</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="verify_model.html">verify_model()</a></code> </p>
+        </td>
+        <td><p>Verify model for sbm_network object exists</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
           <h2 id="section-helper-functions" class="hasAnchor"><a href="#section-helper-functions" class="anchor"></a>Helper Functions</h2>
           <p class="section-desc"><p>Various small functions used for internals of package</p></p>
         </th>
@@ -333,6 +377,12 @@
           <p><code><a href="sbmR-package.html">sbmR-package</a></code> </p>
         </td>
         <td><p>Package reference</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="print.sbm_network.html">print(<i>&lt;sbm_network&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Print network</p></td>
       </tr>
     </tbody>
     </table>
@@ -342,10 +392,11 @@
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#section-model-setup">Model Setup</a></li>
-      <li><a href="#section-network">Network</a></li>
       <li><a href="#section-modeling">Modeling</a></li>
       <li><a href="#section-visualization">Visualization</a></li>
       <li><a href="#section-network-simulation">Network Simulation</a></li>
+      <li><a href="#section-property-getters">Property getters</a></li>
+      <li><a href="#section-low-level-model-manipulation">Low-level model manipulation</a></li>
       <li><a href="#section-helper-functions">Helper Functions</a></li>
     </ul>
   </div>

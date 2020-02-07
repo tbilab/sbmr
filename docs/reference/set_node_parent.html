@@ -133,7 +133,8 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>sbm</th>
-      <td><p>SBM model object as created by <code><a href='create_sbm.html'>create_sbm()</a></code>.</p></td>
+      <td><p><code>sbm_network</code> object as created by
+<code><a href='new_sbm_network.html'>new_sbm_network()</a></code>.</p></td>
     </tr>
     <tr>
       <th>child_id</th>
@@ -152,20 +153,50 @@ value of <code>0</code>.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>SBM model object modified with node hierarchy modified. <em>Note that object is modified in place as well.</em></p>
+    <p><code>sbm_network</code> object</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other advanced: 
+<code><a href='add_edge.html'>add_edge</a>()</code>,
+<code><a href='add_node.html'>add_node</a>()</code>,
+<code><a href='get_node_to_block_edge_counts.html'>get_node_to_block_edge_counts</a>()</code>,
+<code><a href='initialize_blocks.html'>initialize_blocks</a>()</code>,
+<code><a href='update_state.html'>update_state</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='co'># Create a model with two nodes, one at the block level (1)</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>() <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='add_node.html'>add_node</a></span>(<span class='st'>'node_1'</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='add_node.html'>add_node</a></span>(<span class='st'>'node_11'</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+<span class='co'># Start with bipartite network with 6 nodes</span>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>tribble</a></span>(
+  ~<span class='no'>a_node</span>, ~<span class='no'>b_node</span>,
+  <span class='st'>"a1"</span>   , <span class='st'>"b1"</span>   ,
+  <span class='st'>"a1"</span>   , <span class='st'>"b2"</span>   ,
+  <span class='st'>"a1"</span>   , <span class='st'>"b3"</span>   ,
+  <span class='st'>"a2"</span>   , <span class='st'>"b1"</span>   ,
+  <span class='st'>"a3"</span>   , <span class='st'>"b1"</span>
+) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='new_sbm_network.html'>new_sbm_network</a></span>(<span class='kw'>bipartite_edges</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+                  <span class='kw'>edges_from_col</span> <span class='kw'>=</span> <span class='no'>a_node</span>,
+                  <span class='kw'>edges_to_col</span> <span class='kw'>=</span> <span class='no'>b_node</span>)
 
-<span class='co'># Assign node 11 as node 1's parent</span>
-<span class='no'>my_sbm</span> <span class='kw'>%&gt;%</span>
-  <span class='fu'>set_node_parent</span>(<span class='kw'>child_id</span> <span class='kw'>=</span> <span class='st'>'node_1'</span>, <span class='kw'>parent_id</span> <span class='kw'>=</span> <span class='st'>'node_11'</span>)</div><div class='output co'>#&gt;        id  parent type level
-#&gt; 1  node_1 node_11 node     0
-#&gt; 2 node_11    none node     1</div><div class='input'>
+<span class='fu'><a href='get_state.html'>get_state</a></span>(<span class='no'>net</span>)</div><div class='output co'>#&gt;   id parent   type level
+#&gt; 1 a1   none a_node     0
+#&gt; 2 a2   none a_node     0
+#&gt; 3 a3   none a_node     0
+#&gt; 4 b1   none b_node     0
+#&gt; 5 b2   none b_node     0
+#&gt; 6 b3   none b_node     0</div><div class='input'>
+<span class='co'># Make a parent node and assign it to a1</span>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'>set_node_parent</span>(<span class='no'>net</span>, <span class='kw'>child_id</span> <span class='kw'>=</span> <span class='st'>'a1'</span>, <span class='kw'>parent_id</span> <span class='kw'>=</span> <span class='st'>'a1_parent'</span>)
+
+<span class='fu'><a href='get_state.html'>get_state</a></span>(<span class='no'>net</span>)</div><div class='output co'>#&gt;          id    parent   type level
+#&gt; 1        a1 a1_parent a_node     0
+#&gt; 2        a2      none a_node     0
+#&gt; 3        a3      none a_node     0
+#&gt; 4        b1      none b_node     0
+#&gt; 5        b2      none b_node     0
+#&gt; 6        b3      none b_node     0
+#&gt; 7 a1_parent      none a_node     1</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -173,6 +204,7 @@ value of <code>0</code>.</p></td>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

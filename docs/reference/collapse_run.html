@@ -126,12 +126,11 @@
 
     <pre class="usage"><span class='fu'>collapse_run</span>(
   <span class='no'>sbm</span>,
-  <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>2</span>,
   <span class='kw'>num_final_blocks</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>10</span>,
-  <span class='kw'>num_block_proposals</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>num_mcmc_sweeps</span> <span class='kw'>=</span> <span class='fl'>10</span>,
+  <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>2</span>,
   <span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
+  <span class='kw'>num_block_proposals</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>parallel</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
@@ -139,27 +138,8 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>level</th>
-      <td><p>Level of nodes who's blocks will have their block membership run
-through MCMC proposal-accept routine.</p></td>
-    </tr>
-    <tr>
-      <th>sigma</th>
-      <td><p>Controls the rate of collapse. At each step of the collapsing
-the model will try and remove <code>current_num_nodes(1 - 1/sigma)</code> nodes from
-the model. So a larger sigma means a faster collapse rate.</p></td>
-    </tr>
-    <tr>
       <th>num_final_blocks</th>
       <td><p>Array of integers corresponding to number of blocks to check in run.</p></td>
-    </tr>
-    <tr>
-      <th>num_block_proposals</th>
-      <td><p>Controls how many merger proposals are drawn for
-each block in the model. A larger number will increase the exploration of
-merge potentials but may lead the model to local minimums. If the number of
-proposals is greater than then number of blocks then all blocks are
-searched exhaustively.</p></td>
     </tr>
     <tr>
       <th>num_mcmc_sweeps</th>
@@ -169,9 +149,23 @@ their most natural resting place in a given collapsed state. Larger values
 will slow down runtime but can potentially lead for more stable results.</p></td>
     </tr>
     <tr>
+      <th>sigma</th>
+      <td><p>Controls the rate of collapse. At each step of the collapsing
+the model will try and remove <code>current_num_nodes(1 - 1/sigma)</code> nodes from
+the model. So a larger sigma means a faster collapse rate.</p></td>
+    </tr>
+    <tr>
       <th>eps</th>
       <td><p>Controls randomness of move proposals. Effects both the block
 merging and mcmc sweeps.</p></td>
+    </tr>
+    <tr>
+      <th>num_block_proposals</th>
+      <td><p>Controls how many merger proposals are drawn for
+each block in the model. A larger number will increase the exploration of
+merge potentials but may lead the model to local minimums. If the number of
+proposals is greater than then number of blocks then all blocks are
+searched exhaustively.</p></td>
     </tr>
     <tr>
       <th>parallel</th>
@@ -184,30 +178,52 @@ merging and mcmc sweeps.</p></td>
     <p>Tibble with three columns with rows corresponding to the result of
 each merge step:  <code>entropy</code>, <code>num_blocks</code> left in model, and a list column
 of <code>state</code> which is the state dump dataframe for model at end of merge.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other modeling: 
+<code><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a>()</code>,
+<code><a href='collapse_blocks.html'>collapse_blocks</a>()</code>,
+<code><a href='get_block_edge_counts.html'>get_block_edge_counts</a>()</code>,
+<code><a href='get_entropy.html'>get_entropy</a>()</code>,
+<code><a href='get_num_blocks.html'>get_num_blocks</a>()</code>,
+<code><a href='get_state.html'>get_state</a>()</code>,
+<code><a href='mcmc_sweep.html'>mcmc_sweep</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
+    <pre class="examples"><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
 
 <span class='co'># Start with a random network of two blocks with 25 nodes each</span>
-<span class='no'>network</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>25</span>)
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>25</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'>collapse_run</span>(<span class='kw'>num_final_blocks</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>5</span>, <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>1.5</span>)
 
-<span class='co'># Create SBM from simulated data</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>(<span class='no'>network</span>)
+<span class='co'># Collapse runs can be done in parallel</span>
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+  <span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>25</span>) <span class='kw'>%&gt;%</span>
+    <span class='fu'>collapse_run</span>(<span class='kw'>num_final_blocks</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>5</span>, <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>1.5</span>, <span class='kw'>parallel</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+}
 
-<span class='co'># Run agglomerative clustering with no intermediate MCMC steps on network</span>
-<span class='no'>collapse_results</span> <span class='kw'>&lt;-</span> <span class='fu'>collapse_run</span>(<span class='no'>my_sbm</span>, <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>num_final_blocks</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>6</span>)
-
-<span class='co'># Visualize results of collapsing</span>
-<span class='fu'><a href='visualize_collapse_results.html'>visualize_collapse_results</a></span>(<span class='no'>collapse_results</span>)</div><div class='img'><img src='collapse_run-1.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'># Choose best result</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a></span>(<span class='no'>my_sbm</span>, <span class='no'>collapse_results</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 4 blocks and an entropy of 1872.1581.</div><div class='input'>
-</div></pre>
+<span class='co'># We can look directly at the collapse results</span>
+<span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='get_collapse_results.html'>get_collapse_results</a></span>()</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt;   entropy num_blocks state            
+#&gt;     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;list&gt;</span><span>           
+#&gt; </span><span style='color: #555555;'>1</span><span>   </span><span style='text-decoration: underline;'>2</span><span>368.          1 </span><span style='color: #555555;'>&lt;df[,4] [77 × 4]&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>2</span><span>   </span><span style='text-decoration: underline;'>2</span><span>057.          2 </span><span style='color: #555555;'>&lt;df[,4] [79 × 4]&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>3</span><span>   </span><span style='text-decoration: underline;'>1</span><span>985.          3 </span><span style='color: #555555;'>&lt;df[,4] [81 × 4]&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>4</span><span>   </span><span style='text-decoration: underline;'>2</span><span>002.          4 </span><span style='color: #555555;'>&lt;df[,4] [83 × 4]&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>5</span><span>   </span><span style='text-decoration: underline;'>1</span><span>737.          5 </span><span style='color: #555555;'>&lt;df[,4] [85 × 4]&gt;</span><span></div><div class='input'>
+<span class='co'># We can visualize the collapse results</span>
+<span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='visualize_collapse_results.html'>visualize_collapse_results</a></span>()</div><div class='img'><img src='collapse_run-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'># We can choose best result with default heuristic</span>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a></span>(<span class='no'>net</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 4 blocks and an entropy of 2001.616.</div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 
