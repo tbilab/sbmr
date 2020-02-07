@@ -4,39 +4,44 @@
 \alias{get_entropy}
 \title{Compute entropy for current model state}
 \usage{
-get_entropy(sbm, level = 0)
+get_entropy(sbm)
 }
 \arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
-
-\item{level}{Level of nodes for which block entropy is accessed. E.g. the
-default value of \code{0} will get entropy of model as described by the blocks
-in level \code{1}.}
+\item{sbm}{\code{sbm_network} object as created by
+\code{\link{new_sbm_network()}}.}
 }
 \value{
 Entropy value (numeric).
 }
 \description{
-Computes the (degree-corrected) entropy for the network at the specified
-level (int).
+Computes the (degree-corrected) entropy for the network at the node level.
 }
 \examples{
 
-# Build basic network with 3 nodes and two blocks
-my_sbm <- create_sbm() \%>\%
-  add_node('node_1') \%>\%
-  add_node('node_2') \%>\%
-  add_node('node_3') \%>\%
-  add_node('node_11', level = 1) \%>\%
-  add_node('node_12', level = 1) \%>\%
-  add_edge('node_1', 'node_2') \%>\%
-  add_edge('node_1', 'node_3') \%>\%
-  add_edge('node_2', 'node_3') \%>\%
-  set_node_parent(child_id = 'node_1', parent_id = 'node_11') \%>\%
-  set_node_parent(child_id = 'node_2', parent_id = 'node_11') \%>\%
-  set_node_parent(child_id = 'node_3', parent_id = 'node_12')
+set.seed(42)
 
-# Compute entropy of network
-get_entropy(my_sbm)
+# Start with a small simulated network with random block assignments
+net <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 15) \%>\%
+  initialize_blocks(num_blocks = 4)
+
+# Calculate entropy with random blocks
+get_entropy(net)
+
+# Run some MCMC sweeps
+net <- mcmc_sweep(net, num_sweeps = 25, variable_num_blocks = FALSE)
+
+# Entropy after sweeps
+get_entropy(net)
 
 }
+\seealso{
+Other modeling: 
+\code{\link{choose_best_collapse_state}()},
+\code{\link{collapse_blocks}()},
+\code{\link{collapse_run}()},
+\code{\link{get_block_edge_counts}()},
+\code{\link{get_num_blocks}()},
+\code{\link{get_state}()},
+\code{\link{mcmc_sweep}()}
+}
+\concept{modeling}

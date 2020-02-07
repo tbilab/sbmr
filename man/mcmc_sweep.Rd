@@ -7,25 +7,27 @@
 mcmc_sweep(
   sbm,
   num_sweeps = 1,
-  variable_num_blocks = TRUE,
   eps = 0.1,
+  variable_num_blocks = TRUE,
   track_pairs = FALSE,
   level = 0,
-  verbose = FALSE
+  verbose = FALSE,
+  return_sbm_network = TRUE
 )
 }
 \arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
+\item{sbm}{\code{sbm_network} object as created by
+\code{\link{new_sbm_network()}}.}
 
 \item{num_sweeps}{Number of times all nodes are passed through for move
 proposals.}
 
+\item{eps}{Controls randomness of move proposals. Effects both the block
+merging and mcmc sweeps.}
+
 \item{variable_num_blocks}{Should the model allow new blocks to be created or
 empty blocks removed while sweeping or should number of blocks remain
 constant?}
-
-\item{eps}{Controls randomness of move proposals. Effects both the block
-merging and mcmc sweeps.}
 
 \item{track_pairs}{Return a dataframe with all pairs of nodes along with the
 number of sweeps they shared the same group?}
@@ -38,11 +40,8 @@ have information given on entropy delta, probability of moving, and if the
 move were accepted printed to the console.}
 }
 \value{
-List with two dataframes. The first telling for all sweeps everytime
-a node was moved and what group it was moved to. The second telling for
-each sweep the entropy delta and total number of nodes that were moved to
-new groups in that sweep. If \code{track_pairs = TRUE}, then an additional
-\code{pairing_counts} dataframe is added to output.
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Runs a single Metropolis Hastings MCMC sweep across all nodes at specified
@@ -56,21 +55,38 @@ if new blocks blocks can be proposed and empty blocks removed (boolean).
 
 set.seed(42)
 
-# Start with a random network and assign randomly to 4 blocks
-n_blocks <- 3
-my_sbm <- create_sbm(sim_basic_block_network(n_blocks = n_blocks, n_nodes_per_block = 15)) \%>\%
-  initialize_blocks(num_blocks = n_blocks)
+# Start with a small simulated network with random block assignments
+net <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 15) \%>\%
+  initialize_blocks(num_blocks = 4)
 
 # Calculate entropy with random blocks
-get_entropy(my_sbm)
+get_entropy(net)
 
-# Run 4 MCMC sweeps
-sweep_results <- my_sbm \%>\% mcmc_sweep(num_sweeps = 4, variable_num_blocks = FALSE)
+# Run some MCMC sweeps
+net <- mcmc_sweep(net, num_sweeps = 25, variable_num_blocks = FALSE)
 
-# Look at the per-sweep level information
-sweep_results$sweep_info
+# Entropy after sweeps
+get_entropy(net)
 
-# Get idea of node-pair similarity by looking at how often every pair of nodes is connected over sweeps
-my_sbm \%>\% mcmc_sweep(num_sweeps = 4, track_pairs = TRUE)
+# Per-sweep level information
+get_sweep_results(net)
+
+# Use track_pairs = TRUE to get an idea of node-pair similarity by looking at
+# how often every pair of nodes is connected over sweeps
+net \%>\%
+  mcmc_sweep(num_sweeps = 25, track_pairs = TRUE) \%>\%
+  get_sweep_pair_counts()
+
 
 }
+\seealso{
+Other modeling: 
+\code{\link{choose_best_collapse_state}()},
+\code{\link{collapse_blocks}()},
+\code{\link{collapse_run}()},
+\code{\link{get_block_edge_counts}()},
+\code{\link{get_entropy}()},
+\code{\link{get_num_blocks}()},
+\code{\link{get_state}()}
+}
+\concept{modeling}

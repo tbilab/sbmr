@@ -126,7 +126,12 @@ between two nodes with a uniform common probability." />
 between two nodes with a uniform common probability.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sim_random_network</span>(<span class='kw'>n_nodes</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>prob_of_edge</span> <span class='kw'>=</span> <span class='fl'>0.7</span>, <span class='kw'>allow_self_edges</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>sim_random_network</span>(
+  <span class='kw'>n_nodes</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>prob_of_edge</span> <span class='kw'>=</span> <span class='fl'>0.7</span>,
+  <span class='kw'>allow_self_edges</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>setup_model</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -145,29 +150,79 @@ occuring</p></td>
       <td><p>Should nodes be allowed to have edges to
 themselves?</p></td>
     </tr>
+    <tr>
+      <th>setup_model</th>
+      <td><p>Should an SBM model object be added? Set to <code>FALSE</code> if
+network is just being visualized or described.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An edge dataframe with node ids for edges in the <code>from</code> and
-<code>to</code> columns</p>
+    <p>An S3 object of class <code>sbm_network</code>. For details see
+<a href='new_sbm_network.html'>new_sbm_network</a> section "Class structure."</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other simulations: 
+<code><a href='sim_basic_block_network.html'>sim_basic_block_network</a>()</code>,
+<code><a href='sim_sbm_network.html'>sim_sbm_network</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>sim_random_network</span>(<span class='kw'>n_nodes</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>prob_of_edge</span> <span class='kw'>=</span> <span class='fl'>0.9</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 6 x 2</span><span>
-#&gt;   from   to    
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> 
-#&gt; </span><span style='color: #555555;'>1</span><span> node_1 node_2
-#&gt; </span><span style='color: #555555;'>2</span><span> node_1 node_3
-#&gt; </span><span style='color: #555555;'>3</span><span> node_1 node_4
-#&gt; </span><span style='color: #555555;'>4</span><span> node_2 node_3
-#&gt; </span><span style='color: #555555;'>5</span><span> node_2 node_4
-#&gt; </span><span style='color: #555555;'>6</span><span> node_3 node_4</div></span></pre>
+    <pre class="examples"><div class='input'>
+<span class='co'># Basic random network</span>
+<span class='fu'>sim_random_network</span>(<span class='kw'>n_nodes</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>prob_of_edge</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)</div><div class='output co'>#&gt; SBM Network with 10 nodes of a single type and 21 edges. 
+#&gt;  
+#&gt; Nodes: <span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt;   id     block type 
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> node_1 node  node 
+#&gt; </span><span style='color: #555555;'>2</span><span> node_2 node  node 
+#&gt; </span><span style='color: #555555;'>3</span><span> node_3 node  node 
+#&gt; </span><span style='color: #555555;'>4</span><span> node_4 node  node 
+#&gt; </span><span style='color: #555555;'>5</span><span> node_5 node  node 
+#&gt; ... 
+#&gt;  
+#&gt; Edges: </span><span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt;   from   to     edges
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> node_1 node_3     1
+#&gt; </span><span style='color: #555555;'>2</span><span> node_1 node_5     1
+#&gt; </span><span style='color: #555555;'>3</span><span> node_1 node_8     1
+#&gt; </span><span style='color: #555555;'>4</span><span> node_2 node_4     1
+#&gt; </span><span style='color: #555555;'>5</span><span> node_2 node_5     1
+#&gt; ... 
+#&gt;  </div><div class='input'>
+<span class='co'># Simulate a fully connected network by setting probability of edge to 1</span>
+<span class='fu'>sim_random_network</span>(<span class='kw'>n_nodes</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>prob_of_edge</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt; SBM Network with 10 nodes of a single type and 45 edges. 
+#&gt;  
+#&gt; Nodes: </span><span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt;   id     block type 
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> node_1 node  node 
+#&gt; </span><span style='color: #555555;'>2</span><span> node_2 node  node 
+#&gt; </span><span style='color: #555555;'>3</span><span> node_3 node  node 
+#&gt; </span><span style='color: #555555;'>4</span><span> node_4 node  node 
+#&gt; </span><span style='color: #555555;'>5</span><span> node_5 node  node 
+#&gt; ... 
+#&gt;  
+#&gt; Edges: </span><span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt;   from   to     edges
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> node_1 node_2     1
+#&gt; </span><span style='color: #555555;'>2</span><span> node_1 node_3     1
+#&gt; </span><span style='color: #555555;'>3</span><span> node_1 node_4     1
+#&gt; </span><span style='color: #555555;'>4</span><span> node_1 node_5     1
+#&gt; </span><span style='color: #555555;'>5</span><span> node_1 node_6     1
+#&gt; ... 
+#&gt;  </div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

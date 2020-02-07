@@ -4,10 +4,7 @@
 \alias{visualize_propensity_dist}
 \title{Visualize pairwise propensity distribution}
 \usage{
-visualize_propensity_dist(sweep_results)
-}
-\arguments{
-\item{sweep_results}{Results from running \code{\link{mcmc_sweep()}} with the argument \code{track_pairs = TRUE}.}
+visualize_propensity_dist(sbm)
 }
 \value{
 GGplot2 plot containing ECDF of the pairwise propensities of residing in same block for MCMC sweeps.
@@ -17,18 +14,25 @@ Investigate the results of cluster stability from MCMC sweeps. Shows the
 empirical CDF of the pairwise probability/proportion of two nodes residing in
 the same block over the given MCMC sweeps.
 }
+\details{
+\code{sbmR::mcmc_sweep(sbm, track_pairs = TRUE, ...)} must be run on object before this function.
+}
 \examples{
 
-network <- sim_basic_block_network(
-  n_blocks = 3,
-  n_nodes_per_block = 25
-)
-# Initialize model with random groups and run 75 MCMC sweeps
-sweep_results <- create_sbm(network) \%>\%
+# Simulate a model
+net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) \%>\%
   initialize_blocks(3) \%>\%
   mcmc_sweep(num_sweeps = 75, track_pairs = TRUE)
 
 # Plot results
-visualize_propensity_dist(sweep_results)
+visualize_propensity_dist(net)
 
 }
+\seealso{
+Other visualizations: 
+\code{\link{visualize_collapse_results}()},
+\code{\link{visualize_mcmc_trace}()},
+\code{\link{visualize_network}()},
+\code{\link{visualize_propensity_network}()}
+}
+\concept{visualizations}

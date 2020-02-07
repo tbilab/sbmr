@@ -6,21 +6,18 @@
 \usage{
 choose_best_collapse_state(
   sbm,
-  collapse_results,
   use_entropy_value_for_score = FALSE,
   heuristic = "dev_from_rolling_mean",
   verbose = FALSE
 )
 }
 \arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
+\item{sbm}{\code{sbm_network} object as created by
+\code{\link{new_sbm_network()}}.}
 
-\item{collapse_results}{Results of running agglomerative collapse algorithm
-on sbm with \code{\link{collapse_blocks}}.}
-
-\item{use_entropy_value_for_score}{If set to \code{TRUE} then instead of the merge results
-entropy delta being used for the score function the entropy will be.
-Typically the heuristics work better on entropy delta values.}
+\item{use_entropy_value_for_score}{If set to \code{TRUE} then instead of the merge
+results entropy delta being used for the score function the entropy will
+be. Typically the heuristics work better on entropy delta values.}
 
 \item{heuristic}{How the best partitioning is defined. Takes either a
 function that takes one/two arguments: an entropy vector and an optional
@@ -31,8 +28,8 @@ location, or a string labeling algorithm. Currently only \code{"lowest"},
 \item{verbose}{Should model tell you what step was chosen (\code{TRUE} or \code{FALSE})?}
 }
 \value{
-SBM model updated to match state from the merge step with 'best'
-partitioning.
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Choose and load best model state from agglomerative collapsing algorithm
@@ -41,16 +38,11 @@ Choose and load best model state from agglomerative collapsing algorithm
 set.seed(42)
 
 # Start with a random network of two blocks with 25 nodes each
-network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25)
-
-# Create SBM from simulated data
-my_sbm <- create_sbm(network)
-
-# Run agglomerative clustering with no intermediate MCMC steps on network
-collapse_results <- collapse_run(my_sbm, sigma = 3, num_final_blocks = 1:6)
+net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) \%>\%
+  collapse_blocks(sigma = 2)
 
 # Choose best result with default heuristic
-my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, verbose = TRUE)
+net <- choose_best_collapse_state(net, verbose = TRUE)
 
 # Score heuristic that fits a nonlinear model to observed values and chooses by largest negative residual
 nls_score <- function(e, k){
@@ -59,9 +51,21 @@ nls_score <- function(e, k){
 }
 
 # Choose result using custom heuristic function
-my_sbm <- choose_best_collapse_state(my_sbm,
-                                     collapse_results,
+my_sbm <- choose_best_collapse_state(net,
                                      heuristic = nls_score,
                                      verbose = TRUE)
 
 }
+\seealso{
+visualize_collapse_results
+
+Other modeling: 
+\code{\link{collapse_blocks}()},
+\code{\link{collapse_run}()},
+\code{\link{get_block_edge_counts}()},
+\code{\link{get_entropy}()},
+\code{\link{get_num_blocks}()},
+\code{\link{get_state}()},
+\code{\link{mcmc_sweep}()}
+}
+\concept{modeling}

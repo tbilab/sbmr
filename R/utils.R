@@ -18,6 +18,8 @@ NULL
 #' of all combinations (order does _not_ matter) of elements of vector of length
 #' `n`.
 #'
+#' @family helpers
+#'
 #' @param n Number of elements in vector to get combinations of
 #' @param repeats Do we allow repeats in pairs? E.g. should a-a, b-b, etc. be allowed in generated pairs?
 #'
@@ -48,7 +50,14 @@ get_combination_indices <- function(n, repeats = FALSE){
 }
 
 
-# Determin if an object is of the class list, not the type
+# Determine if an object is of the class list, not the type
 is_list_class <- function(x){
   "list" %in% class(x)
 }
+
+# Syntax sugar
+not_in <- function(a, b){
+  !(a %in% b)
+}
+
+

@@ -7,6 +7,12 @@
 #' The default values will draw propensity values for bernouli edges with an
 #' average of a 50% chance of edge.
 #'
+#' If `return_edge_propensities == TRUE`: an `$edge_propensities` slot is added
+#' to the returned `sbm_network` object containing a dataframe that shows the
+#' randomly drawn edge propensities between blocks.
+#'
+#' @family simulations
+#'
 #' @param n_blocks How many blocks to simulate
 #' @param n_nodes_per_block How many nodes in each block
 #' @param propensity_drawer Function that takes a single size argumenet and
@@ -19,16 +25,30 @@
 #'
 #' @seealso \code{\link{sim_sbm_network}} \code{\link{sim_random_network}}
 #'
-#' @return A list with a `nodes` dataframe (containing a node's `id` and `block`
-#'   membership), an `edges` dataframe (containing `from` and `to` nodes along
-#'   with the total number of `edges` as drawn from `edge_dist`), and if
-#'   `return_edge_propensities == TRUE`: `edge_propensities`
-#'   dataframe that shows the randomly drawn edge propensities between
-#'   blocks.
+#' @inherit new_sbm_network return
+#'
 #' @export
 #'
 #' @examples
-#' sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 10)
+#'
+#' sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 40)
+#'
+#' sim_basic_block_network(n_blocks = 8, n_nodes_per_block = 20)
+#'
+#' # Can save the generating edge propensities as well
+#' net <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 20, return_edge_propensities = TRUE)
+#' net$edge_propensities
+#'
+#'
+#' right_skewed_beta <- function(n) rbeta(n, 1, 5)
+#'
+#' # Distribution that draws propensities can be customized
+#' net <- sim_basic_block_network(n_blocks = 4,
+#'                                n_nodes_per_block = 20,
+#'                                return_edge_propensities = TRUE,
+#'                                propensity_drawer = right_skewed_beta)
+#' net$edge_propensities
+#'
 sim_basic_block_network <- function(
   n_blocks = 2,
   n_nodes_per_block = 5,
@@ -36,7 +56,8 @@ sim_basic_block_network <- function(
   edge_dist = purrr::rbernoulli,
   allow_self_edges = FALSE,
   keep_edge_counts = FALSE,
-  return_edge_propensities = FALSE){
+  return_edge_propensities = FALSE,
+  setup_model = FALSE){
 
   # Build blocks option with a constant number of nodes per block
   blocks <- dplyr::tibble(
@@ -50,7 +71,6 @@ sim_basic_block_network <- function(
   block_pair_inds <- get_combination_indices(n_blocks, repeats = TRUE)
   n_pairs <- length(block_pair_inds$a)
 
-
   edge_propensities <- dplyr::tibble(
     block_1 = blocks$block[block_pair_inds$a],
     block_2 = blocks$block[block_pair_inds$b],
@@ -58,18 +78,20 @@ sim_basic_block_network <- function(
   )
 
   # Pass the constructed dataframes to the main sbm simulation function and remove edges
-  sim_results <- sim_sbm_network(
+  simulated_sbm_network <- sim_sbm_network(
     block_info = blocks,
     edge_propensities = edge_propensities,
     edge_dist = purrr::rbernoulli,
     allow_self_edges = allow_self_edges,
-    keep_edge_counts = keep_edge_counts
+    keep_edge_counts = keep_edge_counts,
+    setup_model = setup_model
   )
 
   if (return_edge_propensities){
-    sim_results$edge_propensities <- edge_propensities
+    # Add a value for the edge propensities to object if desired
+    simulated_sbm_network$edge_propensities <- edge_propensities
   }
 
-  sim_results
+  simulated_sbm_network
 }
 

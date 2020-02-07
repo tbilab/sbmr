@@ -6,6 +6,8 @@
 #' equilibriate block. See the `agglomerative_merging.Rmd` vignette for more
 #' complete discussion of options/behavior.
 #'
+#' @family modeling
+#'
 #' @inheritParams mcmc_sweep
 #' @param num_mcmc_sweeps How many MCMC sweeps the model does at each
 #'   agglomerative merge step. This allows the model to allow nodes to find
@@ -30,9 +32,7 @@
 #' @param eps Controls randomness of move proposals. Effects both the block
 #'   merging and mcmc sweeps.
 #'
-#' @return Tibble with four columns with rows corresponding to the result of
-#'   each merge step:  `entropy_delta` of last merge step, `entropy` of model after last merge step, `num_blocks` left in model, and a list column
-#'   of `state` which is the state dump dataframe for model at end of merge.
+#' @inherit new_sbm_network return
 #' @export
 #'
 #' @examples
@@ -40,28 +40,60 @@
 #' set.seed(42)
 #'
 #' # Start with a random network of two blocks with 25 nodes each
-#' my_sbm <- sim_basic_block_network(n_blocks = 2, n_nodes_per_block = 25) %>%
-#'   create_sbm()
+#' net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) %>%
+#'   collapse_blocks(sigma = 1.2)
 #'
-#' # Run agglomerative clustering with no intermediate MCMC steps on network
-#' collapse_results <- collapse_blocks(my_sbm, num_mcmc_sweeps = 0)
+#' # We can look directly at the collapse results
+#' net %>% get_collapse_results()
 #'
-#' # Investigate number of nodes at each step
-#' collapse_results %>%
-#'   dplyr::select(-state)
+#' # We can visualize the collapse results
+#' net %>% visualize_collapse_results()
 #'
-collapse_blocks <- function(
-  sbm,
-  level = 0,
-  num_mcmc_sweeps = 0,
-  desired_num_blocks = 1,
-  report_all_steps = TRUE,
-  eps = 0.1,
-  num_block_proposals = 5,
-  sigma = 2
-){
+#' # We can choose best result with default heuristic
+#' net <- choose_best_collapse_state(net, verbose = TRUE)
+#'
+#' # Setting sigma to a higher value means faster collapsing at the cost of less accuracy
+#' net %>%
+#'   collapse_blocks(sigma = 2) %>%
+#'   visualize_collapse_results()
+#'
+collapse_blocks <- function(sbm,
+                            desired_num_blocks = 1,
+                            num_mcmc_sweeps = 0,
+                            sigma = 2,
+                            eps = 0.1,
+                            num_block_proposals = 5,
+                            level = 0,
+                            report_all_steps = TRUE){
+  UseMethod("collapse_blocks")
+}
 
-  collapse_results <- sbm$collapse_blocks(
+collapse_blocks.default <- function(sbm,
+                                    desired_num_blocks = 1,
+                                    num_mcmc_sweeps = 0,
+                                    sigma = 2,
+                                    eps = 0.1,
+                                    num_block_proposals = 5,
+                                    level = 0,
+                                    report_all_steps = TRUE){
+  cat("collapse_blocks generic")
+}
+
+#' @export
+collapse_blocks.sbm_network <- function(sbm,
+                                        desired_num_blocks = 1,
+                                        num_mcmc_sweeps = 0,
+                                        sigma = 2,
+                                        eps = 0.1,
+                                        num_block_proposals = 5,
+                                        level = 0,
+                                        report_all_steps = TRUE){
+  # We call verify_model here in case this is being called in another thread using
+  # the collapse_run function. In that case the pointer to the s4 class will be stale
+  # and we will need to re-create the model class.
+  sbm <- verify_model(sbm)
+
+  collapse_results <- attr(sbm, 'model')$collapse_blocks(
     as.integer(level),
     as.integer(num_mcmc_sweeps),
     as.integer(desired_num_blocks),
@@ -71,13 +103,14 @@ collapse_blocks <- function(
     report_all_steps
   )
 
-  purrr::map_dfr(
-    collapse_results,
+  sbm$collapse_results <-collapse_results %>% purrr::map_dfr(
     ~dplyr::tibble(entropy = .$entropy,
                    entropy_delta = .$entropy_delta,
                    num_blocks = .$num_blocks)
   ) %>%
     dplyr::mutate(state = purrr::map(collapse_results, 'state'))
+
+  sbm
 }
 
 

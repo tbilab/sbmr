@@ -5,6 +5,8 @@
 #' score for a given entropy-number of blocks step for agglomerative merging
 #' algorithms.
 #'
+#' @family helpers
+#'
 #' @param heuristic How the best partitioning is defined. Takes either a
 #'   function that takes one/two arguments: an entropy vector and an optional
 #'   number of blocks vector with each element corresponding to a given

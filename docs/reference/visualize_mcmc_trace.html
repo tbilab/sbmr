@@ -37,7 +37,7 @@
 
 <meta property="og:title" content="Trace plot of multiple MCMC sweep sweeps — visualize_mcmc_trace" />
 <meta property="og:description" content="A simple line plot showing both the entropy delta and the number of nodes
-moved for each sweep." />
+moved for each sweep. sbmR::mcmc_sweep() must be run on object before this function." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -123,46 +123,40 @@ moved for each sweep." />
 
     <div class="ref-description">
     <p>A simple line plot showing both the entropy delta and the number of nodes
-moved for each sweep.</p>
+moved for each sweep. <code><a href='mcmc_sweep.html'>sbmR::mcmc_sweep()</a></code> must be run on object before this function.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>visualize_mcmc_trace</span>(<span class='no'>sweep_results</span>)</pre>
+    <pre class="usage"><span class='fu'>visualize_mcmc_trace</span>(<span class='no'>sbm</span>)</pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>sweep_results</th>
-      <td><p>Results of running <code><a href='mcmc_sweep.html'>sbmR::mcmc_sweep()</a></code></p></td>
-    </tr>
-    </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>GGplot line plot with x-axis as sweep number and y-axes as sweep
 entropy delta and number of nodes moved during sweep.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other visualizations: 
+<code><a href='visualize_collapse_results.html'>visualize_collapse_results</a>()</code>,
+<code><a href='visualize_network.html'>visualize_network</a>()</code>,
+<code><a href='visualize_propensity_dist.html'>visualize_propensity_dist</a>()</code>,
+<code><a href='visualize_propensity_network.html'>visualize_propensity_network</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
-
-<span class='co'># Start with a random network and assign randomly to 4 blocks</span>
-<span class='no'>n_blocks</span> <span class='kw'>&lt;-</span> <span class='fl'>3</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>(<span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='no'>n_blocks</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>15</span>)) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='kw'>num_blocks</span> <span class='kw'>=</span> <span class='no'>n_blocks</span>)
-
-<span class='co'># Run 25 MCMC sweeps</span>
-<span class='no'>sweep_results</span> <span class='kw'>&lt;-</span> <span class='no'>my_sbm</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='mcmc_sweep.html'>mcmc_sweep</a></span>(<span class='kw'>num_sweeps</span> <span class='kw'>=</span> <span class='fl'>25</span>, <span class='kw'>variable_num_blocks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='co'># Simulate a model and run mcmc sweeps on it</span>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>25</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='fl'>3</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='mcmc_sweep.html'>mcmc_sweep</a></span>(<span class='kw'>num_sweeps</span> <span class='kw'>=</span> <span class='fl'>75</span>, <span class='kw'>track_pairs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'># Plot results</span>
-<span class='fu'>visualize_mcmc_trace</span>(<span class='no'>sweep_results</span>)</div><div class='img'><img src='visualize_mcmc_trace-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>visualize_mcmc_trace</span>(<span class='no'>net</span>)</div><div class='img'><img src='visualize_mcmc_trace-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

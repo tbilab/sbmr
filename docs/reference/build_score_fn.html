@@ -149,6 +149,15 @@ location, or a string labeling algorithm. Currently only <code>"lowest"</code>,
 
     <p>A function that takes and entropy and number of block vector and
 returns a score for partitioning (higher = better)</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other helpers: 
+<code><a href='get_combination_indices.html'>get_combination_indices</a>()</code>,
+<code><a href='get_sweep_pair_counts.html'>get_sweep_pair_counts</a>()</code>,
+<code><a href='get_sweep_results.html'>get_sweep_results</a>()</code>,
+<code><a href='print.sbm_network.html'>print.sbm_network</a>()</code>,
+<code><a href='rolling_mean.html'>rolling_mean</a>()</code>,
+<code><a href='verify_model.html'>verify_model</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
@@ -162,18 +171,18 @@ returns a score for partitioning (higher = better)</p>
   -<span class='fu'><a href='https://rdrr.io/r/stats/residuals.html'>residuals</a></span>(<span class='no'>entropy_model</span>)
 }
 
-<span class='fu'>build_score_fn</span>(<span class='no'>nls_score</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1] -1436.7564   286.4281   883.0498  1011.5289   888.1043   604.3041
-#&gt;  [7]   213.2580  -263.3895  -800.3742 -1386.1516
+<span class='fu'>build_score_fn</span>(<span class='no'>nls_score</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1] -1436.2854   286.8878   879.0978  1013.5037   888.4070   607.3817
+#&gt;  [7]   211.9168  -263.7188  -801.3782 -1385.8106
 #&gt; attr(,"label")
 #&gt; [1] "Residuals"</div><div class='input'>
 <span class='co'># Works with functions that take one argument</span>
 <span class='no'>invert_score</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>e</span>) -<span class='no'>e</span>/<span class='fl'>2</span>
-<span class='fu'>build_score_fn</span>(<span class='no'>invert_score</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1] 4900.7000 4399.8723 3901.2186 3400.0028 2899.6892 2399.4258 1900.9109
-#&gt;  [8] 1400.1237  900.1221  400.1414</div><div class='input'>
+<span class='fu'>build_score_fn</span>(<span class='no'>invert_score</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1] 4900.2768 4399.6855 3898.9675 3400.8155 2899.7438 2400.9315 1900.2610
+#&gt;  [8] 1400.0263  899.7285  400.4570</div><div class='input'>
 <span class='co'># Works with predefined strings</span>
-<span class='fu'>build_score_fn</span>(<span class='st'>"dev_from_rolling_mean"</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1]     0.0000  -500.8277  -998.7567 -1500.8913 -1501.0130 -1501.3166
-#&gt;  [7] -1498.1925 -1499.8275 -1500.0470 -1500.3663</div><div class='input'><span class='fu'>build_score_fn</span>(<span class='st'>"lowest"</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1] 9801.4000 8799.7447 7802.4373 6800.0056 5799.3784 4798.8516 3801.8218
-#&gt;  [8] 2800.2473 1800.2442  800.2827</div><div class='input'>
+<span class='fu'>build_score_fn</span>(<span class='st'>"dev_from_rolling_mean"</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1]     0.0000  -500.5913 -1001.3516 -1498.2417 -1500.1186 -1498.3661
+#&gt;  [7] -1500.3539 -1500.4287 -1501.0167 -1499.3223</div><div class='input'><span class='fu'>build_score_fn</span>(<span class='st'>"lowest"</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1] 9800.5537 8799.3710 7797.9350 6801.6310 5799.4876 4801.8630 3800.5220
+#&gt;  [8] 2800.0526 1799.4570  800.9141</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -181,6 +190,7 @@ returns a score for partitioning (higher = better)</p>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

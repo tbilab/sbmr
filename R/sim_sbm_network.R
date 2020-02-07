@@ -6,6 +6,9 @@
 #' `propensity` of edge between two edges, and a distribution function
 #' who's main parameter the `propensity` value defines are needed.
 #'
+#' @family simulations
+#'
+#' @inheritParams new_sbm_network
 #' @param block_info A dataframe/tibble with two columns: `block`: the id of the
 #'   block, and `n_nodes`: the number of nodes to simulate from that block.
 #' @param edge_propensities A dataframe with 3 columns: `block_1`: the id
@@ -25,9 +28,7 @@
 #'   edges? If edges distribution is a binary yes or no then you will likely
 #'   want to set this to `TRUE`.
 #'
-#' @return A list with a `nodes` dataframe (containing a node's `id` and `block`
-#'   membership) and a `edges` dataframe (containing `from` and `to` nodes along
-#'   with the total number of `edges` as drawn from `edge_dist`.)
+#' @inherit new_sbm_network return
 #' @export
 #'
 #' @examples
@@ -55,7 +56,8 @@ sim_sbm_network <- function(
   edge_propensities,
   edge_dist = rpois,
   allow_self_edges = FALSE,
-  keep_edge_counts = TRUE){
+  keep_edge_counts = TRUE,
+  setup_model = FALSE){
 
   # Generate all the node names and their blocks
   nodes <- purrr::map2_dfr(
@@ -118,5 +120,10 @@ sim_sbm_network <- function(
       dplyr::select(-edges)
   }
 
-  list(nodes = nodes, edges = edges)
+  # Create a new sbm_network object from the simulated data.
+  new_sbm_network(
+    edges = edges,
+    nodes = nodes,
+    setup_model = setup_model
+  )
 }

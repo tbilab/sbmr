@@ -4,15 +4,11 @@
 \alias{get_node_to_block_edge_counts}
 \title{Get node's edge counts to blocks}
 \usage{
-get_node_to_block_edge_counts(
-  sbm,
-  node_id,
-  connection_level = 1L,
-  node_level = 0L
-)
+get_node_to_block_edge_counts(sbm, node_id, connection_level = 1L)
 }
 \arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
+\item{sbm}{\code{sbm_network} object as created by
+\code{\link{new_sbm_network()}}.}
 
 \item{node_id}{String identifying the node that edge counts are desired for}
 
@@ -28,15 +24,23 @@ block.
 }
 \examples{
 
-# Initialize a random network and assign random blocks
-sbm <- sim_basic_block_network(n_blocks = 5) \%>\%
-create_sbm() \%>\%
-initialize_blocks(5)
+# A small simulated network with random block assignment
+net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 10) \%>\%
+  initialize_blocks(3)
 
-# Gather edge counts for a node in the network
-sbm \%>\% get_node_to_block_edge_counts("g1_1")
+# Get a random node's edge counts to blocks
+node_id <- sample(net$nodes$id, 1)
+net \%>\% get_node_to_block_edge_counts(node_id, connection_level = 1)
 
 }
 \seealso{
 \code{\link{get_block_edge_counts}}
+
+Other advanced: 
+\code{\link{add_edge}()},
+\code{\link{add_node}()},
+\code{\link{initialize_blocks}()},
+\code{\link{set_node_parent}()},
+\code{\link{update_state}()}
 }
+\concept{advanced}

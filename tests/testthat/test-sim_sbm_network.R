@@ -19,7 +19,7 @@ edge_propensities <- dplyr::tribble(
 
 test_that("Expected number of nodes returned", {
   expect_equal(
-    nrow(sim_sbm_network(block_info, edge_propensities)$nodes),
+    attr(sim_sbm_network(block_info, edge_propensities), 'n_nodes'),
     sum(block_info$n_nodes)
   )
 })
@@ -41,7 +41,7 @@ test_that("Partite structure can be reflected by zeroing out or ommitting block 
     "a2",         "b2",         7,
   )
 
-  simulated <- sim_sbm_network(block_info, edge_propensities)$edges
+  simulated_edges <- sim_sbm_network(block_info, edge_propensities)$edges
 
   # There should be no edges between any nodes that have the same type as
   # encoded in letter before block name
@@ -50,7 +50,7 @@ test_that("Partite structure can be reflected by zeroing out or ommitting block 
 
   # There should be no edges between nodes of the same type
   expect_false(
-    any(get_type(simulated$from) == get_type(simulated$to))
+    any(get_type(simulated_edges$from) == get_type(simulated_edges$to))
   )
 })
 
@@ -85,12 +85,10 @@ test_that("Higher propensity block combos should be reflected with more edges", 
   get_block <- . %>% stringr::str_remove("_[0-9]+")
 
 
-  simulated <- sim_sbm_network(block_info, edge_propensities)$edges
-
   # First get the observed ordering of least likely to connect to most likely to
   # connect pairs of blocks
   # Note that these are zero censored values so true mean will be different than real Lambda
-  observed_pair_order <- simulated %>%
+  observed_pair_order <- sim_sbm_network(block_info, edge_propensities)$edges %>%
     dplyr::mutate(
       blocks = sorted_block_collapse(get_block(from),get_block(to))
     ) %>%

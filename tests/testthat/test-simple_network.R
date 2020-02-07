@@ -4,15 +4,13 @@ test_that("Proper number of edges happens", {
   prob_of_edge <- 0.5
   n_samples <- 100
 
-
   sim_avg_con_count <- function(self_edges){
     1:n_samples %>%
       purrr::map_int(~{
-        nrow(sim_random_network(n_nodes, prob_of_edge, allow_self_edges = self_edges))
+        nrow(sim_random_network(n_nodes, prob_of_edge, allow_self_edges = self_edges)$edges)
       }) %>%
       mean()
   }
-
 
   # Calculate the expected number of edges. This is divided by two because we
   # only draw unique combos of blocks so if we have edges for nodes a->b we wont
