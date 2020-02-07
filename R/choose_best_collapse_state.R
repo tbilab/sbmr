@@ -53,7 +53,6 @@ choose_best_collapse_state.sbm_network <- function(sbm,
                                                    heuristic = 'dev_from_rolling_mean',
                                                    verbose = FALSE){
   collapse_results <- get_collapse_results(sbm)
-
   # Apply the heuristic on the entropy column and choose the higheset value
   best_state <- collapse_results %>%
     dplyr::arrange(num_blocks)
@@ -66,7 +65,7 @@ choose_best_collapse_state.sbm_network <- function(sbm,
       dplyr::filter(!is.na(entropy_delta))
   }
 
-  if (use_entropy_value_for_score | missing_entropy_delta){
+  if (use_entropy_value_for_score){
     best_state <- dplyr::mutate(best_state, score = build_score_fn(heuristic)(entropy, num_blocks))
   } else {
     best_state <- dplyr::mutate(best_state, score = build_score_fn(heuristic)(entropy_delta, num_blocks))
@@ -81,6 +80,6 @@ choose_best_collapse_state.sbm_network <- function(sbm,
   }
 
   # Update the model and s3 class states and return
-  sbm %>% update_state(best_state$state[[1]])
+  verify_model(sbm) %>% update_state(best_state$state[[1]])
 }
 
