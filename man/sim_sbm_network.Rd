@@ -9,7 +9,8 @@ sim_sbm_network(
   edge_propensities,
   edge_dist = rpois,
   allow_self_edges = FALSE,
-  keep_edge_counts = TRUE
+  keep_edge_counts = TRUE,
+  setup_model = FALSE
 )
 }
 \arguments{
@@ -35,11 +36,13 @@ themselves?}
 \item{keep_edge_counts}{Should the edge counts stay on returned
 edges? If edges distribution is a binary yes or no then you will likely
 want to set this to \code{TRUE}.}
+
+\item{setup_model}{Should an SBM model object be added? Set to \code{FALSE} if
+network is just being visualized or described.}
 }
 \value{
-A list with a \code{nodes} dataframe (containing a node's \code{id} and \code{block}
-membership) and a \code{edges} dataframe (containing \code{from} and \code{to} nodes along
-with the total number of \code{edges} as drawn from \code{edge_dist}.)
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Simulates nodes and edges from a network where edge edges are derived
@@ -69,3 +72,9 @@ edge_propensities <- dplyr::tribble(
 sim_sbm_network(block_info, edge_propensities, edge_dist = purrr::rbernoulli)
 
 }
+\seealso{
+Other simulations: 
+\code{\link{sim_basic_block_network}()},
+\code{\link{sim_random_network}()}
+}
+\concept{simulations}

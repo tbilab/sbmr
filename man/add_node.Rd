@@ -4,19 +4,23 @@
 \alias{add_node}
 \title{Add a new node to network}
 \usage{
-add_node(sbm, id, type = "node", level = 0)
+add_node(sbm, id, type = NULL, show_messages = TRUE)
 }
 \arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
+\item{sbm}{\code{sbm_network} object as created by
+\code{\link{new_sbm_network()}}.}
 
 \item{id}{Unique identifying name for node.}
 
-\item{type}{Type of node (string). This is used to distinguish multipartite networks. E.g. "person", or "publication", etc..}
+\item{type}{Type of node (string). This is used to distinguish multipartite
+networks. E.g. "person", or "publication", etc..}
 
-\item{level}{Level in node hierarchy. Level \code{0} indicates node is at the data level, levels greater than \code{0} are block nodes.}
+\item{show_messages}{Should function inform of its actions such as when a
+model already exists so no changes are made?}
 }
 \value{
-SBM model object modified with node added. \emph{Note that object is modified in place as well.}
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Add a node to the network. Takes the node id (string), the node type
@@ -24,10 +28,29 @@ Add a node to the network. Takes the node id (string), the node type
 }
 \examples{
 
-my_sbm <- create_sbm() \%>\%
-  add_node('node_1') \%>\%
-  add_node('node_2')
+# Start with network with 5 nodes.
+net <- sim_random_network(n_nodes = 5, prob_of_edge = 1, setup_model = TRUE)
 
-get_state(my_sbm)
+# Verify nodes
+net$nodes
+net \%>\% get_state()
+
+# Add two nodes
+net <- net \%>\%
+  add_node('new_node1', type = 'node') \%>\%
+  add_node('new_node2', type = 'node')
+
+# New nodes are added to node data and state
+net$nodes
+net \%>\% get_state()
 
 }
+\seealso{
+Other advanced: 
+\code{\link{add_edge}()},
+\code{\link{get_node_to_block_edge_counts}()},
+\code{\link{initialize_blocks}()},
+\code{\link{set_node_parent}()},
+\code{\link{update_state}()}
+}
+\concept{advanced}

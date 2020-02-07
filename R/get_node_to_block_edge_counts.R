@@ -4,6 +4,8 @@
 #' the desired node is connected to and how many connections they have to that
 #' block.
 #'
+#' @family advanced
+#'
 #' @seealso \code{\link{get_block_edge_counts}}
 #' @inheritParams add_node
 #' @param node_id String identifying the node that edge counts are desired for
@@ -14,21 +16,34 @@
 #'
 #' @examples
 #'
-#' # Initialize a random network and assign random blocks
-#' sbm <- sim_basic_block_network(n_blocks = 5) %>%
-#' create_sbm() %>%
-#' initialize_blocks(5)
+#' # A small simulated network with random block assignment
+#' net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 10) %>%
+#'   initialize_blocks(3)
 #'
-#' # Gather edge counts for a node in the network
-#' sbm %>% get_node_to_block_edge_counts("g1_1")
+#' # Get a random node's edge counts to blocks
+#' node_id <- sample(net$nodes$id, 1)
+#' net %>% get_node_to_block_edge_counts(node_id, connection_level = 1)
 #'
-get_node_to_block_edge_counts <- function(sbm,
-                                          node_id,
-                                          connection_level = 1L,
-                                          node_level = 0L){
-
-   # Call the exported method from the rcpp wrapper class.
-  sbm$get_node_to_block_edge_counts(node_id,
-                                    as.integer(node_level),
-                                    as.integer(connection_level))
+get_node_to_block_edge_counts <- function(sbm, node_id, connection_level = 1L){
+  UseMethod("get_node_to_block_edge_counts")
 }
+
+get_node_to_block_edge_counts.default <- function(sbm, node_id, connection_level = 1L){
+  cat("get_node_to_block_edge_counts generic")
+}
+
+#' @export
+get_node_to_block_edge_counts.sbm_network <- function(sbm, node_id, connection_level = 1L){
+
+  # Grab level of the node requested for connections.
+  node_level <- get_state(sbm) %>%
+    dplyr::filter(id == node_id) %>%
+    dplyr::pull(level) %>%
+    as.integer()
+
+  # Call the exported method from the rcpp wrapper class.
+  attr(verify_model(sbm), 'model')$get_node_to_block_edge_counts(node_id,
+                                                        node_level,
+                                                        as.integer(connection_level))
+}
+

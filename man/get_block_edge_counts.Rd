@@ -7,7 +7,8 @@
 get_block_edge_counts(sbm, level = 1)
 }
 \arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
+\item{sbm}{\code{sbm_network} object as created by
+\code{\link{new_sbm_network()}}.}
 }
 \value{
 Dataframe of block pairs (\code{block_a} and \code{block_b}) and the number of edges between them (\code{count}).
@@ -16,15 +17,25 @@ Dataframe of block pairs (\code{block_a} and \code{block_b}) and the number of e
 Returns a dataframe with all pairs of blocks at the desired level and the number of edges between them. Unconnected blocks are ommitted for space savings.
 }
 \examples{
-# Initialize a random network and assign random blocks
-sbm <- sim_basic_block_network(n_blocks = 5) \%>\%
-  create_sbm() \%>\%
-  initialize_blocks(5)
 
-# Gather edge counts for all level 1 block pairs
-sbm \%>\% get_block_edge_counts(1)
+# A small simulated network with random block assignment
+net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 10) \%>\%
+  initialize_blocks(3)
+
+# Get counts of connections from each given block to the others
+net \%>\% get_block_edge_counts()
 
 }
 \seealso{
 \code{\link{get_node_edge_counts}}
+
+Other modeling: 
+\code{\link{choose_best_collapse_state}()},
+\code{\link{collapse_blocks}()},
+\code{\link{collapse_run}()},
+\code{\link{get_entropy}()},
+\code{\link{get_num_blocks}()},
+\code{\link{get_state}()},
+\code{\link{mcmc_sweep}()}
 }
+\concept{modeling}

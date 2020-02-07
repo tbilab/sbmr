@@ -5,28 +5,14 @@
 \title{Visualize network stucture}
 \usage{
 visualize_network(
-  edges,
-  nodes = NULL,
-  width = "100\%",
-  height = NULL,
+  sbm,
   node_color_col = "block",
-  node_shape_col = "type"
+  node_shape_col = "type",
+  width = "100\%",
+  height = NULL
 )
 }
 \arguments{
-\item{edges}{Dataframe with a from and two column encoding edges between
-string node ids (direction does not matter). A list containing both a
-\code{nodes} and \code{edges} dataframe can be passed to avoid having to unpack a
-list of nodes and edges to the arguments of the same name. This is helpful
-for the included simulation functions such as
-\code{\link{sim_sbm_network}}.}
-
-\item{nodes}{Optional dataframe that links a node \code{id} to its \code{type}, for when model is polypartite.}
-
-\item{width}{Desired width for output widget.}
-
-\item{height}{Desired height for output widget.}
-
 \item{node_color_col}{Name of column in the \code{nodes} dataframe that should be
 encoded with color of nodes in the plot. If this value is numeric (defined
 as more than 10 unique values that are numbers) the network will color
@@ -34,6 +20,10 @@ nodes on a linear scale from the min value to the highest value.}
 
 \item{node_shape_col}{Name of column in the \code{nodes} dataframe that should be
 encoded with shape of nodes in the plot}
+
+\item{width}{Desired width for output widget.}
+
+\item{height}{Desired height for output widget.}
 }
 \description{
 Creates a simple interactive network visualization that visually encodes node
@@ -41,15 +31,21 @@ membership and type (if present) for a passed network.
 }
 \examples{
 
-set.seed(42)
-
 # Simulate a 3 block/cluster network with 15 nodes per block
-simulated_network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 15)
+net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 15)
 
 # Visualize network with color encoding the blocks
-visualize_network(simulated_network)
+visualize_network(net)
 
 # Visualize network with shape encoding the blocks
-visualize_network(simulated_network, node_shape_col = 'block', node_color_col = 'type')
+visualize_network(net, node_shape_col = 'block', node_color_col = 'type')
 
 }
+\seealso{
+Other visualizations: 
+\code{\link{visualize_collapse_results}()},
+\code{\link{visualize_mcmc_trace}()},
+\code{\link{visualize_propensity_dist}()},
+\code{\link{visualize_propensity_network}()}
+}
+\concept{visualizations}

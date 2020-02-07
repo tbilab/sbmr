@@ -6,24 +6,28 @@
 \usage{
 collapse_run(
   sbm,
-  level = 0,
-  sigma = 2,
   num_final_blocks = 1:10,
-  num_block_proposals = 5,
   num_mcmc_sweeps = 10,
+  sigma = 2,
   eps = 0.1,
+  num_block_proposals = 5,
   parallel = FALSE
 )
 }
 \arguments{
-\item{level}{Level of nodes who's blocks will have their block membership run
-through MCMC proposal-accept routine.}
+\item{num_final_blocks}{Array of integers corresponding to number of blocks to check in run.}
+
+\item{num_mcmc_sweeps}{How many MCMC sweeps the model does at each
+agglomerative merge step. This allows the model to allow nodes to find
+their most natural resting place in a given collapsed state. Larger values
+will slow down runtime but can potentially lead for more stable results.}
 
 \item{sigma}{Controls the rate of collapse. At each step of the collapsing
 the model will try and remove \code{current_num_nodes(1 - 1/sigma)} nodes from
 the model. So a larger sigma means a faster collapse rate.}
 
-\item{num_final_blocks}{Array of integers corresponding to number of blocks to check in run.}
+\item{eps}{Controls randomness of move proposals. Effects both the block
+merging and mcmc sweeps.}
 
 \item{num_block_proposals}{Controls how many merger proposals are drawn for
 each block in the model. A larger number will increase the exploration of
@@ -31,40 +35,47 @@ merge potentials but may lead the model to local minimums. If the number of
 proposals is greater than then number of blocks then all blocks are
 searched exhaustively.}
 
-\item{num_mcmc_sweeps}{How many MCMC sweeps the model does at each
-agglomerative merge step. This allows the model to allow nodes to find
-their most natural resting place in a given collapsed state. Larger values
-will slow down runtime but can potentially lead for more stable results.}
-
-\item{eps}{Controls randomness of move proposals. Effects both the block
-merging and mcmc sweeps.}
-
 \item{parallel}{Run in parallel using \code{furrr}?}
 }
 \value{
-Tibble with three columns with rows corresponding to the result of
-each merge step:  \code{entropy}, \code{num_blocks} left in model, and a list column
-of \code{state} which is the state dump dataframe for model at end of merge.
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Run Agglomerative Merging to target a range of block numbers
 }
 \examples{
+
 set.seed(42)
 
 # Start with a random network of two blocks with 25 nodes each
-network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25)
+net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) \%>\%
+  collapse_run(num_final_blocks = 1:5, sigma = 1.5)
 
-# Create SBM from simulated data
-my_sbm <- create_sbm(network)
+# Collapse runs can be done in parallel
+\dontrun{
+  net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) \%>\%
+    collapse_run(num_final_blocks = 1:5, sigma = 1.5, parallel = TRUE)
+}
 
-# Run agglomerative clustering with no intermediate MCMC steps on network
-collapse_results <- collapse_run(my_sbm, sigma = 3, num_final_blocks = 1:6)
+# We can look directly at the collapse results
+net \%>\% get_collapse_results()
 
-# Visualize results of collapsing
-visualize_collapse_results(collapse_results)
+# We can visualize the collapse results
+net \%>\% visualize_collapse_results()
 
-# Choose best result
-my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, verbose = TRUE)
+# We can choose best result with default heuristic
+net <- choose_best_collapse_state(net, verbose = TRUE)
 
 }
+\seealso{
+Other modeling: 
+\code{\link{choose_best_collapse_state}()},
+\code{\link{collapse_blocks}()},
+\code{\link{get_block_edge_counts}()},
+\code{\link{get_entropy}()},
+\code{\link{get_num_blocks}()},
+\code{\link{get_state}()},
+\code{\link{mcmc_sweep}()}
+}
+\concept{modeling}

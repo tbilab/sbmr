@@ -6,33 +6,28 @@
 \usage{
 collapse_blocks(
   sbm,
-  level = 0,
-  num_mcmc_sweeps = 0,
   desired_num_blocks = 1,
-  report_all_steps = TRUE,
+  num_mcmc_sweeps = 0,
+  sigma = 2,
   eps = 0.1,
   num_block_proposals = 5,
-  sigma = 2
+  level = 0,
+  report_all_steps = TRUE
 )
 }
 \arguments{
-\item{level}{Level of nodes who's blocks will have their block membership run
-through MCMC proposal-accept routine.}
+\item{desired_num_blocks}{How many blocks should this given merge drop down
+to. If the network has more than one node type this number is multiplied by
+the total number of types.}
 
 \item{num_mcmc_sweeps}{How many MCMC sweeps the model does at each
 agglomerative merge step. This allows the model to allow nodes to find
 their most natural resting place in a given collapsed state. Larger values
 will slow down runtime but can potentially lead for more stable results.}
 
-\item{desired_num_blocks}{How many blocks should this given merge drop down
-to. If the network has more than one node type this number is multiplied by
-the total number of types.}
-
-\item{report_all_steps}{Should the model state be provided for every merge
-step or just the final one? If collapsing is being used to infer
-hierarcichal structure in data or inspection is desired this should be set
-to \code{TRUE}, otherwise it will slow down collapsing due to increased data
-transfer.}
+\item{sigma}{Controls the rate of collapse. At each step of the collapsing
+the model will try and remove \code{current_num_nodes(1 - 1/sigma)} nodes from
+the model. So a larger sigma means a faster collapse rate.}
 
 \item{eps}{Controls randomness of move proposals. Effects both the block
 merging and mcmc sweeps.}
@@ -43,14 +38,18 @@ merge potentials but may lead the model to local minimums. If the number of
 proposals is greater than then number of blocks then all blocks are
 searched exhaustively.}
 
-\item{sigma}{Controls the rate of collapse. At each step of the collapsing
-the model will try and remove \code{current_num_nodes(1 - 1/sigma)} nodes from
-the model. So a larger sigma means a faster collapse rate.}
+\item{level}{Level of nodes who's blocks will have their block membership run
+through MCMC proposal-accept routine.}
+
+\item{report_all_steps}{Should the model state be provided for every merge
+step or just the final one? If collapsing is being used to infer
+hierarcichal structure in data or inspection is desired this should be set
+to \code{TRUE}, otherwise it will slow down collapsing due to increased data
+transfer.}
 }
 \value{
-Tibble with four columns with rows corresponding to the result of
-each merge step:  \code{entropy_delta} of last merge step, \code{entropy} of model after last merge step, \code{num_blocks} left in model, and a list column
-of \code{state} which is the state dump dataframe for model at end of merge.
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Performs agglomerative merging on network, starting with each block has a
@@ -64,14 +63,32 @@ complete discussion of options/behavior.
 set.seed(42)
 
 # Start with a random network of two blocks with 25 nodes each
-my_sbm <- sim_basic_block_network(n_blocks = 2, n_nodes_per_block = 25) \%>\%
-  create_sbm()
+net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) \%>\%
+  collapse_blocks(sigma = 1.2)
 
-# Run agglomerative clustering with no intermediate MCMC steps on network
-collapse_results <- collapse_blocks(my_sbm, num_mcmc_sweeps = 0)
+# We can look directly at the collapse results
+net \%>\% get_collapse_results()
 
-# Investigate number of nodes at each step
-collapse_results \%>\%
-  dplyr::select(-state)
+# We can visualize the collapse results
+net \%>\% visualize_collapse_results()
+
+# We can choose best result with default heuristic
+net <- choose_best_collapse_state(net, verbose = TRUE)
+
+# Setting sigma to a higher value means faster collapsing at the cost of less accuracy
+net \%>\%
+  collapse_blocks(sigma = 2) \%>\%
+  visualize_collapse_results()
 
 }
+\seealso{
+Other modeling: 
+\code{\link{choose_best_collapse_state}()},
+\code{\link{collapse_run}()},
+\code{\link{get_block_edge_counts}()},
+\code{\link{get_entropy}()},
+\code{\link{get_num_blocks}()},
+\code{\link{get_state}()},
+\code{\link{mcmc_sweep}()}
+}
+\concept{modeling}

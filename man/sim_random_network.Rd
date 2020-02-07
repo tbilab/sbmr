@@ -4,7 +4,12 @@
 \alias{sim_random_network}
 \title{Simulate completely random network}
 \usage{
-sim_random_network(n_nodes = 5, prob_of_edge = 0.7, allow_self_edges = FALSE)
+sim_random_network(
+  n_nodes = 5,
+  prob_of_edge = 0.7,
+  allow_self_edges = FALSE,
+  setup_model = FALSE
+)
 }
 \arguments{
 \item{n_nodes}{Total number of unique nodes to simulate}
@@ -14,15 +19,30 @@ occuring}
 
 \item{allow_self_edges}{Should nodes be allowed to have edges to
 themselves?}
+
+\item{setup_model}{Should an SBM model object be added? Set to \code{FALSE} if
+network is just being visualized or described.}
 }
 \value{
-An edge dataframe with node ids for edges in the \code{from} and
-\code{to} columns
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Generate an edge dataframe from an \href{https://en.wikipedia.org/wiki/Erd\%C5\%91s\%E2\%80\%93R\%C3\%A9nyi_model}{Erdos-Renyi network.} An edge will occur
 between two nodes with a uniform common probability.
 }
 \examples{
-sim_random_network(n_nodes = 4, prob_of_edge = 0.9)
+
+# Basic random network
+sim_random_network(n_nodes = 10, prob_of_edge = 0.5)
+
+# Simulate a fully connected network by setting probability of edge to 1
+sim_random_network(n_nodes = 10, prob_of_edge = 1)
+
 }
+\seealso{
+Other simulations: 
+\code{\link{sim_basic_block_network}()},
+\code{\link{sim_sbm_network}()}
+}
+\concept{simulations}

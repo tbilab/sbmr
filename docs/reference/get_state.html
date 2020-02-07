@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Dump state of model to dataframe — get_state • sbmR</title>
+<title>Dump state of current SBM model to dataframe — get_state • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,9 +35,10 @@
 
 
 
-<meta property="og:title" content="Dump state of model to dataframe — get_state" />
+<meta property="og:title" content="Dump state of current SBM model to dataframe — get_state" />
 <meta property="og:description" content="Exports the current state of the network as dataframe with each node as a row
-and columns for node id, parent id, node type, and node level." />
+and columns for node id, parent id, node type, and node level. Can also be
+accomplished by attr(sbm, 'state')." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -116,61 +117,81 @@ and columns for node id, parent id, node type, and node level." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Dump state of model to dataframe</h1>
+    <h1>Dump state of current SBM model to dataframe</h1>
     
     <div class="hidden name"><code>get_state.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>Exports the current state of the network as dataframe with each node as a row
-and columns for node id, parent id, node type, and node level.</p>
+and columns for node id, parent id, node type, and node level. Can also be
+accomplished by <code><a href='https://rdrr.io/r/base/attr.html'>attr(sbm, 'state')</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_state</span>(<span class='no'>sbm</span>)</pre>
+    <pre class="usage"><span class='fu'>get_state</span>(<span class='no'>x</span>)</pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>sbm</th>
-      <td><p>SBM model object as created by <code><a href='create_sbm.html'>create_sbm()</a></code>.</p></td>
-    </tr>
-    </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A dataframe describing the current state of the network:</p><dl class='dl-horizontal'>
-<dt>id</dt><dd><p>id of node</p></dd>
-<dt>parent</dt><dd><p>id of node's parent. <code>none</code> if node has no parent.</p></dd>
-<dt>type</dt><dd><p>type of node</p></dd>
-<dt>level</dt><dd><p>level of node in network hierarchy</p></dd>
-
+<dt>id</dt><dd><p>id of node</p></dd> <dt>parent</dt><dd><p>id of node's parent. <code>none</code> if node has
+no parent.</p></dd> <dt>type</dt><dd><p>type of node</p></dd> <dt>level</dt><dd><p>level of node in network
+hierarchy</p></dd> 
 </dl>
 
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other modeling: 
+<code><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a>()</code>,
+<code><a href='collapse_blocks.html'>collapse_blocks</a>()</code>,
+<code><a href='collapse_run.html'>collapse_run</a>()</code>,
+<code><a href='get_block_edge_counts.html'>get_block_edge_counts</a>()</code>,
+<code><a href='get_entropy.html'>get_entropy</a>()</code>,
+<code><a href='get_num_blocks.html'>get_num_blocks</a>()</code>,
+<code><a href='mcmc_sweep.html'>mcmc_sweep</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='co'># Build a bipartite network with 1 node and one block for each type</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='create_sbm.html'>create_sbm</a></span>() <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='add_node.html'>add_node</a></span>(<span class='st'>'a1'</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>'a'</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='add_node.html'>add_node</a></span>(<span class='st'>'a11'</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>'a'</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>1</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='add_node.html'>add_node</a></span>(<span class='st'>'b1'</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>'b'</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='add_node.html'>add_node</a></span>(<span class='st'>'b11'</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>'b'</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>1</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='set_node_parent.html'>set_node_parent</a></span>(<span class='st'>'a1'</span>, <span class='st'>'a11'</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='set_node_parent.html'>set_node_parent</a></span>(<span class='st'>'b1'</span>, <span class='st'>'b11'</span>)
+<span class='co'># Small edge list to build network</span>
+<span class='no'>edges</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>tribble</a></span>(
+  ~<span class='no'>from</span>, ~<span class='no'>to</span>,
+  <span class='st'>"a1"</span>   , <span class='st'>"b1"</span>   ,
+  <span class='st'>"a1"</span>   , <span class='st'>"b2"</span>   ,
+  <span class='st'>"a1"</span>   , <span class='st'>"b3"</span>   ,
+  <span class='st'>"a2"</span>   , <span class='st'>"b1"</span>   ,
+  <span class='st'>"a2"</span>   , <span class='st'>"b4"</span>   ,
+  <span class='st'>"a3"</span>   , <span class='st'>"b1"</span>
+)
 
-<span class='no'>my_sbm</span> <span class='kw'>%&gt;%</span> <span class='fu'>get_state</span>()</div><div class='output co'>#&gt;    id parent type level
-#&gt; 1  a1    a11    a     0
-#&gt; 2  b1    b11    b     0
-#&gt; 3 a11   none    a     1
-#&gt; 4 b11   none    b     1</div><div class='input'>
+<span class='co'># A small simulated network with no blocks</span>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='new_sbm_network.html'>new_sbm_network</a></span>(<span class='no'>edges</span>)
+
+<span class='fu'>get_state</span>(<span class='no'>net</span>)</div><div class='output co'>#&gt;   id parent type level
+#&gt; 1 a1   none node     0
+#&gt; 2 a2   none node     0
+#&gt; 3 a3   none node     0
+#&gt; 4 b1   none node     0
+#&gt; 5 b2   none node     0
+#&gt; 6 b3   none node     0
+#&gt; 7 b4   none node     0</div><div class='input'>
+<span class='co'># Add some blocks and state will reflect</span>
+<span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='fl'>2</span>) <span class='kw'>%&gt;%</span> <span class='fu'>get_state</span>()</div><div class='output co'>#&gt;      id parent type level
+#&gt; 1    a1  0-1_0 node     0
+#&gt; 2    a2  0-1_0 node     0
+#&gt; 3    a3  0-1_0 node     0
+#&gt; 4    b1  0-1_1 node     0
+#&gt; 5    b2  0-1_0 node     0
+#&gt; 6    b3  0-1_1 node     0
+#&gt; 7    b4  0-1_1 node     0
+#&gt; 8 0-1_0   none node     1
+#&gt; 9 0-1_1   none node     1</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

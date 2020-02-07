@@ -65,29 +65,19 @@ visualize_network(network, width = '100%')
 We can see a decent amount of separation with perhaps more cohesion between the green and blue nodes than the orange
 
 
-## Setting up SBM
-
-Now that we have our data we can load it into an SBM object and look at the first few nodes worth of summary. 
-
-```{r}
-my_sbm <- create_sbm(network)
-
-my_sbm %>% get_state() %>% head()
-```
-
-
 ### Initializing the chain location
 
 In an attempt to set our initial chain location to an optimal position we will agglomeratively merge the network using the collapse groups function. This will return a list of results for different model sizes. 
 
 ```{r}
-collapse_results <- my_sbm %>%
+network <- network %>%
   collapse_blocks(report_all_steps = TRUE, sigma = 1.1)
 ```
 
 
 ```{r}
-visualize_collapse_results(collapse_results, heuristic = 'dev_from_rolling_mean') +
+network %>% 
+  visualize_collapse_results(heuristic = 'dev_from_rolling_mean') +
   geom_vline(xintercept = n_blocks, color = 'orangered') +
   xlim(0,20)
 ```
@@ -98,7 +88,8 @@ So we can use the helper function `choose_best_collapse_state()` to scan through
 Right now we will stick with the deviation from rolling mean to choose the best number of blocks. 
 
 ```{r}
-my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, heuristic = "dev_from_rolling_mean", verbose = TRUE)
+network <- network %>% 
+  choose_best_collapse_state(heuristic = "dev_from_rolling_mean", verbose = TRUE)
 ```
 
 ### Visualizing these results. 
@@ -106,15 +97,17 @@ my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, heuristic = "dev_
 We can investigate the structure of this chosen partitioning against the true structure that we simulated using `visualize_network()`...
 
 ```{r extract_infered_blocks}
-merged_state <- my_sbm %>% 
-  get_state() %>% 
-  select(id, parent)
+true_to_inferred_table <- function(network){
+  right_join(get_state(network),
+             network$nodes,
+             by = 'id') %>% 
+    filter(level == 0) %>%
+    rename(inferred = parent) %>% {
+      table(.$inferred, .$block)
+    }
+}
 
-nodes_w_inferred_block <- network$nodes  %>%
-  left_join(merged_state, by = 'id') %>% 
-  rename(inferred = parent)
-
-table(nodes_w_inferred_block$inferred,nodes_w_inferred_block$block)
+true_to_inferred_table(network)
 ```
 
 So we already have a perfect separation into the `r n_blocks` blocks. This should be a good starting place for our sampling.
@@ -127,9 +120,13 @@ Now that we have our model in a starting place hopefully close to the median of 
 ```{r}
 num_sweeps <- 20
 
-sweep_results <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps, eps = 0.1, track_pairs = FALSE)
+network <- network %>%
+  mcmc_sweep(num_sweeps = num_sweeps, 
+             eps = 0.1, 
+             track_pairs = FALSE)
 
-visualize_mcmc_trace(sweep_results) +
+network %>% 
+  visualize_mcmc_trace() +
   labs(
     title = glue::glue('Result of {num_sweeps} MCMC sweeps'),
     subtitle = "Entropy Delta of sweep and number of nodes moved for sweep"
@@ -143,9 +140,13 @@ We can force it to explore a bit more by upping the epsilon value for the model.
 ```{r}
 num_sweeps <- 20
 
-sweep_results <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps, eps = 4, track_pairs = FALSE)
+network <- network %>% 
+  mcmc_sweep(num_sweeps = num_sweeps, 
+             eps = 4, 
+             track_pairs = FALSE)
 
-visualize_mcmc_trace(sweep_results) +
+network %>% 
+  visualize_mcmc_trace() +
   labs(
     title = glue::glue('Result of {num_sweeps} MCMC sweeps, eps = 4'),
     subtitle = "Entropy Delta of sweep and number of nodes moved for sweep"
@@ -154,13 +155,7 @@ visualize_mcmc_trace(sweep_results) +
 
 
 ```{r}
-nodes_w_inferred_block <- my_sbm %>% 
-  get_state() %>% 
-  select(id, parent) %>% 
-  right_join(network$nodes, by = 'id') %>% 
-  rename(inferred = parent)
-
-table(nodes_w_inferred_block$inferred,nodes_w_inferred_block$block)
+true_to_inferred_table(network)
 ```
 
 This increased epsilon value resulted mostly in some small groups being split of of the larger ones. A thing to note however, even though we have more groups than we should, never have an infered group that spans more than a single true group. 
@@ -172,24 +167,20 @@ Let's run 50 sweeps for a few different epsilon values and see how the traces co
 ```{r}
 # Function to run n sweeps from a freshly initialized model
 run_sweeps_at_eps <- function(eps, num_sweeps = 50){
-  # Load a fresh sbm right after collapsing initialization
-  fresh_sbm <- choose_best_collapse_state(my_sbm, collapse_results, heuristic = "dev_from_rolling_mean")
-  
-  # Run sweeps at given epsilon value and return results
-  mcmc_sweep(fresh_sbm, num_sweeps = num_sweeps, eps = eps)$sweep_info %>% 
-    mutate(sweep = 1:n(),
-           eps = eps,
-           label = glue::glue('eps = {eps}')) %>% 
-    pivot_longer(entropy_delta:num_nodes_moved)
+  # Refresh sbm to right after collapsing initialization
+  # and run sweeps at given epsilon value 
+  network %>% 
+    choose_best_collapse_state(heuristic = "dev_from_rolling_mean") %>% 
+    mcmc_sweep(num_sweeps = num_sweeps, eps = eps) %>% 
+    get_sweep_results() %>% 
+    pluck('sweep_info') %>% 
+    mutate(sweep = 1:n(), label = glue::glue('eps = {eps}'))
 }
 
-all_eps_results <- seq(from = 0.1, to = 10, length.out = 4) %>% 
-  map_dfr(run_sweeps_at_eps)
-
-all_eps_results %>% 
-  filter(name == 'entropy_delta') %>% 
+seq(from = 0.1, to = 10, length.out = 4) %>% 
+  map_dfr(run_sweeps_at_eps) %>% 
   mutate(label = forcats::fct_inorder(as.factor(label))) %>% 
-  ggplot(aes(x = sweep, y = value)) +
+  ggplot(aes(x = sweep, y = entropy_delta)) +
   geom_line() +
   facet_grid(label~.)
 ```
@@ -204,15 +195,16 @@ The `mcmc_sweep()` method has an option to keep track of how connected each node
 First we will run one hundred sweeps for nodes with epsilon set to 0.5. 
 
 ```{r}
-sweep_results <- my_sbm %>%
-  choose_best_collapse_state( collapse_results, heuristic = "dev_from_rolling_mean") %>% 
+network <- network %>% 
+  choose_best_collapse_state(heuristic = "dev_from_rolling_mean") %>% 
   mcmc_sweep(num_sweeps = 100, eps = 0.5, track_pairs = TRUE)
 ```
 
 Then we can look at the supplied `pairing_counts` dataframe to see how often pairwise nodes are connected to eachother. 
 
 ```{r}
-sweep_results$pairing_counts %>% 
+network %>% 
+  get_sweep_pair_counts() %>% 
   ggplot(aes(x = node_a, y = node_b, fill = proportion_connected)) +
   geom_raster() +
   theme(
@@ -232,7 +224,7 @@ A good behavior indicating there are strong clusters in your data is an ECDF tha
 
 
 ```{r}
-visualize_propensity_dist(sweep_results)
+visualize_propensity_dist(network)
 ```
 
 So we see a very strong flat line from zero all the way to a small bump at around 0.65 and then again a sharp bump right at one. This indicates that a few nodes sometimes split off into other groups. 
@@ -242,7 +234,7 @@ A last way of looking at this is to create a new network from our data. This tim
 Let's check our MCMC sweep results with it...
 
 ```{r}
-visualize_propensity_network(sweep_results)
+visualize_propensity_network(network)
 ```
 
 

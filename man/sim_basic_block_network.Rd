@@ -12,7 +12,8 @@ sim_basic_block_network(
   edge_dist = purrr::rbernoulli,
   allow_self_edges = FALSE,
   keep_edge_counts = FALSE,
-  return_edge_propensities = FALSE
+  return_edge_propensities = FALSE,
+  setup_model = FALSE
 )
 }
 \arguments{
@@ -42,14 +43,13 @@ want to set this to \code{TRUE}.}
 \item{return_edge_propensities}{If set to \code{TRUE} the returned list will
 also include the simulated edge propensities dataframe. This can be
 used for recreating draws using \code{\link{sim_sbm_network()}}.}
+
+\item{setup_model}{Should an SBM model object be added? Set to \code{FALSE} if
+network is just being visualized or described.}
 }
 \value{
-A list with a \code{nodes} dataframe (containing a node's \code{id} and \code{block}
-membership), an \code{edges} dataframe (containing \code{from} and \code{to} nodes along
-with the total number of \code{edges} as drawn from \code{edge_dist}), and if
-\code{return_edge_propensities == TRUE}: \code{edge_propensities}
-dataframe that shows the randomly drawn edge propensities between
-blocks.
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Simulates a simple block structured network with a desired number of constant
@@ -59,9 +59,37 @@ used as the propensity parameter for drawing edge counts from a node pair.
 The default values will draw propensity values for bernouli edges with an
 average of a 50\% chance of edge.
 }
+\details{
+If \code{return_edge_propensities == TRUE}: an \verb{$edge_propensities} slot is added
+to the returned \code{sbm_network} object containing a dataframe that shows the
+randomly drawn edge propensities between blocks.
+}
 \examples{
-sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 10)
+
+sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 40)
+
+sim_basic_block_network(n_blocks = 8, n_nodes_per_block = 20)
+
+# Can save the generating edge propensities as well
+net <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 20, return_edge_propensities = TRUE)
+net$edge_propensities
+
+
+right_skewed_beta <- function(n) rbeta(n, 1, 5)
+
+# Distribution that draws propensities can be customized
+net <- sim_basic_block_network(n_blocks = 4,
+                               n_nodes_per_block = 20,
+                               return_edge_propensities = TRUE,
+                               propensity_drawer = right_skewed_beta)
+net$edge_propensities
+
 }
 \seealso{
 \code{\link{sim_sbm_network}} \code{\link{sim_random_network}}
+
+Other simulations: 
+\code{\link{sim_random_network}()},
+\code{\link{sim_sbm_network}()}
 }
+\concept{simulations}

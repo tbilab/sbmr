@@ -7,7 +7,8 @@
 set_node_parent(sbm, child_id, parent_id, level = 0)
 }
 \arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
+\item{sbm}{\code{sbm_network} object as created by
+\code{\link{new_sbm_network()}}.}
 
 \item{child_id}{Id of node for which parent is being added}
 
@@ -17,7 +18,8 @@ set_node_parent(sbm, child_id, parent_id, level = 0)
 value of \code{0}.}
 }
 \value{
-SBM model object modified with node hierarchy modified. \emph{Note that object is modified in place as well.}
+An S3 object of class \code{sbm_network}. For details see
+\link{new_sbm_network} section "Class structure."
 }
 \description{
 Sets the parent node (or block) for a given node. Takes child node's id
@@ -26,12 +28,33 @@ Sets the parent node (or block) for a given node. Takes child node's id
 \examples{
 
 # Create a model with two nodes, one at the block level (1)
-my_sbm <- create_sbm() \%>\%
-  add_node('node_1') \%>\%
-  add_node('node_11', level = 1)
+# Start with bipartite network with 6 nodes
+net <- dplyr::tribble(
+  ~a_node, ~b_node,
+  "a1"   , "b1"   ,
+  "a1"   , "b2"   ,
+  "a1"   , "b3"   ,
+  "a2"   , "b1"   ,
+  "a3"   , "b1"
+) \%>\%
+  new_sbm_network(bipartite_edges = TRUE,
+                  edges_from_col = a_node,
+                  edges_to_col = b_node)
 
-# Assign node 11 as node 1's parent
-my_sbm \%>\%
-  set_node_parent(child_id = 'node_1', parent_id = 'node_11')
+get_state(net)
+
+# Make a parent node and assign it to a1
+net <- set_node_parent(net, child_id = 'a1', parent_id = 'a1_parent')
+
+get_state(net)
 
 }
+\seealso{
+Other advanced: 
+\code{\link{add_edge}()},
+\code{\link{add_node}()},
+\code{\link{get_node_to_block_edge_counts}()},
+\code{\link{initialize_blocks}()},
+\code{\link{update_state}()}
+}
+\concept{advanced}

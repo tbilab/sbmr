@@ -4,10 +4,7 @@
 \alias{visualize_mcmc_trace}
 \title{Trace plot of multiple MCMC sweep sweeps}
 \usage{
-visualize_mcmc_trace(sweep_results)
-}
-\arguments{
-\item{sweep_results}{Results of running \code{sbmR::mcmc_sweep()}}
+visualize_mcmc_trace(sbm)
 }
 \value{
 GGplot line plot with x-axis as sweep number and y-axes as sweep
@@ -15,21 +12,24 @@ entropy delta and number of nodes moved during sweep.
 }
 \description{
 A simple line plot showing both the entropy delta and the number of nodes
-moved for each sweep.
+moved for each sweep. \code{sbmR::mcmc_sweep()} must be run on object before this function.
 }
 \examples{
 
-set.seed(42)
-
-# Start with a random network and assign randomly to 4 blocks
-n_blocks <- 3
-my_sbm <- create_sbm(sim_basic_block_network(n_blocks = n_blocks, n_nodes_per_block = 15)) \%>\%
-  initialize_blocks(num_blocks = n_blocks)
-
-# Run 25 MCMC sweeps
-sweep_results <- my_sbm \%>\% mcmc_sweep(num_sweeps = 25, variable_num_blocks = FALSE)
+# Simulate a model and run mcmc sweeps on it
+net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) \%>\%
+  initialize_blocks(3) \%>\%
+  mcmc_sweep(num_sweeps = 75, track_pairs = TRUE)
 
 # Plot results
-visualize_mcmc_trace(sweep_results)
+visualize_mcmc_trace(net)
 
 }
+\seealso{
+Other visualizations: 
+\code{\link{visualize_collapse_results}()},
+\code{\link{visualize_network}()},
+\code{\link{visualize_propensity_dist}()},
+\code{\link{visualize_propensity_network}()}
+}
+\concept{visualizations}

@@ -13,6 +13,8 @@
 #'
 #' This is used internally to compute elbow points in entropy calculations
 #'
+#' @family helpers
+#'
 #' @param vec A vector of numeric values
 #' @param window Size of rolling mean to compare against
 #'

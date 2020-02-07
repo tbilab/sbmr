@@ -2,36 +2,51 @@
 % Please edit documentation in R/get_state.R
 \name{get_state}
 \alias{get_state}
-\title{Dump state of model to dataframe}
+\title{Dump state of current SBM model to dataframe}
 \usage{
-get_state(sbm)
-}
-\arguments{
-\item{sbm}{SBM model object as created by \code{\link{create_sbm()}}.}
+get_state(x)
 }
 \value{
 A dataframe describing the current state of the network: \describe{
-\item{id}{id of node}
-\item{parent}{id of node's parent. \code{none} if node has no parent.}
-\item{type}{type of node}
-\item{level}{level of node in network hierarchy}
-}
+\item{id}{id of node} \item{parent}{id of node's parent. \code{none} if node has
+no parent.} \item{type}{type of node} \item{level}{level of node in network
+hierarchy} }
 }
 \description{
 Exports the current state of the network as dataframe with each node as a row
-and columns for node id, parent id, node type, and node level.
+and columns for node id, parent id, node type, and node level. Can also be
+accomplished by \code{attr(sbm, 'state')}.
 }
 \examples{
 
-# Build a bipartite network with 1 node and one block for each type
-my_sbm <- create_sbm() \%>\%
-  add_node('a1', type = 'a') \%>\%
-  add_node('a11', type = 'a', level = 1) \%>\%
-  add_node('b1', type = 'b') \%>\%
-  add_node('b11', type = 'b', level = 1) \%>\%
-  set_node_parent('a1', 'a11') \%>\%
-  set_node_parent('b1', 'b11')
+# Small edge list to build network
+edges <- dplyr::tribble(
+  ~from, ~to,
+  "a1"   , "b1"   ,
+  "a1"   , "b2"   ,
+  "a1"   , "b3"   ,
+  "a2"   , "b1"   ,
+  "a2"   , "b4"   ,
+  "a3"   , "b1"
+)
 
-my_sbm \%>\% get_state()
+# A small simulated network with no blocks
+net <- new_sbm_network(edges)
+
+get_state(net)
+
+# Add some blocks and state will reflect
+net \%>\% initialize_blocks(2) \%>\% get_state()
 
 }
+\seealso{
+Other modeling: 
+\code{\link{choose_best_collapse_state}()},
+\code{\link{collapse_blocks}()},
+\code{\link{collapse_run}()},
+\code{\link{get_block_edge_counts}()},
+\code{\link{get_entropy}()},
+\code{\link{get_num_blocks}()},
+\code{\link{mcmc_sweep}()}
+}
+\concept{modeling}

@@ -1,35 +1,40 @@
 #' Compute entropy for current model state
 #'
-#' Computes the (degree-corrected) entropy for the network at the specified
-#' level (int).
+#' Computes the (degree-corrected) entropy for the network at the node level.
+#'
+#' @family modeling
 #'
 #' @inheritParams add_node
-#' @param level Level of nodes for which block entropy is accessed. E.g. the
-#'   default value of `0` will get entropy of model as described by the blocks
-#'   in level `1`.
 #'
 #' @return Entropy value (numeric).
 #' @export
 #'
 #' @examples
 #'
-#' # Build basic network with 3 nodes and two blocks
-#' my_sbm <- create_sbm() %>%
-#'   add_node('node_1') %>%
-#'   add_node('node_2') %>%
-#'   add_node('node_3') %>%
-#'   add_node('node_11', level = 1) %>%
-#'   add_node('node_12', level = 1) %>%
-#'   add_edge('node_1', 'node_2') %>%
-#'   add_edge('node_1', 'node_3') %>%
-#'   add_edge('node_2', 'node_3') %>%
-#'   set_node_parent(child_id = 'node_1', parent_id = 'node_11') %>%
-#'   set_node_parent(child_id = 'node_2', parent_id = 'node_11') %>%
-#'   set_node_parent(child_id = 'node_3', parent_id = 'node_12')
+#' set.seed(42)
 #'
-#' # Compute entropy of network
-#' get_entropy(my_sbm)
+#' # Start with a small simulated network with random block assignments
+#' net <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 15) %>%
+#'   initialize_blocks(num_blocks = 4)
 #'
-get_entropy <- function(sbm, level = 0){
-  sbm$get_entropy(as.integer(level))
+#' # Calculate entropy with random blocks
+#' get_entropy(net)
+#'
+#' # Run some MCMC sweeps
+#' net <- mcmc_sweep(net, num_sweeps = 25, variable_num_blocks = FALSE)
+#'
+#' # Entropy after sweeps
+#' get_entropy(net)
+#'
+get_entropy <- function(sbm){
+  UseMethod("get_entropy")
+}
+
+get_entropy.default <- function(sbm){
+  cat("get_entropy generic")
+}
+
+#' @export
+get_entropy.sbm_network <- function(sbm){
+  attr(verify_model(sbm), 'model')$get_entropy(0L)
 }

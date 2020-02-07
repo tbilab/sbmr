@@ -137,7 +137,8 @@ who's main parameter the <code>propensity</code> value defines are needed.</p>
   <span class='no'>edge_propensities</span>,
   <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='no'>rpois</span>,
   <span class='kw'>allow_self_edges</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>keep_edge_counts</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+  <span class='kw'>keep_edge_counts</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>setup_model</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -176,13 +177,22 @@ themselves?</p></td>
 edges? If edges distribution is a binary yes or no then you will likely
 want to set this to <code>TRUE</code>.</p></td>
     </tr>
+    <tr>
+      <th>setup_model</th>
+      <td><p>Should an SBM model object be added? Set to <code>FALSE</code> if
+network is just being visualized or described.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list with a <code>nodes</code> dataframe (containing a node's <code>id</code> and <code>block</code>
-membership) and a <code>edges</code> dataframe (containing <code>from</code> and <code>to</code> nodes along
-with the total number of <code>edges</code> as drawn from <code>edge_dist</code>.)</p>
+    <p>An S3 object of class <code>sbm_network</code>. For details see
+<a href='new_sbm_network.html'>new_sbm_network</a> section "Class structure."</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other simulations: 
+<code><a href='sim_basic_block_network.html'>sim_basic_block_network</a>()</code>,
+<code><a href='sim_random_network.html'>sim_random_network</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>block_info</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>tribble</a></span>(
@@ -202,38 +212,28 @@ with the total number of <code>edges</code> as drawn from <code>edge_dist</code>
       <span class='st'>"c"</span>,      <span class='st'>"c"</span>,         <span class='fl'>0.4</span>,
 )
 
-<span class='fu'>sim_sbm_network</span>(<span class='no'>block_info</span>, <span class='no'>edge_propensities</span>, <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='no'><a href='https://purrr.tidyverse.org/reference/rbernoulli.html'>rbernoulli</a></span>)</div><div class='output co'>#&gt; $nodes
-#&gt; <span style='color: #555555;'># A tibble: 37 x 2</span><span>
-#&gt;    id    block
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> a_1   a    
-#&gt; </span><span style='color: #555555;'> 2</span><span> a_2   a    
-#&gt; </span><span style='color: #555555;'> 3</span><span> a_3   a    
-#&gt; </span><span style='color: #555555;'> 4</span><span> a_4   a    
-#&gt; </span><span style='color: #555555;'> 5</span><span> a_5   a    
-#&gt; </span><span style='color: #555555;'> 6</span><span> a_6   a    
-#&gt; </span><span style='color: #555555;'> 7</span><span> a_7   a    
-#&gt; </span><span style='color: #555555;'> 8</span><span> a_8   a    
-#&gt; </span><span style='color: #555555;'> 9</span><span> a_9   a    
-#&gt; </span><span style='color: #555555;'>10</span><span> a_10  a    
-#&gt; </span><span style='color: #555555;'># … with 27 more rows</span><span>
-#&gt; 
-#&gt; $edges
-#&gt; </span><span style='color: #555555;'># A tibble: 259 x 3</span><span>
-#&gt;    from  to    edges
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> a_1   a_2       1
-#&gt; </span><span style='color: #555555;'> 2</span><span> a_1   a_3       1
-#&gt; </span><span style='color: #555555;'> 3</span><span> a_1   a_4       1
-#&gt; </span><span style='color: #555555;'> 4</span><span> a_1   a_6       1
-#&gt; </span><span style='color: #555555;'> 5</span><span> a_1   a_7       1
-#&gt; </span><span style='color: #555555;'> 6</span><span> a_1   a_8       1
-#&gt; </span><span style='color: #555555;'> 7</span><span> a_1   a_10      1
-#&gt; </span><span style='color: #555555;'> 8</span><span> a_1   b_3       1
-#&gt; </span><span style='color: #555555;'> 9</span><span> a_1   b_10      1
-#&gt; </span><span style='color: #555555;'>10</span><span> a_2   a_4       1
-#&gt; </span><span style='color: #555555;'># … with 249 more rows</span><span>
-#&gt; </div><div class='input'>
+<span class='fu'>sim_sbm_network</span>(<span class='no'>block_info</span>, <span class='no'>edge_propensities</span>, <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='no'><a href='https://purrr.tidyverse.org/reference/rbernoulli.html'>rbernoulli</a></span>)</div><div class='output co'>#&gt; SBM Network with 37 nodes of a single type and 245 edges. 
+#&gt;  
+#&gt; Nodes: <span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt;   id    block type 
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> a_1   a     node 
+#&gt; </span><span style='color: #555555;'>2</span><span> a_2   a     node 
+#&gt; </span><span style='color: #555555;'>3</span><span> a_3   a     node 
+#&gt; </span><span style='color: #555555;'>4</span><span> a_4   a     node 
+#&gt; </span><span style='color: #555555;'>5</span><span> a_5   a     node 
+#&gt; ... 
+#&gt;  
+#&gt; Edges: </span><span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt;   from  to    edges
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> a_1   a_2       1
+#&gt; </span><span style='color: #555555;'>2</span><span> a_1   a_3       1
+#&gt; </span><span style='color: #555555;'>3</span><span> a_1   a_4       1
+#&gt; </span><span style='color: #555555;'>4</span><span> a_1   a_9       1
+#&gt; </span><span style='color: #555555;'>5</span><span> a_1   a_10      1
+#&gt; ... 
+#&gt;  </div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -241,6 +241,7 @@ with the total number of <code>edges</code> as drawn from <code>edge_dist</code>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
+      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 
