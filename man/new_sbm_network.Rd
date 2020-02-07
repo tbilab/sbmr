@@ -40,7 +40,7 @@ detected by function? Usefull to disable when not running in an interactive
 mode etc.}
 }
 \value{
-
+An S3 object of class \code{sbm_network} containing data (\verb{$edges} and \verb{$nodes}) and internal model object (\verb{$model}).
 }
 \description{
 Constructs an object with the \code{sbm_network} class. Takes as input at a
@@ -49,6 +49,47 @@ contain addition information about the nodes in the network. A helper for
 allowing bipartite structure is provided which will treat either side of
 passed edges dataframe as two different types of nodes.
 }
+\section{Class structure}{
+
+
+The \code{sbm_network} class is an S3 class with two minimum components:
+
+\describe{
+\item{\verb{$edges}}{Edges that the network is built out of.
+This is simply the passed \code{edges} input to the function.}
+\item{\verb{$nodes}}{Nodes that the edges connect. This is either the passed \code{nodes} input or
+is created from the \code{edges} input automatically by listing the unique node
+ids seen in the edges.}
+}
+
+Often a third value \verb{$model} is present as well. This is an S4 class that is
+exported by the C++ code used to implement all the modeling algorithms. Most
+of the time the user should not have to interact with this object and thus it
+can be ignored.
+
+If the method \code{\link{mcmc_sweep}} has been run on the \code{sbm_network}
+object then a \verb{$sweep_result} slot will be added. For more info see
+\code{\link{mcmc_sweep}}.
+
+If either of the methods \code{\link{collapse_groups}} or
+\code{\link{collapse_run}} have been applied to the \code{sbm_network} object then
+the slot \verb{$collapse_result} will be append.
+
+A few attributes are contained by the class as well:
+
+\describe{
+\item{\code{n_nodes}}{Number of unique nodes in the current model. Equivalent to
+\code{nrow(sbm_network$nodes)}.}
+\item{\code{n_edges}}{Number of edges in the current model. Equivalent to
+\code{nrow(sbm_network$edges)}.}
+\item{\code{from_column}}{Raw quosure representing the
+\code{edges_from_column} argument. This is kept so
+bipartite network types can be inferred and no modification of the passed
+\code{edges} dataframe needs to take place.}
+\item{\code{to_column}}{Same as \code{from_column}}
+}
+}
+
 \examples{
 
 # Build small object from simple edge dataframe
