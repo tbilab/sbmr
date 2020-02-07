@@ -16,16 +16,11 @@
 #' set.seed(42)
 #'
 #' # Start with a random network of two blocks with 25 nodes each
-#' network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25)
-#'
-#' # Create SBM from simulated data
-#' my_sbm <- create_sbm(network)
-#'
-#' # Run agglomerative clustering with no intermediate MCMC steps on network
-#' collapse_results <- collapse_run(my_sbm, sigma = 3, num_final_blocks = 1:6)
+#' net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) %>%
+#'   collapse_blocks(sigma = 2)
 #'
 #' # Choose best result with default heuristic
-#' my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, verbose = TRUE)
+#' net <- choose_best_collapse_state(net, verbose = TRUE)
 #'
 #' # Score heuristic that fits a nonlinear model to observed values and chooses by largest negative residual
 #' nls_score <- function(e, k){
@@ -34,8 +29,7 @@
 #' }
 #'
 #' # Choose result using custom heuristic function
-#' my_sbm <- choose_best_collapse_state(my_sbm,
-#'                                      collapse_results,
+#' my_sbm <- choose_best_collapse_state(net,
 #'                                      heuristic = nls_score,
 #'                                      verbose = TRUE)
 #'
@@ -58,7 +52,6 @@ choose_best_collapse_state.sbm_network <- function(sbm,
                                                    use_entropy_value_for_score = FALSE,
                                                    heuristic = 'dev_from_rolling_mean',
                                                    verbose = FALSE){
-
   collapse_results <- get_collapse_results(sbm)
 
   # Apply the heuristic on the entropy column and choose the higheset value
