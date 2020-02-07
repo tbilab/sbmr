@@ -10,18 +10,17 @@ test_that("MCMC Sweeps function as expected", {
     initialize_blocks(num_blocks = n_blocks)
 
   sweep_and_check_n_blocks <- function(i, variable_num_blocks, sbm){
-    sweep <- mcmc_sweep(net, variable_num_blocks = variable_num_blocks)
-    sweep$total_num_blocks <- get_num_blocks(sweep$sbm_network)
-    sweep
+    net %>%
+      mcmc_sweep(variable_num_blocks = variable_num_blocks) %>%
+      get_num_blocks()
   }
 
   # Run MCMC sweeps that do not allow block numbers to change
   n_blocks_stays_same_results <- 1:n_sweeps %>%
-    purrr::map(sweep_and_check_n_blocks, variable_num_blocks = FALSE, sbm = my_sbm)
+    purrr::map_int(sweep_and_check_n_blocks, variable_num_blocks = FALSE, sbm = my_sbm)
 
   # Every step should result in the same number of blocks in model
   n_blocks_stays_same_results %>%
-    purrr::map_int('total_num_blocks') %>%
     magrittr::equals(n_blocks) %>%
     all() %>%
     expect_true()
@@ -29,11 +28,10 @@ test_that("MCMC Sweeps function as expected", {
 
   # Now let the model change number of blocks and see if it ever does
   n_blocks_changes <- 1:n_sweeps %>%
-    purrr::map(sweep_and_check_n_blocks, variable_num_blocks = TRUE, sbm = my_sbm)
+    purrr::map_int(sweep_and_check_n_blocks, variable_num_blocks = TRUE, sbm = my_sbm)
 
   # Expect at least one block change
   n_blocks_changes %>%
-    purrr::map_int('total_num_blocks') %>%
     magrittr::equals(n_blocks) %>%
     magrittr::not() %>%
     any() %>%
@@ -49,14 +47,14 @@ test_that("Pair tracking can be enabled and disabled",{
     initialize_blocks(num_blocks = 5)
 
   # Run a few sweeps where pair tracking is enabled
-  pair_tracking_sweeps <- mcmc_sweep(net, num_sweeps = num_sweeps, track_pairs = TRUE)
+  pair_tracking_sweeps <- mcmc_sweep(net, num_sweeps = num_sweeps, track_pairs = TRUE)$mcmc_sweeps
 
   expect_true(
     exists('pairing_counts', where = pair_tracking_sweeps)
   )
 
   # Run a few sweeps without pair tracking
-  no_pair_tracking_sweeps <- mcmc_sweep(net, num_sweeps = num_sweeps, track_pairs = FALSE)
+  no_pair_tracking_sweeps <- mcmc_sweep(net, num_sweeps = num_sweeps, track_pairs = FALSE)$mcmc_sweeps
   expect_false(
     exists('pairing_counts', where=no_pair_tracking_sweeps)
   )
@@ -76,7 +74,7 @@ test_that("No nodes should have pairs for more steps than number of sweeps",{
     # Run a few sweeps where pair tracking is enabled
     pair_connections <- mcmc_sweep(initialize_blocks(net,5),
                                    num_sweeps = num_sweeps,
-                                   track_pairs = TRUE)$pairing_counts
+                                   track_pairs = TRUE)$mcmc_sweeps$pairing_counts
 
 
     # Make sure that none of the times connected exceeds the number of sweeps requested

@@ -46,28 +46,21 @@ test_that("State tracking returns the correct state", {
 test_that("No costly duplication of S4 class is done when assigning s3 class copies.", {
 
   net <- sim_basic_block_network(n_blocks = 3,
-                                     n_nodes_per_block = 40,
-                                     setup_model = TRUE) %>%
+                                 n_nodes_per_block = 40,
+                                 setup_model = TRUE) %>%
     initialize_blocks(num_blocks = 5)
 
   # Take snapshot of model and state before sweep
   pre_sweep_model_address <- lobstr::obj_addr(net$model)
 
   # Run MCMC sweep
-  mcmc_results <- net %>% mcmc_sweep(num_sweeps = 25)
+  net_after_sweeps <- net %>% mcmc_sweep(num_sweeps = 25)
 
   # Take snapshot after sweep
-  post_sweep_model_address <- lobstr::obj_addr(net$model)
+  post_sweep_model_address <- lobstr::obj_addr(net_after_sweeps$model)
 
-  # The addresses and the directly accessed state should stay the same
-
-  # Load up returned sbm_network from results
-  post_sweep_returned_sbm_model_address <- lobstr::obj_addr(mcmc_results$sbm_network$model)
-
-  # All objects should be equal
+  # Addresses should be equal
   expect_equal(pre_sweep_model_address, post_sweep_model_address)
-  expect_equal(pre_sweep_model_address, post_sweep_returned_sbm_model_address)
-  expect_equal(post_sweep_model_address, post_sweep_returned_sbm_model_address)
 })
 
 test_that("S3 class attributes are immutable", {
