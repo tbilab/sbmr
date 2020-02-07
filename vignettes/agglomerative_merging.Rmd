@@ -11,7 +11,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.width = 6
+  fig.width = 6,
+  warning = FALSE
 )
 
 library(sbmR)
@@ -198,7 +199,7 @@ Let's try our above merging run with 5 MCMC sweeps after each step.
 ```{r collapse_w_shuffle}
 network <- network %>% 
   collapse_blocks(sigma = 0.9, 
-                  num_mcmc_sweeps = 5,
+                  num_mcmc_sweeps = 3,
                   report_all_steps = TRUE)
 
 visualize_collapse_results(network, heuristic = 'dev_from_rolling_mean') +
@@ -298,7 +299,7 @@ Let's try setting sigma to `1.5` and seeing how both the collapse performs and h
 First time the normal exhaustive collapse...
 ```{r}
 full_collapse_time <- system.time({
-  network <- collapse_blocks(network, sigma = 0.9, report_all_steps = TRUE)
+  collapse_blocks(network, sigma = 0.9, report_all_steps = TRUE)
 })
 
 full_collapse_time
@@ -309,7 +310,7 @@ Now raise sigma to 1.5 and time...
 
 ```{r}
 raised_sigma_collapse_time <- system.time({
-  network <- collapse_blocks(network, sigma = 1.5, report_all_steps = TRUE)
+  collapse_blocks(network, sigma = 1.5, report_all_steps = TRUE)
 })
 
 raised_sigma_collapse_time
@@ -320,6 +321,8 @@ Just by increasing sigma to 1.5 we have sped up the collapsing by `r round(full_
 Speed isn't important if the model isnt working properly, however. So let's see how the collapse worked.
 
 ```{r}
+network <- collapse_blocks(network, sigma = 1.5, report_all_steps = TRUE)
+
 visualize_collapse_results(network, heuristic = "dev_from_rolling_mean") +
   axis_limits +
   true_num_clusters_line +
@@ -356,13 +359,11 @@ The parallel argument is particularly valuable as it exploits the fact that each
 Lets try it on our model scanning from 1-10 groups using sigma of `1.5` and `5` mcmc sweeps for each individual collapse. 
 
 ```{r parallel_collapse_run}
-system.time({
-  network <- network %>% 
-    collapse_run(num_final_blocks = 1:10, 
-                 sigma = 1.5,
-                 num_mcmc_sweeps = 5,
-                 parallel = TRUE)
-})
+network <- network %>% 
+  collapse_run(num_final_blocks = 1:10, 
+               sigma = 1.5,
+               num_mcmc_sweeps = 5,
+               parallel = TRUE)
 ```
 
 
