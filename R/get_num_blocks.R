@@ -9,11 +9,28 @@
 #' @export
 #'
 #' @examples
-#'network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 40, setup_model = TRUE) %>%
-#'   initialize_blocks(num_blocks = 5)
 #'
-#' # Returns the number of blocks currently in model. Note this is not neccesarily the true number.
-#' get_num_blocks(network)
+#' # Small edge list to build network
+#' edges <- dplyr::tribble(
+#'   ~from, ~to,
+#'   "a1"   , "b1"   ,
+#'   "a1"   , "b2"   ,
+#'   "a1"   , "b3"   ,
+#'   "a2"   , "b1"   ,
+#'   "a2"   , "b4"   ,
+#'   "a3"   , "b1"
+#' )
+#'
+#' # A small simulated network with no blocks
+#' net <- new_sbm_network(edges)
+#'
+#' get_num_blocks(net)
+#'
+#' # Add some two random blocks
+#' net %>% initialize_blocks(2) %>% get_num_blocks()
+#'
+#' # Add a block per node
+#' net %>% initialize_blocks() %>% get_num_blocks()
 #'
 get_num_blocks <- function(sbm){
   UseMethod("get_num_blocks")
