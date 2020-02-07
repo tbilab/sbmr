@@ -17,11 +17,21 @@
 #'
 #' @examples
 #'
-#' my_sbm <- create_sbm() %>%
-#'   add_node('node_1') %>%
-#'   add_node('node_2')
+#' # Start with network with 5 nodes.
+#' net <- sim_random_network(n_nodes = 5, prob_of_edge = 1, setup_model = TRUE)
 #'
-#' get_state(my_sbm)
+#' # Verify nodes
+#' net$nodes
+#' net %>% get_state()
+#'
+#' # Add two nodes
+#' net <- net %>%
+#'   add_node('new_node1', type = 'node') %>%
+#'   add_node('new_node2', type = 'node')
+#'
+#' # New nodes are added to node data and state
+#' net$nodes
+#' net %>% get_state()
 #'
 add_node <- function(sbm, id, type = NULL, show_messages = TRUE){
   UseMethod("add_node")
