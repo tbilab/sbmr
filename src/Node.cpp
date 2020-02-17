@@ -160,11 +160,11 @@ inline NodePtr Node::get_parent_at_level(const int level_of_parent)
 }
 
 // =============================================================================
-// Get all nodes connected to Node at a given level.
+// Get all nodes connected to Node at a given level with specified type
 // We return a vector because we need random access to elements in this array
 // and that isn't provided to us with the list format.
 // =============================================================================
-NodeVec Node::get_edges_to_level(const int desired_level)
+NodeVec Node::get_edges_to_level(const int desired_level, const int node_type)
 {
   // Vector to return containing parents at desired level for edges
   NodeVec level_cons;
@@ -175,7 +175,9 @@ NodeVec Node::get_edges_to_level(const int desired_level)
   // Go through every child node's edges list, find parent at
   // desired level and place in connected nodes vector
   for (const auto& edge : edges) {
-    level_cons.push_back(edge->get_parent_at_level(desired_level));
+    if(edge->type == node_type){
+      level_cons.push_back(edge->get_parent_at_level(desired_level));
+    }
   }
 
   return level_cons;

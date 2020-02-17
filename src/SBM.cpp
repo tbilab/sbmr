@@ -10,9 +10,10 @@ NodePtr SBM::propose_move(const NodePtr node, const double eps)
   PROFILE_FUNCTION();
 
   const int block_level = node->level + 1;
+  const int node_type = node->type;
 
   // Grab a list of all the blocks that the node could join
-  const NodeVec potential_blocks = get_nodes_of_type_at_level(node->type, block_level);
+  const NodeVec potential_blocks = get_nodes_of_type_at_level(node_type, block_level);
 
   // Sample a random neighbor of node
   const NodePtr rand_neighbor = sampler.sample(node->edges)->get_parent_at_level(node->level);
@@ -26,7 +27,7 @@ NodePtr SBM::propose_move(const NodePtr node, const double eps)
 
   // Decide where we will get new block from and draw from potential candidates
   return sampler.draw_unif() < prob_of_random_block ? sampler.sample(potential_blocks)
-                                                    : sampler.sample(rand_neighbor->get_edges_to_level(block_level));
+                                                    : sampler.sample(rand_neighbor->get_edges_to_level(block_level, node_type));
 }
 
 // =============================================================================
@@ -69,6 +70,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 
   for (const auto& edge : node->edges) {
     const NodePtr edge_block = edge->get_parent_at_level(block_level);
+    
     if (edge_block == old_block) {
       node_to_old_block++;
     }
