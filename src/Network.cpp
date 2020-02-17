@@ -170,6 +170,15 @@ void Network::add_edge(const string node1_id, const string node2_id)
 };
 
 // =============================================================================
+// Add an alowed pairing of node types for edges
+// =============================================================================
+void Network::add_allowed_node_type_combos(const int from_type, const int to_type)
+{
+  edge_type_pairs[from_type].insert(to_type);
+  edge_type_pairs[to_type].insert(from_type);
+}
+
+// =============================================================================
 // Builds and assigns a block node for every node in a given level
 // =============================================================================
 void Network::give_every_node_at_level_own_block(const int level)
