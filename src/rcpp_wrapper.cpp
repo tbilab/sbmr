@@ -12,10 +12,33 @@ class Rcpp_SBM : public SBM {
   std::unordered_map<string, int> type_string_to_int;
   std::unordered_map<int, string> type_int_to_string;
 
+  bool specified_allowed_edges = false;
+
   // Keeps track of all the edges for graph so object can be copied within r
   // without needing a whole new set of the generating data
   std::list<std::string> edges_from;
   std::list<std::string> edges_to;
+
+  // Add allowed edge pairs to the object. Overwrites previous work if it was there
+  void add_allowed_pairs(const std::vector<std::string> from_type,
+                         const std::vector<std::string> to_type)
+  {
+    // Clear old allowed pairs (if they exist)
+    edge_type_pairs.clear();
+
+    // Convert the types to the model-language integer types
+    const std::vector<std::string> from_type_ints = type_to_int(from_type);
+    const std::vector<std::string> to_type_ints   = type_to_int(to_type);
+
+    // Add pairs to network map of allowed pairs
+    const int num_pairs = from_type.size();
+    for (int i = 0; i < num_pairs; i++) {
+      add_allowed_node_type_combos(from_type_ints[i], to_type_ints[i]);
+    }
+
+    // Let object know that we're working with specified types now.
+    specified_allowed_edges = true;
+  }
 
   void add_node(const std::string id, const std::string type, const int level)
   {
@@ -62,8 +85,27 @@ class Rcpp_SBM : public SBM {
 
   void add_edge(const std::string node_a_id, const std::string node_b_id)
   {
-    SBM::add_edge(find_node_by_id(node_a_id, 0),
-                  find_node_by_id(node_b_id, 0));
+    const NodePtr node_a = find_node_by_id(node_a_id, 0);
+    const NodePtr node_b = find_node_by_id(node_b_id, 0);
+
+    const int node_a_type = get_int_type(node_a->type);
+    const int node_b_type = get_int_type(node_b->type);
+
+    // If the user has specified allowed edges explicitely, make sure that this edge follows protocol
+    if (specified_allowed_edges) {
+      const bool a_to_b_bad = !(edge_type_pairs.at(node_a_type).count(node_b_type));
+      const bool b_to_a_bad = !(edge_type_pairs.at(node_b_type).count(node_a_type));
+
+      if (a_to_b_bad | b_to_a_bad) {
+        stop("Edge of " + node_a_id + " - " + node_b_id + " does not fit allowed specified allowed_edge_pairs type combos.");
+      }
+    }
+    else {
+      // If the user has not specified the allowed edges explicitely, then build allowed combos from the edges
+      add_allowed_node_type_combos(node_a_type, node_b_type);
+    }
+
+    SBM::add_edge(node_a, node_b);
 
     // Add edge to the edges vector
     edges_from.push_back(node_a_id);
@@ -84,6 +126,21 @@ class Rcpp_SBM : public SBM {
 
     return string_types;
   }
+
+  int get_int_type(const std::string& string_type)
+  {
+    // Attempt to locate string type in string-to-int map
+    const auto loc_of_int_type = type_string_to_int.find(string_type);
+
+    // If type is not in map, throw an error
+    if (loc_of_int_type == type_string_to_int.end()) {
+      stop(type + " not found in model");
+    }
+
+    // Convert string to int and return
+    return loc_of_int_type->second;
+  }
+
   // Convert the types from strings to integers
   std::vector<int> type_to_int(const std::vector<string>& string_types)
   {
@@ -91,16 +148,8 @@ class Rcpp_SBM : public SBM {
     int_types.reserve(string_types.size());
 
     for (const auto& type : string_types) {
-      // Make sure that the requested type has been seen by the model already and
-      // send message to R if it hasnt.
-      const auto loc_of_int_type = type_string_to_int.find(type);
-      if (loc_of_int_type == type_string_to_int.end()) {
-        stop(type + " not found in model");
-      }
-      else {
-        // Convert string to int and push to vector
-        int_types.push_back(loc_of_int_type->second);
-      }
+      // Convert string to int and push to vector
+      int_types.push_back(get_int_type(type));
     }
 
     return int_types;
