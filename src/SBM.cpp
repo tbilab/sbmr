@@ -10,7 +10,7 @@ NodePtr SBM::propose_move(const NodePtr node, const double eps)
   PROFILE_FUNCTION();
 
   const int block_level = node->level + 1;
-  const int node_type = node->type;
+  const int node_type   = node->type;
 
   // Grab a list of all the blocks that the node could join
   const NodeVec potential_blocks = get_nodes_of_type_at_level(node_type, block_level);
@@ -70,7 +70,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 
   for (const auto& edge : node->edges) {
     const NodePtr edge_block = edge->get_parent_at_level(block_level);
-    
+
     if (edge_block == old_block) {
       node_to_old_block++;
     }
@@ -328,9 +328,8 @@ double SBM::get_entropy(const int level)
   // Grab all block nodes
   const LevelPtr block_level = get_level(level + 1);
 
-  if (block_level->size() == 0)
-  {
-     throw "Can't compute entropy for network with no block structure.";
+  if (block_level->size() == 0) {
+    throw "Can't compute entropy for network with no block structure.";
   }
 
   // Now calculate the edge entropy betweeen nodes.
@@ -662,12 +661,13 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
     // Gather info for return
     step_results.push_back(Merge_Step(total_entropy_delta, get_state(), curr_num_blocks));
     step_results[0].entropy = initial_entropy + total_entropy_delta;
-  } else {
-    // Update the results entropy values with the true entropy rather than the delta provided. 
+  }
+  else {
+    // Update the results entropy values with the true entropy rather than the delta provided.
     double current_entropy = initial_entropy;
     for (auto& step_result : step_results) {
       step_result.entropy = current_entropy + step_result.entropy_delta;
-      current_entropy = step_result.entropy;
+      current_entropy     = step_result.entropy;
     }
   }
 

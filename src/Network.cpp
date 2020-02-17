@@ -414,11 +414,11 @@ void Network::load_from_state(const State_Dump state)
   clean_empty_blocks();
 }
 
-
 // Gathers counts of edges between all pairs of connected blocks in network
-std::map<Edge, int> Network::gather_block_counts_at_level(const int level){
+std::map<Edge, int> Network::gather_block_counts_at_level(const int level)
+{
   std::map<Edge, int> block_counts;
-  
+
   // Loop through edges and gather at desired level
   for (auto& edge : edges) {
     block_counts[edge.at_level(level)]++;

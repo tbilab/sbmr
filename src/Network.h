@@ -1,8 +1,8 @@
 #ifndef __NETWORK_INCLUDED__
 #define __NETWORK_INCLUDED__
 
-#include "Node.h"
 #include "Edge.h"
+#include "Node.h"
 #include "Sampler.h"
 
 #include <unordered_map>
@@ -31,7 +31,6 @@ struct State_Dump {
   }
 };
 
-
 // Some type definitions for cleaning up ugly syntax
 typedef std::shared_ptr<Node>      NodePtr;
 typedef std::map<string, NodePtr>  NodeLevel;
@@ -56,13 +55,12 @@ class Network {
   LevelMap                          nodes;            // A map keyed by level integer of each level of nodes
   std::map<int, std::map<int, int>> node_type_counts; // A map keyed by type to a map keyed by level of node counts
   std::list<Edge>                   edges;            // Each pair of edges in the network
-  
+
   // Map keyed by a node type. Value is the types of nodes the key type is allowed to connect to.
   std::unordered_map<int, std::unordered_set<int>> edge_type_pairs;
-  
+
   // Do we have an explicitely set list of allowed edges or should we build this list ourselves?
   bool specified_allowed_edges = false;
-
 
   // Methods
   // =========================================================================

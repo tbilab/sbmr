@@ -170,12 +170,12 @@ NodeVec Node::get_edges_to_level(const int desired_level, const int node_type)
   NodeVec level_cons;
 
   // Conservatively assume all edges will be taken
-  level_cons.reserve(edges.size());  
+  level_cons.reserve(edges.size());
 
   // Go through every child node's edges list, find parent at
   // desired level and place in connected nodes vector
   for (const auto& edge : edges) {
-    if(edge->type == node_type){
+    if (edge->type == node_type) {
       level_cons.push_back(edge->get_parent_at_level(desired_level));
     }
   }
@@ -192,7 +192,7 @@ NodeEdgeMap Node::gather_edges_to_level(const int level)
   // Setup an edge count map for node
   NodeEdgeMap edges_counts;
 
-  // Fill out edge count map by 
+  // Fill out edge count map by
   // - looping over all edges
   // - mapping them to the desired level
   // - and adding to their counts
