@@ -1,29 +1,3 @@
-# Or if adding a node dataframe as well, arbitrary polypartite structure is possible
-edges_tripartite <- dplyr::tribble(
-  ~from,    ~to,
-     "a1", "b1",
-     "a1", "b2",
-     "a2", "b1",
-     "b1", "c1",
-     "b2", "c1",
-     "b2", "c2"
-)
-
-nodes_tripartite <- dplyr::tribble(
-  ~id, ~type,
-  "a1", "a",
-  "a2", "a",
-  "b1", "b",
-  "b2", "b",
-  "c1", "c",
-  "c2", "c"
-)
-
-new_sbm_network(edges = edges_tripartite,
-                nodes = nodes_tripartite)
-
-
-
 test_that("Error thrown when stated connection potentials are violated", {
   edges_tripartite <- dplyr::tribble(
     ~from,  ~to,
