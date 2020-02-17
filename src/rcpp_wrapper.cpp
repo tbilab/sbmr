@@ -27,8 +27,8 @@ class Rcpp_SBM : public SBM {
     edge_type_pairs.clear();
 
     // Convert the types to the model-language integer types
-    const std::vector<std::string> from_type_ints = type_to_int(from_type);
-    const std::vector<std::string> to_type_ints   = type_to_int(to_type);
+    const std::vector<int> from_type_ints = type_to_int(from_type);
+    const std::vector<int> to_type_ints   = type_to_int(to_type);
 
     // Add pairs to network map of allowed pairs
     const int num_pairs = from_type.size();
@@ -88,13 +88,10 @@ class Rcpp_SBM : public SBM {
     const NodePtr node_a = find_node_by_id(node_a_id, 0);
     const NodePtr node_b = find_node_by_id(node_b_id, 0);
 
-    const int node_a_type = get_int_type(node_a->type);
-    const int node_b_type = get_int_type(node_b->type);
-
     // If the user has specified allowed edges explicitely, make sure that this edge follows protocol
     if (specified_allowed_edges) {
-      const bool a_to_b_bad = !(edge_type_pairs.at(node_a_type).count(node_b_type));
-      const bool b_to_a_bad = !(edge_type_pairs.at(node_b_type).count(node_a_type));
+      const bool a_to_b_bad = !(edge_type_pairs.at(node_a->type).count(node_b->type));
+      const bool b_to_a_bad = !(edge_type_pairs.at(node_b->type).count(node_a->type));
 
       if (a_to_b_bad | b_to_a_bad) {
         stop("Edge of " + node_a_id + " - " + node_b_id + " does not fit allowed specified allowed_edge_pairs type combos.");
@@ -102,7 +99,7 @@ class Rcpp_SBM : public SBM {
     }
     else {
       // If the user has not specified the allowed edges explicitely, then build allowed combos from the edges
-      add_allowed_node_type_combos(node_a_type, node_b_type);
+      add_allowed_node_type_combos(node_a->type, node_b->type);
     }
 
     SBM::add_edge(node_a, node_b);
@@ -134,7 +131,7 @@ class Rcpp_SBM : public SBM {
 
     // If type is not in map, throw an error
     if (loc_of_int_type == type_string_to_int.end()) {
-      stop(type + " not found in model");
+      stop(string_type + " not found in model");
     }
 
     // Convert string to int and return
@@ -464,6 +461,9 @@ RCPP_MODULE(SBM)
       .method("add_edge",
               &Rcpp_SBM::add_edge,
               "Connects two nodes in network (at level 0) by their ids (string).")
+      .method("add_allowed_pairs",
+              &Rcpp_SBM::add_allowed_pairs,
+              "Add list of allowed pairs of node types for edges.")
       .method("set_node_parent",
               &Rcpp_SBM::set_node_parent,
               "Sets the parent node (or block) for a given node. Takes child node's id (string), parent node's id (string), and the level of child node (int).")
