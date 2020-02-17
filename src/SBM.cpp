@@ -14,8 +14,8 @@ NodePtr SBM::propose_move(const NodePtr node, const double eps)
   // Grab a list of all the blocks that the node could join
   const NodeVec potential_blocks = get_nodes_of_type_at_level(node->type, block_level);
 
-  // Sample a random neighbor of the current node
-  const NodePtr rand_neighbor = sampler.sample(node->get_edges_to_level(node->level));
+  // Sample a random neighbor of node
+  const NodePtr rand_neighbor = sampler.sample(node->edges)->get_parent_at_level(node->level);
 
   // Get number total number edges for neighbor's block
   const int neighbor_block_degree = rand_neighbor->parent->degree;
