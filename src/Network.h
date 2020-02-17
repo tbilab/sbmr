@@ -59,6 +59,10 @@ class Network {
   
   // Map keyed by a node type. Value is the types of nodes the key type is allowed to connect to.
   std::unordered_map<int, std::unordered_set<int>> edge_type_pairs;
+  
+  // Do we have an explicitely set list of allowed edges or should we build this list ourselves?
+  bool specified_allowed_edges = false;
+
 
   // Methods
   // =========================================================================

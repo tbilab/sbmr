@@ -156,6 +156,13 @@ NodeVec Network::get_nodes_of_type_at_level(const int type, const int level)
 void Network::add_edge(const NodePtr node1, const NodePtr node2)
 {
   PROFILE_FUNCTION();
+
+  // Check if we have an explicite list of allowed edge patterns or if we should
+  // add this edge as a possible pair.
+  if (!specified_allowed_edges) {
+    add_allowed_node_type_combos(node1->type, node2->type);
+  }
+
   Node::connect_nodes(node1, node2);   // Connect nodes to eachother
   edges.push_back(Edge(node1, node2)); // Add edge to edge tracking list
 };

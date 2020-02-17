@@ -12,7 +12,6 @@ class Rcpp_SBM : public SBM {
   std::unordered_map<string, int> type_string_to_int;
   std::unordered_map<int, string> type_int_to_string;
 
-  bool specified_allowed_edges = false;
 
   // Keeps track of all the edges for graph so object can be copied within r
   // without needing a whole new set of the generating data
