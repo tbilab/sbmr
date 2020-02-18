@@ -159,13 +159,6 @@ class Rcpp_SBM : public SBM {
   }
 
 
-  void set_node_parent(const std::string child_id,
-                       const std::string parent_id,
-                       const int         level = 0)
-  {
-    find_node_by_id(child_id, level)->set_parent(find_node_by_id(parent_id, level + 1));
-  }
-
   void initialize_blocks(const int num_blocks, const int level)
   {
     Network::initialize_blocks(num_blocks, level);
@@ -420,9 +413,6 @@ RCPP_MODULE(SBM)
       .method("add_edge_types",
               &Rcpp_SBM::add_edge_types,
               "Add list of allowed pairs of node types for edges.")
-      .method("set_node_parent",
-              &Rcpp_SBM::set_node_parent,
-              "Sets the parent node (or block) for a given node. Takes child node's id (string), parent node's id (string), and the level of child node (int).")
       .method("initialize_blocks",
               &Rcpp_SBM::initialize_blocks,
               "Adds a desired number of blocks and randomly assigns them for a given level. num_blocks = -1 means every node gets their own block")
@@ -451,75 +441,3 @@ RCPP_MODULE(SBM)
               &Rcpp_SBM::collapse_run,
               "Performs a sequence of block collapse steps on network. Targets a range of final blocks numbers and collapses to them and returns final result form each collapse.");
 }
-/*** R
-sbm <- new(SBM)
-
-sbm$add_node("a1", "a", 0)
-sbm$add_node("a2", "a", 0)
-sbm$add_node("a3", "a", 0)
-sbm$add_node("b1", "b", 0)
-sbm$add_node("b2", "b", 0)
-sbm$add_node("b3", "b", 0)
-
-
-sbm$get_state()
-
-sbm$add_node("a11", "a", 1L)
-sbm$add_node("a12", "a", 1L)
-sbm$add_node("b11", "b", 1L)
-sbm$add_node("b12", "b", 1L)
-
-sbm$add_edge("a1", "b1")
-sbm$add_edge("a1", "b2")
-sbm$add_edge("a1", "b3")
-sbm$add_edge("a2", "b3")
-sbm$add_edge("a3", "b2")
-
-
-sbm$set_node_parent("a1", "a11", 0)
-sbm$set_node_parent("a2", "a11", 0)
-sbm$set_node_parent("a3", "a12", 0)
-sbm$set_node_parent("b1", "b11", 0)
-sbm$set_node_parent("b2", "b11", 0)
-sbm$set_node_parent("b3", "b12", 0)
-
-
-
-original_state <- sbm$get_state()
-
-for(i in 1:10){
-  entro_pre <- sbm$get_entropy(0L)
-  blocks_moved <- sbm$mcmc_sweep(0L,FALSE)
-  print(paste("started with entropy of", entro_pre, "and moved", blocks_moved))
-}
-
-new_state <- sbm$get_state()
-
-load_state(sbm, original_state)
-
-
-# Bring me back to original state
-# load_state(sbm, original_state)
-#
-# library(tidyverse)
-# merge_results <- sbm$collapse_blocks(0, 15)
-# load_state(sbm, original_state)
-# new_state <- sbm$get_state()
-#
-# sort_state <- . %>%  arrange(level, type, id)
-# original_state %>% sort_state()
-# new_state %>% sort_state()
-
-#
-#
-# desired_state <- init_results[[1]]$state
-#
-# sbm$get_state()
-# load_state(sbm, original_state)
-# sbm$get_state()
-# sbm$mcmc_sweep(0L,FALSE)
-# sbm$mcmc_sweep(0L,FALSE)
-# sbm$get_entropy(0L)
-
-
-*/
