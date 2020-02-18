@@ -160,7 +160,7 @@ void Network::add_edge(const NodePtr node1, const NodePtr node2)
   // Check if we have an explicite list of allowed edge patterns or if we should
   // add this edge as a possible pair.
   if (!specified_allowed_edges) {
-    add_allowed_node_type_combos(node1->type, node2->type);
+    add_edge_types(node1->type, node2->type);
   }
 
   Node::connect_nodes(node1, node2);   // Connect nodes to eachother
@@ -179,7 +179,7 @@ void Network::add_edge(const string node1_id, const string node2_id)
 // =============================================================================
 // Add an alowed pairing of node types for edges
 // =============================================================================
-void Network::add_allowed_node_type_combos(const int from_type, const int to_type)
+void Network::add_edge_types(const int from_type, const int to_type)
 {
   edge_type_pairs[from_type].insert(to_type);
   edge_type_pairs[to_type].insert(from_type);

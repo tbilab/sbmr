@@ -27,7 +27,7 @@ class Rcpp_SBM : public SBM {
     // Add pairs to network map of allowed pairs
     const int num_pairs = from_type.size();
     for (int i = 0; i < num_pairs; i++) {
-      add_allowed_node_type_combos(from_type_ints[i], to_type_ints[i]);
+      add_edge_types(from_type_ints[i], to_type_ints[i]);
     }
 
     // Let object know that we're working with specified types now.
@@ -93,7 +93,7 @@ class Rcpp_SBM : public SBM {
     }
     else {
       // If the user has not specified the allowed edges explicitely, then build allowed combos from the edges
-      add_allowed_node_type_combos(node_a->type, node_b->type);
+      add_edge_types(node_a->type, node_b->type);
     }
 
     SBM::add_edge(node_a, node_b);
