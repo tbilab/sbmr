@@ -286,9 +286,6 @@ new_sbm_network <- function(edges = dplyr::tibble(),
   type_map <- dplyr::distinct(nodes, type) %>%
     dplyr::mutate(type_index = dplyr::row_number())
 
-  # Add new integer type to nodes data
-  nodes <- nodes %>%
-    dplyr::left_join(type_map, by = 'type')
 
   # Build object
   x <- structure(list(nodes = nodes,
