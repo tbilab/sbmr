@@ -282,6 +282,13 @@ new_sbm_network <- function(edges = dplyr::tibble(),
     nodes <- dplyr::filter(nodes, not_in(id, unconnected_nodes))
   }
 
+  # Build a type map so we can give node types to cpp model as memory efficient integers
+  type_map <- dplyr::distinct(nodes, type) %>%
+    dplyr::mutate(type_index = dplyr::row_number())
+
+  # Add new integer type to nodes data
+  nodes <- nodes %>%
+    dplyr::left_join(type_map, by = 'type')
 
   # Build object
   x <- structure(list(nodes = nodes,
@@ -291,7 +298,8 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                  n_edges = nrow(edges),
                  from_column = from_column,
                  to_column = to_column,
-                 edge_types = edge_types )
+                 edge_types = edge_types,
+                 type_map = type_map)
 
   # Initialize a model if requested
   if (setup_model) {
