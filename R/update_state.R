@@ -71,8 +71,17 @@ update_state.default <- function(sbm, state_df){
 #' @export
 update_state.sbm_network <- function(sbm, state_df){
 
-  # Bind the integer types
-  state_df <- dplyr::left_join(state_df, type_map, by = 'type')
+  # If the new state has integer types, then convert them to strings
+  # If the new state has string types, then add integer types as well
+  type_col_is_integer <- is.integer(state_df$type)
+  if(type_col_is_integer){
+    state_df <- state_df %>%
+      dplyr::rename(type_index = type) %>%
+      dplyr::left_join(attr(sbm, 'type_map'), by = 'type_index')
+  } else {
+    state_df <- state_df %>%
+      dplyr::left_join(attr(sbm, 'type_map'), by = 'type')
+  }
 
   # Check for any unrecognized types
   if (any(is.na(state_df$type_index))){
