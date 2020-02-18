@@ -67,19 +67,21 @@ test_that("State updating method", {
   )
 
   new_state <- dplyr::tribble(
-     ~id,          ~parent,   ~type,  ~level,
-    "a1",       "a_parent",  "node",      0L,
-    "a2",       "a_parent",  "node",      0L,
-    "a3",       "a_parent",  "node",      0L,
-    "b1",       "b_parent",  "node",      0L,
-    "b2",       "b_parent",  "node",      0L,
-    "b3",       "b_parent",  "node",      0L,
-    "b4",       "b_parent",  "node",      0L,
-    "a_parent", "none",      "node",      1L,
-    "b_parent", "none",      "node",      1L,
+     ~id,          ~parent,   ~type, ~level,
+    "a1",       "a_parent",  "node",     0L,
+    "a2",       "a_parent",  "node",     0L,
+    "a3",       "a_parent",  "node",     0L,
+    "b1",       "b_parent",  "node",     0L,
+    "b2",       "b_parent",  "node",     0L,
+    "b3",       "b_parent",  "node",     0L,
+    "b4",       "b_parent",  "node",     0L,
+    "a_parent", "none",      "node",     1L,
+    "b_parent", "none",      "node",     1L,
   )
 
-  new_state_w_index_type <- dplyr::mutate(new_state, type_index = 1L)
+
+  new_state_w_index_type <- new_state %>%
+    dplyr::mutate(type = 1L)
 
   net <- new_sbm_network(edges = edges, nodes = nodes)
 
@@ -87,8 +89,19 @@ test_that("State updating method", {
   net <- net %>% update_state(new_state)
 
   # Now the states should be identical
-  expect_true( dplyr::all_equal(dplyr::mutate(new_state, type_index = 1L), attr(net, 'state')))
-  expect_true( dplyr::all_equal(dplyr::mutate(new_state, type = 1L), attr(net, 'model')$get_state()))
+  expect_true( dplyr::all_equal(new_state_w_index_type, attr(net, 'state')))
+  expect_true( dplyr::all_equal(new_state_w_index_type, attr(net, 'model')$get_state()))
+
+
+  # Now to updating using a integer-typed dataframe
+  net <- new_sbm_network(edges = edges, nodes = nodes)
+
+  # Update state using update_state() method
+  net <- net %>% update_state(new_state_w_index_type)
+
+  # Now the states should be identical
+  expect_true( dplyr::all_equal(new_state_w_index_type, attr(net, 'state')))
+  expect_true( dplyr::all_equal(new_state_w_index_type, attr(net, 'model')$get_state()))
 })
 
 test_that("No costly duplication of S4 class is done when assigning s3 class copies.", {
