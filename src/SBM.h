@@ -17,8 +17,6 @@ struct Merge_Step {
   double              entropy;
   State_Dump          state;
   int                 num_blocks;
-  std::vector<string> from_node;
-  std::vector<string> to_node;
   Merge_Step()
       : entropy_delta(0)
   {

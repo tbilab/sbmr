@@ -548,8 +548,6 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
 
       // Record pair for results
       results.entropy_delta += merge_entropy_delta;
-      results.from_node.push_back(best_merge.first->id);
-      results.to_node.push_back(best_merge.second->id);
       num_merges_made++;
     }
 
