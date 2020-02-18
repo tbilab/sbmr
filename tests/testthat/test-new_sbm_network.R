@@ -24,7 +24,7 @@ test_that("Properly builds a missing nodes dataframe",{
   sbm_net <- new_sbm_network(edges = edges)
 
   expect_equal(
-    dplyr::select(sbm_net$nodes, -type_index),
+    sbm_net$nodes,
     dplyr::tribble(
       ~id, ~type,
       "a1", "node",
