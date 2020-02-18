@@ -14,7 +14,7 @@ class Rcpp_SBM : public SBM {
 
 
   // Add allowed edge pairs to the object. Overwrites previous work if it was there
-  void add_allowed_pairs(const std::vector<std::string> from_type,
+  void add_edge_types(const std::vector<std::string> from_type,
                          const std::vector<std::string> to_type)
   {
     // Clear old allowed pairs (if they exist)
@@ -88,7 +88,7 @@ class Rcpp_SBM : public SBM {
       const bool b_to_a_bad = !(edge_type_pairs.at(node_b->type).count(node_a->type));
 
       if (a_to_b_bad | b_to_a_bad) {
-        stop("Edge of " + node_a_id + " - " + node_b_id + " does not fit allowed specified allowed_edge_pairs type combos.");
+        stop("Edge of " + node_a_id + " - " + node_b_id + " does not fit allowed specified edge_types type combos.");
       }
     }
     else {
@@ -417,8 +417,8 @@ RCPP_MODULE(SBM)
       .method("add_edge",
               &Rcpp_SBM::add_edge,
               "Connects two nodes in network (at level 0) by their ids (string).")
-      .method("add_allowed_pairs",
-              &Rcpp_SBM::add_allowed_pairs,
+      .method("add_edge_types",
+              &Rcpp_SBM::add_edge_types,
               "Add list of allowed pairs of node types for edges.")
       .method("set_node_parent",
               &Rcpp_SBM::set_node_parent,

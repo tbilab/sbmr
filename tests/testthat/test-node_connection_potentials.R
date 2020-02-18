@@ -21,7 +21,7 @@ test_that("Error thrown when stated connection potentials are violated", {
   )
 
   # a nodes can connect to b and c but b and c can not connect
-  allowed_edge_pairs <- dplyr::tribble(
+  edge_types <- dplyr::tribble(
     ~from,  ~to,
       "a", "b",
       "a", "c"
@@ -30,7 +30,7 @@ test_that("Error thrown when stated connection potentials are violated", {
   expect_error(
     new_sbm_network(edges = edges_tripartite,
                     nodes = nodes_tripartite,
-                    allowed_edge_pairs = allowed_edge_pairs)
+                    edge_types = edge_types)
   )
 
 })

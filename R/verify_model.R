@@ -62,9 +62,9 @@ verify_model.sbm_network <- function(x, show_messages = FALSE){
   }
 
   # If the model has a allowed node pairs list, let model know before adding edges
-  allowed_pairs <- attr(x, 'allowed_edge_pairs')
+  allowed_pairs <- attr(x, 'edge_types')
   if(!is.null(allowed_pairs)){
-    sbm_model$add_allowed_pairs(dplyr::pull(allowed_pairs, !!attr(x, "from_column")),
+    sbm_model$add_edge_types(dplyr::pull(allowed_pairs, !!attr(x, "from_column")),
                                 dplyr::pull(allowed_pairs, !!attr(x, "to_column")))
   }
 

@@ -54,7 +54,7 @@
 #'   network is just being visualized or described.
 #' @param default_node_type What should nodes that the type is generated for be
 #'   called?
-#' @param allowed_edge_pairs A dataframe in the same format of as `edges` that
+#' @param edge_types A dataframe in the same format of as `edges` that
 #'   contains allowed pairs (order does not matter) of possible node type
 #'   combinations across edges. For instance: nodes of type polinator are
 #'   allowed to connect to flower nodes but not to other pollinator nodes. If
@@ -128,19 +128,19 @@
 #' new_sbm_network(edges = edges_tripartite,
 #'                 nodes = nodes_tripartite)
 #'
-#' # the allowed_edge_pairs argument lets you explicitely tell the
+#' # the edge_types argument lets you explicitely tell the
 #' # model what each type of node is allowed to connect to.
 #' # Here we use it to enforce tripartite structure where nodes of
 #' # the a type can connect to either b or c but b and c can only
 #' # connect to a.
 #'
-#' allowed_edge_pairs <- dplyr::tribble(~from, ~to,
+#' edge_types <- dplyr::tribble(~from, ~to,
 #'                                        "a", "b",
 #'                                        "a", "c")
 #'
 #' new_sbm_network(edges = edges_tripartite,
 #'                 nodes = nodes_tripartite,
-#'                 allowed_edge_pairs = allowed_edge_pairs)
+#'                 edge_types = edge_types)
 #'
 new_sbm_network <- function(edges = dplyr::tibble(),
                             nodes = NULL,
@@ -148,7 +148,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                             edges_to_column = to,
                             bipartite_edges = FALSE,
                             setup_model = TRUE,
-                            allowed_edge_pairs = NULL,
+                            edge_types = NULL,
                             default_node_type = "node",
                             show_warnings = interactive()){
 
@@ -295,7 +295,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                  n_edges = nrow(edges),
                  from_column = from_column,
                  to_column = to_column,
-                 allowed_edge_pairs = allowed_edge_pairs )
+                 edge_types = edge_types )
 
   # Initialize a model if requested
   if (setup_model) {
