@@ -75,11 +75,11 @@ class Network {
   NodePtr             get_node_by_id(string id, int level = 0);                 // Grabs and returns node of specified id, at desired level.
   NodePtr             get_node_from_level(int level);                           // Grabs the first node found at a given level, used in testing.
   NodeVec             get_nodes_of_type_at_level(int type, int level);          // Return nodes of a desired type from level matching type
+  std::map<Edge, int> get_block_counts_at_level(int level);                  // Gathers counts of edges between any two blocks in network
   void                load_from_state(State_Dump state);                        // Load a level blocking from a state dump
   void                give_every_node_at_level_own_block(int level);            // Builds and assigns a block node for every node in a given level
   void                initialize_blocks(int num_blocks, int level);             // Adds a num_blocks to model and randomly assigns them for a given level (-1 means every node gets their own block)
   NodeVec             clean_empty_blocks();                                     // Scan through levels and remove all block nodes that have no children. Returns # of blocks removed
-  std::map<Edge, int> get_block_counts_at_level(int level);                  // Gathers counts of edges between any two blocks in network
   static string       build_block_id(int type, int level, int index);           // Builds a block id from a scaffold for generated new blocks
 };
 
