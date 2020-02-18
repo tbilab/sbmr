@@ -288,20 +288,18 @@ new_sbm_network <- function(edges = dplyr::tibble(),
 
 
   # Build object
-  x <- structure(
-    list(nodes = nodes,
-         edges = edges),
-    class = "sbm_network",
-    n_nodes = nrow(nodes),
-    n_edges = nrow(edges),
-    from_column = from_column,
-    to_column = to_column,
-    allowed_edge_pairs = allowed_edge_pairs
-  )
+  x <- structure(list(nodes = nodes,
+                      edges = edges),
+                 class = "sbm_network",
+                 n_nodes = nrow(nodes),
+                 n_edges = nrow(edges),
+                 from_column = from_column,
+                 to_column = to_column,
+                 allowed_edge_pairs = allowed_edge_pairs )
 
   # Initialize a model if requested
   if (setup_model) {
-    x <- verify_model(x,show_messages = FALSE)
+    x <- verify_model(x, show_messages = FALSE)
   }
 
   # Return
