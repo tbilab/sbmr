@@ -6,56 +6,26 @@ using namespace Rcpp;
 
 class Rcpp_SBM : public SBM {
   public:
-  // Keeps track of user friendly string types and turns them
-  // into c++ friendly integer types
-  int                             current_type_int = 0;
-  std::unordered_map<string, int> type_string_to_int;
-  std::unordered_map<int, string> type_int_to_string;
-
 
   // Add allowed edge pairs to the object. Overwrites previous work if it was there
-  void add_edge_types(const std::vector<std::string> from_type,
-                         const std::vector<std::string> to_type)
+  void add_edge_types(const std::vector<int> from_type,
+                      const std::vector<int> to_type)
   {
     // Clear old allowed pairs (if they exist)
     edge_type_pairs.clear();
 
-    // Convert the types to the model-language integer types
-    const std::vector<int> from_type_ints = type_to_int(from_type);
-    const std::vector<int> to_type_ints   = type_to_int(to_type);
-
     // Add pairs to network map of allowed pairs
     const int num_pairs = from_type.size();
     for (int i = 0; i < num_pairs; i++) {
-      Network::add_edge_types(from_type_ints[i], to_type_ints[i]);
+      Network::add_edge_types(from_type[i], to_type[i]);
     }
 
     // Let object know that we're working with specified types now.
     specified_allowed_edges = true;
   }
 
-  void add_node(const std::string id, const std::string type, const int level)
+  void add_node(const std::string id, const int type, const int level)
   {
-    int node_int_type;
-
-    // See if the node's type is in our list
-    const auto loc_of_int_type = type_string_to_int.find(type);
-
-    if (loc_of_int_type == type_string_to_int.end()) {
-      // If its a new type, we need to add a new entry for this type to both maps
-      type_string_to_int.emplace(type, current_type_int);
-      type_int_to_string.emplace(current_type_int, type);
-
-      // Set the value as newly designated integer
-      node_int_type = current_type_int;
-
-      // Iterate type integer keeper forward
-      current_type_int++;
-    }
-    else {
-      node_int_type = loc_of_int_type->second;
-    }
-
     // Check to make sure that this node doesn't already exist in the network
     auto base_level = get_level(level);
     if (base_level->find(id) != base_level->end()) {
@@ -63,7 +33,7 @@ class Rcpp_SBM : public SBM {
     }
     else {
       // Add node to model
-      SBM::add_node(id, node_int_type, level);
+      SBM::add_node(id, type, level);
     }
   }
 
@@ -99,56 +69,13 @@ class Rcpp_SBM : public SBM {
     SBM::add_edge(node_a, node_b);
   }
 
-  // Convert the types from integers (cpp friendly) to strings (r friendly)
-  std::vector<string> type_to_string(const std::vector<int>& int_types)
-  {
-    // Convert the type column to the string types
-    std::vector<string> string_types;
-    string_types.reserve(int_types.size());
-
-    for (const auto& type : int_types) {
-      // Convert int to string and push to vector
-      string_types.push_back(type_int_to_string[type]);
-    }
-
-    return string_types;
-  }
-
-  int get_int_type(const std::string& string_type)
-  {
-    // Attempt to locate string type in string-to-int map
-    const auto loc_of_int_type = type_string_to_int.find(string_type);
-
-    // If type is not in map, throw an error
-    if (loc_of_int_type == type_string_to_int.end()) {
-      stop(string_type + " not found in model");
-    }
-
-    // Convert string to int and return
-    return loc_of_int_type->second;
-  }
-
-  // Convert the types from strings to integers
-  std::vector<int> type_to_int(const std::vector<string>& string_types)
-  {
-    std::vector<int> int_types;
-    int_types.reserve(string_types.size());
-
-    for (const auto& type : string_types) {
-      // Convert string to int and push to vector
-      int_types.push_back(get_int_type(type));
-    }
-
-    return int_types;
-  }
-
   inline DataFrame state_to_df(State_Dump state)
   {
     // Create and return dump of state as dataframe
     return DataFrame::create(
         _["id"]               = state.id,
         _["parent"]           = state.parent,
-        _["type"]             = type_to_string(state.type),
+        _["type"]             = state.type,
         _["level"]            = state.level,
         _["stringsAsFactors"] = false);
   }
@@ -163,6 +90,7 @@ class Rcpp_SBM : public SBM {
   {
     Network::initialize_blocks(num_blocks, level);
   }
+
 
   double get_entropy(const int level)
   {
@@ -182,7 +110,7 @@ class Rcpp_SBM : public SBM {
       for (auto node_b_it = std::next(node_a_it);
            node_b_it != node_map->end();
            node_b_it++) {
-        bool in_same_group = node_a_it->second->parent == node_b_it->second->parent;
+        const bool in_same_group = node_a_it->second->parent == node_b_it->second->parent;
 
         // Initialize pair info for group
         concensus_pairs.emplace(
@@ -386,12 +314,12 @@ class Rcpp_SBM : public SBM {
   void load_from_state(std::vector<string> id,
                        std::vector<string> parent,
                        std::vector<int>    level,
-                       std::vector<string> string_types)
+                       std::vector<int>    types)
   {
 
     // Construct a state dump from vectors and
     // pass the constructed state to load_state function
-    SBM::load_from_state(State_Dump(id, parent, level, type_to_int(string_types)));
+    SBM::load_from_state(State_Dump(id, parent, level, types));
   }
 
 
