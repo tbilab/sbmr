@@ -371,15 +371,15 @@ void Network::load_from_state(const State_Dump state)
 {
   PROFILE_FUNCTION();
 
-  int n = state.parent.size();
+  const int n = state.parent.size();
 
   for (int i = 0; i < n; i++) {
     int node_type = state.type[i];
 
-    string child_id     = state.id[i];
-    string parent_id    = state.parent[i];
-    int    child_level  = state.level[i];
-    int    parent_level = child_level + 1;
+    const string child_id     = state.id[i];
+    const string parent_id    = state.parent[i];
+    const int    child_level  = state.level[i];
+    const int    parent_level = child_level + 1;
 
     auto aquire_node = [node_type, this](string node_id, int node_level) {
       LevelPtr nodes_at_level = get_level(node_level);
@@ -396,17 +396,14 @@ void Network::load_from_state(const State_Dump state)
     };
 
     // "none" indicates the highest level has been reached
-    if (parent_id == "none")
+    if (parent_id == "none") {
       continue;
+    }
 
     // Attempt to find the parent node in the network
-    NodePtr parent_node = aquire_node(parent_id, parent_level);
-
     // Next grab the child node (this one should exist...)
-    NodePtr child_node = aquire_node(child_id, child_level);
-
     // Assign the parent node to the child node
-    child_node->set_parent(parent_node);
+    aquire_node(child_id, child_level)->set_parent(aquire_node(parent_id, parent_level));
   }
 
   // Now clean up any potentially childless nodes that got kicked
