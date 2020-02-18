@@ -307,7 +307,7 @@ TEST_CASE("Counting edges", "[Network]")
   REQUIRE(b22->degree == 3);
 
   // Gather edges between all blocks at level one
-  const auto level_1_counts = my_net.gather_block_counts_at_level(1);
+  const auto level_1_counts = my_net.get_block_counts_at_level(1);
 
   REQUIRE(level_1_counts.size() > 1);
 
