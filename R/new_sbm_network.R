@@ -54,11 +54,11 @@
 #'   network is just being visualized or described.
 #' @param default_node_type What should nodes that the type is generated for be
 #'   called?
-#' @param edge_types A dataframe in the same format of as `edges` that
-#'   contains allowed pairs (order does not matter) of possible node type
-#'   combinations across edges. For instance: nodes of type polinator are
-#'   allowed to connect to flower nodes but not to other pollinator nodes. If
-#'   this is left undefined, it is inferred from edges.
+#' @param edge_types A dataframe in the same format of as `edges` that contains
+#'   allowed pairs (order does not matter) of possible node type combinations
+#'   across edges. For instance: nodes of type polinator are allowed to connect
+#'   to flower nodes but not to other pollinator nodes. If this is left
+#'   undefined, it is inferred from edges.
 #' @param show_warnings Do you want to be warned when minor problems are
 #'   detected by function? Usefull to disable when not running in an interactive
 #'   mode etc.
@@ -173,17 +173,13 @@ new_sbm_network <- function(edges = dplyr::tibble(),
     # Break edges down to unique nodes and assign appropriate types
     unique_to_nodes <- edges %>%
       dplyr::distinct(!!to_column) %>%
-      dplyr::transmute(
-        id = !!to_column,
-        type = to_node_type
-      )
+      dplyr::transmute(id = !!to_column,
+                       type = to_node_type)
 
     unique_from_nodes <- edges %>%
       dplyr::distinct(!!from_column) %>%
-      dplyr::transmute(
-        id = !!from_column,
-        type = from_node_type
-      )
+      dplyr::transmute(id = !!from_column,
+                       type = from_node_type)
 
     # Combine and count duplicates
     all_unique <- dplyr::bind_rows(unique_to_nodes, unique_from_nodes) %>%
