@@ -4,10 +4,9 @@ test_that("Correct numbers of nodes and edges are returned", {
     n_nodes_per_block = 40
   )
 
-  sbm_net <- new_sbm_network(edges = network$edges, nodes = network$nodes)
 
-  expect_equal(attr(sbm_net, "n_nodes"), 3*40)
-  expect_equal(attr(sbm_net, "n_edges"), nrow(network$edges))
+  expect_equal(attr(network, "n_nodes"), 3*40)
+  expect_equal(attr(network, "n_edges"), nrow(network$edges))
 })
 
 
@@ -25,8 +24,8 @@ test_that("Properly builds a missing nodes dataframe",{
   sbm_net <- new_sbm_network(edges = edges)
 
   expect_equal(
-    sbm_net$nodes,
-    nodes <- dplyr::tribble(
+    dplyr::select(sbm_net$nodes, -type_index),
+    dplyr::tribble(
       ~id, ~type,
       "a1", "node",
       "a2", "node",
@@ -95,7 +94,7 @@ test_that("Throws error for empty edges dataframe",{
 })
 
 
-test_that("Throws error for poorly edges dataframe missing required columns",{
+test_that("Throws error for edges dataframe missing required columns",{
   edges <- dplyr::tribble(
     ~a_node, ~b_node,
     "a1",  "b1",
@@ -243,22 +242,21 @@ test_that("Default node type can change", {
 test_that("Model is instantiated if requested", {
   network <- sim_basic_block_network(
     n_blocks = 3,
-    n_nodes_per_block = 40
+    n_nodes_per_block = 40,
+    setup_model = TRUE
   )
 
-  sbm_net <- new_sbm_network(edges = network$edges, nodes = network$nodes)
-  testthat::expect_false(is.null(attr(sbm_net, 'model')))
+  testthat::expect_false(is.null(attr(network, 'model')))
 })
 
 
-test_that("Model is not instantiated if requested", {
+test_that("Model is not instantiated by default", {
   network <- sim_basic_block_network(
     n_blocks = 3,
     n_nodes_per_block = 40
   )
 
-  sbm_net <- new_sbm_network(edges = network$edges, nodes = network$nodes, setup_model = FALSE)
-  testthat::expect_true(is.null(attr(sbm_net, 'model')))
+  testthat::expect_true(is.null(attr(network, 'model')))
 })
 
 
