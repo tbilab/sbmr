@@ -147,25 +147,24 @@ new groups in that sweep. If <code>track_pairs = TRUE</code>, then an additional
   <span class='fu'><a href='collapse_blocks.html'>collapse_blocks</a></span>(<span class='kw'>num_mcmc_sweeps</span> <span class='kw'>=</span> <span class='fl'>0</span>)
 
 <span class='co'># Look at the results of the collapse directly</span>
-<span class='fu'>get_collapse_results</span>(<span class='no'>my_sbm</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 16 x 4</span><span>
+<span class='fu'>get_collapse_results</span>(<span class='no'>my_sbm</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 15 x 4</span><span>
 #&gt;    entropy entropy_delta num_blocks state             
 #&gt;      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;list&gt;</span><span>            
 #&gt; </span><span style='color: #555555;'> 1</span><span>    706.         52.9          44 </span><span style='color: #555555;'>&lt;df[,4] [138 × 4]&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 2</span><span>    766.         59.8          36 </span><span style='color: #555555;'>&lt;df[,4] [122 × 4]&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 3</span><span>    811.         45.5          30 </span><span style='color: #555555;'>&lt;df[,4] [110 × 4]&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 4</span><span>    846.         35.2          25 </span><span style='color: #555555;'>&lt;df[,4] [100 × 4]&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 5</span><span>    887.         41.1          19 </span><span style='color: #555555;'>&lt;df[,4] [88 × 4]&gt;</span><span> 
-#&gt; </span><span style='color: #555555;'> 6</span><span>    915.         27.3          15 </span><span style='color: #555555;'>&lt;df[,4] [80 × 4]&gt;</span><span> 
-#&gt; </span><span style='color: #555555;'> 7</span><span>    927.         12.2          12 </span><span style='color: #555555;'>&lt;df[,4] [74 × 4]&gt;</span><span> 
-#&gt; </span><span style='color: #555555;'> 8</span><span>    932.          5.39         11 </span><span style='color: #555555;'>&lt;df[,4] [72 × 4]&gt;</span><span> 
-#&gt; </span><span style='color: #555555;'> 9</span><span>    942.          9.88          9 </span><span style='color: #555555;'>&lt;df[,4] [68 × 4]&gt;</span><span> 
-#&gt; </span><span style='color: #555555;'>10</span><span>    946.          3.61          8 </span><span style='color: #555555;'>&lt;df[,4] [66 × 4]&gt;</span><span> 
-#&gt; </span><span style='color: #555555;'>11</span><span>    958.         12.5           6 </span><span style='color: #555555;'>&lt;df[,4] [62 × 4]&gt;</span><span> 
-#&gt; </span><span style='color: #555555;'>12</span><span>    960.          1.62          5 </span><span style='color: #555555;'>&lt;df[,4] [60 × 4]&gt;</span><span> 
-#&gt; </span><span style='color: #555555;'>13</span><span>    969.          8.73          4 </span><span style='color: #555555;'>&lt;df[,4] [58 × 4]&gt;</span><span> 
-#&gt; </span><span style='color: #555555;'>14</span><span>    972.          3.70          3 </span><span style='color: #555555;'>&lt;df[,4] [56 × 4]&gt;</span><span> 
-#&gt; </span><span style='color: #555555;'>15</span><span>    984.         11.7           2 </span><span style='color: #555555;'>&lt;df[,4] [54 × 4]&gt;</span><span> 
-#&gt; </span><span style='color: #555555;'>16</span><span>   </span><span style='text-decoration: underline;'>1</span><span>013.         28.9           1 </span><span style='color: #555555;'>&lt;df[,4] [52 × 4]&gt;</span><span> </div><div class='input'>
+#&gt; </span><span style='color: #555555;'> 2</span><span>    773.         66.9          35 </span><span style='color: #555555;'>&lt;df[,4] [120 × 4]&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 3</span><span>    812.         39.6          29 </span><span style='color: #555555;'>&lt;df[,4] [108 × 4]&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 4</span><span>    847.         34.6          24 </span><span style='color: #555555;'>&lt;df[,4] [98 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'> 5</span><span>    872.         24.9          20 </span><span style='color: #555555;'>&lt;df[,4] [90 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'> 6</span><span>    917.         45.0          14 </span><span style='color: #555555;'>&lt;df[,4] [78 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'> 7</span><span>    935.         18.2          11 </span><span style='color: #555555;'>&lt;df[,4] [72 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'> 8</span><span>    948.         13.2           9 </span><span style='color: #555555;'>&lt;df[,4] [68 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'> 9</span><span>    951.          2.80          8 </span><span style='color: #555555;'>&lt;df[,4] [66 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'>10</span><span>    956.          4.77          7 </span><span style='color: #555555;'>&lt;df[,4] [64 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'>11</span><span>    963.          7.07          6 </span><span style='color: #555555;'>&lt;df[,4] [62 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'>12</span><span>    965.          2.68          5 </span><span style='color: #555555;'>&lt;df[,4] [60 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'>13</span><span>    983.         17.4           3 </span><span style='color: #555555;'>&lt;df[,4] [56 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'>14</span><span>    995.         12.3           2 </span><span style='color: #555555;'>&lt;df[,4] [54 × 4]&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'>15</span><span>   </span><span style='text-decoration: underline;'>1</span><span>016.         20.9           1 </span><span style='color: #555555;'>&lt;df[,4] [52 × 4]&gt;</span><span> </div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
