@@ -13,11 +13,6 @@ class Rcpp_SBM : public SBM {
   std::unordered_map<int, string> type_int_to_string;
 
 
-  // Keeps track of all the edges for graph so object can be copied within r
-  // without needing a whole new set of the generating data
-  std::list<std::string> edges_from;
-  std::list<std::string> edges_to;
-
   // Add allowed edge pairs to the object. Overwrites previous work if it was there
   void add_allowed_pairs(const std::vector<std::string> from_type,
                          const std::vector<std::string> to_type)
@@ -102,10 +97,6 @@ class Rcpp_SBM : public SBM {
     }
 
     SBM::add_edge(node_a, node_b);
-
-    // Add edge to the edges vector
-    edges_from.push_back(node_a_id);
-    edges_to.push_back(node_b_id);
   }
 
   // Convert the types from integers (cpp friendly) to strings (r friendly)
@@ -167,40 +158,6 @@ class Rcpp_SBM : public SBM {
     return state_to_df(SBM::get_state());
   }
 
-  DataFrame get_edges()
-  {
-    return DataFrame::create(
-        _["from"]             = edges_from,
-        _["to"]               = edges_to,
-        _["stringsAsFactors"] = false);
-  }
-
-  List get_data()
-  {
-    // Grab level 0
-    const LevelPtr level_data = get_level(0);
-
-    // Initialize vectors to hold ids and types of nodes
-    std::vector<string> node_ids;
-    std::vector<string> node_types;
-    node_ids.reserve(level_data->size());
-    node_types.reserve(level_data->size());
-    // scan through level and fill in vectors
-    for (const auto& node : *level_data) {
-      node_ids.push_back(node.first);
-      node_types.push_back(type_int_to_string[node.second->type]);
-    }
-
-    return List::create(
-        _["nodes"] = DataFrame::create(
-            _["id"]               = node_ids,
-            _["type"]             = node_types,
-            _["stringsAsFactors"] = false),
-        _["edges"] = DataFrame::create(
-            _["from"]             = edges_from,
-            _["to"]               = edges_to,
-            _["stringsAsFactors"] = false));
-  }
 
   void set_node_parent(const std::string child_id,
                        const std::string parent_id,
@@ -472,18 +429,12 @@ RCPP_MODULE(SBM)
       .method("get_state",
               &Rcpp_SBM::get_state,
               "Exports the current state of the network as dataframe with each node as a row and columns for node id, parent id, node type, and node level.")
-      .method("get_edges",
-              &Rcpp_SBM::get_edges,
-              "Returns a from and to columned dataframe of all the edges added to class")
       .method("get_node_to_block_edge_counts",
               &Rcpp_SBM::get_node_to_block_edge_counts,
               "Returns a dataframe with the requested nodes connection counts to all blocks/nodes at a desired level.")
       .method("get_block_edge_counts",
               &Rcpp_SBM::get_block_edge_counts,
               "Returns a dataframe of counts of edges between all connected pairs of blocks at given level.")
-      .method("get_data",
-              &Rcpp_SBM::get_data,
-              "Returns data needed to construct sbm again from R")
       .method("load_from_state",
               &Rcpp_SBM::load_from_state,
               "Takes model state export as given by SBM$get_state() and returns model to specified state. This is useful for resetting model before running various algorithms such as agglomerative merging.")
