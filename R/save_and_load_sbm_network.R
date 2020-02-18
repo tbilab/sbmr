@@ -62,5 +62,6 @@ save_sbm_network.sbm_network <- function(x, loc){
 load_sbm_network <- function(loc){
   x <- readr::read_rds(loc)
 
+  # Restart rcpp model object
   verify_model(x)
 }
