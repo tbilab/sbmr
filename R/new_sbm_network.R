@@ -54,11 +54,11 @@
 #'   network is just being visualized or described.
 #' @param default_node_type What should nodes that the type is generated for be
 #'   called?
-#' @param allowed_edge_pairs A dataframe in the same format of as
-#'   `edges` that contains allowed pairs (order does not matter) of possible
-#'   node type combinations across edges. For instance: nodes of type polinator
-#'   are allowed to connect to flower nodes but not to other pollinator nodes.
-#'   If this is left undefined, it is inferred from edges.
+#' @param allowed_edge_pairs A dataframe in the same format of as `edges` that
+#'   contains allowed pairs (order does not matter) of possible node type
+#'   combinations across edges. For instance: nodes of type polinator are
+#'   allowed to connect to flower nodes but not to other pollinator nodes. If
+#'   this is left undefined, it is inferred from edges.
 #' @param show_warnings Do you want to be warned when minor problems are
 #'   detected by function? Usefull to disable when not running in an interactive
 #'   mode etc.
@@ -127,6 +127,20 @@
 #'
 #' new_sbm_network(edges = edges_tripartite,
 #'                 nodes = nodes_tripartite)
+#'
+#' # the allowed_edge_pairs argument lets you explicitely tell the
+#' # model what each type of node is allowed to connect to.
+#' # Here we use it to enforce tripartite structure where nodes of
+#' # the a type can connect to either b or c but b and c can only
+#' # connect to a.
+#'
+#' allowed_edge_pairs <- dplyr::tribble(~from, ~to,
+#'                                        "a", "b",
+#'                                        "a", "c")
+#'
+#' new_sbm_network(edges = edges_tripartite,
+#'                 nodes = nodes_tripartite,
+#'                 allowed_edge_pairs = allowed_edge_pairs)
 #'
 new_sbm_network <- function(edges = dplyr::tibble(),
                             nodes = NULL,
