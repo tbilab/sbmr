@@ -54,6 +54,11 @@
 #'   network is just being visualized or described.
 #' @param default_node_type What should nodes that the type is generated for be
 #'   called?
+#' @param allowed_edge_pairs A dataframe in the same format of as `edges` that
+#'   contains allowed pairs (order does not matter) of possible node type
+#'   combinations across edges. For instance: nodes of type polinator are
+#'   allowed to connect to flower nodes but not to other pollinator nodes. If
+#'   this is left undefined, it is inferred from edges.
 #' @param show_warnings Do you want to be warned when minor problems are
 #'   detected by function? Usefull to disable when not running in an interactive
 #'   mode etc.
@@ -123,12 +128,27 @@
 #' new_sbm_network(edges = edges_tripartite,
 #'                 nodes = nodes_tripartite)
 #'
+#' # the allowed_edge_pairs argument lets you explicitely tell the
+#' # model what each type of node is allowed to connect to.
+#' # Here we use it to enforce tripartite structure where nodes of
+#' # the a type can connect to either b or c but b and c can only
+#' # connect to a.
+#'
+#' allowed_edge_pairs <- dplyr::tribble(~from, ~to,
+#'                                        "a", "b",
+#'                                        "a", "c")
+#'
+#' new_sbm_network(edges = edges_tripartite,
+#'                 nodes = nodes_tripartite,
+#'                 allowed_edge_pairs = allowed_edge_pairs)
+#'
 new_sbm_network <- function(edges = dplyr::tibble(),
                             nodes = NULL,
                             edges_from_column = from,
                             edges_to_column = to,
                             bipartite_edges = FALSE,
                             setup_model = TRUE,
+                            allowed_edge_pairs = NULL,
                             default_node_type = "node",
                             show_warnings = interactive()){
 
@@ -266,20 +286,20 @@ new_sbm_network <- function(edges = dplyr::tibble(),
     nodes <- dplyr::filter(nodes, not_in(id, unconnected_nodes))
   }
 
+
   # Build object
-  x <- structure(
-    list(nodes = nodes,
-         edges = edges),
-    class = "sbm_network",
-    n_nodes = nrow(nodes),
-    n_edges = nrow(edges),
-    from_column = from_column,
-    to_column = to_column
-  )
+  x <- structure(list(nodes = nodes,
+                      edges = edges),
+                 class = "sbm_network",
+                 n_nodes = nrow(nodes),
+                 n_edges = nrow(edges),
+                 from_column = from_column,
+                 to_column = to_column,
+                 allowed_edge_pairs = allowed_edge_pairs )
 
   # Initialize a model if requested
   if (setup_model) {
-    x <- verify_model(x,show_messages = FALSE)
+    x <- verify_model(x, show_messages = FALSE)
   }
 
   # Return

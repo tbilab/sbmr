@@ -216,7 +216,7 @@ network %>%
   state_to_truth_table()
 ```
 
-Again we got a perfect collapsing into the `n_block` generating blocks. 
+Again we got an almost perfect collapsing into the `n_block` generating blocks. 
 
 
 

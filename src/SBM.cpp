@@ -10,12 +10,13 @@ NodePtr SBM::propose_move(const NodePtr node, const double eps)
   PROFILE_FUNCTION();
 
   const int block_level = node->level + 1;
+  const int node_type   = node->type;
 
   // Grab a list of all the blocks that the node could join
-  const NodeVec potential_blocks = get_nodes_of_type_at_level(node->type, block_level);
+  const NodeVec potential_blocks = get_nodes_of_type_at_level(node_type, block_level);
 
-  // Sample a random neighbor of the current node
-  const NodePtr rand_neighbor = sampler.sample(node->get_edges_to_level(node->level));
+  // Sample a random neighbor of node
+  const NodePtr rand_neighbor = sampler.sample(node->edges)->get_parent_at_level(node->level);
 
   // Get number total number edges for neighbor's block
   const int neighbor_block_degree = rand_neighbor->parent->degree;
@@ -26,7 +27,7 @@ NodePtr SBM::propose_move(const NodePtr node, const double eps)
 
   // Decide where we will get new block from and draw from potential candidates
   return sampler.draw_unif() < prob_of_random_block ? sampler.sample(potential_blocks)
-                                                    : sampler.sample(rand_neighbor->get_edges_to_level(block_level));
+                                                    : sampler.sample(rand_neighbor->get_edges_to_level(block_level, node_type));
 }
 
 // =============================================================================
@@ -59,30 +60,35 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
   int node_to_old_block = 0;
   int node_to_new_block = 0;
 
-  const NodeVec& old_block_edges = old_block->get_edges_to_level(block_level);
-  for (const auto& edge : old_block_edges) {
-    move_edge_counts[edge].old_to_neighbor++;
+  for (const auto& edge : old_block->edges) {
+    move_edge_counts[edge->get_parent_at_level(block_level)].old_to_neighbor++;
   }
 
-  const NodeVec& new_block_edges = new_block->get_edges_to_level(block_level);
-  for (const auto& edge : new_block_edges) {
-    move_edge_counts[edge].new_to_neighbor++;
+  for (const auto& edge : new_block->edges) {
+    move_edge_counts[edge->get_parent_at_level(block_level)].new_to_neighbor++;
   }
 
-  const NodeVec& node_edges = node->get_edges_to_level(block_level);
-  for (const auto& edge : node_edges) {
-    if (edge == old_block) {
+  for (const auto& edge : node->edges) {
+    const NodePtr edge_block = edge->get_parent_at_level(block_level);
+
+    if (edge_block == old_block) {
       node_to_old_block++;
     }
-    else if (edge == new_block) {
+    else if (edge_block == new_block) {
       node_to_new_block++;
     }
 
-    move_edge_counts[edge].node_to_neighbor++;
+    move_edge_counts[edge_block].node_to_neighbor++;
   }
 
   // How many possible neighbor blocks are there?
-  const int n_possible_neighbors = node_type_counts[node_edges[0]->type][block_level];
+  // Loop over all the possible neighbor node types for this node and add up.
+  int n_possible_neighbors = 0;
+
+  const auto possible_neighbor_types = edge_type_pairs.at(node->type);
+  for (const auto& neighbor_type : possible_neighbor_types) {
+    n_possible_neighbors += node_type_counts[neighbor_type][block_level];
+  }
 
   // These are constants for edge connections that are used in entropy calc
   const int node_to_old_new_delta = node_to_old_block - node_to_new_block;
@@ -322,9 +328,8 @@ double SBM::get_entropy(const int level)
   // Grab all block nodes
   const LevelPtr block_level = get_level(level + 1);
 
-  if (block_level->size() == 0)
-  {
-     throw "Can't compute entropy for network with no block structure.";
+  if (block_level->size() == 0) {
+    throw "Can't compute entropy for network with no block structure.";
   }
 
   // Now calculate the edge entropy betweeen nodes.
@@ -656,12 +661,13 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
     // Gather info for return
     step_results.push_back(Merge_Step(total_entropy_delta, get_state(), curr_num_blocks));
     step_results[0].entropy = initial_entropy + total_entropy_delta;
-  } else {
-    // Update the results entropy values with the true entropy rather than the delta provided. 
+  }
+  else {
+    // Update the results entropy values with the true entropy rather than the delta provided.
     double current_entropy = initial_entropy;
     for (auto& step_result : step_results) {
       step_result.entropy = current_entropy + step_result.entropy_delta;
-      current_entropy = step_result.entropy;
+      current_entropy     = step_result.entropy;
     }
   }
 

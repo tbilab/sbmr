@@ -37,14 +37,10 @@ TEST_CASE("Basic Initialization", "[Node]")
   REQUIRE(n1->get_parent_at_level(1)->id == n1->parent->id);
 
   // Make sure the edge propigate properly.
-  REQUIRE(
-      "m1, m3" == print_node_ids(n1->get_edges_to_level(0)));
-  REQUIRE(
-      "d1, d2" == print_node_ids(n1->get_edges_to_level(1)));
-  REQUIRE(
-      "d1, d1, d2" == print_node_ids(c1->get_edges_to_level(1)));
-  REQUIRE(
-      "d2, d2" == print_node_ids(c2->get_edges_to_level(1)));
+  REQUIRE("m1, m3" == print_node_ids(n1->get_edges_to_level(0, 2)));
+  REQUIRE("d1, d2" == print_node_ids(n1->get_edges_to_level(1, 2)));
+  REQUIRE("d1, d1, d2" == print_node_ids(c1->get_edges_to_level(1, 2)));
+  REQUIRE("d2, d2" == print_node_ids(c2->get_edges_to_level(1, 2)));
 }
 
 TEST_CASE("Gathering edge counts to a level", "[Node]")

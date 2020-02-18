@@ -12,10 +12,27 @@ class Rcpp_SBM : public SBM {
   std::unordered_map<string, int> type_string_to_int;
   std::unordered_map<int, string> type_int_to_string;
 
-  // Keeps track of all the edges for graph so object can be copied within r
-  // without needing a whole new set of the generating data
-  std::list<std::string> edges_from;
-  std::list<std::string> edges_to;
+
+  // Add allowed edge pairs to the object. Overwrites previous work if it was there
+  void add_allowed_pairs(const std::vector<std::string> from_type,
+                         const std::vector<std::string> to_type)
+  {
+    // Clear old allowed pairs (if they exist)
+    edge_type_pairs.clear();
+
+    // Convert the types to the model-language integer types
+    const std::vector<int> from_type_ints = type_to_int(from_type);
+    const std::vector<int> to_type_ints   = type_to_int(to_type);
+
+    // Add pairs to network map of allowed pairs
+    const int num_pairs = from_type.size();
+    for (int i = 0; i < num_pairs; i++) {
+      add_allowed_node_type_combos(from_type_ints[i], to_type_ints[i]);
+    }
+
+    // Let object know that we're working with specified types now.
+    specified_allowed_edges = true;
+  }
 
   void add_node(const std::string id, const std::string type, const int level)
   {
@@ -62,12 +79,24 @@ class Rcpp_SBM : public SBM {
 
   void add_edge(const std::string node_a_id, const std::string node_b_id)
   {
-    SBM::add_edge(find_node_by_id(node_a_id, 0),
-                  find_node_by_id(node_b_id, 0));
+    const NodePtr node_a = find_node_by_id(node_a_id, 0);
+    const NodePtr node_b = find_node_by_id(node_b_id, 0);
 
-    // Add edge to the edges vector
-    edges_from.push_back(node_a_id);
-    edges_to.push_back(node_b_id);
+    // If the user has specified allowed edges explicitely, make sure that this edge follows protocol
+    if (specified_allowed_edges) {
+      const bool a_to_b_bad = !(edge_type_pairs.at(node_a->type).count(node_b->type));
+      const bool b_to_a_bad = !(edge_type_pairs.at(node_b->type).count(node_a->type));
+
+      if (a_to_b_bad | b_to_a_bad) {
+        stop("Edge of " + node_a_id + " - " + node_b_id + " does not fit allowed specified allowed_edge_pairs type combos.");
+      }
+    }
+    else {
+      // If the user has not specified the allowed edges explicitely, then build allowed combos from the edges
+      add_allowed_node_type_combos(node_a->type, node_b->type);
+    }
+
+    SBM::add_edge(node_a, node_b);
   }
 
   // Convert the types from integers (cpp friendly) to strings (r friendly)
@@ -84,6 +113,21 @@ class Rcpp_SBM : public SBM {
 
     return string_types;
   }
+
+  int get_int_type(const std::string& string_type)
+  {
+    // Attempt to locate string type in string-to-int map
+    const auto loc_of_int_type = type_string_to_int.find(string_type);
+
+    // If type is not in map, throw an error
+    if (loc_of_int_type == type_string_to_int.end()) {
+      stop(string_type + " not found in model");
+    }
+
+    // Convert string to int and return
+    return loc_of_int_type->second;
+  }
+
   // Convert the types from strings to integers
   std::vector<int> type_to_int(const std::vector<string>& string_types)
   {
@@ -91,16 +135,8 @@ class Rcpp_SBM : public SBM {
     int_types.reserve(string_types.size());
 
     for (const auto& type : string_types) {
-      // Make sure that the requested type has been seen by the model already and
-      // send message to R if it hasnt.
-      const auto loc_of_int_type = type_string_to_int.find(type);
-      if (loc_of_int_type == type_string_to_int.end()) {
-        stop(type + " not found in model");
-      }
-      else {
-        // Convert string to int and push to vector
-        int_types.push_back(loc_of_int_type->second);
-      }
+      // Convert string to int and push to vector
+      int_types.push_back(get_int_type(type));
     }
 
     return int_types;
@@ -122,40 +158,6 @@ class Rcpp_SBM : public SBM {
     return state_to_df(SBM::get_state());
   }
 
-  DataFrame get_edges()
-  {
-    return DataFrame::create(
-        _["from"]             = edges_from,
-        _["to"]               = edges_to,
-        _["stringsAsFactors"] = false);
-  }
-
-  List get_data()
-  {
-    // Grab level 0
-    const LevelPtr level_data = get_level(0);
-
-    // Initialize vectors to hold ids and types of nodes
-    std::vector<string> node_ids;
-    std::vector<string> node_types;
-    node_ids.reserve(level_data->size());
-    node_types.reserve(level_data->size());
-    // scan through level and fill in vectors
-    for (const auto& node : *level_data) {
-      node_ids.push_back(node.first);
-      node_types.push_back(type_int_to_string[node.second->type]);
-    }
-
-    return List::create(
-        _["nodes"] = DataFrame::create(
-            _["id"]               = node_ids,
-            _["type"]             = node_types,
-            _["stringsAsFactors"] = false),
-        _["edges"] = DataFrame::create(
-            _["from"]             = edges_from,
-            _["to"]               = edges_to,
-            _["stringsAsFactors"] = false));
-  }
 
   void set_node_parent(const std::string child_id,
                        const std::string parent_id,
@@ -415,6 +417,9 @@ RCPP_MODULE(SBM)
       .method("add_edge",
               &Rcpp_SBM::add_edge,
               "Connects two nodes in network (at level 0) by their ids (string).")
+      .method("add_allowed_pairs",
+              &Rcpp_SBM::add_allowed_pairs,
+              "Add list of allowed pairs of node types for edges.")
       .method("set_node_parent",
               &Rcpp_SBM::set_node_parent,
               "Sets the parent node (or block) for a given node. Takes child node's id (string), parent node's id (string), and the level of child node (int).")
@@ -424,18 +429,12 @@ RCPP_MODULE(SBM)
       .method("get_state",
               &Rcpp_SBM::get_state,
               "Exports the current state of the network as dataframe with each node as a row and columns for node id, parent id, node type, and node level.")
-      .method("get_edges",
-              &Rcpp_SBM::get_edges,
-              "Returns a from and to columned dataframe of all the edges added to class")
       .method("get_node_to_block_edge_counts",
               &Rcpp_SBM::get_node_to_block_edge_counts,
               "Returns a dataframe with the requested nodes connection counts to all blocks/nodes at a desired level.")
       .method("get_block_edge_counts",
               &Rcpp_SBM::get_block_edge_counts,
               "Returns a dataframe of counts of edges between all connected pairs of blocks at given level.")
-      .method("get_data",
-              &Rcpp_SBM::get_data,
-              "Returns data needed to construct sbm again from R")
       .method("load_from_state",
               &Rcpp_SBM::load_from_state,
               "Takes model state export as given by SBM$get_state() and returns model to specified state. This is useful for resetting model before running various algorithms such as agglomerative merging.")

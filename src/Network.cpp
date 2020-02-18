@@ -156,6 +156,13 @@ NodeVec Network::get_nodes_of_type_at_level(const int type, const int level)
 void Network::add_edge(const NodePtr node1, const NodePtr node2)
 {
   PROFILE_FUNCTION();
+
+  // Check if we have an explicite list of allowed edge patterns or if we should
+  // add this edge as a possible pair.
+  if (!specified_allowed_edges) {
+    add_allowed_node_type_combos(node1->type, node2->type);
+  }
+
   Node::connect_nodes(node1, node2);   // Connect nodes to eachother
   edges.push_back(Edge(node1, node2)); // Add edge to edge tracking list
 };
@@ -168,6 +175,15 @@ void Network::add_edge(const string node1_id, const string node2_id)
   PROFILE_FUNCTION();
   Network::add_edge(get_node_by_id(node1_id), get_node_by_id(node2_id));
 };
+
+// =============================================================================
+// Add an alowed pairing of node types for edges
+// =============================================================================
+void Network::add_allowed_node_type_combos(const int from_type, const int to_type)
+{
+  edge_type_pairs[from_type].insert(to_type);
+  edge_type_pairs[to_type].insert(from_type);
+}
 
 // =============================================================================
 // Builds and assigns a block node for every node in a given level
@@ -398,11 +414,11 @@ void Network::load_from_state(const State_Dump state)
   clean_empty_blocks();
 }
 
-
 // Gathers counts of edges between all pairs of connected blocks in network
-std::map<Edge, int> Network::gather_block_counts_at_level(const int level){
+std::map<Edge, int> Network::gather_block_counts_at_level(const int level)
+{
   std::map<Edge, int> block_counts;
-  
+
   // Loop through edges and gather at desired level
   for (auto& edge : edges) {
     block_counts[edge.at_level(level)]++;

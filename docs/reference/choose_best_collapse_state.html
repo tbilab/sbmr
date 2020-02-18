@@ -183,7 +183,7 @@ location, or a string labeling algorithm. Currently only <code>"lowest"</code>,
   <span class='fu'><a href='collapse_blocks.html'>collapse_blocks</a></span>(<span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>2</span>)
 
 <span class='co'># Choose best result with default heuristic</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>net</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 2150.1848.</div><div class='input'>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>net</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 2149.8395.</div><div class='input'>
 <span class='co'># Score heuristic that fits a nonlinear model to observed values and chooses by largest negative residual</span>
 <span class='no'>nls_score</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>e</span>, <span class='no'>k</span>){
   <span class='no'>entropy_model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/nls.html'>nls</a></span>(<span class='no'>e</span> ~ <span class='no'>a</span> + <span class='no'>b</span> * <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='no'>k</span>), <span class='kw'>start</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span>(<span class='no'>e</span>), <span class='kw'>b</span> <span class='kw'>=</span> -<span class='fl'>25</span>))
@@ -193,7 +193,7 @@ location, or a string labeling algorithm. Currently only <code>"lowest"</code>,
 <span class='co'># Choose result using custom heuristic function</span>
 <span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>net</span>,
                                      <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='no'>nls_score</span>,
-                                     <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 12 blocks and an entropy of 2071.0015.</div><div class='input'>
+                                     <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 5 blocks and an entropy of 2132.1193.</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

@@ -11,6 +11,7 @@ new_sbm_network(
   edges_to_column = to,
   bipartite_edges = FALSE,
   setup_model = TRUE,
+  allowed_edge_pairs = NULL,
   default_node_type = "node",
   show_warnings = interactive()
 )
@@ -32,6 +33,12 @@ column?}
 
 \item{setup_model}{Should an SBM model object be added? Set to \code{FALSE} if
 network is just being visualized or described.}
+
+\item{allowed_edge_pairs}{A dataframe in the same format of as \code{edges} that
+contains allowed pairs (order does not matter) of possible node type
+combinations across edges. For instance: nodes of type polinator are
+allowed to connect to flower nodes but not to other pollinator nodes. If
+this is left undefined, it is inferred from edges.}
 
 \item{default_node_type}{What should nodes that the type is generated for be
 called?}
@@ -144,6 +151,20 @@ nodes_tripartite <- dplyr::tribble(
 
 new_sbm_network(edges = edges_tripartite,
                 nodes = nodes_tripartite)
+
+# the allowed_edge_pairs argument lets you explicitely tell the
+# model what each type of node is allowed to connect to.
+# Here we use it to enforce tripartite structure where nodes of
+# the a type can connect to either b or c but b and c can only
+# connect to a.
+
+allowed_edge_pairs <- dplyr::tribble(~from, ~to,
+                                       "a", "b",
+                                       "a", "c")
+
+new_sbm_network(edges = edges_tripartite,
+                nodes = nodes_tripartite,
+                allowed_edge_pairs = allowed_edge_pairs)
 
 }
 \seealso{
