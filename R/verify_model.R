@@ -33,7 +33,6 @@ verify_model.default <- function(x){
 
 #' @export
 verify_model.sbm_network <- function(x, show_messages = FALSE){
-
   has_model_already <- !is.null(attr(x, 'model'))
   has_state_already <- !is.null(attr(x, "state"))
 
@@ -57,25 +56,25 @@ verify_model.sbm_network <- function(x, show_messages = FALSE){
   sbm_model <- new(SBM)
 
   # Fill in all the needed nodes
-  for(i in 1:attr(x, "n_nodes")){
-    sbm_model$add_node(x$nodes$id[i], x$nodes$type_index[i], 0L)
+  # bind the integer types to nodes before sending them to model
+  dplyr::left_join(x$nodes, attr(x, 'type_map'), by = 'type') %>% {
+    purrr::walk2(.$id, .$type_index,
+                 function(id, type){ sbm_model$add_node(id, type, 0L) })
   }
 
   # If the model has a allowed node pairs list, let model know before adding edges
   allowed_pairs <- attr(x, 'edge_types')
   if(!is.null(allowed_pairs)){
-    sbm_model$add_edge_types(dplyr::pull(allowed_pairs, !!attr(x, "from_column")),
-                                dplyr::pull(allowed_pairs, !!attr(x, "to_column")))
+    sbm_model$add_edge_types(convert_to_type_index(dplyr::pull(allowed_pairs, !!attr(x, "from_column")), x),
+                             convert_to_type_index(dplyr::pull(allowed_pairs, !!attr(x, "to_column"))  , x))
   }
 
   # Fill in the edges
   from_nodes <- dplyr::pull(x$edges, !!attr(x, "from_column"))
   to_nodes <- dplyr::pull(x$edges, !!attr(x, "to_column"))
   for(i in 1:attr(x, "n_edges")){
-    sbm_model$add_edge(
-      from_nodes[i],
-      to_nodes[i]
-    )
+    sbm_model$add_edge(from_nodes[i],
+                       to_nodes[i])
   }
 
   if (has_state_already) {
@@ -86,9 +85,9 @@ verify_model.sbm_network <- function(x, show_messages = FALSE){
 
     # Reload state using the s4 method for doing so exposed by rcpp
     sbm_model$load_from_state(previous_state$id,
-                        previous_state$parent,
-                        previous_state$level,
-                        previous_state$type)
+                              previous_state$parent,
+                              previous_state$level,
+                              previous_state$type)
   } else {
     if(show_messages) message("New SBM model object initialized.")
     # Update object state with newly created state
