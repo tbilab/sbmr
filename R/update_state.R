@@ -71,12 +71,22 @@ update_state.default <- function(sbm, state_df){
 #' @export
 update_state.sbm_network <- function(sbm, state_df){
 
+  # Bind the integer types
+  state_df <- dplyr::left_join(state_df, type_map, by = 'type')
+
+  # Check for any unrecognized types
+  if (any(is.na(state_df$type_index))){
+    bad_nodes <- paste(state_df$id[is.na(state_df$type_index)], collapse = ",")
+    stop(paste0("New state has nodes (", bad_nodes ,") with unrecognized types."))
+  }
+
+
   attr(sbm, 'state') <- state_df
 
   attr(sbm, 'model')$load_from_state(state_df$id,
-                            state_df$parent,
-                            state_df$level,
-                            state_df$type)
+                                     state_df$parent,
+                                     state_df$level,
+                                     state_df$type_index)
 
   sbm
 }
