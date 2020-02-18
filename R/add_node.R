@@ -46,16 +46,19 @@ add_node.sbm_network <- function(sbm, id, type = NULL, show_messages = TRUE){
 
   type_missing <- is.null(type)
   node_not_in_network <- not_in(id, sbm$nodes$id)
+  type_map <- attr(sbm, 'type_map')
 
   if(node_not_in_network){
 
     if(type_missing){
-      type <- sbm$nodes$type[1]
+      type <- type_map$type[1]
+      type_index <- type_map$type_index[1]
       if(show_messages){
         message(glue::glue("{id} node not in network but has no specified type. Defaulting to {type}"))
       }
     }
 
+    type_index <- type_map$type_index[type_map$type == type]
     # Add node to nodes list
     sbm$nodes <- dplyr::bind_rows(sbm$nodes,
                                   dplyr::tibble(id = id, type = type))
@@ -65,7 +68,7 @@ add_node.sbm_network <- function(sbm, id, type = NULL, show_messages = TRUE){
     sbm <- verify_model(sbm)
 
     # Add node to s4 model class
-    attr(sbm, 'model')$add_node(id, type, 0L)
+    attr(sbm, 'model')$add_node(id, type_index, 0L)
 
     # Update state with new nodes [inefficient]
     attr(sbm, "state") <- attr(sbm, 'model')$get_state()
