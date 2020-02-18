@@ -58,7 +58,7 @@ verify_model.sbm_network <- function(x, show_messages = FALSE){
 
   # Fill in all the needed nodes
   for(i in 1:attr(x, "n_nodes")){
-    sbm_model$add_node(x$nodes$id[i], x$nodes$type[i], 0L)
+    sbm_model$add_node(x$nodes$id[i], x$nodes$type_index[i], 0L)
   }
 
   # If the model has a allowed node pairs list, let model know before adding edges
