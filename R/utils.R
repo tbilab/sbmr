@@ -60,4 +60,22 @@ not_in <- function(a, b){
   !(a %in% b)
 }
 
+# Get index type for a string type
+get_type_index <- function(string_type, sbm){
+  (attr(sbm, 'type_map') %>%
+    dplyr::filter(type == string_type) %>%
+    dplyr::pull(type_index))[1]
+}
+
+convert_to_type_index <- function(string_types, sbm){
+  dplyr::tibble(type = string_types) %>%
+    dplyr::left_join(attr(sbm, 'type_map'), by = 'type') %>%
+    dplyr::pull(type_index)
+}
+
+convert_to_string_index <- function(integer_types, sbm){
+  dplyr::tibble(type_index = integer_types) %>%
+    dplyr::left_join(attr(sbm, 'type_map'), by = 'type_index') %>%
+    dplyr::pull(type)
+}
 
