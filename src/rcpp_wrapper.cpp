@@ -165,7 +165,7 @@ class Rcpp_SBM : public SBM {
                       const std::vector<std::string>& to_types)
   {
     START_GET_ERRORS
-    Network::add_edge_types(from_types, to_types);
+    SBM::add_edge_types(from_types, to_types);
     END_GET_ERRORS
   }
 
@@ -193,7 +193,7 @@ class Rcpp_SBM : public SBM {
   void initialize_blocks(const int& num_blocks, const int& level)
   {
     START_GET_ERRORS
-    Network::initialize_blocks(num_blocks, level);
+    SBM::initialize_blocks(num_blocks, level);
     END_GET_ERRORS
   }
 
@@ -262,16 +262,16 @@ class Rcpp_SBM : public SBM {
                                             const int&         connections_level = 1)
   {
     START_GET_ERRORS
-    return Network::get_node_to_block_edge_counts(id,
-                                                  node_level,
-                                                  connections_level);
+    return SBM::get_node_to_block_edge_counts(id,
+                                              node_level,
+                                              connections_level);
     END_GET_ERRORS
   }
 
   BlockEdgeCounts get_block_edge_counts(const int& level = 1)
   {
     START_GET_ERRORS
-    return Network::get_block_edge_counts(level);
+    return SBM::get_block_edge_counts(level);
     END_GET_ERRORS
   }
 
