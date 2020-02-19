@@ -160,18 +160,29 @@ NodeVec Network::get_nodes_of_type_at_level(const std::string& type, const int l
 // =============================================================================
 // Adds a edge between two nodes based on their references
 // =============================================================================
-void Network::add_edge(const NodePtr node1, const NodePtr node2)
+void Network::add_edge(const NodePtr node_a, const NodePtr node_b)
 {
   PROFILE_FUNCTION();
 
   // Check if we have an explicite list of allowed edge patterns or if we should
   // add this edge as a possible pair.
-  if (!specified_allowed_edges) {
-    add_edge_types(node1->type, node2->type);
+
+  // If the user has specified allowed edges explicitely, make sure that this edge follows protocol
+  if (specified_allowed_edges) {
+    const bool a_to_b_bad = !(edge_type_pairs.at(node_a->type).count(node_b->type));
+    const bool b_to_a_bad = !(edge_type_pairs.at(node_b->type).count(node_a->type));
+
+    if (a_to_b_bad | b_to_a_bad) {
+      const std::string error_msg = "Edge of " + node_a->id + " - " + node_b->id + " does not fit allowed specified edge_types type combos.";
+      throw std::logic_error(error_msg);
+    }
+  }
+  else {
+    add_edge_types(node_a->type, node_b->type);
   }
 
-  Node::connect_nodes(node1, node2);   // Connect nodes to eachother
-  edges.push_back(Edge(node1, node2)); // Add edge to edge tracking list
+  Node::connect_nodes(node_a, node_b);   // Connect nodes to eachother
+  edges.push_back(Edge(node_a, node_b)); // Add edge to edge tracking list
 };
 
 // =============================================================================
