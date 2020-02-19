@@ -1,8 +1,28 @@
 #include "SBM.h"
 
+#include <RcppCommon.h>
+
+// declaring the specialization
+namespace Rcpp {
+  template <> SEXP wrap(const State_Dump&);
+}
+
 #include <Rcpp.h>
 
 using namespace Rcpp;
+
+namespace Rcpp {
+  // Let Rcpp know how to convert a state dump object into a dataframe for R
+  template <> SEXP wrap(const State_Dump& state){
+    // Create and return dump of state as dataframe
+    return DataFrame::create(
+      _["id"]               = state.id,
+      _["parent"]           = state.parent,
+      _["type"]             = state.type,
+      _["level"]            = state.level,
+      _["stringsAsFactors"] = false);
+  }
+}
 
 class Rcpp_SBM : public SBM {
   public:
@@ -79,9 +99,10 @@ class Rcpp_SBM : public SBM {
         _["stringsAsFactors"] = false);
   }
 
-  DataFrame get_state()
+  State_Dump get_state()
   {
-    return state_to_df(SBM::get_state());
+    // return state_to_df(SBM::get_state());
+    return SBM::get_state();
   }
 
   void initialize_blocks(const int& num_blocks, const int& level)
