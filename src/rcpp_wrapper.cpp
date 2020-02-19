@@ -5,6 +5,7 @@
 // declaring the specialization
 namespace Rcpp {
   template <> SEXP wrap(const State_Dump&);
+  template <> SEXP wrap(const NodePtr& node_ref);
 }
 
 #include <Rcpp.h>
@@ -22,6 +23,12 @@ namespace Rcpp {
       _["level"]            = state.level,
       _["stringsAsFactors"] = false);
   }
+
+  // Node pointer just gets converted to the node id
+  template <> SEXP wrap(const NodePtr& node_ref){
+    return 0;
+  }
+
 }
 
 class Rcpp_SBM : public SBM {
@@ -45,15 +52,7 @@ class Rcpp_SBM : public SBM {
 
   void add_node(const std::string& id, const std::string& type, const int& level)
   {
-    // Check to make sure that this node doesn't already exist in the network
-    auto base_level = get_level(level);
-    if (base_level->find(id) != base_level->end()) {
-      warning(id + " already exists in network\n");
-    }
-    else {
-      // Add node to model
-      SBM::add_node(id, type, level);
-    }
+    SBM::add_node(id, type, level);
   }
 
   NodePtr find_node_by_id(const std::string& node_id, const int &level)
