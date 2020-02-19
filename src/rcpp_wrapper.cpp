@@ -13,11 +13,23 @@ namespace Rcpp {
   template <> SEXP wrap(const NodePtr&);
   template <> SEXP wrap(const BlockEdgeCounts&);
   template <> SEXP wrap(const MCMC_Sweeps&);
+  template <> SEXP wrap(const CollapseResults&);
 }
 
 #include <Rcpp.h>
-
 using namespace Rcpp;
+
+inline DataFrame state_to_df(const State_Dump& state)
+{
+  // Create and return dump of state as dataframe
+  return DataFrame::create(
+    _["id"]               = state.id,
+    _["parent"]           = state.parent,
+    _["type"]             = state.type,
+    _["level"]            = state.level,
+    _["stringsAsFactors"] = false);
+}
+
 
 namespace Rcpp {
   // Let Rcpp know how to convert a state dump object into a dataframe for R
@@ -100,6 +112,23 @@ namespace Rcpp {
                                   _["stringsAsFactors"] = false)
                                             : "NA");
   }
+
+
+  template <> SEXP wrap(const CollapseResults& collapse_results){
+    List entropy_results;
+
+    for (const auto& step : collapse_results) {
+
+      entropy_results.push_back(
+        List::create(
+          _["entropy_delta"] = step.entropy_delta,
+          _["entropy"]       = step.entropy,
+          _["state"]         = state_to_df(step.state),
+          _["num_blocks"]    = step.num_blocks));
+    }
+
+    return entropy_results;
+  }
 }
 
 class Rcpp_SBM : public SBM {
@@ -127,16 +156,6 @@ class Rcpp_SBM : public SBM {
     END_GET_ERRORS
   }
 
-  inline DataFrame state_to_df(const State_Dump& state)
-  {
-    // Create and return dump of state as dataframe
-    return DataFrame::create(
-        _["id"]               = state.id,
-        _["parent"]           = state.parent,
-        _["type"]             = state.type,
-        _["level"]            = state.level,
-        _["stringsAsFactors"] = false);
-  }
 
   State_Dump get_state()
   {
@@ -180,60 +199,41 @@ class Rcpp_SBM : public SBM {
     END_GET_ERRORS
   }
 
-  List collapse_blocks(const int&    node_level,
-                       const int&    num_mcmc_steps,
-                       const int&    desired_num_blocks,
-                       const int&    num_checks_per_block,
-                       const double& sigma,
-                       const double& eps,
-                       const bool&   report_all_steps)
+    CollapseResults collapse_blocks(const int&    node_level,
+                                  const int&    num_mcmc_steps,
+                                  const int&    desired_num_blocks,
+                                  const int&    num_checks_per_block,
+                                  const double& sigma,
+                                  const double& eps,
+                                  const bool&   report_all_steps)
   {
-
-    // Perform collapse
-    const auto collapse_results = SBM::collapse_blocks(node_level,
-                                                       num_mcmc_steps,
-                                                       desired_num_blocks,
-                                                       num_checks_per_block,
-                                                       sigma,
-                                                       eps,
-                                                       report_all_steps);
-
-    List entropy_results;
-
-    for (const auto& step : collapse_results) {
-
-      entropy_results.push_back(
-          List::create(
-              _["entropy_delta"] = step.entropy_delta,
-              _["entropy"]       = step.entropy,
-              _["state"]         = state_to_df(step.state),
-              _["num_blocks"]    = step.num_blocks));
-    }
-
-    return entropy_results;
+    START_GET_ERRORS
+    return SBM::collapse_blocks(node_level,
+                                num_mcmc_steps,
+                                desired_num_blocks,
+                                num_checks_per_block,
+                                sigma,
+                                eps,
+                                report_all_steps);
+    END_GET_ERRORS
   }
 
-  List collapse_run(const int&              node_level,
-                    const int&              num_mcmc_steps,
-                    const int&              num_checks_per_block,
-                    const double&           sigma,
-                    const double&           eps,
-                    const std::vector<int>& block_nums)
+  CollapseResults collapse_run(const int&              node_level,
+                               const int&              num_mcmc_steps,
+                               const int&              num_checks_per_block,
+                               const double&           sigma,
+                               const double&           eps,
+                               const std::vector<int>& block_nums)
   {
-
-    List return_to_r;
-    for (const int& target_num : block_nums) {
-      return_to_r.push_back(
-          collapse_blocks(
-              node_level,
-              num_mcmc_steps,
-              target_num,
-              num_checks_per_block,
-              sigma,
-              eps,
-              false)[0]);
-    }
-    return return_to_r;
+    START_GET_ERRORS
+    return SBM::collapse_run(
+        node_level,
+        num_mcmc_steps,
+        num_checks_per_block,
+        sigma,
+        eps,
+        block_nums);
+    END_GET_ERRORS
   }
 
   DataFrame get_node_to_block_edge_counts(const std::string& id,
