@@ -7,16 +7,16 @@ typedef std::shared_ptr<Node> NodePtr;
 
 TEST_CASE("Basic Initialization", "[Node]")
 {
-  NodePtr n1 = std::make_shared<Node>("n1", 0, 1);
-  NodePtr n2 = std::make_shared<Node>("n2", 0, 1);
-  NodePtr n3 = std::make_shared<Node>("n3", 0, 1);
-  NodePtr m1 = std::make_shared<Node>("m1", 0, 2);
-  NodePtr m2 = std::make_shared<Node>("m2", 0, 2);
-  NodePtr m3 = std::make_shared<Node>("m3", 0, 2);
-  NodePtr c1 = std::make_shared<Node>("c1", 1, 1);
-  NodePtr c2 = std::make_shared<Node>("c2", 1, 1);
-  NodePtr d1 = std::make_shared<Node>("d1", 1, 2);
-  NodePtr d2 = std::make_shared<Node>("d2", 1, 2);
+  NodePtr n1 = std::make_shared<Node>("n1", 0, "a");
+  NodePtr n2 = std::make_shared<Node>("n2", 0, "a");
+  NodePtr n3 = std::make_shared<Node>("n3", 0, "a");
+  NodePtr m1 = std::make_shared<Node>("m1", 0, "b");
+  NodePtr m2 = std::make_shared<Node>("m2", 0, "b");
+  NodePtr m3 = std::make_shared<Node>("m3", 0, "b");
+  NodePtr c1 = std::make_shared<Node>("c1", 1, "a");
+  NodePtr c2 = std::make_shared<Node>("c2", 1, "a");
+  NodePtr d1 = std::make_shared<Node>("d1", 1, "b");
+  NodePtr d2 = std::make_shared<Node>("d2", 1, "b");
 
   n1->set_parent(c1);
   n2->set_parent(c1);
@@ -37,31 +37,31 @@ TEST_CASE("Basic Initialization", "[Node]")
   REQUIRE(n1->get_parent_at_level(1)->id == n1->parent->id);
 
   // Make sure the edge propigate properly.
-  REQUIRE("m1, m3" == print_node_ids(n1->get_edges_to_level(0, 2)));
-  REQUIRE("d1, d2" == print_node_ids(n1->get_edges_to_level(1, 2)));
-  REQUIRE("d1, d1, d2" == print_node_ids(c1->get_edges_to_level(1, 2)));
-  REQUIRE("d2, d2" == print_node_ids(c2->get_edges_to_level(1, 2)));
+  REQUIRE("m1, m3" == print_node_ids(n1->get_edges_to_level(0, "b")));
+  REQUIRE("d1, d2" == print_node_ids(n1->get_edges_to_level(1, "b")));
+  REQUIRE("d1, d1, d2" == print_node_ids(c1->get_edges_to_level(1, "b")));
+  REQUIRE("d2, d2" == print_node_ids(c2->get_edges_to_level(1, "b")));
 }
 
 TEST_CASE("Gathering edge counts to a level", "[Node]")
 {
   // Node level
-  NodePtr a1 = std::make_shared<Node>("a1", 0, 1);
-  NodePtr a2 = std::make_shared<Node>("a2", 0, 1);
-  NodePtr a3 = std::make_shared<Node>("a3", 0, 1);
-  NodePtr b1 = std::make_shared<Node>("b1", 0, 2);
-  NodePtr b2 = std::make_shared<Node>("b2", 0, 2);
-  NodePtr b3 = std::make_shared<Node>("b3", 0, 2);
+  NodePtr a1 = std::make_shared<Node>("a1", 0, "a");
+  NodePtr a2 = std::make_shared<Node>("a2", 0, "a");
+  NodePtr a3 = std::make_shared<Node>("a3", 0, "a");
+  NodePtr b1 = std::make_shared<Node>("b1", 0, "b");
+  NodePtr b2 = std::make_shared<Node>("b2", 0, "b");
+  NodePtr b3 = std::make_shared<Node>("b3", 0, "b");
 
   // First level / blocks
-  NodePtr a11 = std::make_shared<Node>("a11", 1, 1);
-  NodePtr a12 = std::make_shared<Node>("a12", 1, 1);
-  NodePtr b11 = std::make_shared<Node>("b11", 1, 2);
-  NodePtr b12 = std::make_shared<Node>("b12", 1, 2);
+  NodePtr a11 = std::make_shared<Node>("a11", 1, "a");
+  NodePtr a12 = std::make_shared<Node>("a12", 1, "a");
+  NodePtr b11 = std::make_shared<Node>("b11", 1, "b");
+  NodePtr b12 = std::make_shared<Node>("b12", 1, "b");
 
   // Second level / super blocks
-  NodePtr a21 = std::make_shared<Node>("a21", 2, 1);
-  NodePtr b21 = std::make_shared<Node>("b21", 2, 2);
+  NodePtr a21 = std::make_shared<Node>("a21", 2, "a");
+  NodePtr b21 = std::make_shared<Node>("b21", 2, "b");
 
   a1->set_parent(a11);
   a2->set_parent(a12);
@@ -121,12 +121,12 @@ TEST_CASE("Gathering edge counts to a level", "[Node]")
 TEST_CASE("Edge count gathering (unipartite)", "[Node]")
 {
 
-  NodePtr n1 = std::make_shared<Node>("n1", 0, 1);
-  NodePtr n2 = std::make_shared<Node>("n2", 0, 1);
-  NodePtr n3 = std::make_shared<Node>("n3", 0, 1);
-  NodePtr n4 = std::make_shared<Node>("n4", 0, 1);
-  NodePtr n5 = std::make_shared<Node>("n5", 0, 1);
-  NodePtr n6 = std::make_shared<Node>("n6", 0, 1);
+  NodePtr n1 = std::make_shared<Node>("n1", 0);
+  NodePtr n2 = std::make_shared<Node>("n2", 0);
+  NodePtr n3 = std::make_shared<Node>("n3", 0);
+  NodePtr n4 = std::make_shared<Node>("n4", 0);
+  NodePtr n5 = std::make_shared<Node>("n5", 0);
+  NodePtr n6 = std::make_shared<Node>("n6", 0);
 
   // Add edges
   Node::connect_nodes(n1, n2);
@@ -143,9 +143,9 @@ TEST_CASE("Edge count gathering (unipartite)", "[Node]")
   Node::connect_nodes(n5, n6);
 
   // Make 3 blocks
-  NodePtr a = std::make_shared<Node>("a", 1, 1);
-  NodePtr b = std::make_shared<Node>("b", 1, 1);
-  NodePtr c = std::make_shared<Node>("c", 1, 1);
+  NodePtr a = std::make_shared<Node>("a", 1);
+  NodePtr b = std::make_shared<Node>("b", 1);
+  NodePtr c = std::make_shared<Node>("c", 1);
 
   // Assign nodes to their blocks
   n1->set_parent(a);
@@ -178,12 +178,12 @@ TEST_CASE("Edge count gathering (unipartite)", "[Node]")
 TEST_CASE("Edge count gathering after moving (unipartite)", "[Node]")
 {
 
-  NodePtr n1 = std::make_shared<Node>("n1", 0, 1);
-  NodePtr n2 = std::make_shared<Node>("n2", 0, 1);
-  NodePtr n3 = std::make_shared<Node>("n3", 0, 1);
-  NodePtr n4 = std::make_shared<Node>("n4", 0, 1);
-  NodePtr n5 = std::make_shared<Node>("n5", 0, 1);
-  NodePtr n6 = std::make_shared<Node>("n6", 0, 1);
+  NodePtr n1 = std::make_shared<Node>("n1", 0);
+  NodePtr n2 = std::make_shared<Node>("n2", 0);
+  NodePtr n3 = std::make_shared<Node>("n3", 0);
+  NodePtr n4 = std::make_shared<Node>("n4", 0);
+  NodePtr n5 = std::make_shared<Node>("n5", 0);
+  NodePtr n6 = std::make_shared<Node>("n6", 0);
 
   // Add edges
   Node::connect_nodes(n1, n2);
@@ -200,9 +200,9 @@ TEST_CASE("Edge count gathering after moving (unipartite)", "[Node]")
   Node::connect_nodes(n5, n6);
 
   // Make 3 blocks
-  NodePtr a = std::make_shared<Node>("a", 1, 1);
-  NodePtr b = std::make_shared<Node>("b", 1, 1);
-  NodePtr c = std::make_shared<Node>("c", 1, 1);
+  NodePtr a = std::make_shared<Node>("a", 1);
+  NodePtr b = std::make_shared<Node>("b", 1);
+  NodePtr c = std::make_shared<Node>("c", 1);
 
   // Assign nodes to their blocks
   n1->set_parent(a);
@@ -233,22 +233,22 @@ TEST_CASE("Edge count gathering after moving (unipartite)", "[Node]")
 TEST_CASE("Tracking node degrees", "[Node]")
 {
   // Node level
-  NodePtr a1 = std::make_shared<Node>("a1", 0, 1);
-  NodePtr a2 = std::make_shared<Node>("a2", 0, 1);
-  NodePtr a3 = std::make_shared<Node>("a3", 0, 1);
-  NodePtr b1 = std::make_shared<Node>("b1", 0, 2);
-  NodePtr b2 = std::make_shared<Node>("b2", 0, 2);
-  NodePtr b3 = std::make_shared<Node>("b3", 0, 2);
+  NodePtr a1 = std::make_shared<Node>("a1", 0, "a");
+  NodePtr a2 = std::make_shared<Node>("a2", 0, "a");
+  NodePtr a3 = std::make_shared<Node>("a3", 0, "a");
+  NodePtr b1 = std::make_shared<Node>("b1", 0, "b");
+  NodePtr b2 = std::make_shared<Node>("b2", 0, "b");
+  NodePtr b3 = std::make_shared<Node>("b3", 0, "b");
 
   // First level / blocks
-  NodePtr a11 = std::make_shared<Node>("a11", 1, 1);
-  NodePtr a12 = std::make_shared<Node>("a12", 1, 1);
-  NodePtr b11 = std::make_shared<Node>("b11", 1, 2);
-  NodePtr b12 = std::make_shared<Node>("b12", 1, 2);
+  NodePtr a11 = std::make_shared<Node>("a11", 1, "a");
+  NodePtr a12 = std::make_shared<Node>("a12", 1, "a");
+  NodePtr b11 = std::make_shared<Node>("b11", 1, "b");
+  NodePtr b12 = std::make_shared<Node>("b12", 1, "b");
 
   // Second level / super blocks
-  NodePtr a21 = std::make_shared<Node>("a21", 2, 1);
-  NodePtr b21 = std::make_shared<Node>("b21", 2, 2);
+  NodePtr a21 = std::make_shared<Node>("a21", 2, "a");
+  NodePtr b21 = std::make_shared<Node>("b21", 2, "b");
 
   a1->set_parent(a11);
   a2->set_parent(a12);
