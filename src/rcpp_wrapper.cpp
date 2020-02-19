@@ -5,6 +5,7 @@
 // declaring the specialization
 namespace Rcpp {
   template <> SEXP wrap(const State_Dump&);
+  template <> SEXP wrap(const NodePtr& node_ref);
 }
 
 #include <Rcpp.h>
@@ -22,6 +23,12 @@ namespace Rcpp {
       _["level"]            = state.level,
       _["stringsAsFactors"] = false);
   }
+
+  // Node pointer just gets converted to the node id
+  template <> SEXP wrap(const NodePtr& node_ref){
+    return 0;
+  }
+
 }
 
 class Rcpp_SBM : public SBM {
