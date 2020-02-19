@@ -24,131 +24,138 @@ inline DataFrame state_to_df(const State_Dump& state)
 {
   // Create and return dump of state as dataframe
   return DataFrame::create(
-    _["id"]               = state.id,
-    _["parent"]           = state.parent,
-    _["type"]             = state.type,
-    _["level"]            = state.level,
-    _["stringsAsFactors"] = false);
-}
-
-
-namespace Rcpp {
-  // Let Rcpp know how to convert a state dump object into a dataframe for R
-  template <> SEXP wrap(const State_Dump& state){
-    // Create and return dump of state as dataframe
-    return DataFrame::create(
       _["id"]               = state.id,
       _["parent"]           = state.parent,
       _["type"]             = state.type,
       _["level"]            = state.level,
       _["stringsAsFactors"] = false);
+}
+
+namespace Rcpp {
+// Let Rcpp know how to convert a state dump object into a dataframe for R
+template <>
+SEXP wrap(const State_Dump& state)
+{
+  // Create and return dump of state as dataframe
+  return DataFrame::create(
+      _["id"]               = state.id,
+      _["parent"]           = state.parent,
+      _["type"]             = state.type,
+      _["level"]            = state.level,
+      _["stringsAsFactors"] = false);
+}
+
+// Node pointer just gets converted to the node id
+template <>
+SEXP wrap(const NodePtr& node_ref)
+{
+  return 0;
+}
+
+template <>
+SEXP wrap(const BlockEdgeCounts& block_edge_counts)
+{
+
+  const int n_pairs = block_edge_counts.size();
+
+  // Initialize some vectors to return results with
+  // Build dataframe with these values
+  std::vector<std::string> block_a;
+  std::vector<std::string> block_b;
+  std::vector<int>         counts;
+  block_a.reserve(n_pairs);
+  block_b.reserve(n_pairs);
+  counts.reserve(n_pairs);
+
+  // Fill in
+  for (const auto& block_edge : block_edge_counts) {
+    block_a.push_back(block_edge.first.node_a->id);
+    block_b.push_back(block_edge.first.node_b->id);
+    counts.push_back(block_edge.second);
   }
 
-  // Node pointer just gets converted to the node id
-  template <> SEXP wrap(const NodePtr& node_ref){
-    return 0;
-  }
+  // Return
+  return DataFrame::create(_["block_a"]          = block_a,
+                           _["block_b"]          = block_b,
+                           _["count"]            = counts,
+                           _["stringsAsFactors"] = false);
+}
 
+template <>
+SEXP wrap(const MCMC_Sweeps& results)
+{
 
-  template <> SEXP wrap(const BlockEdgeCounts& block_edge_counts){
+  // Check if we have pair tracking information present
+  const int  size_tracked_pairs = results.block_consensus.concensus_pairs.size();
+  const bool tracked_pairs      = size_tracked_pairs > 0;
 
-    const int n_pairs = block_edge_counts.size();
+  // Initialize vectors to hold pair tracking results, if needed.
+  std::vector<std::string> node_pair;
+  std::vector<int>         times_connected;
 
-    // Initialize some vectors to return results with
-    // Build dataframe with these values
-    std::vector<std::string> block_a;
-    std::vector<std::string> block_b;
-    std::vector<int>         counts;
-    block_a.reserve(n_pairs);
-    block_b.reserve(n_pairs);
-    counts.reserve(n_pairs);
+  if (tracked_pairs) {
+    // Fill out pair tracking vectors with map internals
+    node_pair.reserve(size_tracked_pairs);
+    times_connected.reserve(size_tracked_pairs);
 
-    // Fill in
-    for (const auto& block_edge : block_edge_counts) {
-      block_a.push_back(block_edge.first.node_a->id);
-      block_b.push_back(block_edge.first.node_b->id);
-      counts.push_back(block_edge.second);
+    for (const auto& pair : results.block_consensus.concensus_pairs) {
+      node_pair.push_back(pair.first);
+      times_connected.push_back((pair.second).times_connected);
     }
-
-    // Return
-    return DataFrame::create(_["block_a"]          = block_a,
-                             _["block_b"]          = block_b,
-                             _["count"]            = counts,
-                             _["stringsAsFactors"] = false);
-
   }
 
+  // package up results into a list
+  return List::create(
+      _["nodes_moved"] = results.nodes_moved,
+      _["sweep_info"]  = DataFrame::create(
+          _["entropy_delta"]    = results.sweep_entropy_delta,
+          _["num_nodes_moved"]  = results.sweep_num_nodes_moved,
+          _["stringsAsFactors"] = false),
+      _["pairing_counts"] = tracked_pairs ? DataFrame::create(
+                                _["node_pair"]        = node_pair,
+                                _["times_connected"]  = times_connected,
+                                _["stringsAsFactors"] = false)
+                                          : "NA");
+}
 
-  template <> SEXP wrap(const MCMC_Sweeps& results){
+template <>
+SEXP wrap(const CollapseResults& collapse_results)
+{
+  List entropy_results;
 
-    // Check if we have pair tracking information present
-    const int  size_tracked_pairs = results.block_consensus.concensus_pairs.size();
-    const bool tracked_pairs      = size_tracked_pairs > 0;
+  for (const auto& step : collapse_results) {
 
-    // Initialize vectors to hold pair tracking results, if needed.
-    std::vector<std::string> node_pair;
-    std::vector<int>         times_connected;
-
-    if (tracked_pairs) {
-      // Fill out pair tracking vectors with map internals
-      node_pair.reserve(size_tracked_pairs);
-      times_connected.reserve(size_tracked_pairs);
-
-      for (const auto& pair : results.block_consensus.concensus_pairs) {
-        node_pair.push_back(pair.first);
-        times_connected.push_back((pair.second).times_connected);
-      }
-    }
-
-    // package up results into a list
-    return List::create(
-        _["nodes_moved"] = results.nodes_moved,
-        _["sweep_info"]  = DataFrame::create(
-            _["entropy_delta"]    = results.sweep_entropy_delta,
-            _["num_nodes_moved"]  = results.sweep_num_nodes_moved,
-            _["stringsAsFactors"] = false),
-        _["pairing_counts"] = tracked_pairs ? DataFrame::create(
-                                  _["node_pair"]        = node_pair,
-                                  _["times_connected"]  = times_connected,
-                                  _["stringsAsFactors"] = false)
-                                            : "NA");
-  }
-
-
-  template <> SEXP wrap(const CollapseResults& collapse_results){
-    List entropy_results;
-
-    for (const auto& step : collapse_results) {
-
-      entropy_results.push_back(
+    entropy_results.push_back(
         List::create(
-          _["entropy_delta"] = step.entropy_delta,
-          _["entropy"]       = step.entropy,
-          _["state"]         = state_to_df(step.state),
-          _["num_blocks"]    = step.num_blocks));
-    }
-
-    return entropy_results;
+            _["entropy_delta"] = step.entropy_delta,
+            _["entropy"]       = step.entropy,
+            _["state"]         = state_to_df(step.state),
+            _["num_blocks"]    = step.num_blocks));
   }
 
-  template <> SEXP wrap(const NodeEdgeMap& node_connections){
-    const int n_connections = node_connections.size();
+  return entropy_results;
+}
 
-    // Build dataframe with these values
-    std::vector<std::string> connection_id;
-    std::vector<int>         connection_count;
-    connection_id.reserve(n_connections);
-    connection_count.reserve(n_connections);
+template <>
+SEXP wrap(const NodeEdgeMap& node_connections)
+{
+  const int n_connections = node_connections.size();
 
-    for (const auto& connection : node_connections) {
-      connection_id.push_back(connection.first->id);
-      connection_count.push_back(connection.second);
-    }
+  // Build dataframe with these values
+  std::vector<std::string> connection_id;
+  std::vector<int>         connection_count;
+  connection_id.reserve(n_connections);
+  connection_count.reserve(n_connections);
 
-    return DataFrame::create(_["id"]               = connection_id,
-                             _["count"]            = connection_count,
-                             _["stringsAsFactors"] = false);
-  };
+  for (const auto& connection : node_connections) {
+    connection_id.push_back(connection.first->id);
+    connection_count.push_back(connection.second);
+  }
+
+  return DataFrame::create(_["id"]               = connection_id,
+                           _["count"]            = connection_count,
+                           _["stringsAsFactors"] = false);
+};
 }
 
 class Rcpp_SBM : public SBM {
@@ -176,7 +183,6 @@ class Rcpp_SBM : public SBM {
     END_GET_ERRORS
   }
 
-
   State_Dump get_state()
   {
     START_GET_ERRORS
@@ -198,10 +204,6 @@ class Rcpp_SBM : public SBM {
     END_GET_ERRORS
   }
 
-
-  // =============================================================================
-  // Runs multiple MCMC sweeps and keeps track of the results efficiently
-  // =============================================================================
   MCMC_Sweeps mcmc_sweep(const int&    level,
                          const int&    num_sweeps,
                          const double& eps,
@@ -260,7 +262,9 @@ class Rcpp_SBM : public SBM {
                                             const int&         connections_level = 1)
   {
     START_GET_ERRORS
-    return Network::get_node_to_block_edge_counts(id, node_level, connections_level);
+    return Network::get_node_to_block_edge_counts(id,
+                                                  node_level,
+                                                  connections_level);
     END_GET_ERRORS
   }
 
