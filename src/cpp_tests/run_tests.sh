@@ -24,7 +24,8 @@ fi
 
 
 # Compile all the tests
-g++ -std=c++11 ${OPTIMIZATION_LEVEL} cpp_tests/tests-main.o \
+g++ -std=c++11 ${OPTIMIZATION_LEVEL} -DNO_RCPP=1\
+  cpp_tests/tests-main.o \
   Node.o Network.o SBM.o Sampler.o Block_Consensus.o \
   cpp_tests/tests-node.cpp \
   cpp_tests/tests-edge.cpp \
