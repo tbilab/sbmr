@@ -183,11 +183,11 @@ class Rcpp_SBM : public SBM {
   // Runs multiple MCMC sweeps and keeps track of the results efficiently
   // =============================================================================
   MCMC_Sweeps mcmc_sweep(const int&    level,
-                  const int&    num_sweeps,
-                  const double& eps,
-                  const bool&   variable_num_blocks,
-                  const bool&   track_pairs,
-                  const bool&   verbose)
+                         const int&    num_sweeps,
+                         const double& eps,
+                         const bool&   variable_num_blocks,
+                         const bool&   track_pairs,
+                         const bool&   verbose)
   {
     START_GET_ERRORS
     return SBM::mcmc_sweep(level,
@@ -199,7 +199,7 @@ class Rcpp_SBM : public SBM {
     END_GET_ERRORS
   }
 
-    CollapseResults collapse_blocks(const int&    node_level,
+  CollapseResults collapse_blocks(const int&    node_level,
                                   const int&    num_mcmc_steps,
                                   const int&    desired_num_blocks,
                                   const int&    num_checks_per_block,
@@ -226,13 +226,12 @@ class Rcpp_SBM : public SBM {
                                const std::vector<int>& block_nums)
   {
     START_GET_ERRORS
-    return SBM::collapse_run(
-        node_level,
-        num_mcmc_steps,
-        num_checks_per_block,
-        sigma,
-        eps,
-        block_nums);
+    return SBM::collapse_run(node_level,
+                             num_mcmc_steps,
+                             num_checks_per_block,
+                             sigma,
+                             eps,
+                             block_nums);
     END_GET_ERRORS
   }
 
