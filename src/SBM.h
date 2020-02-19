@@ -80,8 +80,6 @@ class SBM : public Network {
   // A random sampler generation class.
   Sampler sampler;
 
-  // Parameters that control the mcmc and merging stuffs
-  // double EPS = 0.1;
 
   // Methods
   // =========================================================================
@@ -97,7 +95,9 @@ class SBM : public Network {
   NodePtr propose_move(NodePtr node, double eps);
 
   // Make a decision on the proposed new block for node
-  Proposal_Res make_proposal_decision(NodePtr node, NodePtr new_block, double eps);
+  Proposal_Res make_proposal_decision(NodePtr node,
+                                      NodePtr new_block,
+                                      double  eps);
 
   // Runs efficient MCMC sweep algorithm on desired node level
   MCMC_Sweeps mcmc_sweep(int    level,
