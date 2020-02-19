@@ -441,9 +441,14 @@ void Network::load_from_state(const State_Dump state)
 }
 
 // Gathers counts of edges between all pairs of connected blocks in network
-BlockEdgeCounts Network::get_block_counts_at_level(const int level)
+BlockEdgeCounts Network::get_block_edge_counts(const int level)
 {
   BlockEdgeCounts block_counts;
+
+  // Make sure we have blocks at the level asked for before proceeding
+  if (nodes.count(level) == 0) {
+    throw std::range_error("Model has no blocks at level " + std::to_string(level));
+  }
 
   // Loop through edges and gather at desired level
   for (auto& edge : edges) {

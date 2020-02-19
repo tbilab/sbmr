@@ -101,7 +101,7 @@ class Network {
   NodeVec get_nodes_of_type_at_level(const std::string& type, const int level); // Return nodes of a desired type from level matching type
 
   // Gathers counts of edges between any two blocks in network
-  BlockEdgeCounts get_block_counts_at_level(int level);
+  BlockEdgeCounts get_block_edge_counts(int level);
 
   // Load a level blocking from a state dump
   void load_from_state(State_Dump state);

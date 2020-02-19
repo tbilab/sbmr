@@ -347,7 +347,7 @@ double SBM::get_entropy(const int level)
   double edge_entropy = 0.0;
 
   // Gather block-to-block edge counts
-  const std::map<Edge, int> block_edges = get_block_counts_at_level(level + 1);
+  const std::map<Edge, int> block_edges = get_block_edge_counts(level + 1);
   for (const auto& block_edge : block_edges) {
     const NodePtr block_r = block_edge.first.node_a;
     const NodePtr block_s = block_edge.first.node_b;
