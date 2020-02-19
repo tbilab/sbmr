@@ -164,7 +164,7 @@ inline NodePtr Node::get_parent_at_level(const int level_of_parent)
 // We return a vector because we need random access to elements in this array
 // and that isn't provided to us with the list format.
 // =============================================================================
-NodeVec Node::get_edges_to_level(const int desired_level, const int node_type)
+NodeVec Node::get_edges_to_level(const int desired_level, const std::string& node_type)
 {
   // Vector to return containing parents at desired level for edges
   NodeVec level_cons;

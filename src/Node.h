@@ -25,11 +25,10 @@ using std::string;
 class Node;
 
 // For a bit of clarity
-typedef std::shared_ptr<Node>       NodePtr;
-typedef std::unordered_set<NodePtr> ChildSet;
-typedef std::vector<NodePtr>        NodeVec;
-typedef std::list<NodePtr>          NodeList;
-// typedef std::map<NodePtr, int>      NodeEdgeMap;
+typedef std::shared_ptr<Node>            NodePtr;
+typedef std::unordered_set<NodePtr>      ChildSet;
+typedef std::vector<NodePtr>             NodeVec;
+typedef std::list<NodePtr>               NodeList;
 typedef std::unordered_map<NodePtr, int> NodeEdgeMap;
 
 //=================================
@@ -40,17 +39,17 @@ class Node : public std::enable_shared_from_this<Node> {
   // Constructors
   // =========================================================================
 
-  // Takes ID, node hiearchy level, and assumes default 0 for type
-  Node(string node_id, int level)
+  // Takes ID, node hiearchy level, and assumes default 'a' for type
+  Node(std::string node_id, int level)
       : id(node_id)
       , level(level)
-      , type(0)
+      , type("a")
       , degree(0)
   {
   }
 
   // Takes the node's id, level, and type.
-  Node(string node_id, int level, int type)
+  Node(std::string node_id, int level, std::string type)
       : id(node_id)
       , level(level)
       , type(type)
@@ -58,28 +57,37 @@ class Node : public std::enable_shared_from_this<Node> {
   {
   }
 
+  // Takes the node's id, level, and type as integer (for legacy api compatability)
+  Node(std::string node_id, int level, int type)
+      : id(node_id)
+      , level(level)
+      , type(std::to_string(type))
+      , degree(0)
+  {
+  }
+
   // Attributes
   // =========================================================================
-  string   id;       // Unique integer id for node
-  NodeList edges;    // Nodes that are connected to this node
-  int      level;    // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
-  NodePtr  parent;   // What node contains this node (aka its cluster)
-  ChildSet children; // Nodes that are contained within node (if node is cluster)
-  int      type;     // What type of node is this?
-  int      degree;   // How many edges/ edges does this node have?
+  std::string id;       // Unique integer id for node
+  std::string type;     // What type of node is this?
+  int         level;    // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
+  NodeList    edges;    // Nodes that are connected to this node
+  NodePtr     parent;   // What node contains this node (aka its cluster)
+  ChildSet    children; // Nodes that are contained within node (if node is cluster)
+  int         degree;   // How many edges/ edges does this node have?
 
   // Methods
   // =========================================================================
-  NodePtr     this_ptr();                                        // Gets a shared pointer to object (replaces this)
-  void        set_parent(NodePtr new_parent);                    // Set current node parent/cluster
-  void        add_child(NodePtr new_child);                      // Add a node to the children vector
-  void        remove_child(NodePtr child);                       // Remove a child node
-  void        add_edge(NodePtr node);                            // Add edge to another node
-  void        update_edges_from_node(NodePtr node, bool remove); // Add or remove edges from nodes edge list
-  NodePtr     get_parent_at_level(int level);                    // Get parent of node at a given level
-  NodeVec     get_edges_to_level(int level, int type);           // Get all nodes connected to Node at a given level
-  NodeEdgeMap gather_edges_to_level(int level);                  // Get a map keyed by node with value of number of edges for all of a nodes edges to a level
-  static void connect_nodes(NodePtr node_a, NodePtr node_b);     // Static method to connect two nodes to each other with edge
+  NodePtr     this_ptr();                                                                // Gets a shared pointer to object (replaces this)
+  void        set_parent(NodePtr new_parent);                                            // Set current node parent/cluster
+  void        add_child(NodePtr new_child);                                              // Add a node to the children vector
+  void        remove_child(NodePtr child);                                               // Remove a child node
+  void        add_edge(NodePtr node);                                                    // Add edge to another node
+  void        update_edges_from_node(NodePtr node, bool remove);                         // Add or remove edges from nodes edge list
+  NodePtr     get_parent_at_level(int level);                                            // Get parent of node at a given level
+  NodeVec     get_edges_to_level(const int desired_level, const std::string& node_type); // Get all nodes connected to Node at a given level
+  NodeEdgeMap gather_edges_to_level(int level);                                          // Get a map keyed by node with value of number of edges for all of a nodes edges to a level
+  static void connect_nodes(NodePtr node_a, NodePtr node_b);                             // Static method to connect two nodes to each other with edge
 };
 
 #endif
