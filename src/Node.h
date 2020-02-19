@@ -90,4 +90,15 @@ class Node : public std::enable_shared_from_this<Node> {
   static void connect_nodes(NodePtr node_a, NodePtr node_b);                             // Static method to connect two nodes to each other with edge
 };
 
+// Macros to turn on or off RCPP specific error reporting. 
+#if NO_RCPP
+#define RCPP_ERRORS_BEGIN
+#define RCPP_ERRORS_END 
+#else
+// Eases the process of wrapping functions to get errors forwarded to R
+#define RCPP_ERRORS_BEGIN try {
+#define RCPP_ERRORS_END } catch(const std::exception& ex){throw Rcpp::exception(ex.what(), false);}
+#endif
+
+
 #endif

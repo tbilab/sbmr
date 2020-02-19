@@ -15,6 +15,7 @@ inline NodePtr Node::this_ptr()
 // =============================================================================
 inline void Node::add_edge(const NodePtr node)
 {
+  RCPP_ERRORS_BEGIN
   //PROFILE_FUNCTION();
 
   // propigate new edge upwards to all parents
@@ -28,6 +29,7 @@ inline void Node::add_edge(const NodePtr node)
     current_node = current_node->parent;
     current_level++;
   }
+  RCPP_ERRORS_END
 }
 
 // =============================================================================

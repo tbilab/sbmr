@@ -8,7 +8,9 @@ OPTIMIZATION_LEVEL=""
 # OPTIMIZATION_LEVEL=-O2
 
 # Compile the main classes
-g++ -std=c++11 ${OPTIMIZATION_LEVEL} -c Node.cpp Network.cpp SBM.cpp Sampler.cpp Block_Consensus.cpp
+g++ -std=c++11 ${OPTIMIZATION_LEVEL} -c \
+  -DNO_RCPP=1 \
+  Node.cpp Network.cpp SBM.cpp Sampler.cpp Block_Consensus.cpp
 
 
 echo "=============================================================================\nCompiling Tests..."
