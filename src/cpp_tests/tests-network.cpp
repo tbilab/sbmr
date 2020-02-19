@@ -9,17 +9,17 @@ TEST_CASE("Basic initialization of network", "[Network]")
   Network my_net;
 
   // Add some nodes to Network
-  my_net.add_node("n1", 0);
-  my_net.add_node("n2", 0);
-  my_net.add_node("n3", 0);
-  my_net.add_node("m1", 1);
-  my_net.add_node("m2", 1);
-  my_net.add_node("m3", 1);
-  my_net.add_node("m4", 1);
+  my_net.add_node("n1", "n");
+  my_net.add_node("n2", "n");
+  my_net.add_node("n3", "n");
+  my_net.add_node("m1", "m");
+  my_net.add_node("m2", "m");
+  my_net.add_node("m3", "m");
+  my_net.add_node("m4", "m");
 
   // Create a block node
-  my_net.create_block_node(0, 1);
-  my_net.create_block_node(1, 1);
+  my_net.create_block_node("n", 1);
+  my_net.create_block_node("m", 1);
 
   // How many nodes at the 'data' level do we have?
   REQUIRE(my_net.nodes.at(0)->size() == 7);
@@ -32,15 +32,15 @@ TEST_CASE("Basic initialization of network", "[Network]")
 
   // Group name convention <type>-<level>_<id>
   REQUIRE(
-      print_node_ids(*my_net.nodes.at(1)) == "0-1_0, 1-1_1");
+      print_node_ids(*my_net.nodes.at(1)) == "m-1_1, n-1_0");
 
   // Filter to a given node type
   REQUIRE(
-      "n1, n2, n3" == print_node_ids(my_net.get_nodes_of_type_at_level(0, 0)));
+      "n1, n2, n3" == print_node_ids(my_net.get_nodes_of_type_at_level("n", 0)));
   REQUIRE(
-      "m1, m2, m3, m4" == print_node_ids(my_net.get_nodes_of_type_at_level(1, 0)));
+      "m1, m2, m3, m4" == print_node_ids(my_net.get_nodes_of_type_at_level("m", 0)));
   REQUIRE(
-      "1-1_1" == print_node_ids(my_net.get_nodes_of_type_at_level(1, 1)));
+      "m-1_1" == print_node_ids(my_net.get_nodes_of_type_at_level("m", 1)));
 
   // Get number of levels
   REQUIRE(my_net.nodes.size() == 2);
@@ -54,26 +54,26 @@ TEST_CASE("Tracking node types", "[Network]")
   Network my_net;
 
   // Add some nodes to Network
-  my_net.add_node("n1", 0);
-  my_net.add_node("n2", 0);
+  my_net.add_node("n1", "n");
+  my_net.add_node("n2", "n");
 
   // There should only be one type of node so far
   REQUIRE(1 == my_net.node_type_counts.size());
 
-  my_net.add_node("m1", 1);
+  my_net.add_node("m1", "m");
 
   // There should now be two types of nodes
   REQUIRE(2 == my_net.node_type_counts.size());
 
-  my_net.add_node("m2", 1);
-  my_net.add_node("n3", 0);
+  my_net.add_node("m2", "m");
+  my_net.add_node("n3", "n");
 
   // There should still just be two types of nodes
   REQUIRE(2 == my_net.node_type_counts.size());
 
-  my_net.add_node("m3", 1);
-  my_net.add_node("o1", 2);
-  my_net.add_node("o2", 2);
+  my_net.add_node("m3", "m");
+  my_net.add_node("o1", "o");
+  my_net.add_node("o2", "o");
 
   // There should now be three types of nodes
   REQUIRE(3 == my_net.node_type_counts.size());
@@ -83,24 +83,24 @@ TEST_CASE("Initializing a block for every node", "[Network]")
 {
   Network my_net;
 
-  my_net.add_node("a1", 1);
-  my_net.add_node("a2", 1);
-  my_net.add_node("a3", 1);
-  my_net.add_node("a4", 1);
-  my_net.add_node("a5", 1);
-  my_net.add_node("a10", 1);
-  my_net.add_node("a11", 1);
-  my_net.add_node("a13", 1);
-  my_net.add_node("a14", 1);
-  my_net.add_node("a6", 1);
-  my_net.add_node("a7", 1);
-  my_net.add_node("a8", 1);
-  my_net.add_node("a9", 1);
-  my_net.add_node("a12", 1);
-  my_net.add_node("b1", 0);
-  my_net.add_node("b2", 0);
-  my_net.add_node("b3", 0);
-  my_net.add_node("b4", 0);
+  my_net.add_node("a1", "a");
+  my_net.add_node("a2", "a");
+  my_net.add_node("a3", "a");
+  my_net.add_node("a4", "a");
+  my_net.add_node("a5", "a");
+  my_net.add_node("a10", "a");
+  my_net.add_node("a11", "a");
+  my_net.add_node("a13", "a");
+  my_net.add_node("a14", "a");
+  my_net.add_node("a6", "a");
+  my_net.add_node("a7", "a");
+  my_net.add_node("a8", "a");
+  my_net.add_node("a9", "a");
+  my_net.add_node("a12", "a");
+  my_net.add_node("b1", "b");
+  my_net.add_node("b2", "b");
+  my_net.add_node("b3", "b");
+  my_net.add_node("b4", "b");
 
   // There should be a total of 18 nodes at base level
   REQUIRE(18 == my_net.get_level(0)->size());
@@ -122,27 +122,27 @@ TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
 {
   Network my_net;
 
-  my_net.add_node("a1", 1);
-  my_net.add_node("a2", 1);
-  my_net.add_node("a3", 1);
-  my_net.add_node("a4", 1);
-  my_net.add_node("a5", 1);
-  my_net.add_node("a6", 1);
-  my_net.add_node("a7", 1);
-  my_net.add_node("a8", 1);
-  my_net.add_node("a9", 1);
-  my_net.add_node("a10", 1);
+  my_net.add_node("a1", "a");
+  my_net.add_node("a2", "a");
+  my_net.add_node("a3", "a");
+  my_net.add_node("a4", "a");
+  my_net.add_node("a5", "a");
+  my_net.add_node("a6", "a");
+  my_net.add_node("a7", "a");
+  my_net.add_node("a8", "a");
+  my_net.add_node("a9", "a");
+  my_net.add_node("a10", "a");
 
-  my_net.add_node("b1", 0);
-  my_net.add_node("b2", 0);
-  my_net.add_node("b3", 0);
-  my_net.add_node("b4", 0);
-  my_net.add_node("b5", 0);
-  my_net.add_node("b6", 0);
-  my_net.add_node("b7", 0);
-  my_net.add_node("b8", 0);
-  my_net.add_node("b9", 0);
-  my_net.add_node("b10", 0);
+  my_net.add_node("b1", "b");
+  my_net.add_node("b2", "b");
+  my_net.add_node("b3", "b");
+  my_net.add_node("b4", "b");
+  my_net.add_node("b5", "b");
+  my_net.add_node("b6", "b");
+  my_net.add_node("b7", "b");
+  my_net.add_node("b8", "b");
+  my_net.add_node("b9", "b");
+  my_net.add_node("b10", "b");
 
   // Distribute 3 total blocks for each type across nodes randomly
   my_net.initialize_blocks(3, 0);
@@ -156,20 +156,20 @@ TEST_CASE("Cleaning up empty blocks", "[Network]")
   Network my_net;
 
   // Start with a few nodes in the network
-  NodePtr n1 = my_net.add_node("n1", 0);
-  NodePtr n2 = my_net.add_node("n2", 0);
-  NodePtr n3 = my_net.add_node("n3", 0);
-  NodePtr n4 = my_net.add_node("n4", 0);
+  NodePtr n1 = my_net.add_node("n1", "a");
+  NodePtr n2 = my_net.add_node("n2", "a");
+  NodePtr n3 = my_net.add_node("n3", "a");
+  NodePtr n4 = my_net.add_node("n4", "a");
 
   // Create a few block nodes at first level
-  NodePtr g1_1 = my_net.create_block_node(0, 1);
-  NodePtr g1_2 = my_net.create_block_node(0, 1);
-  NodePtr g1_3 = my_net.create_block_node(0, 1);
-  NodePtr g1_4 = my_net.create_block_node(0, 1);
+  NodePtr g1_1 = my_net.create_block_node("a", 1);
+  NodePtr g1_2 = my_net.create_block_node("a", 1);
+  NodePtr g1_3 = my_net.create_block_node("a", 1);
+  NodePtr g1_4 = my_net.create_block_node("a", 1);
 
   // Create two blocks for second level
-  NodePtr g2_1 = my_net.create_block_node(0, 2);
-  NodePtr g2_2 = my_net.create_block_node(0, 2);
+  NodePtr g2_1 = my_net.create_block_node("a", 2);
+  NodePtr g2_2 = my_net.create_block_node("a", 2);
 
   // Add children to blocks 1 and two at first level
   n1->set_parent(g1_1);
@@ -213,31 +213,31 @@ TEST_CASE("Counting edges", "[Network]")
   Network my_net;
 
   // Base-level nodes
-  NodePtr a1 = my_net.add_node("a1", 0);
-  NodePtr a2 = my_net.add_node("a2", 0);
-  NodePtr a3 = my_net.add_node("a3", 0);
-  NodePtr a4 = my_net.add_node("a4", 0);
-  NodePtr a5 = my_net.add_node("a5", 0);
+  NodePtr a1 = my_net.add_node("a1", "a");
+  NodePtr a2 = my_net.add_node("a2", "a");
+  NodePtr a3 = my_net.add_node("a3", "a");
+  NodePtr a4 = my_net.add_node("a4", "a");
+  NodePtr a5 = my_net.add_node("a5", "a");
 
-  NodePtr b1 = my_net.add_node("b1", 1);
-  NodePtr b2 = my_net.add_node("b2", 1);
-  NodePtr b3 = my_net.add_node("b3", 1);
-  NodePtr b4 = my_net.add_node("b4", 1);
-  NodePtr b5 = my_net.add_node("b5", 1);
+  NodePtr b1 = my_net.add_node("b1", "b");
+  NodePtr b2 = my_net.add_node("b2", "b");
+  NodePtr b3 = my_net.add_node("b3", "b");
+  NodePtr b4 = my_net.add_node("b4", "b");
+  NodePtr b5 = my_net.add_node("b5", "b");
 
   // level one blocks
-  NodePtr a11 = my_net.add_node("a11", 0, 1);
-  NodePtr a12 = my_net.add_node("a12", 0, 1);
-  NodePtr a13 = my_net.add_node("a13", 0, 1);
-  NodePtr b11 = my_net.add_node("b11", 1, 1);
-  NodePtr b12 = my_net.add_node("b12", 1, 1);
-  NodePtr b13 = my_net.add_node("b13", 1, 1);
+  NodePtr a11 = my_net.add_node("a11", "a", 1);
+  NodePtr a12 = my_net.add_node("a12", "a", 1);
+  NodePtr a13 = my_net.add_node("a13", "a", 1);
+  NodePtr b11 = my_net.add_node("b11", "b", 1);
+  NodePtr b12 = my_net.add_node("b12", "b", 1);
+  NodePtr b13 = my_net.add_node("b13", "b", 1);
 
   // level two blocks
-  NodePtr a21 = my_net.add_node("a21", 0, 2);
-  NodePtr a22 = my_net.add_node("a22", 0, 2);
-  NodePtr b21 = my_net.add_node("b21", 1, 2);
-  NodePtr b22 = my_net.add_node("b22", 1, 2);
+  NodePtr a21 = my_net.add_node("a21", "a", 2);
+  NodePtr a22 = my_net.add_node("a22", "a", 2);
+  NodePtr b21 = my_net.add_node("b21", "b", 2);
+  NodePtr b22 = my_net.add_node("b22", "b", 2);
 
   // Add edges
   my_net.add_edge(a1, b1);
@@ -286,7 +286,7 @@ TEST_CASE("Counting edges", "[Network]")
 
   // There should be three total layers...
   REQUIRE(3 == my_net.nodes.size());
-  REQUIRE(3 == my_net.node_type_counts[0].size());
+  REQUIRE(3 == my_net.node_type_counts.at("a").size());
 
   // 10 nodes at first level...
   REQUIRE(10 == my_net.nodes.at(0)->size());
@@ -401,21 +401,21 @@ TEST_CASE("State dumping and restoring", "[Network")
   Network my_net;
 
   // Start with a few nodes in the network
-  NodePtr a1 = my_net.add_node("a1", 0);
-  NodePtr a2 = my_net.add_node("a2", 0);
-  NodePtr a3 = my_net.add_node("a3", 0);
+  NodePtr a1 = my_net.add_node("a1", "a");
+  NodePtr a2 = my_net.add_node("a2", "a");
+  NodePtr a3 = my_net.add_node("a3", "a");
 
-  NodePtr b1 = my_net.add_node("b1", 1);
-  NodePtr b2 = my_net.add_node("b2", 1);
-  NodePtr b3 = my_net.add_node("b3", 1);
+  NodePtr b1 = my_net.add_node("b1", "b");
+  NodePtr b2 = my_net.add_node("b2", "b");
+  NodePtr b3 = my_net.add_node("b3", "b");
 
-  NodePtr a11 = my_net.add_node("a11", 0, 1);
-  NodePtr a12 = my_net.add_node("a12", 0, 1);
-  NodePtr a13 = my_net.add_node("a13", 0, 1);
+  NodePtr a11 = my_net.add_node("a11", "a", 1);
+  NodePtr a12 = my_net.add_node("a12", "a", 1);
+  NodePtr a13 = my_net.add_node("a13", "a", 1);
 
-  NodePtr b11 = my_net.add_node("b11", 1, 1);
-  NodePtr b12 = my_net.add_node("b12", 1, 1);
-  NodePtr b13 = my_net.add_node("b13", 1, 1);
+  NodePtr b11 = my_net.add_node("b11", "b", 1);
+  NodePtr b12 = my_net.add_node("b12", "b", 1);
+  NodePtr b13 = my_net.add_node("b13", "b", 1);
 
   // Assign simple block structure
   a1->set_parent(a11);
@@ -437,7 +437,7 @@ TEST_CASE("State dumping and restoring", "[Network")
       print_ids_to_string(state1.parent) == "a11, a12, a13, b11, b12, b13, none, none, none, none, none, none");
 
   // Now give node a1 a different parent
-  NodePtr a14 = my_net.add_node("a14", 0, 1);
+  NodePtr a14 = my_net.add_node("a14", "a", 1);
   a1->set_parent(a14);
 
   // Dump model state again
