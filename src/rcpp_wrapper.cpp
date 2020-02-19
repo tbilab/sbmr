@@ -1,5 +1,10 @@
 #include "SBM.h"
 
+// Eases the process of wrapping functions to get errors forwarded to R
+#define START_GET_ERRORS try {
+#define END_GET_ERRORS } catch(const std::exception& ex){throw Rcpp::exception(ex.what(), false);}
+
+
 #include <RcppCommon.h>
 
 // declaring the specialization
@@ -121,17 +126,11 @@ class Rcpp_SBM : public SBM {
     }
   }
 
-  inline void pass_error(const std::exception& ex){
-    throw Rcpp::exception(ex.what(), false);
-  }
   void add_edge(const std::string& node_a_id, const std::string& node_b_id)
   {
-    try {
-      SBM::add_edge(node_a_id, node_b_id);
-    }
-    catch (const std::exception& ex) {
-      pass_error(ex);
-    }
+    START_GET_ERRORS
+    SBM::add_edge(node_a_id, node_b_id);
+    END_GET_ERRORS
   }
 
   inline DataFrame state_to_df(const State_Dump& state)
