@@ -71,7 +71,7 @@ string Network::build_block_id(const std::string& type,
 // =============================================================================
 NodePtr Network::add_node(const std::string& id,
                           const std::string& type,
-                          const int          level = 0)
+                          const int          level)
 {
   PROFILE_FUNCTION();
   // Grab level
@@ -427,4 +427,3 @@ std::map<Edge, int> Network::get_block_counts_at_level(const int level)
 
   return block_counts;
 }
-
