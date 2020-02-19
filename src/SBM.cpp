@@ -191,6 +191,17 @@ MCMC_Sweeps SBM::mcmc_sweep(const int    level,
   NodeVec node_vec;
   node_vec.reserve(node_map->size());
 
+  // Check if we have any blocks ready in the network...
+  const bool no_blocks_present = get_level(block_level)->size() == 0;
+
+  if (no_blocks_present) {
+    initialize_blocks(-1, level);
+
+    if (verbose) {
+      std::cerr << "No blocks present. Initializing one block per node." << std::endl;
+    }
+  }
+
   if (verbose) {
     std::cout << "sweep_num,"
               << "node,"
