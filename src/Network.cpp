@@ -452,3 +452,11 @@ BlockEdgeCounts Network::get_block_counts_at_level(const int level)
 
   return block_counts;
 }
+
+NodeEdgeMap Network::get_node_to_block_edge_counts(const std::string& id,
+                                                   const int&         node_level,
+                                                   const int&         connections_level)
+{
+  // Get edges to desired level
+  return get_node_by_id(id, node_level)->gather_edges_to_level(connections_level);
+}

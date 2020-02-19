@@ -120,6 +120,11 @@ class Network {
   static string build_block_id(const std::string& type,
                                const int          level,
                                const int          index);
+
+  // Get a node's block connections map to a desired level
+  NodeEdgeMap get_node_to_block_edge_counts(const std::string& id,
+                                            const int&         node_level        = 0,
+                                            const int&         connections_level = 1);
 };
 
 #endif
