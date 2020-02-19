@@ -13,10 +13,10 @@
 class SBM;
 
 struct Merge_Step {
-  double              entropy_delta;
-  double              entropy;
-  State_Dump          state;
-  int                 num_blocks;
+  double     entropy_delta;
+  double     entropy;
+  State_Dump state;
+  int        num_blocks;
   Merge_Step()
       : entropy_delta(0)
   {
@@ -81,7 +81,6 @@ class SBM : public Network {
   // =========================================================================
   // A random sampler generation class.
   Sampler sampler;
-
 
   // Methods
   // =========================================================================

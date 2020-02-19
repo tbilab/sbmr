@@ -290,7 +290,6 @@ MCMC_Sweeps SBM::mcmc_sweep(const int    level,
     }
   } // End multi-sweep loop
 
-
   return results;
 }
 
@@ -574,12 +573,12 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
 // of B' blocks for all B from B = N to B = 1.
 // =============================================================================
 CollapseResults SBM::collapse_blocks(const int    node_level,
-                                             const int    num_mcmc_steps,
-                                             const int    desired_num_blocks,
-                                             const int    num_checks_per_block,
-                                             const double sigma,
-                                             const double eps,
-                                             const bool   report_all_steps)
+                                     const int    num_mcmc_steps,
+                                     const int    desired_num_blocks,
+                                     const int    num_checks_per_block,
+                                     const double sigma,
+                                     const double eps,
+                                     const bool   report_all_steps)
 {
   PROFILE_FUNCTION();
   const int block_level = node_level + 1;
@@ -684,7 +683,7 @@ CollapseResults SBM::collapse_blocks(const int    node_level,
 }
 
 // =============================================================================
-// Repeat the collapse_blocks method with a ranging number of desired blocks to 
+// Repeat the collapse_blocks method with a ranging number of desired blocks to
 // collapse to and report just the final result for all
 // =============================================================================
 CollapseResults SBM::collapse_run(const int&              node_level,
