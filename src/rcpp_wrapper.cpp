@@ -116,16 +116,6 @@ class Rcpp_SBM : public SBM {
     SBM::add_node(id, type, level);
   }
 
-  NodePtr find_node_by_id(const std::string& node_id, const int &level)
-  {
-    try {
-      return nodes.at(level)->at(node_id);
-    }
-    catch (...) {
-      stop("Can't find node " + node_id + " at level " + std::to_string(level));
-    }
-  }
-
   void add_edge(const std::string& node_a_id, const std::string& node_b_id)
   {
     START_GET_ERRORS
