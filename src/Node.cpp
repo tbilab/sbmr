@@ -137,7 +137,6 @@ inline NodePtr Node::get_parent_at_level(const int level_of_parent)
   // of the current node.
   if (level_of_parent < level) {
     std::string error_msg = "Requested parent level (" + std::to_string(level_of_parent) + ") lower than current node level (" + std::to_string(level) + ").";
-    std::cerr << error_msg;
     throw std::logic_error(error_msg);
   }
 
@@ -147,7 +146,6 @@ inline NodePtr Node::get_parent_at_level(const int level_of_parent)
   while (current_node->level != level_of_parent) {
     if (!parent) {
       std::string error_msg = "No parent at level " + std::to_string(level_of_parent) + " for " + id;
-      std::cerr << error_msg;
       throw std::range_error(error_msg);
     }
 

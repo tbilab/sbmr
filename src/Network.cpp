@@ -50,8 +50,7 @@ NodePtr Network::get_node_by_id(const std::string& id,
   }
   catch (...) {
     // Throw informative error if it fails
-    std::cerr << "Could not find requested node" << std::endl;
-    throw "Could not find requested node";
+    throw std::range_error("Could not find node " + id + " in network") ;
   }
 }
 
@@ -100,8 +99,7 @@ NodePtr Network::create_block_node(const std::string& type, const int level)
 
   // Make sure requested level is not 0
   if (level == 0) {
-    std::cerr << "Can't create block node at first level" << std::endl;
-    throw "Can't create block node at first level";
+    throw std::logic_error("Can't create block node at first level");
   }
 
   // Initialize new node
@@ -123,9 +121,10 @@ NodeVec Network::get_nodes_from_level(const std::string& type,
 
   // Make sure level has nodes before looping through it
   if (node_level->size() == 0) {
-    std::cerr << "Requested level " << level << " is empty of nodes of type " << type << " when "
-              << (match_type ? "" : "not ") << "matching type" << std::endl;
-    throw "Requested level is empty.";
+    const std::string error_msg = "Requested level " + std::to_string(level)
+        + " is empty of nodes of type " + type + " when "
+        + (match_type ? "" : "not ") + "matching type";
+    throw std::range_error(error_msg);
   }
 
   // Where we will store all the nodes found from level
@@ -250,8 +249,7 @@ void Network::initialize_blocks(const int num_blocks, const int level)
 
   // Make sure level has nodes before looping through it
   if (num_nodes_in_level == 0) {
-    std::cerr << "Requested level is empty. (initialize_blocks())" << std::endl;
-    throw "Requested level is empty.";
+    throw std::range_error("Requested level (" + std::to_string(level) + ") is empty.");
   }
 
   // Figure out how we're making blocks, is it one block per node or a set number

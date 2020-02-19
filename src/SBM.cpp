@@ -329,7 +329,7 @@ double SBM::get_entropy(const int level)
   const LevelPtr block_level = get_level(level + 1);
 
   if (block_level->size() == 0) {
-    throw "Can't compute entropy for network with no block structure.";
+    throw std::logic_error("Network has not had block structure initialized.");
   }
 
   // Now calculate the edge entropy betweeen nodes.
@@ -399,8 +399,7 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
   PROFILE_FUNCTION();
   // Quick check to make sure reasonable request
   if (num_merges_to_make <= 0) {
-    std::cout << "Zero merges requested." << std::endl;
-    throw "Zero merges requested.";
+    throw std::logic_error("Zero merges requested.");
   }
 
   // Level that the block metablocks will sit at
@@ -423,7 +422,7 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
   // Make sure doing a merge makes sense by checking we have enough blocks of every type
   for (const auto& type_count : node_type_counts) {
     if (type_count.second.at(block_level) < 2) {
-      throw "To few blocks to perform merge.";
+      throw std::logic_error("To few blocks to perform merge.");
     }
   }
 
