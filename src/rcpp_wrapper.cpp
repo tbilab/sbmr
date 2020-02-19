@@ -156,7 +156,6 @@ class Rcpp_SBM : public SBM {
 
   State_Dump get_state()
   {
-    // return state_to_df(SBM::get_state());
     return SBM::get_state();
   }
 
@@ -173,46 +172,6 @@ class Rcpp_SBM : public SBM {
     return SBM::get_entropy(level);
   }
 
-  // Sets up all the initial values for the node pair tracking structure
-  inline void initialize_pair_tracking_map(std::unordered_map<std::string, Pair_Status>& concensus_pairs,
-                                           const LevelPtr&                                node_map)
-  {
-    for (auto node_a_it = node_map->begin();
-         node_a_it != node_map->end();
-         node_a_it++) {
-      for (auto node_b_it = std::next(node_a_it);
-           node_b_it != node_map->end();
-           node_b_it++) {
-        const bool in_same_group = node_a_it->second->parent == node_b_it->second->parent;
-
-        // Initialize pair info for group
-        concensus_pairs.emplace(
-            make_pair_key(node_a_it->first, node_b_it->first),
-            Pair_Status(in_same_group));
-      }
-    }
-  }
-
-  // Update the concensus pair struct with a single sweep's results
-  inline void update_pair_tracking_map(std::unordered_map<std::string, Pair_Status>& concensus_pairs,
-                                       const std::unordered_set<std::string>&        updated_pairs)
-  {
-    for (auto& pair : concensus_pairs) {
-
-      // Check if this pair was updated on last sweep
-      const bool updated_last_sweep = updated_pairs.find(pair.first) != updated_pairs.end();
-
-      if (updated_last_sweep) {
-        // Update the pair connection status
-        pair.second.connected = !(pair.second).connected;
-      }
-
-      // Increment the counts if needed
-      if (pair.second.connected) {
-        pair.second.times_connected++;
-      }
-    }
-  }
 
   // =============================================================================
   // Runs multiple MCMC sweeps and keeps track of the results efficiently
