@@ -123,24 +123,7 @@ class Rcpp_SBM : public SBM {
 
   void add_edge(const std::string& node_a_id, const std::string& node_b_id)
   {
-    const NodePtr node_a = find_node_by_id(node_a_id, 0);
-    const NodePtr node_b = find_node_by_id(node_b_id, 0);
-
-    // If the user has specified allowed edges explicitely, make sure that this edge follows protocol
-    if (specified_allowed_edges) {
-      const bool a_to_b_bad = !(edge_type_pairs.at(node_a->type).count(node_b->type));
-      const bool b_to_a_bad = !(edge_type_pairs.at(node_b->type).count(node_a->type));
-
-      if (a_to_b_bad | b_to_a_bad) {
-        stop("Edge of " + node_a_id + " - " + node_b_id + " does not fit allowed specified edge_types type combos.");
-      }
-    }
-    else {
-      // If the user has not specified the allowed edges explicitely, then build allowed combos from the edges
-      Network::add_edge_types(node_a->type, node_b->type);
-    }
-
-    SBM::add_edge(node_a, node_b);
+    SBM::add_edge(node_a_id, node_b_id);
   }
 
   inline DataFrame state_to_df(const State_Dump& state)
