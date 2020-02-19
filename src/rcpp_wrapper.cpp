@@ -121,13 +121,16 @@ class Rcpp_SBM : public SBM {
     }
   }
 
+  inline void pass_error(const std::exception& ex){
+    throw Rcpp::exception(ex.what(), false);
+  }
   void add_edge(const std::string& node_a_id, const std::string& node_b_id)
   {
     try {
       SBM::add_edge(node_a_id, node_b_id);
     }
     catch (const std::exception& ex) {
-      throw Rcpp::exception(ex.what(), false);
+      pass_error(ex);
     }
   }
 
