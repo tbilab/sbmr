@@ -6,10 +6,9 @@ using namespace Rcpp;
 
 class Rcpp_SBM : public SBM {
   public:
-
   // Add allowed edge pairs to the object. Overwrites previous work if it was there
-  void add_edge_types(const std::vector<int> from_type,
-                      const std::vector<int> to_type)
+  void add_edge_types(const std::vector<std::string>& from_type,
+                      const std::vector<std::string>& to_type)
   {
     // Clear old allowed pairs (if they exist)
     edge_type_pairs.clear();
@@ -24,7 +23,7 @@ class Rcpp_SBM : public SBM {
     specified_allowed_edges = true;
   }
 
-  void add_node(const std::string id, const int type, const int level)
+  void add_node(const std::string& id, const std::string& type, const int& level)
   {
     // Check to make sure that this node doesn't already exist in the network
     auto base_level = get_level(level);
@@ -37,7 +36,7 @@ class Rcpp_SBM : public SBM {
     }
   }
 
-  NodePtr find_node_by_id(const std::string node_id, const int level)
+  NodePtr find_node_by_id(const std::string& node_id, const int &level)
   {
     try {
       return nodes.at(level)->at(node_id);
@@ -47,7 +46,7 @@ class Rcpp_SBM : public SBM {
     }
   }
 
-  void add_edge(const std::string node_a_id, const std::string node_b_id)
+  void add_edge(const std::string& node_a_id, const std::string& node_b_id)
   {
     const NodePtr node_a = find_node_by_id(node_a_id, 0);
     const NodePtr node_b = find_node_by_id(node_b_id, 0);
@@ -69,7 +68,7 @@ class Rcpp_SBM : public SBM {
     SBM::add_edge(node_a, node_b);
   }
 
-  inline DataFrame state_to_df(State_Dump state)
+  inline DataFrame state_to_df(const State_Dump& state)
   {
     // Create and return dump of state as dataframe
     return DataFrame::create(
@@ -85,16 +84,14 @@ class Rcpp_SBM : public SBM {
     return state_to_df(SBM::get_state());
   }
 
-
-  void initialize_blocks(const int num_blocks, const int level)
+  void initialize_blocks(const int& num_blocks, const int& level)
   {
     Network::initialize_blocks(num_blocks, level);
   }
 
-
-  double get_entropy(const int level)
+  double get_entropy(const int& level)
   {
-    if (get_level(level + 1)->size() == 0){
+    if (get_level(level + 1)->size() == 0) {
       stop("Can't compute entropy for model with no current block structure.");
     }
     return SBM::get_entropy(level);
@@ -102,7 +99,7 @@ class Rcpp_SBM : public SBM {
 
   // Sets up all the initial values for the node pair tracking structure
   inline void initialize_pair_tracking_map(std::unordered_map<std::string, Pair_Status>& concensus_pairs,
-                                           const LevelPtr                                node_map)
+                                           const LevelPtr&                                node_map)
   {
     for (auto node_a_it = node_map->begin();
          node_a_it != node_map->end();
@@ -144,12 +141,12 @@ class Rcpp_SBM : public SBM {
   // =============================================================================
   // Runs multiple MCMC sweeps and keeps track of the results efficiently
   // =============================================================================
-  List mcmc_sweep(const int    level,
-                  const int    num_sweeps,
-                  const double eps,
-                  const bool   variable_num_blocks,
-                  const bool   track_pairs,
-                  const bool   verbose)
+  List mcmc_sweep(const int&    level,
+                  const int&    num_sweeps,
+                  const double& eps,
+                  const bool&   variable_num_blocks,
+                  const bool&   track_pairs,
+                  const bool&   verbose)
   {
     // Make sure network has blocks at the level for MCMC sweeps to take place.
     // Warn and initialize groups for user
@@ -186,13 +183,13 @@ class Rcpp_SBM : public SBM {
                                           : "NA");
   }
 
-  List collapse_blocks(const int    node_level,
-                       const int    num_mcmc_steps,
-                       const int    desired_num_blocks,
-                       const int    num_checks_per_block,
-                       const double sigma,
-                       const double eps,
-                       const bool   report_all_steps)
+  List collapse_blocks(const int&    node_level,
+                       const int&    num_mcmc_steps,
+                       const int&    desired_num_blocks,
+                       const int&    num_checks_per_block,
+                       const double& sigma,
+                       const double& eps,
+                       const bool&   report_all_steps)
   {
 
     // Perform collapse
@@ -219,12 +216,12 @@ class Rcpp_SBM : public SBM {
     return entropy_results;
   }
 
-  List collapse_run(const int              node_level,
-                    const int              num_mcmc_steps,
-                    const int              num_checks_per_block,
-                    const double           sigma,
-                    const double           eps,
-                    const std::vector<int> block_nums)
+  List collapse_run(const int&              node_level,
+                    const int&              num_mcmc_steps,
+                    const int&              num_checks_per_block,
+                    const double&           sigma,
+                    const double&           eps,
+                    const std::vector<int>& block_nums)
   {
 
     List return_to_r;
@@ -242,9 +239,9 @@ class Rcpp_SBM : public SBM {
     return return_to_r;
   }
 
-  DataFrame get_node_to_block_edge_counts(const std::string id,
-                                          const int         node_level        = 0,
-                                          const int         connections_level = 1)
+  DataFrame get_node_to_block_edge_counts(const std::string& id,
+                                          const int&         node_level        = 0,
+                                          const int&         connections_level = 1)
   {
     // Grab reference to node
     NodePtr node;
@@ -276,10 +273,10 @@ class Rcpp_SBM : public SBM {
                              _["stringsAsFactors"] = false);
   }
 
-  DataFrame get_block_edge_counts(const int level = 1)
+  DataFrame get_block_edge_counts(const int& level = 1)
   {
     // Make sure we have blocks at the level asked for before proceeding
-    if (nodes.count(level) == 0){
+    if (nodes.count(level) == 0) {
       stop("Model has no blocks at level " + std::to_string(level));
     }
 
@@ -311,19 +308,16 @@ class Rcpp_SBM : public SBM {
                              _["stringsAsFactors"] = false);
   }
 
-  void load_from_state(std::vector<string> id,
-                       std::vector<string> parent,
-                       std::vector<int>    level,
-                       std::vector<int>    types)
+  void load_from_state(std::vector<std::string>& id,
+                       std::vector<std::string>& parent,
+                       std::vector<int>&         level,
+                       std::vector<std::string>& types)
   {
 
     // Construct a state dump from vectors and
     // pass the constructed state to load_state function
     SBM::load_from_state(State_Dump(id, parent, level, types));
   }
-
-
-
 };
 
 RCPP_MODULE(SBM)
