@@ -42,8 +42,8 @@ class Node : public std::enable_shared_from_this<Node> {
   // Takes ID, node hiearchy level, and assumes default 'a' for type
   Node(std::string node_id, int level)
       : id(node_id)
-      , level(level)
       , type("a")
+      , level(level)
       , degree(0)
   {
   }
@@ -51,8 +51,8 @@ class Node : public std::enable_shared_from_this<Node> {
   // Takes the node's id, level, and type.
   Node(std::string node_id, int level, std::string type)
       : id(node_id)
-      , level(level)
       , type(type)
+      , level(level)
       , degree(0)
   {
   }
@@ -60,8 +60,8 @@ class Node : public std::enable_shared_from_this<Node> {
   // Takes the node's id, level, and type as integer (for legacy api compatability)
   Node(std::string node_id, int level, int type)
       : id(node_id)
-      , level(level)
       , type(std::to_string(type))
+      , level(level)
       , degree(0)
   {
   }
