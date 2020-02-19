@@ -40,12 +40,13 @@ LevelPtr Network::get_level(const int level)
 // =============================================================================
 // Find and return a node by its id
 // =============================================================================
-NodePtr Network::get_node_by_id(const string desired_id, const int level)
+NodePtr Network::get_node_by_id(const std::string& id,
+                                const int          level)
 {
   PROFILE_FUNCTION();
   try {
     // Attempt to find node on the 'node level' of the Network
-    return nodes.at(level)->at(desired_id);
+    return nodes.at(level)->at(id);
   }
   catch (...) {
     // Throw informative error if it fails
@@ -57,16 +58,20 @@ NodePtr Network::get_node_by_id(const string desired_id, const int level)
 // =============================================================================
 // Builds a block id from a scaffold for generated new blocks
 // =============================================================================
-string Network::build_block_id(const int type, const int level, const int index)
+string Network::build_block_id(const std::string& type,
+                               const int          level,
+                               const int          index)
 {
   PROFILE_FUNCTION();
-  return std::to_string(type) + "-" + std::to_string(level) + "_" + std::to_string(index);
+  return type + "-" + std::to_string(level) + "_" + std::to_string(index);
 }
 
 // =============================================================================
 // Adds a node with an id and type to network
 // =============================================================================
-NodePtr Network::add_node(const string id, const int type, const int level)
+NodePtr Network::add_node(const std::string& id,
+                          const std::string& type,
+                          const int          level = 0)
 {
   PROFILE_FUNCTION();
   // Grab level
@@ -89,7 +94,7 @@ NodePtr Network::add_node(const string id, const int type, const int level)
 // =============================================================================
 // Creates a new block node and add it to its neccesary level
 // =============================================================================
-NodePtr Network::create_block_node(const int type, const int level)
+NodePtr Network::create_block_node(const std::string& type, const int level)
 {
   PROFILE_FUNCTION();
 
@@ -108,7 +113,9 @@ NodePtr Network::create_block_node(const int type, const int level)
 // nodes returned are of the same type as specified, otherwise the nodes
 // returned are _not_ of the same type.
 // =============================================================================
-NodeVec Network::get_nodes_from_level(const int type, const int level, const bool match_type)
+NodeVec Network::get_nodes_from_level(const std::string& type,
+                                      const int          level,
+                                      const bool         match_type)
 {
   PROFILE_FUNCTION();
   // Grab desired level reference
@@ -144,7 +151,7 @@ NodeVec Network::get_nodes_from_level(const int type, const int level, const boo
 // =============================================================================
 // Return nodes of a desired type from level.
 // =============================================================================
-NodeVec Network::get_nodes_of_type_at_level(const int type, const int level)
+NodeVec Network::get_nodes_of_type_at_level(const std::string& type, const int level)
 {
   PROFILE_FUNCTION();
   return get_nodes_from_level(type, level, true);
@@ -170,16 +177,16 @@ void Network::add_edge(const NodePtr node1, const NodePtr node2)
 // =============================================================================
 // Adds a edge between two nodes based on their ids
 // =============================================================================
-void Network::add_edge(const string node1_id, const string node2_id)
+void Network::add_edge(const std::string& id_a, const std::string& id_b)
 {
   PROFILE_FUNCTION();
-  Network::add_edge(get_node_by_id(node1_id), get_node_by_id(node2_id));
+  Network::add_edge(get_node_by_id(id_a), get_node_by_id(id_b));
 };
 
 // =============================================================================
 // Add an alowed pairing of node types for edges
 // =============================================================================
-void Network::add_edge_types(const int from_type, const int to_type)
+void Network::add_edge_types(const std::string& from_type, const std::string& to_type)
 {
   edge_type_pairs[from_type].insert(to_type);
   edge_type_pairs[to_type].insert(from_type);
@@ -225,7 +232,7 @@ void Network::initialize_blocks(const int num_blocks, const int level)
   bool one_block_per_node = num_blocks == -1;
 
   // Make a map that gives us type -> array of new blocks
-  std::map<int, NodeVec> type_to_blocks;
+  std::map<std::string, NodeVec> type_to_blocks;
 
   // If we're randomly distributing nodes, we'll use this map to sample a random
   // block for a given node by its type
@@ -246,14 +253,12 @@ void Network::initialize_blocks(const int num_blocks, const int level)
   // Loop through each of the nodes,
   for (const auto& node : *node_level) {
 
-    const int node_type = node.second->type;
-
     // build a block node at the next level
     // We either build a new block for node if we're giving each node a block
     // or sample new block from available list of blocks for this type
     NodePtr new_block = one_block_per_node
-        ? create_block_node(node_type, level + 1)
-        : block_sampler.sample(type_to_blocks[node_type]);
+        ? create_block_node(node.second->type, level + 1)
+        : block_sampler.sample(type_to_blocks[node.second->type]);
 
     // assign that block node to the node
     node.second->set_parent(new_block);
@@ -374,12 +379,11 @@ void Network::load_from_state(const State_Dump state)
   const int n = state.parent.size();
 
   for (int i = 0; i < n; i++) {
-    int node_type = state.type[i];
-
-    const string child_id     = state.id[i];
-    const string parent_id    = state.parent[i];
-    const int    child_level  = state.level[i];
-    const int    parent_level = child_level + 1;
+    const std::string node_type    = state.type[i];
+    const std::string child_id     = state.id[i];
+    const int         child_level  = state.level[i];
+    const std::string parent_id    = state.parent[i];
+    const int         parent_level = child_level + 1;
 
     auto aquire_node = [node_type, this](string node_id, int node_level) {
       LevelPtr nodes_at_level = get_level(node_level);
@@ -423,3 +427,4 @@ std::map<Edge, int> Network::get_block_counts_at_level(const int level)
 
   return block_counts;
 }
+
