@@ -7,6 +7,7 @@ namespace Rcpp {
   template <> SEXP wrap(const State_Dump&);
   template <> SEXP wrap(const NodePtr&);
   template <> SEXP wrap(const BlockEdgeCounts&);
+  template <> SEXP wrap(const MCMC_Sweeps&);
 }
 
 #include <Rcpp.h>
@@ -59,6 +60,41 @@ namespace Rcpp {
 
   }
 
+
+  template <> SEXP wrap(const MCMC_Sweeps& results){
+
+    // Check if we have pair tracking information present
+    const int  size_tracked_pairs = results.block_consensus.concensus_pairs.size();
+    const bool tracked_pairs      = size_tracked_pairs > 0;
+
+    // Initialize vectors to hold pair tracking results, if needed.
+    std::vector<std::string> node_pair;
+    std::vector<int>         times_connected;
+
+    if (tracked_pairs) {
+      // Fill out pair tracking vectors with map internals
+      node_pair.reserve(size_tracked_pairs);
+      times_connected.reserve(size_tracked_pairs);
+
+      for (const auto& pair : results.block_consensus.concensus_pairs) {
+        node_pair.push_back(pair.first);
+        times_connected.push_back((pair.second).times_connected);
+      }
+    }
+
+    // package up results into a list
+    return List::create(
+        _["nodes_moved"] = results.nodes_moved,
+        _["sweep_info"]  = DataFrame::create(
+            _["entropy_delta"]    = results.sweep_entropy_delta,
+            _["num_nodes_moved"]  = results.sweep_num_nodes_moved,
+            _["stringsAsFactors"] = false),
+        _["pairing_counts"] = tracked_pairs ? DataFrame::create(
+                                  _["node_pair"]        = node_pair,
+                                  _["times_connected"]  = times_connected,
+                                  _["stringsAsFactors"] = false)
+                                            : "NA");
+  }
 }
 
 class Rcpp_SBM : public SBM {
@@ -191,7 +227,7 @@ class Rcpp_SBM : public SBM {
   // =============================================================================
   // Runs multiple MCMC sweeps and keeps track of the results efficiently
   // =============================================================================
-  List mcmc_sweep(const int&    level,
+  MCMC_Sweeps mcmc_sweep(const int&    level,
                   const int&    num_sweeps,
                   const double& eps,
                   const bool&   variable_num_blocks,
@@ -205,32 +241,13 @@ class Rcpp_SBM : public SBM {
       Network::initialize_blocks(-1, level);
     }
 
-    MCMC_Sweeps results = SBM::mcmc_sweep(level,
-                                          num_sweeps,
-                                          eps,
-                                          variable_num_blocks,
-                                          track_pairs,
-                                          verbose);
+   return SBM::mcmc_sweep(level,
+                          num_sweeps,
+                          eps,
+                          variable_num_blocks,
+                          track_pairs,
+                          verbose);
 
-    // Initialize vectors to hold pair tracking results, if needed.
-    std::vector<std::string> node_pair;
-    std::vector<int>         times_connected;
-    if (track_pairs) {
-      results.block_consensus.dump_results(node_pair, times_connected);
-    }
-
-    // package up results into a list
-    return List::create(
-        _["nodes_moved"] = results.nodes_moved,
-        _["sweep_info"]  = DataFrame::create(
-            _["entropy_delta"]    = results.sweep_entropy_delta,
-            _["num_nodes_moved"]  = results.sweep_num_nodes_moved,
-            _["stringsAsFactors"] = false),
-        _["pairing_counts"] = track_pairs ? DataFrame::create(
-                                  _["node_pair"]        = node_pair,
-                                  _["times_connected"]  = times_connected,
-                                  _["stringsAsFactors"] = false)
-                                          : "NA");
   }
 
   List collapse_blocks(const int&    node_level,
