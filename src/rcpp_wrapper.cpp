@@ -108,12 +108,16 @@ class Rcpp_SBM : public SBM {
   void add_edge_types(const std::vector<std::string>& from_types,
                       const std::vector<std::string>& to_types)
   {
+    START_GET_ERRORS
     Network::add_edge_types(from_types, to_types);
+    END_GET_ERRORS
   }
 
   void add_node(const std::string& id, const std::string& type, const int& level)
   {
+    START_GET_ERRORS
     SBM::add_node(id, type, level);
+    END_GET_ERRORS
   }
 
   void add_edge(const std::string& node_a_id, const std::string& node_b_id)
@@ -136,20 +140,23 @@ class Rcpp_SBM : public SBM {
 
   State_Dump get_state()
   {
+    START_GET_ERRORS
     return SBM::get_state();
+    END_GET_ERRORS
   }
 
   void initialize_blocks(const int& num_blocks, const int& level)
   {
+    START_GET_ERRORS
     Network::initialize_blocks(num_blocks, level);
+    END_GET_ERRORS
   }
 
   double get_entropy(const int& level)
   {
-    if (get_level(level + 1)->size() == 0) {
-      stop("Can't compute entropy for model with no current block structure.");
-    }
+    START_GET_ERRORS
     return SBM::get_entropy(level);
+    END_GET_ERRORS
   }
 
 
@@ -163,20 +170,14 @@ class Rcpp_SBM : public SBM {
                   const bool&   track_pairs,
                   const bool&   verbose)
   {
-    // Make sure network has blocks at the level for MCMC sweeps to take place.
-    // Warn and initialize groups for user
-    if (get_level(level + 1)->size() == 0) {
-      warning("No blocks present. Initializing one block per node.");
-      Network::initialize_blocks(-1, level);
-    }
-
-   return SBM::mcmc_sweep(level,
-                          num_sweeps,
-                          eps,
-                          variable_num_blocks,
-                          track_pairs,
-                          verbose);
-
+    START_GET_ERRORS
+    return SBM::mcmc_sweep(level,
+                           num_sweeps,
+                           eps,
+                           variable_num_blocks,
+                           track_pairs,
+                           verbose);
+    END_GET_ERRORS
   }
 
   List collapse_blocks(const int&    node_level,
@@ -285,10 +286,9 @@ class Rcpp_SBM : public SBM {
                        std::vector<int>&         level,
                        std::vector<std::string>& types)
   {
-
-    // Construct a state dump from vectors and
-    // pass the constructed state to load_state function
+    START_GET_ERRORS
     SBM::load_from_state(State_Dump(id, parent, level, types));
+    END_GET_ERRORS
   }
 };
 
