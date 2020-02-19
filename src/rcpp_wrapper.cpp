@@ -100,20 +100,10 @@ namespace Rcpp {
 class Rcpp_SBM : public SBM {
   public:
   // Add allowed edge pairs to the object. Overwrites previous work if it was there
-  void add_edge_types(const std::vector<std::string>& from_type,
-                      const std::vector<std::string>& to_type)
+  void add_edge_types(const std::vector<std::string>& from_types,
+                      const std::vector<std::string>& to_types)
   {
-    // Clear old allowed pairs (if they exist)
-    edge_type_pairs.clear();
-
-    // Add pairs to network map of allowed pairs
-    const int num_pairs = from_type.size();
-    for (int i = 0; i < num_pairs; i++) {
-      Network::add_edge_types(from_type[i], to_type[i]);
-    }
-
-    // Let object know that we're working with specified types now.
-    specified_allowed_edges = true;
+    Network::add_edge_types(from_types, to_types);
   }
 
   void add_node(const std::string& id, const std::string& type, const int& level)

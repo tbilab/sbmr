@@ -192,6 +192,22 @@ void Network::add_edge_types(const std::string& from_type, const std::string& to
   edge_type_pairs[to_type].insert(from_type);
 }
 
+// Vectorized version of add edge types for when a whole set is passed at once
+void Network::add_edge_types(const std::vector<std::string>& from_types, const std::vector<std::string>& to_types)
+{
+  // Clear old allowed pairs (if they exist)
+  edge_type_pairs.clear();
+
+  // Add pairs to network map of allowed pairs
+  const int num_pairs = from_types.size();
+  for (int i = 0; i < num_pairs; i++) {
+    Network::add_edge_types(from_types[i], to_types[i]);
+  }
+
+  // Let object know that we're working with specified types now.
+  specified_allowed_edges = true;
+}
+
 // =============================================================================
 // Builds and assigns a block node for every node in a given level
 // =============================================================================

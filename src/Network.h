@@ -78,6 +78,7 @@ class Network {
 
   // Add an alowed pairing of node types for edges
   void add_edge_types(const std::string& from_type, const std::string& to_type);
+  void add_edge_types(const std::vector<std::string>& from_types, const std::vector<std::string>& to_types);
 
   // Setup a new Node level
   void add_level(int level_index);
