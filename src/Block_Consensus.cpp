@@ -39,18 +39,6 @@ void Block_Consensus::update_pair_tracking_map(const PairSet& updated_pairs)
   }
 }
 
-void Block_Consensus::dump_results(std::vector<std::string>& node_pair,
-                                   std::vector<int>&         times_connected)
-{
-  // Fill out pair tracking vectors with map internals
-  node_pair.reserve(concensus_pairs.size());
-  times_connected.reserve(concensus_pairs.size());
-
-  for (const auto& pair : concensus_pairs) {
-    node_pair.push_back(pair.first);
-    times_connected.push_back((pair.second).times_connected);
-  }
-}
 
 void Block_Consensus::update_changed_pairs(NodePtr   curr_node,
                                            ChildSet& old_connections,

@@ -24,10 +24,6 @@ class Block_Consensus {
   // Updates the pair statuses and iterates based on a set of changed pairs
   void update_pair_tracking_map(const PairSet& updated_pairs);
 
-  // Unrolls the pairs map to two passed vectors
-  void dump_results(std::vector<std::string>& node_pair,
-                    std::vector<int>&         times_connected);
-
   // Update the set of pairs that need to be updated for a given sweep.
   static void update_changed_pairs(NodePtr   curr_node,
                                    ChildSet& old_connections,
