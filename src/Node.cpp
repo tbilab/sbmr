@@ -88,7 +88,7 @@ void Node::set_parent(NodePtr parent_node_ptr)
   //PROFILE_FUNCTION();
 
   if (level != parent_node_ptr->level - 1) {
-    throw std::logic_error("Parent node must be one level above child");
+    throw LOGIC_ERROR("Parent node must be one level above child");
   }
 
   // Remove self from previous parents children list (if it existed)
@@ -139,7 +139,7 @@ inline NodePtr Node::get_parent_at_level(const int level_of_parent)
   // of the current node.
   if (level_of_parent < level) {
     std::string error_msg = "Requested parent level (" + std::to_string(level_of_parent) + ") lower than current node level (" + std::to_string(level) + ").";
-    throw std::logic_error(error_msg);
+    throw LOGIC_ERROR(error_msg);
   }
 
   // Start with this node as current node
@@ -148,7 +148,7 @@ inline NodePtr Node::get_parent_at_level(const int level_of_parent)
   while (current_node->level != level_of_parent) {
     if (!parent) {
       std::string error_msg = "No parent at level " + std::to_string(level_of_parent) + " for " + id;
-      throw std::range_error(error_msg);
+      throw RANGE_ERROR(error_msg);
     }
 
     // Traverse up parents until we've reached just below where we want to go

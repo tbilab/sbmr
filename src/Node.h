@@ -90,6 +90,9 @@ class Node : public std::enable_shared_from_this<Node> {
   static void connect_nodes(NodePtr node_a, NodePtr node_b);                             // Static method to connect two nodes to each other with edge
 };
 
+#define LOGIC_ERROR std::logic_error
+#define RANGE_ERROR std::range_error
+
 // Macros to turn on or off RCPP specific error reporting. 
 #if NO_RCPP
 #define RCPP_ERRORS_BEGIN

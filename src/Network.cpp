@@ -50,7 +50,7 @@ NodePtr Network::get_node_by_id(const std::string& id,
   }
   catch (...) {
     // Throw informative error if it fails
-    throw std::range_error("Could not find node " + id + " in network");
+    throw RANGE_ERROR("Could not find node " + id + " in network");
   }
 }
 
@@ -99,7 +99,7 @@ NodePtr Network::create_block_node(const std::string& type, const int level)
 
   // Make sure requested level is not 0
   if (level == 0) {
-    throw std::logic_error("Can't create block node at first level");
+    throw LOGIC_ERROR("Can't create block node at first level");
   }
 
   // Initialize new node
@@ -124,7 +124,7 @@ NodeVec Network::get_nodes_from_level(const std::string& type,
     const std::string error_msg = "Requested level " + std::to_string(level)
         + " is empty of nodes of type " + type + " when "
         + (match_type ? "" : "not ") + "matching type";
-    throw std::range_error(error_msg);
+    throw RANGE_ERROR(error_msg);
   }
 
   // Where we will store all the nodes found from level
@@ -173,7 +173,7 @@ void Network::add_edge(const NodePtr node_a, const NodePtr node_b)
 
     if (a_to_b_bad | b_to_a_bad) {
       const std::string error_msg = "Edge of " + node_a->id + " - " + node_b->id + " does not fit allowed specified edge_types type combos.";
-      throw std::logic_error(error_msg);
+      throw LOGIC_ERROR(error_msg);
     }
   }
   else {
@@ -249,7 +249,7 @@ void Network::initialize_blocks(const int num_blocks, const int level)
 
   // Make sure level has nodes before looping through it
   if (num_nodes_in_level == 0) {
-    throw std::range_error("Requested level (" + std::to_string(level) + ") is empty.");
+    throw RANGE_ERROR("Requested level (" + std::to_string(level) + ") is empty.");
   }
 
   // Figure out how we're making blocks, is it one block per node or a set number
@@ -447,7 +447,7 @@ BlockEdgeCounts Network::get_block_edge_counts(const int level)
 
   // Make sure we have blocks at the level asked for before proceeding
   if (nodes.count(level) == 0) {
-    throw std::range_error("Model has no blocks at level " + std::to_string(level));
+    throw RANGE_ERROR("Model has no blocks at level " + std::to_string(level));
   }
 
   // Loop through edges and gather at desired level
