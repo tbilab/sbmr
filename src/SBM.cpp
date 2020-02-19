@@ -399,6 +399,7 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
   PROFILE_FUNCTION();
   // Quick check to make sure reasonable request
   if (num_merges_to_make <= 0) {
+    std::cout << "Zero merges requested." << std::endl;
     throw "Zero merges requested.";
   }
 
@@ -420,8 +421,8 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
   std::unordered_set<std::string> checked_pairs;
 
   // Make sure doing a merge makes sense by checking we have enough blocks of every type
-  for (int i = 0; i < node_type_counts.size(); i++) {
-    if (node_type_counts[i][block_level] < 2) {
+  for (const auto& type_count : node_type_counts) {
+    if (type_count.second.at(block_level) < 2) {
       throw "To few blocks to perform merge.";
     }
   }
