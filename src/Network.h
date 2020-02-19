@@ -36,6 +36,7 @@ typedef std::shared_ptr<Node>      NodePtr;
 typedef std::map<string, NodePtr>  NodeLevel;
 typedef std::shared_ptr<NodeLevel> LevelPtr;
 typedef std::map<int, LevelPtr>    LevelMap;
+typedef std::map<Edge, int>        BlockEdgeCounts;
 
 using std::string;
 
@@ -99,7 +100,7 @@ class Network {
   NodeVec get_nodes_of_type_at_level(const std::string& type, const int level); // Return nodes of a desired type from level matching type
 
   // Gathers counts of edges between any two blocks in network
-  std::map<Edge, int> get_block_counts_at_level(int level);
+  BlockEdgeCounts get_block_counts_at_level(int level);
 
   // Load a level blocking from a state dump
   void load_from_state(State_Dump state);
