@@ -47,9 +47,6 @@ get_state.default <- function(x){
 #' @export
 get_state.sbm_network <- function(x){
   # Grab state from attribute and then swap in the string types
-  attr(verify_model(x), 'state') %>%
-    dplyr::rename(type_index = type) %>%
-    dplyr::left_join(attr(x, 'type_map'), by = 'type_index') %>%
-    dplyr::select(-type_index)
+  attr(verify_model(x), 'state')
 }
 

@@ -71,22 +71,6 @@ update_state.default <- function(sbm, state_df){
 #' @export
 update_state.sbm_network <- function(sbm, state_df){
 
-  # If the new state has string types we need to convert them to integers
-  type_col_is_string <- is.character(state_df$type)
-  if(type_col_is_string){
-    state_df <- state_df %>%
-      dplyr::left_join(attr(sbm, 'type_map'), by = 'type') %>%
-      dplyr::rename(type_string = type, type = type_index) %>%
-      dplyr::select(-type_string)
-  }
-
-
-  # Check for any unrecognized types
-  if (any(is.na(state_df$type))){
-    bad_nodes <- paste(state_df$id[is.na(state_df$type)], collapse = ",")
-    stop(paste0("New state has nodes (", bad_nodes ,") with unrecognized types."))
-  }
-
   attr(sbm, 'state') <- state_df
 
   attr(sbm, 'model')$load_from_state(state_df$id,
