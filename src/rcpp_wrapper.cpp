@@ -5,7 +5,8 @@
 // declaring the specialization
 namespace Rcpp {
   template <> SEXP wrap(const State_Dump&);
-  template <> SEXP wrap(const NodePtr& node_ref);
+  template <> SEXP wrap(const NodePtr&);
+  template <> SEXP wrap(const BlockEdgeCounts&);
 }
 
 #include <Rcpp.h>
@@ -27,6 +28,35 @@ namespace Rcpp {
   // Node pointer just gets converted to the node id
   template <> SEXP wrap(const NodePtr& node_ref){
     return 0;
+  }
+
+
+  template <> SEXP wrap(const BlockEdgeCounts& block_edge_counts){
+
+    const int n_pairs = block_edge_counts.size();
+
+    // Initialize some vectors to return results with
+    // Build dataframe with these values
+    std::vector<std::string> block_a;
+    std::vector<std::string> block_b;
+    std::vector<int>         counts;
+    block_a.reserve(n_pairs);
+    block_b.reserve(n_pairs);
+    counts.reserve(n_pairs);
+
+    // Fill in
+    for (const auto& block_edge : block_edge_counts) {
+      block_a.push_back(block_edge.first.node_a->id);
+      block_b.push_back(block_edge.first.node_b->id);
+      counts.push_back(block_edge.second);
+    }
+
+    // Return
+    return DataFrame::create(_["block_a"]          = block_a,
+                             _["block_b"]          = block_b,
+                             _["count"]            = counts,
+                             _["stringsAsFactors"] = false);
+
   }
 
 }
@@ -293,7 +323,7 @@ class Rcpp_SBM : public SBM {
                              _["stringsAsFactors"] = false);
   }
 
-  DataFrame get_block_edge_counts(const int& level = 1)
+  BlockEdgeCounts get_block_edge_counts(const int& level = 1)
   {
     // Make sure we have blocks at the level asked for before proceeding
     if (nodes.count(level) == 0) {
@@ -301,31 +331,7 @@ class Rcpp_SBM : public SBM {
     }
 
     // Gather to our block_edge to count map
-    std::map<Edge, int> block_edge_counts = Network::get_block_counts_at_level(level);
-
-    const int n_pairs = block_edge_counts.size();
-
-    // Initialize some vectors to return results with
-    // Build dataframe with these values
-    std::vector<std::string> block_a;
-    std::vector<std::string> block_b;
-    std::vector<int>         counts;
-    block_a.reserve(n_pairs);
-    block_b.reserve(n_pairs);
-    counts.reserve(n_pairs);
-
-    // Fill in
-    for (const auto& block_edge : block_edge_counts) {
-      block_a.push_back(block_edge.first.node_a->id);
-      block_b.push_back(block_edge.first.node_b->id);
-      counts.push_back(block_edge.second);
-    }
-
-    // Return
-    return DataFrame::create(_["block_a"]          = block_a,
-                             _["block_b"]          = block_b,
-                             _["count"]            = counts,
-                             _["stringsAsFactors"] = false);
+    return Network::get_block_counts_at_level(level);
   }
 
   void load_from_state(std::vector<std::string>& id,
