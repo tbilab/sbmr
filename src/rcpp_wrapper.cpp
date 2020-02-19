@@ -14,6 +14,7 @@ namespace Rcpp {
   template <> SEXP wrap(const BlockEdgeCounts&);
   template <> SEXP wrap(const MCMC_Sweeps&);
   template <> SEXP wrap(const CollapseResults&);
+  template <> SEXP wrap(const NodeEdgeMap&);
 }
 
 #include <Rcpp.h>
@@ -129,6 +130,25 @@ namespace Rcpp {
 
     return entropy_results;
   }
+
+  template <> SEXP wrap(const NodeEdgeMap& node_connections){
+    const int n_connections = node_connections.size();
+
+    // Build dataframe with these values
+    std::vector<std::string> connection_id;
+    std::vector<int>         connection_count;
+    connection_id.reserve(n_connections);
+    connection_count.reserve(n_connections);
+
+    for (const auto& connection : node_connections) {
+      connection_id.push_back(connection.first->id);
+      connection_count.push_back(connection.second);
+    }
+
+    return DataFrame::create(_["id"]               = connection_id,
+                             _["count"]            = connection_count,
+                             _["stringsAsFactors"] = false);
+  };
 }
 
 class Rcpp_SBM : public SBM {
@@ -235,38 +255,13 @@ class Rcpp_SBM : public SBM {
     END_GET_ERRORS
   }
 
-  DataFrame get_node_to_block_edge_counts(const std::string& id,
-                                          const int&         node_level        = 0,
-                                          const int&         connections_level = 1)
+  NodeEdgeMap get_node_to_block_edge_counts(const std::string& id,
+                                            const int&         node_level        = 0,
+                                            const int&         connections_level = 1)
   {
-    // Grab reference to node
-    NodePtr node;
-    try {
-      /* code */
-      node = get_node_by_id(id, node_level);
-    }
-    catch (const std::exception& e) {
-      stop("Could not find requested node " + id + " at level " + std::to_string(node_level));
-    }
-
-    // Get edges to desired level
-    const NodeEdgeMap node_connections = node->gather_edges_to_level(connections_level);
-    const int         n_connections    = node_connections.size();
-
-    // Build dataframe with these values
-    std::vector<std::string> connection_id;
-    std::vector<int>         connection_count;
-    connection_id.reserve(n_connections);
-    connection_count.reserve(n_connections);
-
-    for (const auto& connection : node_connections) {
-      connection_id.push_back(connection.first->id);
-      connection_count.push_back(connection.second);
-    }
-
-    return DataFrame::create(_["id"]               = connection_id,
-                             _["count"]            = connection_count,
-                             _["stringsAsFactors"] = false);
+    START_GET_ERRORS
+    return Network::get_node_to_block_edge_counts(id, node_level, connections_level);
+    END_GET_ERRORS
   }
 
   BlockEdgeCounts get_block_edge_counts(const int& level = 1)
