@@ -123,7 +123,12 @@ class Rcpp_SBM : public SBM {
 
   void add_edge(const std::string& node_a_id, const std::string& node_b_id)
   {
-    SBM::add_edge(node_a_id, node_b_id);
+    try {
+      SBM::add_edge(node_a_id, node_b_id);
+    }
+    catch (const std::exception& ex) {
+      throw Rcpp::exception(ex.what(), false);
+    }
   }
 
   inline DataFrame state_to_df(const State_Dump& state)
