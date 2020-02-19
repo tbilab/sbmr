@@ -266,13 +266,9 @@ class Rcpp_SBM : public SBM {
 
   BlockEdgeCounts get_block_edge_counts(const int& level = 1)
   {
-    // Make sure we have blocks at the level asked for before proceeding
-    if (nodes.count(level) == 0) {
-      stop("Model has no blocks at level " + std::to_string(level));
-    }
-
-    // Gather to our block_edge to count map
-    return Network::get_block_counts_at_level(level);
+    START_GET_ERRORS
+    return Network::get_block_edge_counts(level);
+    END_GET_ERRORS
   }
 
   void load_from_state(std::vector<std::string>& id,
