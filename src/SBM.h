@@ -57,6 +57,8 @@ struct MCMC_Sweeps {
   }
 };
 
+typedef std::vector<Merge_Step> CollapseResults;
+
 // =============================================================================
 // Main node class declaration
 // =============================================================================
@@ -115,13 +117,20 @@ class SBM : public Network {
 
   // Run mcmc chain initialization by finding best organization
   // of B' blocks for all B from B = N to B = 1.
-  std::vector<Merge_Step> collapse_blocks(int    node_level,
-                                          int    num_mcmc_steps,
-                                          int    desired_num_blocks,
-                                          int    num_checks_per_block,
-                                          double sigma,
-                                          double eps,
-                                          bool   report_all_steps);
+  CollapseResults collapse_blocks(int    node_level,
+                                  int    num_mcmc_steps,
+                                  int    desired_num_blocks,
+                                  int    num_checks_per_block,
+                                  double sigma,
+                                  double eps,
+                                  bool   report_all_steps);
+
+  CollapseResults collapse_run(const int&              node_level,
+                               const int&              num_mcmc_steps,
+                               const int&              num_checks_per_block,
+                               const double&           sigma,
+                               const double&           eps,
+                               const std::vector<int>& block_nums);
 
 }; // End SBM class declaration
 

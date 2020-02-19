@@ -573,7 +573,7 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
 // Run mcmc chain initialization by finding best organization
 // of B' blocks for all B from B = N to B = 1.
 // =============================================================================
-std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
+CollapseResults SBM::collapse_blocks(const int    node_level,
                                              const int    num_mcmc_steps,
                                              const int    desired_num_blocks,
                                              const int    num_checks_per_block,
@@ -604,7 +604,7 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
   const int num_steps = curr_num_blocks - desired_num_blocks;
 
   // Setup vector to hold all merge step results.
-  std::vector<Merge_Step> step_results;
+  CollapseResults step_results;
   step_results.reserve(report_all_steps ? num_steps : 1);
 
   // Counter to calculate the total entropy delta of this collapse run. Only used when not reporting all results
@@ -681,4 +681,28 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
   }
 
   return step_results;
+}
+
+// =============================================================================
+// Repeat the collapse_blocks method with a ranging number of desired blocks to 
+// collapse to and report just the final result for all
+// =============================================================================
+CollapseResults SBM::collapse_run(const int&              node_level,
+                                  const int&              num_mcmc_steps,
+                                  const int&              num_checks_per_block,
+                                  const double&           sigma,
+                                  const double&           eps,
+                                  const std::vector<int>& block_nums)
+{
+  CollapseResults run_results;
+  for (const int& target_num : block_nums) {
+    run_results.push_back(collapse_blocks(node_level,
+                                          num_mcmc_steps,
+                                          target_num,
+                                          num_checks_per_block,
+                                          sigma,
+                                          eps,
+                                          false)[0]);
+  }
+  return run_results;
 }
