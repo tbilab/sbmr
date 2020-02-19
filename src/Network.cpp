@@ -50,7 +50,7 @@ NodePtr Network::get_node_by_id(const std::string& id,
   }
   catch (...) {
     // Throw informative error if it fails
-    throw std::range_error("Could not find node " + id + " in network") ;
+    throw std::range_error("Could not find node " + id + " in network");
   }
 }
 

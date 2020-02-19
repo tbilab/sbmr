@@ -69,7 +69,7 @@ class Network {
   // =========================================================================
   // Adds a node of specified id of a type at desired level.
   NodePtr add_node(const std::string& id,
-                   const std::string& type = "a",
+                   const std::string& type  = "a",
                    const int          level = 0);
 
   // Adds a edge between two nodes
