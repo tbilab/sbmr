@@ -38,15 +38,12 @@ class Sampler {
   // ==========================================
   // Methods
 
-  void    initialize_seed(int random_seed); // Used to decide if we want to have deterministic seeding
-  double  draw_unif();                      // Return random uniform value between 0 and 1.
-  int     sample(int max_val);              // Sample from discrete random uniform from 0 to max
-  NodePtr sample(NodeList nodes_to_sample); // Sample random node from a list of nodes
-  NodePtr sample(NodeVec nodes_to_sample);  // Sample random node from vector of nodes
+  void    initialize_seed(int random_seed);        // Used to decide if we want to have deterministic seeding
+  double  draw_unif();                             // Return random uniform value between 0 and 1.
+  int     sample(const int& max_val);                     // Sample from discrete random uniform from 0 to max
+  NodePtr sample(const NodeList& nodes_to_sample); // Sample random node from a list of nodes
+  NodePtr sample(const NodeVec& nodes_to_sample);  // Sample random node from vector of nodes
 
-  static void shuffle_nodes(NodeVec&                                          node_vec,
-                            const std::shared_ptr<std::map<string, NodePtr>>& node_map,
-                            std::mt19937&                                     sampler);
 };
 
 #endif

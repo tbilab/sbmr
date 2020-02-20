@@ -598,9 +598,6 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
   // Grab level map
   const LevelPtr node_map = get_level(level);
 
-  // Initialize vector to hold nodes in order of pass through for a sweep.
-  NodeVec node_vec;
-  node_vec.reserve(node_map->size());
 
   // Check if we have any blocks ready in the network...
   const bool no_blocks_present = get_level(block_level)->size() == 0;
@@ -622,20 +619,27 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
               << "prob_of_accept,"
               << "move_accepted" << std::endl;
   }
+  
+  // Initialize a vector of nodes that will be passed through for a sweep.
+  NodeVec nodes_to_sweep;
+  nodes_to_sweep.reserve(node_map->size());
+  for (const auto& node : *node_map) {
+    nodes_to_sweep.push_back(node.second);
+  }
 
   for (int i = 0; i < num_sweeps; i++) {
     // Book keeper variables for this sweeps stats
     int    num_nodes_moved = 0;
     double entropy_delta   = 0;
 
-    // Generate a random order of nodes to be run through for sweep
-    Sampler::shuffle_nodes(node_vec, node_map, sampler.int_gen);
+    // Shuffle order order of nodes to be run through for sweep
+    std::shuffle(nodes_to_sweep.begin(), nodes_to_sweep.end(), sampler.int_gen);
 
     // Setup container to track what pairs need to be updated for sweep
     std::unordered_set<std::string> pair_moves;
 
     // Loop through each node
-    for (const NodePtr& curr_node : node_vec) {
+    for (const NodePtr& curr_node : nodes_to_sweep) {
 
       // Check if we're running sweep with variable block numbers. If we are, we
       // need to make sure we don't have any extra unoccupied blocks floating around,

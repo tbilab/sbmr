@@ -35,7 +35,7 @@ double Sampler::draw_unif()
 // =============================================================================
 // Draw single sample from a discrete random uniform (0 - max_val] distribution
 // =============================================================================
-int Sampler::sample(int max_val)
+int Sampler::sample(const int& max_val)
 {
   std::uniform_int_distribution<int> dist(0, max_val);
 
@@ -45,22 +45,16 @@ int Sampler::sample(int max_val)
 // =============================================================================
 // Sample a random element from a list of node pointers
 // =============================================================================
-NodePtr Sampler::sample(NodeList node_list)
+NodePtr Sampler::sample(const NodeList& node_list)
 {
-  // Select a random index to grab
-  int random_index = sample(node_list.size() - 1);
-
   // Start an iterator at begining of list
   auto block_it = node_list.begin();
+  
+  // Select a random index to grab and advance list iterator till we've walked 
+  // the desired number of steps
+  std::advance(block_it, sample(node_list.size() - 1));
 
-  // Step through list till we've walked the desired number of steps to the
-  // chosen index
-  int step = 0;
-  while (step != random_index) {
-    step++;
-    block_it++;
-  }
-
+  // Return current element for iterator
   return *block_it;
 }
 
@@ -68,27 +62,8 @@ NodePtr Sampler::sample(NodeList node_list)
 // Sample random node from vector of nodes
 // Easier than list because we can just index to a spot
 // =============================================================================
-NodePtr Sampler::sample(NodeVec node_vec)
+NodePtr Sampler::sample(const NodeVec& node_vec)
 {
-  // Select a random index to grab
-  int random_index = sample(node_vec.size() - 1);
-
-  // Return that element
-  return node_vec.at(random_index);
-}
-
-void Sampler::shuffle_nodes(NodeVec&                                          node_vec,
-                            const std::shared_ptr<std::map<string, NodePtr>>& node_map,
-                            std::mt19937&                                     sampler)
-{
-  // Initialize vector size to hold nodes
-  node_vec.clear();
-
-  // Fill in vector with map elements
-  for (const auto& node : *node_map) {
-    node_vec.push_back(node.second);
-  }
-
-  // Shuffle node order
-  std::shuffle(node_vec.begin(), node_vec.end(), sampler);
+  // Select a random index to return element at that index
+  return node_vec.at(sample(node_vec.size() - 1));
 }
