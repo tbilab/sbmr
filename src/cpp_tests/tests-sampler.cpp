@@ -132,3 +132,45 @@ TEST_CASE("Node list and vector sampling", "[Sampler]")
   REQUIRE(times_vec_agreed == num_samples);
   
 }
+
+TEST_CASE("Node vector shuffling respects seeds", "[Sampler]")
+{
+
+  Sampler sampler_1(42);
+  Sampler sampler_2(42);
+
+  const int num_nodes = 15;
+  NodeVec nodes_vec1;
+  NodeVec nodes_vec2;
+  nodes_vec1.reserve(num_nodes);
+  nodes_vec2.reserve(num_nodes);
+
+  // Build nodes and add to vectors
+  for (int i = 0; i < num_nodes; i++)
+  {
+    NodePtr new_node = std::make_shared<Node>("n" + std::to_string(i), 0, 1);
+    nodes_vec1.push_back(new_node);
+    nodes_vec2.push_back(new_node);
+  }
+  
+  // Run a bunch of samples and makes sure we grab a given element rougly 1/3rd of the time
+  const int num_samples           = 100;
+  
+  for (int i = 0; i < num_samples; ++i) {
+    
+    // Shuffle vec 1 with first sampler
+    std::shuffle(nodes_vec1.begin(), nodes_vec1.end(), sampler_1.generator);
+
+    // Shuffle vec 2 with second sampler
+    std::shuffle(nodes_vec2.begin(), nodes_vec2.end(), sampler_2.generator);
+
+    // Loop through all elements in both vectors and make sure they match
+    for (int i = 0; i < num_nodes; i++)
+    {
+      REQUIRE(nodes_vec1[i] == nodes_vec2[i]);
+    }
+
+
+  }
+
+}
