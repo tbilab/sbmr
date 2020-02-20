@@ -10,8 +10,10 @@ TEST_CASE("Same seeds means same results", "[Sampler]")
   Sampler sampler_1(42);
   Sampler sampler_2(42);
 
-  // The two samplers should give back the same result
-  REQUIRE(sampler_1.draw_unif() == sampler_2.draw_unif());
+  for (int i = 0; i < 20; i++) {
+    // Same result should occur over multiple samples
+    REQUIRE(sampler_1.draw_unif() == sampler_2.draw_unif());
+  }
 }
 
 TEST_CASE("Different seeds means different results", "[Sampler]")
@@ -19,11 +21,10 @@ TEST_CASE("Different seeds means different results", "[Sampler]")
   // Setup multuple generators with same seed
   Sampler sampler_1(42);
   Sampler sampler_2(312);
-
-  // The two samplers should give back the same result
-  REQUIRE(sampler_1.draw_unif() != sampler_2.draw_unif());
+  for (int i = 0; i < 20; i++) {
+    REQUIRE(sampler_1.draw_unif() != sampler_2.draw_unif());
+  }
 }
-
 
 TEST_CASE("Lots of Samples", "[Sampler]")
 {
