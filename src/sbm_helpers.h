@@ -1,3 +1,5 @@
+#ifndef __HELPERS_INCLUDED__
+#define __HELPERS_INCLUDED__
 // Inline functions to help out with verbosity of sbm code.
 
 #include "Node.h"
@@ -24,3 +26,4 @@ inline int get_edge_counts(const NodeEdgeMap& node_cons, const NodePtr& neighbor
       ? 0
       : count_to_neighbor_it->second;
 }
+#endif
