@@ -7,7 +7,7 @@
 
 TEST_CASE("Generate Node move proposals", "[SBM]")
 {
-  double tol    = 0.01;
+  double tol    = 0.05;
   double eps    = 0.01;
   SBM    my_SBM = build_simple_SBM();
 
