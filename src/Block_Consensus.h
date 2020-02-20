@@ -11,12 +11,12 @@ struct Pair_Status {
       , times_connected(0) {};
 };
 
-typedef std::unordered_set<std::string> PairSet;
+typedef std::set<std::string> PairSet;
 
 class Block_Consensus {
   public:
   // Holds the pairs of nodes to connection status and counts
-  std::unordered_map<std::string, Pair_Status> concensus_pairs;
+  std::map<std::string, Pair_Status> concensus_pairs;
 
   // Initialies containers when needed
   void initialize(const LevelPtr& node_map);

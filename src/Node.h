@@ -30,12 +30,12 @@
 #include <exception>
 #include <iostream>
 #include <list>
-#include <map>
 #include <memory>
 #include <queue>
 #include <string>
-#include <unordered_map>
+#include <map>
 #include <unordered_set>
+#include <set>
 #include <vector>
 using std::string;
 
@@ -49,7 +49,7 @@ typedef std::shared_ptr<Node>            NodePtr;
 typedef std::unordered_set<NodePtr>      ChildSet;
 typedef std::vector<NodePtr>             NodeVec;
 typedef std::list<NodePtr>               NodeList;
-typedef std::unordered_map<NodePtr, int> NodeEdgeMap;
+typedef std::map<NodePtr, int> NodeEdgeMap;
 typedef std::shared_ptr<Node>            NodePtr;
 typedef std::map<string, NodePtr>        NodeLevel;
 typedef std::shared_ptr<NodeLevel>       LevelPtr;

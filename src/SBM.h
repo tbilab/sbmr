@@ -8,7 +8,6 @@
 #include "sbm_helpers.h"
 
 #include <math.h>
-#include <unordered_map>
 
 // =============================================================================
 // What this file declares
@@ -63,7 +62,7 @@ struct Sweep_Res {
   std::list<std::string>          nodes_moved;
   std::list<std::string>          new_groups;
   double                          entropy_delta = 0;
-  std::unordered_set<std::string> pair_moves;
+  std::set<std::string> pair_moves;
 };
 
 struct MCMC_Sweeps {
@@ -101,7 +100,7 @@ class SBM {
   std::list<Edge>                           edges;            // Each pair of edges in the network
 
   // Map keyed by a node type. Value is the types of nodes the key type is allowed to connect to.
-  std::unordered_map<std::string, std::unordered_set<std::string>> edge_type_pairs;
+  std::map<std::string, std::set<std::string>> edge_type_pairs;
 
   // Do we have an explicitely set list of allowed edges or should we build this list ourselves?
   bool specified_allowed_edges = false;

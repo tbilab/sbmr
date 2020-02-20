@@ -29,7 +29,7 @@ inline int get_edge_counts(const NodeEdgeMap& node_cons, const NodePtr& neighbor
 
 
 // Adds an edge type the the edge type tracking map. 
-typedef std::unordered_map<std::string, std::unordered_set<std::string>> EdgeTypes;
+typedef std::map<std::string, std::set<std::string>> EdgeTypes;
 
 inline void add_edge_type(EdgeTypes&         edge_type_pairs,
                                    const std::string& from_type,

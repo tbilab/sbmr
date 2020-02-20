@@ -464,7 +464,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr& node,
     int new_to_neighbor  = 0;
     int node_to_neighbor = 0;
   };
-  std::unordered_map<NodePtr, Node_Move_Cons> move_edge_counts;
+  std::map<NodePtr, Node_Move_Cons> move_edge_counts;
 
   // Gather the node to edge counts together to one main map
   int node_to_old_block = 0;
@@ -634,7 +634,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
     std::shuffle(nodes_to_sweep.begin(), nodes_to_sweep.end(), sampler.generator);
 
     // Setup container to track what pairs need to be updated for sweep
-    std::unordered_set<std::string> pair_moves;
+    std::set<std::string> pair_moves;
 
     // Loop through each node
     for (const NodePtr& curr_node : nodes_to_sweep) {
@@ -841,7 +841,7 @@ Merge_Step SBM::agglomerative_merge(const int&    block_level,
   std::priority_queue<std::pair<double, std::pair<NodePtr, NodePtr>>> best_moves_q;
 
   // Set to keep track of what pairs of nodes we have checked already so we dont double check
-  std::unordered_set<std::string> checked_pairs;
+  std::set<std::string> checked_pairs;
 
   // Make sure doing a merge makes sense by checking we have enough blocks of every type
   for (const auto& type_count : node_type_counts) {
@@ -890,7 +890,7 @@ Merge_Step SBM::agglomerative_merge(const int&    block_level,
         const NodePtr& block_b = block.second;
 
         // Build a map of neighbor to pair of both groups connections to that neighbor.
-        std::unordered_map<NodePtr, std::pair<int, int>> pair_counts_to_neighbor;
+        std::map<NodePtr, std::pair<int, int>> pair_counts_to_neighbor;
 
         int        e_ab_ab           = 0;
         int        times_merged_seen = 0;
@@ -952,7 +952,7 @@ Merge_Step SBM::agglomerative_merge(const int&    block_level,
   Merge_Step results;
 
   // A set of the blocks that have been merged already this step and thus are off limits
-  std::unordered_set<NodePtr> merged_blocks;
+  std::set<NodePtr> merged_blocks;
   int                         num_merges_made = 0;
 
   // Start working our way through the queue of best moves and making merges
