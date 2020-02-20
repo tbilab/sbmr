@@ -437,7 +437,7 @@ NodePtr SBM::propose_move(const NodePtr& node,
 
   // Decide where we will get new block from and draw from potential candidates
   return random.draw_unif() < prob_of_random_block ? random.sample(potential_blocks)
-                                                   : random.sample(rand_neighbor->get_edges_to_level(block_level, node->type));
+                                                   : random.sample(rand_neighbor->get_edges_of_type(node->type, block_level));
 }
 
 // =============================================================================
