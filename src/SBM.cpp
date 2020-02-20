@@ -414,7 +414,7 @@ NodeEdgeMap SBM::get_node_to_block_edge_counts(const std::string& id,
 // =============================================================================
 NodePtr SBM::propose_move(const NodePtr& node,
                           const double&  eps,
-                          Sampler&       node_chooser) const
+                          Sampler&       random) const
 {
   PROFILE_FUNCTION();
 
@@ -424,7 +424,7 @@ NodePtr SBM::propose_move(const NodePtr& node,
   const NodeVec potential_blocks = get_nodes_of_type_at_level(node->type, block_level);
 
   // Sample a random neighbor of node
-  const NodePtr rand_neighbor = node_chooser.sample(node->edges)->get_parent_at_level(node->level);
+  const NodePtr rand_neighbor = random.sample(node->edges)->get_parent_at_level(node->level);
 
   // Get number total number edges for neighbor's block
   const int neighbor_block_degree = rand_neighbor->parent->degree;
@@ -434,16 +434,16 @@ NodePtr SBM::propose_move(const NodePtr& node,
   const double prob_of_random_block = ergo_amnt / (neighbor_block_degree + ergo_amnt);
 
   // Decide where we will get new block from and draw from potential candidates
-  return node_chooser.draw_unif() < prob_of_random_block ? node_chooser.sample(potential_blocks)
-                                                         : node_chooser.sample(rand_neighbor->get_edges_to_level(block_level, node->type));
+  return random.draw_unif() < prob_of_random_block ? random.sample(potential_blocks)
+                                                   : random.sample(rand_neighbor->get_edges_to_level(block_level, node->type));
 }
 
 // =============================================================================
 // Make a decision on the proposed new block for node
 // =============================================================================
-Proposal_Res SBM::make_proposal_decision(const NodePtr node,
-                                         const NodePtr new_block,
-                                         const double  eps)
+Proposal_Res SBM::make_proposal_decision(const NodePtr& node,
+                                         const NodePtr& new_block,
+                                         const double&  eps)
 {
   PROFILE_FUNCTION();
 

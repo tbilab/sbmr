@@ -182,9 +182,9 @@ class SBM {
                        Sampler&       node_chooser) const;
 
   // Make a decision on the proposed new block for node
-  Proposal_Res make_proposal_decision(NodePtr node,
-                                      NodePtr new_block,
-                                      double  eps);
+  Proposal_Res make_proposal_decision(const NodePtr& node,
+                                      const NodePtr& new_block,
+                                      const double&  eps);
 
   // Runs efficient MCMC sweep algorithm on desired node level
   MCMC_Sweeps mcmc_sweep(int    level,
