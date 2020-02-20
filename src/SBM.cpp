@@ -384,7 +384,7 @@ void SBM::set_state(const std::vector<std::string>& id,
 }
 
 // Gathers counts of edges between all pairs of connected blocks in network
-BlockEdgeCounts SBM::get_block_edge_counts(const int level)
+const BlockEdgeCounts SBM::get_block_edge_counts(const int& level)
 {
   BlockEdgeCounts block_counts;
 

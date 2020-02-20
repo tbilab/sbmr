@@ -148,7 +148,7 @@ class SBM {
   NodeVec get_nodes_of_type_at_level(const std::string& type, const int& level); 
 
   // Gathers counts of edges between any two blocks in network
-  BlockEdgeCounts get_block_edge_counts(int level);
+  const BlockEdgeCounts get_block_edge_counts(const int& level);
 
   // Load a level blocking from a state dump
   void set_state(const std::vector<std::string>& id,
