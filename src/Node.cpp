@@ -202,7 +202,7 @@ NodeEdgeMap Node::gather_edges_to_level(const int& level) const
 // =============================================================================
 // Static method to connect two nodes to each other with edge
 // =============================================================================
-void Node::connect_nodes(NodePtr node1_ptr, NodePtr node2_ptr)
+void Node::connect_nodes(const NodePtr& node1_ptr, const NodePtr& node2_ptr)
 {
   //PROFILE_FUNCTION();
   node1_ptr->add_edge(node2_ptr);
