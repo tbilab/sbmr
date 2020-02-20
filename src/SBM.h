@@ -140,7 +140,7 @@ class SBM {
   LevelPtr get_level(const int& level) const; 
 
   // Export current state of nodes in model
-  State_Dump get_state();
+  State_Dump get_state() const;
 
   // Grabs and returns node of specified id, at desired level.
   NodePtr get_node_by_id(const std::string& id,
@@ -174,9 +174,6 @@ class SBM {
   // Compute microcononical entropy of current model state at a level
   double get_entropy(int level) const;
 
-  // Merge two blocks, placing all nodes that were under block_b under
-  // block_a and deleting from model.
-  void merge_blocks(const NodePtr& block_a, const NodePtr& block_b);
 
   // Use model state to propose a potential block move for a node.
   NodePtr propose_move(const NodePtr& node,
@@ -195,6 +192,10 @@ class SBM {
                          const bool&   variable_num_blocks,
                          const bool&   track_pairs,
                          const bool&   verbose = false);
+
+  // Merge two blocks, placing all nodes that were under block_b under
+  // block_a and deleting from model.
+  void merge_blocks(const NodePtr& block_a, const NodePtr& block_b);
 
   // Merge two blocks at a given level based on the probability of doing so
   Merge_Step agglomerative_merge(const int&    level_of_blocks,

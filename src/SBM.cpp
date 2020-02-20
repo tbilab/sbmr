@@ -309,7 +309,7 @@ NodeVec SBM::clean_empty_blocks()
 // =============================================================================
 // Export current state of nodes in model
 // =============================================================================
-State_Dump SBM::get_state()
+State_Dump SBM::get_state() const
 {
   PROFILE_FUNCTION();
   // Initialize the return struct
