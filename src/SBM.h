@@ -92,9 +92,7 @@ class SBM {
 
   private:
 
-  // Adds a edge between two nodes
-  void _add_edge(NodePtr node_a, NodePtr node_b); // based on their references
-
+ 
   public:
   // Attributes
   // =========================================================================

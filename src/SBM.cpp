@@ -88,7 +88,6 @@ NodePtr SBM::create_block_node(const std::string& type, const int level)
 };
 
 
-
 // =============================================================================
 // Return nodes of a desired type from level.
 // =============================================================================
@@ -126,23 +125,25 @@ NodeVec SBM::get_nodes_of_type_at_level(const std::string& type, const int& leve
   return nodes_to_return;
 }
 
+
 // =============================================================================
-// Adds a edge between two nodes based on their references
+// Adds a edge between two nodes based on their ids
 // =============================================================================
-void SBM::_add_edge(const NodePtr node_a, const NodePtr node_b)
+void SBM::add_edge(const std::string& id_a, const std::string& id_b)
 {
   PROFILE_FUNCTION();
+  const NodePtr node_a = get_node_by_id(id_a);
+  const NodePtr node_b = get_node_by_id(id_b);
 
   // Check if we have an explicite list of allowed edge patterns or if we should
   // add this edge as a possible pair.
-
   // If the user has specified allowed edges explicitely, make sure that this edge follows protocol
   if (specified_allowed_edges) {
     const bool a_to_b_bad = !(edge_type_pairs.at(node_a->type).count(node_b->type));
     const bool b_to_a_bad = !(edge_type_pairs.at(node_b->type).count(node_a->type));
 
     if (a_to_b_bad | b_to_a_bad) {
-      LOGIC_ERROR("Edge of " + node_a->id + " - " + node_b->id + " does not fit allowed specified edge_types type combos.");
+      LOGIC_ERROR("Edge of " + id_a + " - " + id_b + " does not fit allowed specified edge_types type combos.");
     }
   }
   else {
@@ -151,15 +152,6 @@ void SBM::_add_edge(const NodePtr node_a, const NodePtr node_b)
 
   Node::connect_nodes(node_a, node_b);   // Connect nodes to eachother
   edges.push_back(Edge(node_a, node_b)); // Add edge to edge tracking list
-};
-
-// =============================================================================
-// Adds a edge between two nodes based on their ids
-// =============================================================================
-void SBM::add_edge(const std::string& id_a, const std::string& id_b)
-{
-  PROFILE_FUNCTION();
-  SBM::_add_edge(get_node_by_id(id_a), get_node_by_id(id_b));
 };
 
 // =============================================================================
