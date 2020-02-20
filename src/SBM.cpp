@@ -595,10 +595,6 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
     results.block_consensus.initialize(get_level(level));
   }
 
-  // Grab level map
-  const LevelPtr node_map = get_level(level);
-
-
   // Check if we have any blocks ready in the network...
   const bool no_blocks_present = get_level(block_level)->size() == 0;
 
@@ -619,9 +615,11 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
               << "prob_of_accept,"
               << "move_accepted" << std::endl;
   }
-  
+
   // Initialize a vector of nodes that will be passed through for a sweep.
-  NodeVec nodes_to_sweep;
+  // Grab level map
+  const LevelPtr node_map = get_level(level);
+  NodeVec        nodes_to_sweep;
   nodes_to_sweep.reserve(node_map->size());
   for (const auto& node : *node_map) {
     nodes_to_sweep.push_back(node.second);
