@@ -238,14 +238,6 @@ void SBM::initialize_blocks(const int level, const int num_blocks)
   }
 }
 
-// =============================================================================
-// Grabs the first node found at a given level, used in testing.
-// =============================================================================
-NodePtr SBM::get_node_from_level(const int level)
-{
-  PROFILE_FUNCTION();
-  return nodes.at(level)->begin()->second;
-}
 
 // =============================================================================
 // Scan through entire Network and remove all block nodes that have no children.

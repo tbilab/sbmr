@@ -114,8 +114,6 @@ TEST_CASE("Initializing a block for every node", "[Network]")
   // There should now be a total of 18 nodes at level 1
   REQUIRE(18 == my_net.get_level(1)->size());
 
-  // And a node from this new level should have a single child
-  REQUIRE(1 == my_net.get_node_from_level(1)->children.size());
 }
 
 TEST_CASE("Randomly assigning a given number of blocks", "[Network]")

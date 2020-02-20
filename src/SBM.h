@@ -144,9 +144,8 @@ class SBM {
   NodePtr get_node_by_id(const std::string& id,
                          const int          level = 0);
 
-  // Grabs the first node found at a given level, used in testing.
-  NodePtr get_node_from_level(int level);
-  NodeVec get_nodes_of_type_at_level(const std::string& type, const int& level); // Return nodes of a desired type from level matching type
+ // Return nodes of a desired type from level matching type
+  NodeVec get_nodes_of_type_at_level(const std::string& type, const int& level); 
 
   // Gathers counts of edges between any two blocks in network
   BlockEdgeCounts get_block_edge_counts(int level);
