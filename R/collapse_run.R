@@ -62,7 +62,12 @@ collapse_run.sbm_network <- function(sbm,
                                      num_block_proposals = 5,
                                      parallel = FALSE){
 
-  block_range <- num_final_blocks
+  has_random_seed <- not_null(attr(sbm, 'random_seed'))
+  has_repeats <- length(num_final_blocks) > length(unique(num_final_blocks))
+
+  if(has_random_seed & has_repeats){
+    warning("Using a set random seed for collapse run with repeated target number of groups requested.\nWill result in the exact same results for samples.")
+  }
 
   if(parallel){
     # Set up parallel processing environment. .skip will avoid re-creating a
@@ -70,15 +75,16 @@ collapse_run.sbm_network <- function(sbm,
     future::plan(future::multiprocess, .skip = TRUE)
 
     results <- furrr::future_map_dfr(
-      block_range,
+      num_final_blocks,
       function(desired_num){
-        collapse_blocks(sbm,
-                        desired_num_blocks = desired_num,
-                        sigma = sigma,
-                        eps = eps,
-                        report_all_steps = FALSE,
-                        num_block_proposals = num_block_proposals,
-                        num_mcmc_sweeps = num_mcmc_sweeps) %>%
+        # Initialize model and make sure to not warn about cached model and random seeds if present
+        verify_model(sbm, warn_about_random_seed = FALSE) %>%
+          collapse_blocks(desired_num_blocks = desired_num,
+                          sigma = sigma,
+                          eps = eps,
+                          report_all_steps = FALSE,
+                          num_block_proposals = num_block_proposals,
+                          num_mcmc_sweeps = num_mcmc_sweeps) %>%
           get_collapse_results()
       }
     )
@@ -88,7 +94,7 @@ collapse_run.sbm_network <- function(sbm,
                                          as.integer(num_block_proposals),
                                          sigma,
                                          eps,
-                                         as.integer(block_range))
+                                         as.integer(num_final_blocks))
 
     results <- purrr::map_dfr(
       collapse_results,
