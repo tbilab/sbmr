@@ -154,161 +154,46 @@ SEXP wrap(const NodeEdgeMap& node_connections)
 };
 }
 
-class Rcpp_SBM : public SBM {
-  public:
-  // Add allowed edge pairs to the object. Overwrites previous work if it was there
-  void add_edge_types(const std::vector<std::string>& from_types,
-                      const std::vector<std::string>& to_types)
-  {
-
-    SBM::add_edge_types(from_types, to_types);
-  }
-
-  void add_node(const std::string& id, const std::string& type, const int& level)
-  {
-
-    SBM::add_node(id, type, level);
-  }
-
-  void add_edge(const std::string& node_a_id, const std::string& node_b_id)
-  {
-
-    SBM::add_edge(node_a_id, node_b_id);
-  }
-
-  State_Dump get_state()
-  {
-
-    return SBM::get_state();
-  }
-
-  void initialize_blocks(const int& num_blocks, const int& level)
-  {
-
-    SBM::initialize_blocks(num_blocks, level);
-  }
-
-  double get_entropy(const int& level)
-  {
-
-    return SBM::get_entropy(level);
-  }
-
-  MCMC_Sweeps mcmc_sweep(const int&    level,
-                         const int&    num_sweeps,
-                         const double& eps,
-                         const bool&   variable_num_blocks,
-                         const bool&   track_pairs,
-                         const bool&   verbose)
-  {
-    Args... args
-
-    return SBM::mcmc_sweep(level,
-                           num_sweeps,
-                           eps,
-                           variable_num_blocks,
-                           track_pairs,
-                           verbose);
-  }
-
-  CollapseResults collapse_blocks(const int&    node_level,
-                                  const int&    num_mcmc_steps,
-                                  const int&    desired_num_blocks,
-                                  const int&    num_checks_per_block,
-                                  const double& sigma,
-                                  const double& eps,
-                                  const bool&   report_all_steps)
-  {
-
-    return SBM::collapse_blocks(node_level,
-                                num_mcmc_steps,
-                                desired_num_blocks,
-                                num_checks_per_block,
-                                sigma,
-                                eps,
-                                report_all_steps);
-  }
-
-  CollapseResults collapse_run(const int&              node_level,
-                               const int&              num_mcmc_steps,
-                               const int&              num_checks_per_block,
-                               const double&           sigma,
-                               const double&           eps,
-                               const std::vector<int>& block_nums)
-  {
-
-    return SBM::collapse_run(node_level,
-                             num_mcmc_steps,
-                             num_checks_per_block,
-                             sigma,
-                             eps,
-                             block_nums);
-  }
-
-  NodeEdgeMap get_node_to_block_edge_counts(const std::string& id,
-                                            const int&         node_level        = 0,
-                                            const int&         connections_level = 1)
-  {
-
-    return SBM::get_node_to_block_edge_counts(id,
-                                              node_level,
-                                              connections_level);
-  }
-
-  BlockEdgeCounts get_block_edge_counts(const int& level = 1)
-  {
-    return SBM::get_block_edge_counts(level);
-  }
-
-  void load_from_state(std::vector<std::string>& id,
-                       std::vector<std::string>& parent,
-                       std::vector<int>&         level,
-                       std::vector<std::string>& types)
-  {
-    SBM::load_from_state(State_Dump(id, parent, level, types));
-  }
-};
-
 RCPP_MODULE(SBM)
 {
-  class_<Rcpp_SBM>("SBM")
+  class_<SBM>("SBM")
 
       .constructor()
 
       .method("add_node",
-              &Rcpp_SBM::add_node,
+              &SBM ::add_node,
               "Add a node to the network. Takes the node id (string), the node type (string), and the node level (int). Use level = 0 for data-level nodes.")
       .method("add_edge",
-              &Rcpp_SBM::add_edge,
+              &SBM ::add_edge,
               "Connects two nodes in network (at level 0) by their ids (string).")
       .method("add_edge_types",
-              &Rcpp_SBM::add_edge_types,
+              &SBM ::add_edge_types,
               "Add list of allowed pairs of node types for edges.")
       .method("initialize_blocks",
-              &Rcpp_SBM::initialize_blocks,
+              &SBM ::initialize_blocks,
               "Adds a desired number of blocks and randomly assigns them for a given level. num_blocks = -1 means every node gets their own block")
       .method("get_state",
-              &Rcpp_SBM::get_state,
+              &SBM ::get_state,
               "Exports the current state of the network as dataframe with each node as a row and columns for node id, parent id, node type, and node level.")
       .method("get_node_to_block_edge_counts",
-              &Rcpp_SBM::get_node_to_block_edge_counts,
+              &SBM ::get_node_to_block_edge_counts,
               "Returns a dataframe with the requested nodes connection counts to all blocks/nodes at a desired level.")
       .method("get_block_edge_counts",
-              &Rcpp_SBM::get_block_edge_counts,
+              &SBM ::get_block_edge_counts,
               "Returns a dataframe of counts of edges between all connected pairs of blocks at given level.")
       .method("load_from_state",
-              &Rcpp_SBM::load_from_state,
+              &SBM ::load_from_state,
               "Takes model state export as given by SBM$get_state() and returns model to specified state. This is useful for resetting model before running various algorithms such as agglomerative merging.")
       .method("get_entropy",
-              &Rcpp_SBM::get_entropy,
+              &SBM ::get_entropy,
               "Computes the (degree-corrected) entropy for the network at the specified level (int).")
       .method("mcmc_sweep",
-              &Rcpp_SBM::mcmc_sweep,
+              &SBM ::mcmc_sweep,
               "Runs a single MCMC sweep across all nodes at specified level. Each node is given a chance to move blocks or stay in current block and all nodes are processed in random order. Takes the level that the sweep should take place on (int) and if new blocks blocks can be proposed and empty blocks removed (boolean).")
       .method("collapse_blocks",
-              &Rcpp_SBM::collapse_blocks,
+              &SBM ::collapse_blocks,
               "Performs agglomerative merging on network, starting with each block has a single node down to one block per node type. Arguments are level to perform merge at (int) and number of MCMC steps to peform between each collapsing to equilibriate block. Returns list with entropy and model state at each merge.")
       .method("collapse_run",
-              &Rcpp_SBM::collapse_run,
+              &SBM ::collapse_run,
               "Performs a sequence of block collapse steps on network. Targets a range of final blocks numbers and collapses to them and returns final result form each collapse.");
 }
