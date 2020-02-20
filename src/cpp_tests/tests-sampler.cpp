@@ -72,7 +72,8 @@ TEST_CASE("Uniform integer sampling", "[Sampler]")
 TEST_CASE("Node list and vector sampling", "[Sampler]")
 {
 
-  Sampler my_sampler;
+  Sampler sampler_1(42);
+  Sampler sampler_2(42);
 
   // Build three nodes
   NodePtr n1 = std::make_shared<Node>("n1", 0, 1);
@@ -92,20 +93,42 @@ TEST_CASE("Node list and vector sampling", "[Sampler]")
   nodes_vec.push_back(n3);
 
   // Run a bunch of samples and makes sure we grab a given element rougly 1/3rd of the time
-  int num_samples           = 10000;
-  int times_n2_sampled_list = 0;
-  int times_n2_sampled_vec  = 0;
+  const int num_samples           = 10000;
+  int       times_n2_sampled_list = 0;
+  int       times_n2_sampled_vec  = 0;
+  int       times_list_agreed     = 0;
+  int       times_vec_agreed      = 0;
 
   for (int i = 0; i < num_samples; ++i) {
-    if (my_sampler.sample(nodes_list)->id == "n2") times_n2_sampled_list++;
-    if (my_sampler.sample(nodes_vec)->id == "n2") times_n2_sampled_vec++;
+    std::string list_sample_id = sampler_1.sample(nodes_list)->id;
+    std::string vec_sample_id  = sampler_1.sample(nodes_vec)->id;
+
+    if (sampler_2.sample(nodes_list)->id == list_sample_id) {
+      times_list_agreed++;
+    }
+    if (sampler_2.sample(nodes_vec)->id == vec_sample_id) {
+      times_vec_agreed++;
+    }
+
+    if (list_sample_id == "n2") {
+      times_n2_sampled_list++;
+    }
+    if (vec_sample_id == "n2") {
+      times_n2_sampled_vec++;
+    }
   }
 
   // Make sure list sampled a given correct amount
-  REQUIRE(
-      double(times_n2_sampled_list) / double(num_samples) == Approx(0.333333).epsilon(0.03));
+  REQUIRE(double(times_n2_sampled_list)
+              / double(num_samples)
+          == Approx(0.333333).epsilon(0.03));
 
   // Make sure vector sampled a given correct amount
-  REQUIRE(
-      double(times_n2_sampled_vec) / double(num_samples) == Approx(0.333333).epsilon(0.03));
+  REQUIRE(double(times_n2_sampled_vec)
+              / double(num_samples)
+          == Approx(0.333333).epsilon(0.03));
+
+  REQUIRE(times_list_agreed == num_samples);
+  REQUIRE(times_vec_agreed == num_samples);
+  
 }
