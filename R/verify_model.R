@@ -8,6 +8,8 @@
 #' @param x Object of class `sbm_network`.
 #' @param show_messages Should function inform of its actions such as when a
 #'   model already exists so no changes are made?
+#' @param warn_about_random_seed Should the model warn about cases when set seed
+#'   is present for cached model?
 #'
 #' @inherit new_sbm_network return
 #' @export
@@ -23,16 +25,13 @@
 #' net <- net %>% verify_model()
 #' net
 #'
-verify_model <- function(x, show_messages = FALSE){
+verify_model <- function(x, show_messages = FALSE, warn_about_random_seed = TRUE){
   UseMethod("verify_model")
 }
 
-verify_model.default <- function(x){
-  cat("Default initialize model generic.")
-}
 
 #' @export
-verify_model.sbm_network <- function(x, show_messages = FALSE){
+verify_model.sbm_network <- function(x, show_messages = FALSE, warn_about_random_seed = TRUE){
   has_model_already <- not_null(attr(x, 'model'))
   has_state_already <- not_null(attr(x, "state"))
   has_random_seed <- not_null(attr(x, 'random_seed'))
@@ -52,7 +51,7 @@ verify_model.sbm_network <- function(x, show_messages = FALSE){
       return(x)
     }
 
-    if(has_random_seed){
+    if(has_random_seed & warn_about_random_seed){
       warning("Random seed was specified but model is being restarted from a saved state.\nThis will harm reproducability if compared to uninterupted use of model.")
     }
   }
