@@ -631,7 +631,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
     double entropy_delta   = 0;
 
     // Shuffle order order of nodes to be run through for sweep
-    std::shuffle(nodes_to_sweep.begin(), nodes_to_sweep.end(), sampler.int_gen);
+    std::shuffle(nodes_to_sweep.begin(), nodes_to_sweep.end(), sampler.generator);
 
     // Setup container to track what pairs need to be updated for sweep
     std::unordered_set<std::string> pair_moves;

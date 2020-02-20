@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-TEST_CASE("Setting Seeds", "[Sampler]")
+TEST_CASE("Same seeds means same results", "[Sampler]")
 {
   // Setup multuple generators with same seed
   Sampler sampler_1(42);
@@ -13,6 +13,17 @@ TEST_CASE("Setting Seeds", "[Sampler]")
   // The two samplers should give back the same result
   REQUIRE(sampler_1.draw_unif() == sampler_2.draw_unif());
 }
+
+TEST_CASE("Different seeds means different results", "[Sampler]")
+{
+  // Setup multuple generators with same seed
+  Sampler sampler_1(42);
+  Sampler sampler_2(312);
+
+  // The two samplers should give back the same result
+  REQUIRE(sampler_1.draw_unif() != sampler_2.draw_unif());
+}
+
 
 TEST_CASE("Lots of Samples", "[Sampler]")
 {
@@ -45,7 +56,7 @@ TEST_CASE("Uniform integer sampling", "[Sampler]")
   int max_draw = -1;
 
   for (int i = 0; i < num_samples; ++i) {
-    int current_draw = my_sampler.sample(max_val);
+    int current_draw = my_sampler.get_rand_int(max_val);
 
     if (current_draw < min_draw) min_draw = current_draw;
     if (current_draw > max_draw) max_draw = current_draw;
