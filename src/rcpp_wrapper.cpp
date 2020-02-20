@@ -152,7 +152,8 @@ SEXP wrap(const NodeEdgeMap& node_connections)
                            _["count"]            = connection_count,
                            _["stringsAsFactors"] = false);
 };
-}
+
+} // End RCPP namespace
 
 RCPP_MODULE(SBM)
 {
