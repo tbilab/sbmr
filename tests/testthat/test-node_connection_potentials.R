@@ -30,7 +30,8 @@ test_that("Error thrown when stated connection potentials are violated", {
   expect_error(
     new_sbm_network(edges = edges_tripartite,
                     nodes = nodes_tripartite,
-                    edge_types = edge_types)
+                    edge_types = edge_types,
+                    random_seed = 42)
   )
 
 })

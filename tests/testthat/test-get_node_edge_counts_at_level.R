@@ -1,6 +1,6 @@
 test_that("Correct edge counts returned", {
 
-  net <- sim_basic_block_network(n_blocks = 5) %>%
+  net <- sim_basic_block_network(n_blocks = 5, random_seed = 42) %>%
     initialize_blocks(5)
 
   total_num_edges <- attr(net, 'n_edges')

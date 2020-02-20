@@ -1,7 +1,8 @@
 test_that("Correct numbers of nodes and edges are returned", {
   network <- sim_basic_block_network(
     n_blocks = 3,
-    n_nodes_per_block = 40
+    n_nodes_per_block = 40,
+    random_seed = 42
   )
 
 
@@ -21,7 +22,7 @@ test_that("Properly builds a missing nodes dataframe",{
     "a3",  "b1"
   )
 
-  sbm_net <- new_sbm_network(edges = edges)
+  sbm_net <- new_sbm_network(edges = edges, random_seed = 42)
 
   expect_equal(
     sbm_net$nodes,
@@ -62,7 +63,9 @@ test_that("Throws error for poorly formed nodes dataframe",{
   )
 
   expect_error(
-    new_sbm_network(edges = edges, nodes = nodes),
+    new_sbm_network(edges = edges,
+                    nodes = nodes,
+                    random_seed = 42),
     "Nodes dataframe needs an id column.",
     fixed = TRUE
   )
@@ -87,7 +90,9 @@ test_that("Throws error for empty edges dataframe",{
   )
 
   expect_error(
-    new_sbm_network(edges = edges, nodes = nodes),
+    new_sbm_network(edges = edges,
+                    nodes = nodes,
+                    random_seed = 42),
     "No edges provided",
     fixed = TRUE
   )
@@ -106,13 +111,19 @@ test_that("Throws error for edges dataframe missing required columns",{
   )
 
   expect_error(
-    new_sbm_network(edges = edges, edges_from_column = a_node, edges_to_column = node_b),
+    new_sbm_network(edges = edges,
+                    edges_from_column = a_node,
+                    edges_to_column = node_b,
+                    random_seed = 42),
     "Edges data does not have the specified to column: node_b",
     fixed = TRUE
   )
 
   expect_error(
-    new_sbm_network(edges = edges, edges_from_column = node_a, edges_to_column = b_node),
+    new_sbm_network(edges = edges,
+                    edges_from_column = node_a,
+                    edges_to_column = b_node,
+                    random_seed = 42),
     "Edges data does not have the specified from column: node_a",
     fixed = TRUE
   )
@@ -144,7 +155,10 @@ test_that("Throws warning for discarded unconnected nodes",{
   )
 
   expect_warning(
-    new_sbm_network(edges = edges, nodes = nodes, show_warnings = TRUE),
+    new_sbm_network(edges = edges,
+                    nodes = nodes,
+                    show_warnings = TRUE,
+                    random_seed = 42),
     "Node(s) c1, c2 are not seen in any of the edges and have been removed from data.",
     fixed = TRUE
   )
@@ -175,7 +189,11 @@ test_that("Throws warning for overridden bipartite_edges argument",{
   )
 
   expect_warning(
-    new_sbm_network(edges = edges, nodes = nodes, bipartite_edges = TRUE, show_warnings = TRUE),
+    new_sbm_network(edges = edges,
+                    nodes = nodes,
+                    bipartite_edges = TRUE,
+                    show_warnings = TRUE,
+                    random_seed = 42),
     "bipartite_edges setting ignored due to nodes dataframe being provided.",
     fixed = TRUE
   )
@@ -195,7 +213,9 @@ test_that("Throws messages for mismatched bipartite edges and nodes", {
   )
 
   expect_error(
-    new_sbm_network(edges = edges, bipartite_edges = TRUE),
+    new_sbm_network(edges = edges,
+                    bipartite_edges = TRUE,
+                    random_seed = 42),
     "Bipartite edge structure was requested but some nodes appeared in both from and two columns of supplied edges.",
     fixed = TRUE
   )
@@ -215,7 +235,8 @@ test_that("Bipartite node structure respects the column names in types", {
   sbm_net <- new_sbm_network(edges = edges,
                              bipartite_edges = TRUE,
                              edges_from_col = a_node,
-                             edges_to_col = b_node)
+                             edges_to_col = b_node,
+                             random_seed = 42)
 
   unique_types <- unique(sbm_net$nodes$type)
   expect_true(all(unique_types %in% c('a_node', 'b_node')))
@@ -234,7 +255,9 @@ test_that("Default node type can change", {
   )
 
   expect_equal(
-    new_sbm_network(edges = edges, default_node_type = "my_node_type")$nodes$type[1],
+    new_sbm_network(edges = edges,
+                    default_node_type = "my_node_type",
+                    random_seed = 42)$nodes$type[1],
     "my_node_type")
 })
 
@@ -243,7 +266,8 @@ test_that("Model is instantiated if requested", {
   network <- sim_basic_block_network(
     n_blocks = 3,
     n_nodes_per_block = 40,
-    setup_model = TRUE
+    setup_model = TRUE,
+    random_seed = 42
   )
 
   testthat::expect_false(is.null(attr(network, 'model')))
@@ -253,7 +277,8 @@ test_that("Model is instantiated if requested", {
 test_that("Model is not instantiated by default", {
   network <- sim_basic_block_network(
     n_blocks = 3,
-    n_nodes_per_block = 40
+    n_nodes_per_block = 40,
+    random_seed = 42
   )
 
   testthat::expect_true(is.null(attr(network, 'model')))

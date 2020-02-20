@@ -6,7 +6,7 @@ test_that("MCMC Sweeps function as expected", {
   n_sweeps <- 50
 
   # Start with a random network
-  net <- sim_random_network(n_nodes = 25) %>%
+  net <- sim_random_network(n_nodes = 25, random_seed = 42) %>%
     initialize_blocks(num_blocks = n_blocks)
 
   sweep_and_check_n_blocks <- function(i, variable_num_blocks, sbm){
@@ -43,7 +43,7 @@ test_that("Pair tracking can be enabled and disabled",{
   num_sweeps <- 3
 
   # Start with a random network
-  net <- sim_random_network(n_nodes = 30) %>%
+  net <- sim_random_network(n_nodes = 30, random_seed = 42) %>%
     initialize_blocks(num_blocks = 5)
 
   # Run a few sweeps where pair tracking is enabled
@@ -67,7 +67,7 @@ test_that("No nodes should have pairs for more steps than number of sweeps",{
   num_trails <- 20
 
   # Start with a random network
-  net <- sim_random_network(n_nodes = 30)
+  net <- sim_random_network(n_nodes = 30, random_seed = 42)
 
   for(i in num_trails){
 

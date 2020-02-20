@@ -1,7 +1,10 @@
 test_that("Add Node", {
 
   # Start with network with 5 nodes.
-  net <- sim_random_network(n_nodes = 5, prob_of_edge = 1, setup_model = TRUE)
+  net <- sim_random_network(n_nodes = 5,
+                            prob_of_edge = 1,
+                            setup_model = TRUE,
+                            random_seed = 42)
 
   expect_equal(attr(net, 'n_nodes'), 5)
 
@@ -50,7 +53,9 @@ test_that("Add Node", {
 
 test_that("Add edge", {
   # Start with network with 5 nodes all fully connected
-  net <- sim_random_network(n_nodes = 5, prob_of_edge = 1)
+  net <- sim_random_network(n_nodes = 5,
+                            prob_of_edge = 1,
+                            random_seed = 42)
 
   start_num_edges <- attr(net, 'n_edges')
   # Gives a message about new nodes on default
@@ -93,7 +98,8 @@ test_that("Set node parent", {
     ) %>%
   new_sbm_network(bipartite_edges = TRUE,
                   edges_from_col = a_node,
-                  edges_to_col = b_node)
+                  edges_to_col = b_node,
+                  random_seed = 42)
 
 
   # Make a parent node and assign it to a1
@@ -131,7 +137,9 @@ test_that("Set node parent", {
 test_that("Randomly initializing blocks in network", {
   # Default value is 1 block per node
   expect_equal(
-    sim_random_network(n_nodes = 5, prob_of_edge = 1) %>%
+    sim_random_network(n_nodes = 5,
+                       prob_of_edge = 1,
+                       random_seed = 42) %>%
       initialize_blocks() %>%
       get_num_blocks(),
     5
@@ -139,7 +147,9 @@ test_that("Randomly initializing blocks in network", {
 
   # Can also specify number of blocks
   expect_equal(
-    sim_random_network(n_nodes = 5, prob_of_edge = 1) %>%
+    sim_random_network(n_nodes = 5,
+                       prob_of_edge = 1,
+                       random_seed = 42) %>%
       initialize_blocks(num_blocks = 3) %>%
       get_num_blocks(),
     3
@@ -147,20 +157,26 @@ test_that("Randomly initializing blocks in network", {
 
   # Can't request more blocks than nodes
   expect_error(
-    sim_random_network(n_nodes = 5, prob_of_edge = 1) %>%
+    sim_random_network(n_nodes = 5,
+                       prob_of_edge = 1,
+                       random_seed = 42) %>%
       initialize_blocks(num_blocks = 10),
     "Network only has 5 nodes at level 0. Can't initialize 10 blocks"
   )
 
   # Can't request negative numbers of blocks
   expect_error(
-    sim_random_network(n_nodes = 5, prob_of_edge = 1) %>%
+    sim_random_network(n_nodes = 5,
+                       prob_of_edge = 1,
+                       random_seed = 42) %>%
       initialize_blocks(num_blocks = -2),
     "Can't initialize -2 blocks."
   )
 
   # Can build blocks at multiple levels
-  net <- sim_random_network(n_nodes = 5, prob_of_edge = 1) %>%
+  net <- sim_random_network(n_nodes = 5,
+                            prob_of_edge = 1,
+                            random_seed = 42) %>%
     initialize_blocks() %>%
     initialize_blocks(level = 1)
 
