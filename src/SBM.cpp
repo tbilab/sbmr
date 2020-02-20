@@ -30,7 +30,7 @@ LevelPtr SBM::get_level(const int level)
 // Find and return a node by its id
 // =============================================================================
 NodePtr SBM::get_node_by_id(const std::string& id,
-                            const int          level)
+                            const int          level) const
 {
   PROFILE_FUNCTION();
   try {
@@ -384,7 +384,7 @@ void SBM::set_state(const std::vector<std::string>& id,
 }
 
 // Gathers counts of edges between all pairs of connected blocks in network
-const BlockEdgeCounts SBM::get_block_edge_counts(const int& level)
+BlockEdgeCounts SBM::get_block_edge_counts(const int& level) const
 {
   BlockEdgeCounts block_counts;
 
@@ -403,7 +403,7 @@ const BlockEdgeCounts SBM::get_block_edge_counts(const int& level)
 
 NodeEdgeMap SBM::get_node_to_block_edge_counts(const std::string& id,
                                                const int&         node_level,
-                                               const int&         connections_level)
+                                               const int&         connections_level) const
 {
   // Get edges to desired level
   return get_node_by_id(id, node_level)->gather_edges_to_level(connections_level);

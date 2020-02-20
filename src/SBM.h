@@ -142,14 +142,19 @@ class SBM {
 
   // Grabs and returns node of specified id, at desired level.
   NodePtr get_node_by_id(const std::string& id,
-                         const int          level = 0);
+                         const int          level = 0) const;
 
  // Return nodes of a desired type from level matching type
   NodeVec get_nodes_of_type_at_level(const std::string& type, const int& level); 
 
   // Gathers counts of edges between any two blocks in network
-  const BlockEdgeCounts get_block_edge_counts(const int& level);
+  BlockEdgeCounts get_block_edge_counts(const int& level) const;
 
+  // Get a node's block connections map to a desired level
+  NodeEdgeMap get_node_to_block_edge_counts(const std::string& id,
+                                            const int&         node_level        = 0,
+                                            const int&         connections_level = 1) const;
+  
   // Load a level blocking from a state dump
   void set_state(const std::vector<std::string>& id,
                        const std::vector<std::string>& parent,
@@ -163,10 +168,6 @@ class SBM {
   // Scan through levels and remove all block nodes that have no children. Returns # of blocks removed
   NodeVec clean_empty_blocks();
 
-  // Get a node's block connections map to a desired level
-  NodeEdgeMap get_node_to_block_edge_counts(const std::string& id,
-                                            const int&         node_level        = 0,
-                                            const int&         connections_level = 1);
 
   // Compute microcononical entropy of current model state at a level
   double get_entropy(int level);
