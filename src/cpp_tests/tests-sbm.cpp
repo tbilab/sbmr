@@ -124,7 +124,7 @@ TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
   bool all_zeros = true;
 
   // Give it some random groupings of the correct number of groups
-  my_SBM.initialize_blocks(3, 0);
+  my_SBM.initialize_blocks(0, 3);
 
   auto all_nodes = my_SBM.get_level(0);
 
@@ -181,7 +181,7 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
   SBM my_SBM = build_bipartite_simulated();
 
   // Give it some random groupings of the correct number of groups
-  my_SBM.initialize_blocks(3, 0);
+  my_SBM.initialize_blocks(0, 3);
 
   auto all_nodes = my_SBM.get_level(0);
 

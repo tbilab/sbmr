@@ -109,7 +109,7 @@ TEST_CASE("Initializing a block for every node", "[Network]")
   REQUIRE(0 == my_net.get_level(1)->size());
 
   // Now assignin every node their own parent block
-  my_net.give_every_node_at_level_own_block(0);
+  my_net.initialize_blocks(0);
 
   // There should now be a total of 18 nodes at level 1
   REQUIRE(18 == my_net.get_level(1)->size());
@@ -145,7 +145,7 @@ TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
   my_net.add_node("b10", "b");
 
   // Distribute 3 total blocks for each type across nodes randomly
-  my_net.initialize_blocks(3, 0);
+  my_net.initialize_blocks(0, 3);
 
   // There should now be a total of 6 nodes at level 1
   REQUIRE(6 == my_net.get_level(1)->size());

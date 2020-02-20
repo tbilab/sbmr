@@ -129,9 +129,7 @@ class SBM {
   void add_edge(const std::string& id_a, const std::string& id_b); // based on their ids
 
   // Add an alowed pairing of node types for edges
-  void add_edge_type(const std::string& from_type, const std::string& to_type);
   void add_edge_types(const std::vector<std::string>& from_types, const std::vector<std::string>& to_types);
-
 
   // Creates a new block node and adds it to its neccesary level
   NodePtr create_block_node(const std::string& type, const int level);
@@ -159,12 +157,9 @@ class SBM {
                        const std::vector<int>&         level,
                        const std::vector<std::string>& types);
 
-  // Builds and assigns a block node for every node in a given level
-  void give_every_node_at_level_own_block(int level);
-
+ 
   // Adds a num_blocks to model and randomly assigns them for a given level (-1 means every node gets their own block)
-  void initialize_blocks(int num_blocks,
-                         int level);
+  void initialize_blocks(int level, int num_blocks = -1);
 
   // Scan through levels and remove all block nodes that have no children. Returns # of blocks removed
   NodeVec clean_empty_blocks();

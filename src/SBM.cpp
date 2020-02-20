@@ -126,6 +126,7 @@ NodeVec SBM::get_nodes_of_type_at_level(const std::string& type, const int& leve
 }
 
 
+
 // =============================================================================
 // Adds a edge between two nodes based on their ids
 // =============================================================================
@@ -147,21 +148,13 @@ void SBM::add_edge(const std::string& id_a, const std::string& id_b)
     }
   }
   else {
-    add_edge_type(node_a->type, node_b->type);
+    add_edge_type(edge_type_pairs, node_a->type, node_b->type);
   }
 
   Node::connect_nodes(node_a, node_b);   // Connect nodes to eachother
   edges.push_back(Edge(node_a, node_b)); // Add edge to edge tracking list
 };
 
-// =============================================================================
-// Add an alowed pairing of node types for edges
-// =============================================================================
-void SBM::add_edge_type(const std::string& from_type, const std::string& to_type)
-{
-  edge_type_pairs[from_type].insert(to_type);
-  edge_type_pairs[to_type].insert(from_type);
-}
 
 // Vectorized version of add edge types for when a whole set is passed at once
 void SBM::add_edge_types(const std::vector<std::string>& from_types, const std::vector<std::string>& to_types)
@@ -172,26 +165,20 @@ void SBM::add_edge_types(const std::vector<std::string>& from_types, const std::
   // Add pairs to network map of allowed pairs
   const int num_pairs = from_types.size();
   for (int i = 0; i < num_pairs; i++) {
-    SBM::add_edge_type(from_types[i], to_types[i]);
+    add_edge_type(edge_type_pairs, from_types[i], to_types[i]);
   }
 
   // Let object know that we're working with specified types now.
   specified_allowed_edges = true;
 }
 
-// =============================================================================
-// Builds and assigns a block node for every node in a given level
-// =============================================================================
-void SBM::give_every_node_at_level_own_block(const int level)
-{
-  initialize_blocks(-1, level);
-}
+
 
 // =============================================================================
 // Adds a desired number of blocks and randomly assigns them for a given level
 // num_blocks = -1 means every node gets their own block
 // =============================================================================
-void SBM::initialize_blocks(const int num_blocks, const int level)
+void SBM::initialize_blocks(const int level, const int num_blocks)
 {
   PROFILE_FUNCTION();
 
@@ -623,7 +610,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int    level,
   const bool no_blocks_present = get_level(block_level)->size() == 0;
 
   if (no_blocks_present) {
-    initialize_blocks(-1, level);
+    initialize_blocks(level);
 
     if (verbose) {
       WARN_ABOUT("No blocks present. Initializing one block per node.");
@@ -845,7 +832,7 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
 
   if (nodes.count(meta_level) < 1) {
     // Build a single meta-block for each block if they don't exist already
-    give_every_node_at_level_own_block(block_level);
+    initialize_blocks(block_level);
   }
 
   // Grab all the blocks we're looking to merge
@@ -1013,8 +1000,8 @@ CollapseResults SBM::collapse_blocks(const int    node_level,
 
   // Start by giving every node at the desired level its own block and every
   // one of those blocks its own metablock
-  give_every_node_at_level_own_block(node_level);
-  give_every_node_at_level_own_block(block_level);
+  initialize_blocks(node_level);
+  initialize_blocks(block_level);
 
   // Calculate initial entropy for model before merging is done
   const double initial_entropy = get_entropy(node_level);
