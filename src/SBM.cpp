@@ -6,7 +6,7 @@
 // Grab reference to a desired level map. If level doesn't exist yet, it will be
 // created
 // =============================================================================
-LevelPtr SBM::get_level(const int level)
+LevelPtr SBM::get_level(const int& level)
 {
   PROFILE_FUNCTION();
   // Grab level for block node
@@ -24,6 +24,18 @@ LevelPtr SBM::get_level(const int level)
   }
 
   return block_level->second;
+}
+
+// Const version that doesn't append level
+LevelPtr SBM::get_level(const int& level) const 
+{
+  PROFILE_FUNCTION();
+  try {
+    return nodes.at(level);
+  }
+  catch (...) {
+    RANGE_ERROR("No nodes/ blocks at level " + std::to_string(level));
+  }
 }
 
 // =============================================================================
@@ -706,7 +718,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
 // Compute microcononical entropy of current model state
 // Note that this is currently only the degree corrected entropy
 // =============================================================================
-double SBM::get_entropy(const int level)
+double SBM::get_entropy(const int level) const
 {
   PROFILE_FUNCTION();
   //============================================================================
@@ -720,6 +732,7 @@ double SBM::get_entropy(const int level)
 
   // Grab pointer to current level and start loop
   const LevelPtr node_level = get_level(level);
+
   for (const auto& node : *node_level) {
     const int node_degree = node.second->degree;
     n_total_edges += node_degree;

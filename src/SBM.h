@@ -135,7 +135,9 @@ class SBM {
   NodePtr create_block_node(const std::string& type, const int level);
 
   // Grabs pointer to level of nodes
-  LevelPtr get_level(int level);
+  LevelPtr get_level(const int& level);
+  // const version that wont append new level if it doesn't exist
+  LevelPtr get_level(const int& level) const; 
 
   // Export current state of nodes in model
   State_Dump get_state();
@@ -170,7 +172,7 @@ class SBM {
 
 
   // Compute microcononical entropy of current model state at a level
-  double get_entropy(int level);
+  double get_entropy(int level) const;
 
   // Merge two blocks, placing all nodes that were under block_b under
   // block_a and deleting from model.
