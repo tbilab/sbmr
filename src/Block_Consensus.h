@@ -19,16 +19,16 @@ class Block_Consensus {
   std::unordered_map<std::string, Pair_Status> concensus_pairs;
 
   // Initialies containers when needed
-  void initialize(const LevelPtr node_map);
+  void initialize(const LevelPtr& node_map);
 
   // Updates the pair statuses and iterates based on a set of changed pairs
   void update_pair_tracking_map(const PairSet& updated_pairs);
 
   // Update the set of pairs that need to be updated for a given sweep.
-  static void update_changed_pairs(NodePtr   curr_node,
-                                   ChildSet& old_connections,
-                                   ChildSet& new_connections,
-                                   PairSet&  pair_moves);
+  static void update_changed_pairs(const std::string& node_id,
+                                   const ChildSet&    old_connections,
+                                   const ChildSet&    new_connections,
+                                   PairSet&           pair_moves);
 };
 
 // Helper to build alphabetically string pair of two node ids for pair maps
@@ -37,12 +37,6 @@ inline std::string make_pair_key(const std::string& a_node, const std::string& b
   return a_node > b_node
       ? a_node + "--" + b_node
       : b_node + "--" + a_node;
-}
-
-// Helper to build alphabetically string pair of two node ids for pair maps
-inline std::string make_pair_key(const NodePtr& a_node, const NodePtr& b_node)
-{
-  return make_pair_key(a_node->id, b_node->id);
 }
 
 #endif

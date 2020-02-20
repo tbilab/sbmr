@@ -685,7 +685,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
         entropy_delta += proposal_results.entropy_delta;
 
         if (track_pairs) {
-          Block_Consensus::update_changed_pairs(curr_node, old_block->children, proposed_new_block->children,
+          Block_Consensus::update_changed_pairs(curr_node->id, old_block->children, proposed_new_block->children,
                                                 pair_moves);
         }
       } // End accepted if statement
@@ -880,7 +880,7 @@ Merge_Step SBM::agglomerative_merge(const int&    block_level,
       }
 
       // See if this combo of groups has already been looked at
-      const bool unchecked_pair = checked_pairs.insert(make_pair_key(merge_block, block.second)).second;
+      const bool unchecked_pair = checked_pairs.insert(make_pair_key(merge_block->id, block.second->id)).second;
 
       if (unchecked_pair) {
 
