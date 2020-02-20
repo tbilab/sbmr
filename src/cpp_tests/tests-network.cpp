@@ -1,4 +1,4 @@
-#include "../Network.h"
+#include "../SBM.h"
 #include "print_helpers.h"
 #include "catch.hpp"
 
@@ -6,7 +6,7 @@
 
 TEST_CASE("Basic initialization of network", "[Network]")
 {
-  Network my_net;
+  SBM my_net;
 
   // Add some nodes to Network
   my_net.add_node("n1", "n");
@@ -51,7 +51,7 @@ TEST_CASE("Basic initialization of network", "[Network]")
 
 TEST_CASE("Tracking node types", "[Network]")
 {
-  Network my_net;
+  SBM my_net;
 
   // Add some nodes to Network
   my_net.add_node("n1", "n");
@@ -81,7 +81,7 @@ TEST_CASE("Tracking node types", "[Network]")
 
 TEST_CASE("Initializing a block for every node", "[Network]")
 {
-  Network my_net;
+  SBM my_net;
 
   my_net.add_node("a1", "a");
   my_net.add_node("a2", "a");
@@ -120,7 +120,7 @@ TEST_CASE("Initializing a block for every node", "[Network]")
 
 TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
 {
-  Network my_net;
+  SBM my_net;
 
   my_net.add_node("a1", "a");
   my_net.add_node("a2", "a");
@@ -153,7 +153,7 @@ TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
 
 TEST_CASE("Cleaning up empty blocks", "[Network]")
 {
-  Network my_net;
+  SBM my_net;
 
   // Start with a few nodes in the network
   NodePtr n1 = my_net.add_node("n1", "a");
@@ -183,7 +183,7 @@ TEST_CASE("Cleaning up empty blocks", "[Network]")
   g1_3->set_parent(g2_1);
   g1_4->set_parent(g2_2);
 
-  // Make sure our network is the proper size
+  // Make sure our SBM is the proper size
   REQUIRE(3 == my_net.nodes.size());
   REQUIRE(4 == my_net.nodes.at(0)->size());
   REQUIRE(4 == my_net.nodes.at(1)->size());
@@ -210,7 +210,7 @@ TEST_CASE("Cleaning up empty blocks", "[Network]")
 
 TEST_CASE("Counting edges", "[Network]")
 {
-  Network my_net;
+  SBM my_net;
 
   // Base-level nodes
   NodePtr a1 = my_net.add_node("a1", "a");
@@ -240,19 +240,15 @@ TEST_CASE("Counting edges", "[Network]")
   NodePtr b22 = my_net.add_node("b22", "b", 2);
 
   // Add edges
-  my_net.add_edge(a1, b1);
-  my_net.add_edge(a1, b2);
-
-  my_net.add_edge(a2, b1);
-  my_net.add_edge(a2, b3);
-  my_net.add_edge(a2, b5);
-
-  my_net.add_edge(a3, b2);
-
-  my_net.add_edge(a4, b4);
-  my_net.add_edge(a4, b5);
-
-  my_net.add_edge(a5, b3);
+  my_net.add_edge("a1", "b1");
+  my_net.add_edge("a1", "b2");
+  my_net.add_edge("a2", "b1");
+  my_net.add_edge("a2", "b3");
+  my_net.add_edge("a2", "b5");
+  my_net.add_edge("a3", "b2");
+  my_net.add_edge("a4", "b4");
+  my_net.add_edge("a4", "b5");
+  my_net.add_edge("a5", "b3");
 
   // Set hierarchy
 
@@ -282,7 +278,7 @@ TEST_CASE("Counting edges", "[Network]")
   b12->set_parent(b21);
   b13->set_parent(b22);
 
-  // Make sure our network is the proper size
+  // Make sure our SBM is the proper size
 
   // There should be three total layers...
   REQUIRE(3 == my_net.nodes.size());
@@ -398,7 +394,7 @@ TEST_CASE("Counting edges", "[Network]")
 
 TEST_CASE("State dumping and restoring", "[Network")
 {
-  Network my_net;
+  SBM my_net;
 
   // Start with a few nodes in the network
   NodePtr a1 = my_net.add_node("a1", "a");
@@ -451,8 +447,8 @@ TEST_CASE("State dumping and restoring", "[Network")
       print_ids_to_string(state2.parent) == "a12, a13, a14, b11, b12, b13, none, none, none, none, none, none, none");
 
   // Now restore model to pre a1->a14 move state
-  my_net.load_from_state(state1);
-
+  my_net.load_from_state(state1.id, state1.parent, state1.level, state1.type);
+ 
   State_Dump state3 = my_net.get_state();
 
   // Make sure state dumps 1 and 3 match state dump is in correct form

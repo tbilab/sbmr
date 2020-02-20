@@ -1,63 +1,6 @@
 #include "../SBM.h"
 
-// SBM build_simulated_SBM()
-// {
-//   // This function implements a network built using the bisbmsim package
-//   // produced for the TBI lab and is built using the R script at
-//   // /tools/simulate_test_network.R
-//   SBM my_SBM;
 
-//   my_SBM.add_node("a1", 1);
-//   my_SBM.add_node("a2", 1);
-//   my_SBM.add_node("a3", 1);
-//   my_SBM.add_node("a4", 1);
-//   my_SBM.add_node("a5", 1);
-//   my_SBM.add_node("a10", 1);
-//   my_SBM.add_node("a11", 1);
-//   my_SBM.add_node("a12", 1);
-//   my_SBM.add_node("a13", 1);
-//   my_SBM.add_node("a14", 1);
-//   my_SBM.add_node("a6", 1);
-//   my_SBM.add_node("a7", 1);
-//   my_SBM.add_node("a8", 1);
-//   my_SBM.add_node("a9", 1);
-//   my_SBM.add_node("b1", 0);
-//   my_SBM.add_node("b2", 0);
-//   my_SBM.add_node("b3", 0);
-//   my_SBM.add_node("b4", 0);
-
-//   my_SBM.add_edge("a1", "b1");
-//   my_SBM.add_edge("a2", "b1");
-//   my_SBM.add_edge("a3", "b1");
-//   my_SBM.add_edge("a4", "b1");
-//   my_SBM.add_edge("a5", "b1");
-//   my_SBM.add_edge("a1", "b2");
-//   my_SBM.add_edge("a2", "b2");
-//   my_SBM.add_edge("a3", "b2");
-//   my_SBM.add_edge("a4", "b2");
-//   my_SBM.add_edge("a5", "b2");
-//   my_SBM.add_edge("a10", "b2");
-//   my_SBM.add_edge("a11", "b2");
-//   my_SBM.add_edge("a12", "b2");
-//   my_SBM.add_edge("a13", "b2");
-//   my_SBM.add_edge("a14", "b2");
-//   my_SBM.add_edge("a6", "b3");
-//   my_SBM.add_edge("a7", "b3");
-//   my_SBM.add_edge("a8", "b3");
-//   my_SBM.add_edge("a9", "b3");
-//   my_SBM.add_edge("a10", "b3");
-//   my_SBM.add_edge("a11", "b3");
-//   my_SBM.add_edge("a12", "b3");
-//   my_SBM.add_edge("a13", "b3");
-//   my_SBM.add_edge("a14", "b3");
-//   my_SBM.add_edge("a10", "b4");
-//   my_SBM.add_edge("a11", "b4");
-//   my_SBM.add_edge("a12", "b4");
-//   my_SBM.add_edge("a13", "b4");
-//   my_SBM.add_edge("a14", "b4");
-
-//   return my_SBM;
-// }
 
 // Loads a simple bipartite sbm model with optional hierarchy added
 SBM build_simple_SBM()
@@ -100,16 +43,13 @@ SBM build_simple_SBM()
   NodePtr b4 = my_SBM.add_node("b4", "b");
 
   // Add edges
-  my_SBM.add_edge(a1, b2);
-
-  my_SBM.add_edge(a2, b1);
-  my_SBM.add_edge(a2, b2);
-
-  my_SBM.add_edge(a3, b1);
-  my_SBM.add_edge(a3, b2);
-  my_SBM.add_edge(a3, b4);
-
-  my_SBM.add_edge(a4, b3);
+  my_SBM.add_edge("a1", "b2");
+  my_SBM.add_edge("a2", "b1");
+  my_SBM.add_edge("a2", "b2");
+  my_SBM.add_edge("a3", "b1");
+  my_SBM.add_edge("a3", "b2");
+  my_SBM.add_edge("a3", "b4");
+  my_SBM.add_edge("a4", "b3");
 
   // Make 2 type 0/a blocks
   NodePtr a11 = my_SBM.add_node("a11", "a", 1);
@@ -151,18 +91,18 @@ SBM build_simple_SBM_unipartite()
   NodePtr n5 = my_SBM.add_node("n5", "a");
   NodePtr n6 = my_SBM.add_node("n6", "a");
   // Add edge"a"
-  my_SBM.add_edge(n1, n2);
-  my_SBM.add_edge(n1, n3);
-  my_SBM.add_edge(n1, n4);
-  my_SBM.add_edge(n1, n5);
-  my_SBM.add_edge(n2, n3);
-  my_SBM.add_edge(n2, n4);
-  my_SBM.add_edge(n2, n5);
-  my_SBM.add_edge(n3, n4);
-  my_SBM.add_edge(n3, n6);
-  my_SBM.add_edge(n4, n5);
-  my_SBM.add_edge(n4, n6);
-  my_SBM.add_edge(n5, n6);
+  my_SBM.add_edge("n1", "n2");
+  my_SBM.add_edge("n1", "n3");
+  my_SBM.add_edge("n1", "n4");
+  my_SBM.add_edge("n1", "n5");
+  my_SBM.add_edge("n2", "n3");
+  my_SBM.add_edge("n2", "n4");
+  my_SBM.add_edge("n2", "n5");
+  my_SBM.add_edge("n3", "n4");
+  my_SBM.add_edge("n3", "n6");
+  my_SBM.add_edge("n4", "n5");
+  my_SBM.add_edge("n4", "n6");
+  my_SBM.add_edge("n5", "n6");
 
   // Make 3 blocks
   NodePtr a = my_SBM.add_node("a", "a", 1);
