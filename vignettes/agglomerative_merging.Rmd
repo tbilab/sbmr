@@ -47,7 +47,8 @@ group_size <- 40 # W/ 50 nodes in each
 network <- sim_basic_block_network(
   n_blocks = n_blocks,     
   n_nodes_per_block = group_size,  
-  return_edge_propensities = TRUE
+  return_edge_propensities = TRUE,
+  random_seed = 42 # This is the internal model seed (not same as set.seed())
 )
 ```
 

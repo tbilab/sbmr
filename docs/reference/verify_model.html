@@ -126,7 +126,7 @@ exists and is usable. If it isn't it is created." />
 exists and is usable. If it isn't it is created.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>verify_model</span>(<span class='no'>x</span>, <span class='kw'>show_messages</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>verify_model</span>(<span class='no'>x</span>, <span class='kw'>show_messages</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>warn_about_random_seed</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -139,6 +139,11 @@ exists and is usable. If it isn't it is created.</p>
       <th>show_messages</th>
       <td><p>Should function inform of its actions such as when a
 model already exists so no changes are made?</p></td>
+    </tr>
+    <tr>
+      <th>warn_about_random_seed</th>
+      <td><p>Should the model warn about cases when set seed
+is present for cached model?</p></td>
     </tr>
     </table>
 

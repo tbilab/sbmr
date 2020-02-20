@@ -139,9 +139,10 @@ passed edges dataframe as two different types of nodes.</p>
   <span class='kw'>edges_to_column</span> <span class='kw'>=</span> <span class='no'>to</span>,
   <span class='kw'>bipartite_edges</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>setup_model</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>allowed_edge_pairs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>edge_types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>default_node_type</span> <span class='kw'>=</span> <span class='st'>"node"</span>,
-  <span class='kw'>show_warnings</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()
+  <span class='kw'>show_warnings</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>(),
+  <span class='kw'>random_seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -177,12 +178,12 @@ column?</p></td>
 network is just being visualized or described.</p></td>
     </tr>
     <tr>
-      <th>allowed_edge_pairs</th>
-      <td><p>A dataframe in the same format of as <code>edges</code> that
-contains allowed pairs (order does not matter) of possible node type
-combinations across edges. For instance: nodes of type polinator are
-allowed to connect to flower nodes but not to other pollinator nodes. If
-this is left undefined, it is inferred from edges.</p></td>
+      <th>edge_types</th>
+      <td><p>A dataframe in the same format of as <code>edges</code> that contains
+allowed pairs (order does not matter) of possible node type combinations
+across edges. For instance: nodes of type polinator are allowed to connect
+to flower nodes but not to other pollinator nodes. If this is left
+undefined, it is inferred from edges.</p></td>
     </tr>
     <tr>
       <th>default_node_type</th>
@@ -194,6 +195,13 @@ called?</p></td>
       <td><p>Do you want to be warned when minor problems are
 detected by function? Usefull to disable when not running in an interactive
 mode etc.</p></td>
+    </tr>
+    <tr>
+      <th>random_seed</th>
+      <td><p>Integer seed to be passed to model's internal random
+sampling engine. Note that if the model is restored from a saved state this
+seed will be initialized again to the start value which will harm
+reproducability.</p></td>
     </tr>
     </table>
 
@@ -390,19 +398,19 @@ thus it can be ignored.</p></dd>
 #&gt;  
 #&gt; Model
 #&gt; Currently has 0 blocks</div><div class='input'>
-<span class='co'># the allowed_edge_pairs argument lets you explicitely tell the</span>
+<span class='co'># the edge_types argument lets you explicitely tell the</span>
 <span class='co'># model what each type of node is allowed to connect to.</span>
 <span class='co'># Here we use it to enforce tripartite structure where nodes of</span>
 <span class='co'># the a type can connect to either b or c but b and c can only</span>
 <span class='co'># connect to a.</span>
 
-<span class='no'>allowed_edge_pairs</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>tribble</a></span>(~<span class='no'>from</span>, ~<span class='no'>to</span>,
+<span class='no'>edge_types</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>tribble</a></span>(~<span class='no'>from</span>, ~<span class='no'>to</span>,
                                        <span class='st'>"a"</span>, <span class='st'>"b"</span>,
                                        <span class='st'>"a"</span>, <span class='st'>"c"</span>)
 
 <span class='fu'>new_sbm_network</span>(<span class='kw'>edges</span> <span class='kw'>=</span> <span class='no'>edges_tripartite</span>,
                 <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='no'>nodes_tripartite</span>,
-                <span class='kw'>allowed_edge_pairs</span> <span class='kw'>=</span> <span class='no'>allowed_edge_pairs</span>)</div><div class='output co'>#&gt; <span class='error'>Error in sbm_model$add_edge(from_nodes[i], to_nodes[i]): Edge of b1 - c1 does not fit allowed specified allowed_edge_pairs type combos.</span></div><div class='input'>
+                <span class='kw'>edge_types</span> <span class='kw'>=</span> <span class='no'>edge_types</span>)</div><div class='output co'>#&gt; <span class='error'>Error: Edge of b1 - c1 does not fit allowed specified edge_types type combos.</span></div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
