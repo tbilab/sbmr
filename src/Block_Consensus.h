@@ -1,7 +1,7 @@
 #ifndef __BLOCK_CONSENSUS_INCLUDED__
 #define __BLOCK_CONSENSUS_INCLUDED__
 
-#include "Network.h"
+#include "Node.h"
 
 struct Pair_Status {
   bool connected;
