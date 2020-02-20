@@ -35,6 +35,7 @@ verify_model.default <- function(x){
 verify_model.sbm_network <- function(x, show_messages = FALSE){
   has_model_already <- not_null(attr(x, 'model'))
   has_state_already <- not_null(attr(x, "state"))
+  has_random_seed <- not_null(attr(x, 'random_seed'))
 
   if (has_model_already){
     model_is_stale <- tryCatch(
@@ -50,10 +51,20 @@ verify_model.sbm_network <- function(x, show_messages = FALSE){
       if(show_messages) message("Object already has model initialized. No changes made")
       return(x)
     }
+
+    if(has_random_seed){
+      warning("Random seed was specified but model is being restarted from a saved state.\nThis will harm reproducability if compared to uninterupted use of model.")
+    }
   }
 
-  # Instantiate instance of sbm class
-  sbm_model <- new(SBM)
+  if(has_random_seed){
+    # Instantiate instance of sbm class with random seed
+    sbm_model <- new(SBM, as.integer(attr(x, 'random_seed')))
+  } else {
+    # Instantiate instance of sbm class with no random seed
+    sbm_model <- new(SBM)
+  }
+
 
   # Fill in all the needed nodes
   # bind the integer types to nodes before sending them to model
