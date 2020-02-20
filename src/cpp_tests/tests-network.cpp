@@ -445,7 +445,7 @@ TEST_CASE("State dumping and restoring", "[Network")
       print_ids_to_string(state2.parent) == "a12, a13, a14, b11, b12, b13, none, none, none, none, none, none, none");
 
   // Now restore model to pre a1->a14 move state
-  my_net.load_from_state(state1.id, state1.parent, state1.level, state1.type);
+  my_net.set_state(state1.id, state1.parent, state1.level, state1.type);
  
   State_Dump state3 = my_net.get_state();
 

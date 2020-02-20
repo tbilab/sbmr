@@ -151,7 +151,7 @@ class SBM {
   BlockEdgeCounts get_block_edge_counts(int level);
 
   // Load a level blocking from a state dump
-  void load_from_state(const std::vector<std::string>& id,
+  void set_state(const std::vector<std::string>& id,
                        const std::vector<std::string>& parent,
                        const std::vector<int>&         level,
                        const std::vector<std::string>& types);

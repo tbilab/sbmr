@@ -81,7 +81,7 @@ verify_model.sbm_network <- function(x, show_messages = FALSE){
     previous_state <- attr(x, "state")
 
     # Reload state using the s4 method for doing so exposed by rcpp
-    sbm_model$load_from_state(previous_state$id,
+    sbm_model$set_state(previous_state$id,
                               previous_state$parent,
                               previous_state$level,
                               previous_state$type)

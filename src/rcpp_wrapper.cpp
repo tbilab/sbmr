@@ -182,8 +182,8 @@ RCPP_MODULE(SBM)
       .method("get_block_edge_counts",
               &SBM ::get_block_edge_counts,
               "Returns a dataframe of counts of edges between all connected pairs of blocks at given level.")
-      .method("load_from_state",
-              &SBM ::load_from_state,
+      .method("set_state",
+              &SBM ::set_state,
               "Takes model state export as given by SBM$get_state() and returns model to specified state. This is useful for resetting model before running various algorithms such as agglomerative merging.")
       .method("get_entropy",
               &SBM ::get_entropy,

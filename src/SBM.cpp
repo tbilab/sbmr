@@ -337,7 +337,7 @@ State_Dump SBM::get_state()
 // =============================================================================
 // Load current state of nodes in model from state dump given SBM::get_state()
 // =============================================================================
-void SBM::load_from_state(const std::vector<std::string>& id,
+void SBM::set_state(const std::vector<std::string>& id,
                           const std::vector<std::string>& parent,
                           const std::vector<int>&         level,
                           const std::vector<std::string>& type)

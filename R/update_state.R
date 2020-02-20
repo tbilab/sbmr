@@ -73,7 +73,7 @@ update_state.sbm_network <- function(sbm, state_df){
 
   attr(sbm, 'state') <- state_df
 
-  attr(sbm, 'model')$load_from_state(state_df$id,
+  attr(sbm, 'model')$set_state(state_df$id,
                                      state_df$parent,
                                      state_df$level,
                                      state_df$type)
