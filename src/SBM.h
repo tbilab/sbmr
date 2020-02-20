@@ -187,12 +187,12 @@ class SBM {
                                       const double&  eps);
 
   // Runs efficient MCMC sweep algorithm on desired node level
-  MCMC_Sweeps mcmc_sweep(int    level,
-                         int    num_sweeps,
-                         double eps,
-                         bool   variable_num_blocks,
-                         bool   track_pairs,
-                         bool   verbose = false);
+  MCMC_Sweeps mcmc_sweep(const int&    level,
+                         const int&    num_sweeps,
+                         const double& eps,
+                         const bool&   variable_num_blocks,
+                         const bool&   track_pairs,
+                         const bool&   verbose = false);
 
   // Merge two blocks at a given level based on the probability of doing so
   Merge_Step agglomerative_merge(int    level_of_blocks,

@@ -574,12 +574,12 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr& node,
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-MCMC_Sweeps SBM::mcmc_sweep(const int    level,
-                            const int    num_sweeps,
-                            const double eps,
-                            const bool   variable_num_blocks,
-                            const bool   track_pairs,
-                            const bool   verbose)
+MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
+                            const int&    num_sweeps,
+                            const double& eps,
+                            const bool&   variable_num_blocks,
+                            const bool&   track_pairs,
+                            const bool&   verbose)
 {
   PROFILE_FUNCTION();
 
