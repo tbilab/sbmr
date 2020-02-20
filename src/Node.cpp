@@ -15,7 +15,6 @@ inline NodePtr Node::this_ptr()
 // =============================================================================
 inline void Node::add_edge(const NodePtr node)
 {
-  RCPP_ERRORS_BEGIN
   //PROFILE_FUNCTION();
 
   // propigate new edge upwards to all parents
@@ -29,7 +28,6 @@ inline void Node::add_edge(const NodePtr node)
     current_node = current_node->parent;
     current_level++;
   }
-  RCPP_ERRORS_END
 }
 
 // =============================================================================
@@ -88,7 +86,7 @@ void Node::set_parent(NodePtr parent_node_ptr)
   //PROFILE_FUNCTION();
 
   if (level != parent_node_ptr->level - 1) {
-    throw LOGIC_ERROR("Parent node must be one level above child");
+    LOGIC_ERROR("Parent node must be one level above child");
   }
 
   // Remove self from previous parents children list (if it existed)
@@ -138,8 +136,7 @@ inline NodePtr Node::get_parent_at_level(const int level_of_parent)
   // First we need to make sure that the requested level is not less than that
   // of the current node.
   if (level_of_parent < level) {
-    std::string error_msg = "Requested parent level (" + std::to_string(level_of_parent) + ") lower than current node level (" + std::to_string(level) + ").";
-    throw LOGIC_ERROR(error_msg);
+    LOGIC_ERROR("Requested parent level (" + std::to_string(level_of_parent) + ") lower than current node level (" + std::to_string(level) + ").");
   }
 
   // Start with this node as current node
@@ -147,8 +144,7 @@ inline NodePtr Node::get_parent_at_level(const int level_of_parent)
 
   while (current_node->level != level_of_parent) {
     if (!parent) {
-      std::string error_msg = "No parent at level " + std::to_string(level_of_parent) + " for " + id;
-      throw RANGE_ERROR(error_msg);
+      RANGE_ERROR("No parent at level " + std::to_string(level_of_parent) + " for " + id);
     }
 
     // Traverse up parents until we've reached just below where we want to go

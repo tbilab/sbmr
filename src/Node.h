@@ -6,22 +6,18 @@
 #define __NODE_INCLUDED__
 
 #if NO_RCPP
-#define RCPP_ERRORS_BEGIN
-#define RCPP_ERRORS_END
+#define LOGIC_ERROR(msg) throw std::logic_error(msg)
+#define RANGE_ERROR(msg) throw std::range_error(msg)
 #else
 #include <Rcpp.h>
 // Eases the process of wrapping functions to get errors forwarded to R
-#define RCPP_ERRORS_BEGIN try {
-#define RCPP_ERRORS_END                      \
-  }                                          \
-  catch (const std::exception& ex)           \
-  {                                          \
-    throw Rcpp::exception(ex.what(), false); \
-  }
+#define LOGIC_ERROR(msg)         \
+  const std::string e_msg = msg; \
+  throw Rcpp::exception(e_msg.c_str(), false)
+#define RANGE_ERROR(msg)         \
+  const std::string e_msg = msg; \
+  throw Rcpp::exception(e_msg.c_str(), false)
 #endif
-
-#define LOGIC_ERROR std::logic_error
-#define RANGE_ERROR std::range_error
 
 #include "profiling/Instrument.h"
 
