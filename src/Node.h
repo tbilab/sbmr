@@ -5,24 +5,25 @@
 #ifndef __NODE_INCLUDED__
 #define __NODE_INCLUDED__
 
-
 #if NO_RCPP
 #define RCPP_ERRORS_BEGIN
-#define RCPP_ERRORS_END 
+#define RCPP_ERRORS_END
 #else
 #include <Rcpp.h>
 // Eases the process of wrapping functions to get errors forwarded to R
 #define RCPP_ERRORS_BEGIN try {
-#define RCPP_ERRORS_END } catch(const std::exception& ex){throw Rcpp::exception(ex.what(), false);}
+#define RCPP_ERRORS_END                      \
+  }                                          \
+  catch (const std::exception& ex)           \
+  {                                          \
+    throw Rcpp::exception(ex.what(), false); \
+  }
 #endif
 
 #define LOGIC_ERROR std::logic_error
 #define RANGE_ERROR std::range_error
 
-
-
 #include "profiling/Instrument.h"
-
 
 #include <exception>
 #include <iostream>
@@ -47,6 +48,10 @@ typedef std::unordered_set<NodePtr>      ChildSet;
 typedef std::vector<NodePtr>             NodeVec;
 typedef std::list<NodePtr>               NodeList;
 typedef std::unordered_map<NodePtr, int> NodeEdgeMap;
+typedef std::shared_ptr<Node>            NodePtr;
+typedef std::map<string, NodePtr>        NodeLevel;
+typedef std::shared_ptr<NodeLevel>       LevelPtr;
+typedef std::map<int, LevelPtr>          LevelMap;
 
 //=================================
 // Main node class declaration
@@ -106,8 +111,5 @@ class Node : public std::enable_shared_from_this<Node> {
   NodeEdgeMap gather_edges_to_level(int level);                                          // Get a map keyed by node with value of number of edges for all of a nodes edges to a level
   static void connect_nodes(NodePtr node_a, NodePtr node_b);                             // Static method to connect two nodes to each other with edge
 };
-
-
-
 
 #endif
