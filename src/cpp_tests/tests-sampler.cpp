@@ -13,6 +13,7 @@ TEST_CASE("Same seeds means same results", "[Sampler]")
   for (int i = 0; i < 20; i++) {
     // Same result should occur over multiple samples
     REQUIRE(sampler_1.draw_unif() == sampler_2.draw_unif());
+    REQUIRE(sampler_1.get_rand_int(100) == sampler_2.get_rand_int(100));
   }
 }
 
@@ -23,6 +24,7 @@ TEST_CASE("Different seeds means different results", "[Sampler]")
   Sampler sampler_2(312);
   for (int i = 0; i < 20; i++) {
     REQUIRE(sampler_1.draw_unif() != sampler_2.draw_unif());
+    REQUIRE(sampler_1.get_rand_int(100) != sampler_2.get_rand_int(100));
   }
 }
 
