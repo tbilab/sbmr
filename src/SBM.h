@@ -176,7 +176,7 @@ class SBM {
 
   // Merge two blocks, placing all nodes that were under block_b under
   // block_a and deleting from model.
-  void merge_blocks(NodePtr block_a, NodePtr block_b);
+  void merge_blocks(const NodePtr& block_a, const NodePtr& block_b);
 
   // Use model state to propose a potential block move for a node.
   NodePtr propose_move(const NodePtr& node,
@@ -197,20 +197,20 @@ class SBM {
                          const bool&   verbose = false);
 
   // Merge two blocks at a given level based on the probability of doing so
-  Merge_Step agglomerative_merge(int    level_of_blocks,
-                                 int    n_merges,
-                                 int    num_checks_per_block,
-                                 double eps);
+  Merge_Step agglomerative_merge(const int&    level_of_blocks,
+                                 const int&    n_merges,
+                                 const int&    num_checks_per_block,
+                                 const double& eps);
 
   // Run mcmc chain initialization by finding best organization
   // of B' blocks for all B from B = N to B = 1.
-  CollapseResults collapse_blocks(int    node_level,
-                                  int    num_mcmc_steps,
-                                  int    desired_num_blocks,
-                                  int    num_checks_per_block,
-                                  double sigma,
-                                  double eps,
-                                  bool   report_all_steps);
+  CollapseResults collapse_blocks(const int&    node_level,
+                                  const int&    num_mcmc_steps,
+                                  const int&    desired_num_blocks,
+                                  const int&    num_checks_per_block,
+                                  const double& sigma,
+                                  const double& eps,
+                                  const bool&   report_all_steps);
 
   CollapseResults collapse_run(const int&              node_level,
                                const int&              num_mcmc_steps,

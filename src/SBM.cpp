@@ -798,7 +798,7 @@ double SBM::get_entropy(const int level) const
 // Merge two blocks, placing all nodes that were under block_b under block_a and
 // deleting block_a from model.
 // =============================================================================
-void SBM::merge_blocks(NodePtr absorbing_block, NodePtr absorbed_block)
+void SBM::merge_blocks(const NodePtr& absorbing_block, const NodePtr& absorbed_block)
 {
   PROFILE_FUNCTION();
   // Place all the members of block b under block a
@@ -823,10 +823,10 @@ void SBM::merge_blocks(NodePtr absorbing_block, NodePtr absorbed_block)
 // =============================================================================
 // Merge blocks at a given level based on the best probability of doing so
 // =============================================================================
-Merge_Step SBM::agglomerative_merge(const int    block_level,
-                                    const int    num_merges_to_make,
-                                    const int    num_checks_per_block,
-                                    const double eps)
+Merge_Step SBM::agglomerative_merge(const int&    block_level,
+                                    const int&    num_merges_to_make,
+                                    const int&    num_checks_per_block,
+                                    const double& eps)
 {
   PROFILE_FUNCTION();
   // Quick check to make sure reasonable request
@@ -994,13 +994,13 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
 // Run mcmc chain initialization by finding best organization
 // of B' blocks for all B from B = N to B = 1.
 // =============================================================================
-CollapseResults SBM::collapse_blocks(const int    node_level,
-                                     const int    num_mcmc_steps,
-                                     const int    desired_num_blocks,
-                                     const int    num_checks_per_block,
-                                     const double sigma,
-                                     const double eps,
-                                     const bool   report_all_steps)
+CollapseResults SBM::collapse_blocks(const int&    node_level,
+                                     const int&    num_mcmc_steps,
+                                     const int&    desired_num_blocks,
+                                     const int&    num_checks_per_block,
+                                     const double& sigma,
+                                     const double& eps,
+                                     const bool&   report_all_steps)
 {
   PROFILE_FUNCTION();
   const int block_level = node_level + 1;
