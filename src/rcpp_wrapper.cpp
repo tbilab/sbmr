@@ -1,9 +1,5 @@
 #include "SBM.h"
 
-// Eases the process of wrapping functions to get errors forwarded to R
-#define START_GET_ERRORS try {
-#define END_GET_ERRORS } catch(const std::exception& ex){throw Rcpp::exception(ex.what(), false);}
-
 
 #include <RcppCommon.h>
 
@@ -164,44 +160,38 @@ class Rcpp_SBM : public SBM {
   void add_edge_types(const std::vector<std::string>& from_types,
                       const std::vector<std::string>& to_types)
   {
-    START_GET_ERRORS
+
     SBM::add_edge_types(from_types, to_types);
-    END_GET_ERRORS
   }
 
   void add_node(const std::string& id, const std::string& type, const int& level)
   {
-    START_GET_ERRORS
+
     SBM::add_node(id, type, level);
-    END_GET_ERRORS
   }
 
   void add_edge(const std::string& node_a_id, const std::string& node_b_id)
   {
-    START_GET_ERRORS
+
     SBM::add_edge(node_a_id, node_b_id);
-    END_GET_ERRORS
   }
 
   State_Dump get_state()
   {
-    START_GET_ERRORS
+
     return SBM::get_state();
-    END_GET_ERRORS
   }
 
   void initialize_blocks(const int& num_blocks, const int& level)
   {
-    START_GET_ERRORS
+
     SBM::initialize_blocks(num_blocks, level);
-    END_GET_ERRORS
   }
 
   double get_entropy(const int& level)
   {
-    START_GET_ERRORS
+
     return SBM::get_entropy(level);
-    END_GET_ERRORS
   }
 
   MCMC_Sweeps mcmc_sweep(const int&    level,
@@ -211,14 +201,14 @@ class Rcpp_SBM : public SBM {
                          const bool&   track_pairs,
                          const bool&   verbose)
   {
-    START_GET_ERRORS
+    Args... args
+
     return SBM::mcmc_sweep(level,
                            num_sweeps,
                            eps,
                            variable_num_blocks,
                            track_pairs,
                            verbose);
-    END_GET_ERRORS
   }
 
   CollapseResults collapse_blocks(const int&    node_level,
@@ -229,7 +219,7 @@ class Rcpp_SBM : public SBM {
                                   const double& eps,
                                   const bool&   report_all_steps)
   {
-    START_GET_ERRORS
+
     return SBM::collapse_blocks(node_level,
                                 num_mcmc_steps,
                                 desired_num_blocks,
@@ -237,7 +227,6 @@ class Rcpp_SBM : public SBM {
                                 sigma,
                                 eps,
                                 report_all_steps);
-    END_GET_ERRORS
   }
 
   CollapseResults collapse_run(const int&              node_level,
@@ -247,32 +236,28 @@ class Rcpp_SBM : public SBM {
                                const double&           eps,
                                const std::vector<int>& block_nums)
   {
-    START_GET_ERRORS
+
     return SBM::collapse_run(node_level,
                              num_mcmc_steps,
                              num_checks_per_block,
                              sigma,
                              eps,
                              block_nums);
-    END_GET_ERRORS
   }
 
   NodeEdgeMap get_node_to_block_edge_counts(const std::string& id,
                                             const int&         node_level        = 0,
                                             const int&         connections_level = 1)
   {
-    START_GET_ERRORS
+
     return SBM::get_node_to_block_edge_counts(id,
                                               node_level,
                                               connections_level);
-    END_GET_ERRORS
   }
 
   BlockEdgeCounts get_block_edge_counts(const int& level = 1)
   {
-    START_GET_ERRORS
     return SBM::get_block_edge_counts(level);
-    END_GET_ERRORS
   }
 
   void load_from_state(std::vector<std::string>& id,
@@ -280,9 +265,7 @@ class Rcpp_SBM : public SBM {
                        std::vector<int>&         level,
                        std::vector<std::string>& types)
   {
-    START_GET_ERRORS
     SBM::load_from_state(State_Dump(id, parent, level, types));
-    END_GET_ERRORS
   }
 };
 
