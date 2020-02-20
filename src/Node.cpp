@@ -183,7 +183,7 @@ NodeVec Node::get_edges_of_type(const std::string& node_type, const int& desired
 // Collapse a nodes edge to a given level into a map of
 // connected block id->count
 // =============================================================================
-NodeEdgeMap Node::gather_edges_to_level(const int level)
+NodeEdgeMap Node::gather_edges_to_level(const int& level) const
 {
   // Setup an edge count map for node
   NodeEdgeMap edges_counts;
