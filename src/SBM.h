@@ -145,7 +145,7 @@ class SBM {
                          const int          level = 0) const;
 
  // Return nodes of a desired type from level matching type
-  NodeVec get_nodes_of_type_at_level(const std::string& type, const int& level); 
+  NodeVec get_nodes_of_type_at_level(const std::string& type, const int& level) const; 
 
   // Gathers counts of edges between any two blocks in network
   BlockEdgeCounts get_block_edge_counts(const int& level) const;
@@ -177,7 +177,9 @@ class SBM {
   void merge_blocks(NodePtr block_a, NodePtr block_b);
 
   // Use model state to propose a potential block move for a node.
-  NodePtr propose_move(NodePtr node, double eps);
+  NodePtr propose_move(const NodePtr& node,
+                       const double&  eps,
+                       Sampler&       node_chooser) const;
 
   // Make a decision on the proposed new block for node
   Proposal_Res make_proposal_decision(NodePtr node,

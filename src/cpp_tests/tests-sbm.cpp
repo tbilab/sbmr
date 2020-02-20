@@ -23,7 +23,7 @@ TEST_CASE("Generate Node move proposals", "[SBM]")
   // Run multiple trials and of move and see how often a given node is moved
   for (int i = 0; i < num_trials; ++i) {
     // Do move attempt (dry run)
-    NodePtr new_block = my_SBM.propose_move(a1, eps);
+    NodePtr new_block = my_SBM.propose_move(a1, eps, my_SBM.sampler);
 
     if (new_block->id == old_block->id)
       num_times_no_move++;
