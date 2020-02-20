@@ -138,8 +138,6 @@ class SBM {
   void add_edge_type(const std::string& from_type, const std::string& to_type);
   void add_edge_types(const std::vector<std::string>& from_types, const std::vector<std::string>& to_types);
 
-  // Setup a new Node level
-  void add_level(int level_index);
 
   // Creates a new block node and adds it to its neccesary level
   NodePtr create_block_node(const std::string& type, const int level);
@@ -176,11 +174,6 @@ class SBM {
 
   // Scan through levels and remove all block nodes that have no children. Returns # of blocks removed
   NodeVec clean_empty_blocks();
-
-  // Builds a block id from a scaffold for generated new blocks
-  static string build_block_id(const std::string& type,
-                               const int          level,
-                               const int          index);
 
   // Get a node's block connections map to a desired level
   NodeEdgeMap get_node_to_block_edge_counts(const std::string& id,

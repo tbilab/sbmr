@@ -1,17 +1,6 @@
 #include "SBM.h"
 
-// =============================================================================
-// Setup a new Node level
-// =============================================================================
-void SBM::add_level(const int level)
-{
-  PROFILE_FUNCTION();
-  // First, make sure level doesn't already exist
-  if (nodes.find(level) == nodes.end()) {
-    // Setup first level of the node map
-    nodes.emplace(level, std::make_shared<NodeLevel>());
-  }
-}
+
 
 // =============================================================================
 // Grab reference to a desired level map. If level doesn't exist yet, it will be
@@ -28,7 +17,7 @@ LevelPtr SBM::get_level(const int level)
 
   if (level_doesnt_exist) {
     // Add a new node level
-    add_level(level);
+    nodes.emplace(level, std::make_shared<NodeLevel>());
 
     // 'find' that new level
     block_level = nodes.find(level);
@@ -54,16 +43,6 @@ NodePtr SBM::get_node_by_id(const std::string& id,
   }
 }
 
-// =============================================================================
-// Builds a block id from a scaffold for generated new blocks
-// =============================================================================
-string SBM::build_block_id(const std::string& type,
-                           const int          level,
-                           const int          index)
-{
-  PROFILE_FUNCTION();
-  return type + "-" + std::to_string(level) + "_" + std::to_string(index);
-}
 
 // =============================================================================
 // Adds a node with an id and type to network
@@ -77,7 +56,9 @@ NodePtr SBM::add_node(const std::string& id,
   LevelPtr node_level = get_level(level);
 
   // Check if we need to make the id or not
-  string node_id = id == "new block" ? build_block_id(type, level, node_level->size()) : id;
+  string node_id = id == "new block"
+      ? type + "-" + std::to_string(level) + "_" + std::to_string(node_level->size())
+      : id;
 
   // Create node
   NodePtr new_node = std::make_shared<Node>(node_id, level, type);
