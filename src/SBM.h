@@ -91,11 +91,7 @@ using std::string;
 class SBM {
 
   private:
-  // Return nodes of a desired type from level can be switched
-  // Either matching or not matching the specified type
-  NodeVec get_nodes_from_level(const std::string& type,
-                               const int          level,
-                               const bool         match_type);
+
   // Adds a edge between two nodes
   void _add_edge(NodePtr node_a, NodePtr node_b); // based on their references
 
@@ -154,7 +150,7 @@ class SBM {
 
   // Grabs the first node found at a given level, used in testing.
   NodePtr get_node_from_level(int level);
-  NodeVec get_nodes_of_type_at_level(const std::string& type, const int level); // Return nodes of a desired type from level matching type
+  NodeVec get_nodes_of_type_at_level(const std::string& type, const int& level); // Return nodes of a desired type from level matching type
 
   // Gathers counts of edges between any two blocks in network
   BlockEdgeCounts get_block_edge_counts(int level);

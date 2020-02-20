@@ -87,16 +87,15 @@ NodePtr SBM::create_block_node(const std::string& type, const int level)
   return add_node("new block", type, level);
 };
 
+
+
 // =============================================================================
-// Return nodes of a desired type from level. If match_type = true then the
-// nodes returned are of the same type as specified, otherwise the nodes
-// returned are _not_ of the same type.
+// Return nodes of a desired type from level.
 // =============================================================================
-NodeVec SBM::get_nodes_from_level(const std::string& type,
-                                  const int          level,
-                                  const bool         match_type)
+NodeVec SBM::get_nodes_of_type_at_level(const std::string& type, const int& level)
 {
   PROFILE_FUNCTION();
+  
   // Grab desired level reference
   LevelPtr node_level = nodes.at(level);
 
@@ -104,8 +103,7 @@ NodeVec SBM::get_nodes_from_level(const std::string& type,
   if (node_level->size() == 0) {
 
     RANGE_ERROR("Requested level " + std::to_string(level)
-                + " is empty of nodes of type " + type + " when "
-                + (match_type ? "" : "not ") + "matching type");
+                + " is empty of nodes of type " + type + " when matching type");
   }
 
   // Where we will store all the nodes found from level
@@ -117,7 +115,7 @@ NodeVec SBM::get_nodes_from_level(const std::string& type,
 
     // Decide to keep the node or not based on if it matches or doesn't and our
     // keeping preferance
-    bool keep_node = match_type ? (node.second->type == type) : (node.second->type != type);
+    bool keep_node = node.second->type == type;
 
     if (keep_node) {
       // ...Place it in returning list
@@ -126,15 +124,6 @@ NodeVec SBM::get_nodes_from_level(const std::string& type,
   }
 
   return nodes_to_return;
-}
-
-// =============================================================================
-// Return nodes of a desired type from level.
-// =============================================================================
-NodeVec SBM::get_nodes_of_type_at_level(const std::string& type, const int level)
-{
-  PROFILE_FUNCTION();
-  return get_nodes_from_level(type, level, true);
 }
 
 // =============================================================================
