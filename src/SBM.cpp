@@ -664,7 +664,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int    level,
     initialize_blocks(-1, level);
 
     if (verbose) {
-      std::cerr << "No blocks present. Initializing one block per node." << std::endl;
+      WARN_ABOUT("No blocks present. Initializing one block per node.");
     }
   }
 
@@ -1092,8 +1092,7 @@ CollapseResults SBM::collapse_blocks(const int    node_level,
       merge_results = agglomerative_merge(block_level, num_merges, num_checks_per_block, eps);
     }
     catch (...) {
-      std::cerr << "Collapsibility limit of network reached so we break early\n"
-                << "There are currently " << curr_num_blocks << " blocks left.\n";
+      WARN_ABOUT("Collapsibility limit of network reached so we break early\n There are currently " + std::to_string(curr_num_blocks) + " blocks left.");
 
       // We reached the collapsibility limit of our network so we break early
       break;
