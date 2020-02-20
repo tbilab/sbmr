@@ -1,7 +1,5 @@
 #include "SBM.h"
 
-
-
 // =============================================================================
 // Grab reference to a desired level map. If level doesn't exist yet, it will be
 // created
@@ -27,7 +25,7 @@ LevelPtr SBM::get_level(const int& level)
 }
 
 // Const version that doesn't append level
-LevelPtr SBM::get_level(const int& level) const 
+LevelPtr SBM::get_level(const int& level) const
 {
   PROFILE_FUNCTION();
   try {
@@ -54,7 +52,6 @@ NodePtr SBM::get_node_by_id(const std::string& id,
     RANGE_ERROR("Could not find node " + id + " in network");
   }
 }
-
 
 // =============================================================================
 // Adds a node with an id and type to network
@@ -99,14 +96,13 @@ NodePtr SBM::create_block_node(const std::string& type, const int level)
   return add_node("new block", type, level);
 };
 
-
 // =============================================================================
 // Return nodes of a desired type from level.
 // =============================================================================
 NodeVec SBM::get_nodes_of_type_at_level(const std::string& type, const int& level) const
 {
   PROFILE_FUNCTION();
-  
+
   // Grab desired level reference
   LevelPtr node_level = nodes.at(level);
 
@@ -137,8 +133,6 @@ NodeVec SBM::get_nodes_of_type_at_level(const std::string& type, const int& leve
   return nodes_to_return;
 }
 
-
-
 // =============================================================================
 // Adds a edge between two nodes based on their ids
 // =============================================================================
@@ -167,7 +161,6 @@ void SBM::add_edge(const std::string& id_a, const std::string& id_b)
   edges.push_back(Edge(node_a, node_b)); // Add edge to edge tracking list
 };
 
-
 // Vectorized version of add edge types for when a whole set is passed at once
 void SBM::add_edge_types(const std::vector<std::string>& from_types, const std::vector<std::string>& to_types)
 {
@@ -183,8 +176,6 @@ void SBM::add_edge_types(const std::vector<std::string>& from_types, const std::
   // Let object know that we're working with specified types now.
   specified_allowed_edges = true;
 }
-
-
 
 // =============================================================================
 // Adds a desired number of blocks and randomly assigns them for a given level
@@ -249,7 +240,6 @@ void SBM::initialize_blocks(const int level, const int num_blocks)
     node.second->set_parent(new_block);
   }
 }
-
 
 // =============================================================================
 // Scan through entire Network and remove all block nodes that have no children.
@@ -350,9 +340,9 @@ State_Dump SBM::get_state() const
 // Load current state of nodes in model from state dump given SBM::get_state()
 // =============================================================================
 void SBM::set_state(const std::vector<std::string>& id,
-                          const std::vector<std::string>& parent,
-                          const std::vector<int>&         level,
-                          const std::vector<std::string>& type)
+                    const std::vector<std::string>& parent,
+                    const std::vector<int>&         level,
+                    const std::vector<std::string>& type)
 {
   PROFILE_FUNCTION();
 
