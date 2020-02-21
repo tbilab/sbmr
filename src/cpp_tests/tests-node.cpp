@@ -43,6 +43,38 @@ TEST_CASE("Basic Initialization", "[Node]")
   REQUIRE("d2, d2" == print_node_ids(c2->get_edges_of_type("b",1)));
 }
 
+TEST_CASE("Child addition and deletion", "[Node]")
+{
+  NodePtr n1  = std::make_shared<Node>("n1", 0, "a");
+  NodePtr n2  = std::make_shared<Node>("n2", 0, "a");
+  NodePtr n3  = std::make_shared<Node>("n3", 0, "a");
+  NodePtr n11 = std::make_shared<Node>("n11", 1, "a");
+  NodePtr n12 = std::make_shared<Node>("n12", 1, "a");
+
+  n1->set_parent(n11);
+  n2->set_parent(n11);
+  n3->set_parent(n12);
+
+  // n11 should have 2 children
+  REQUIRE(n11->children.size() == 2);
+  // One of those children should be n2
+  REQUIRE(n11->children.count(n2) == 1);
+
+  // n12 should have 1 child
+  REQUIRE(n12->children.size() == 1);
+
+  // Set the parent of n2 to be n12 and results should flip
+  n2->set_parent(n12);
+
+  // n11 should have 1 child
+  REQUIRE(n11->children.size() == 1);
+
+  // n12 should have 2 children
+  REQUIRE(n12->children.size() == 2);
+  // One of those children should be n2
+  REQUIRE(n12->children.count(n2) == 1);
+}
+
 TEST_CASE("Gathering edge counts to a level", "[Node]")
 {
   // Node level
