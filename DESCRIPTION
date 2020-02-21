@@ -24,7 +24,8 @@ Imports:
     purrr,
     stringr,
     readr,
-    glue
+    glue,
+    r2d3
 Suggests: 
     testthat (>= 2.1.0),
     knitr,
