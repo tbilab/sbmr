@@ -70,6 +70,8 @@ collapse_run.sbm_network <- function(sbm,
   }
 
   if(parallel){
+    requireNamespace("future", quietly = TRUE)
+    requireNamespace("furrr", quietly = TRUE)
     # Set up parallel processing environment. .skip will avoid re-creating a
     # plan if one already exists (saves substantial time on subsequent runs)
     future::plan(future::multiprocess, .skip = TRUE)

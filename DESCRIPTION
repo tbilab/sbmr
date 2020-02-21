@@ -19,7 +19,6 @@ Imports:
     rlang,
     magrittr,
     ggplot2,
-    future,
     dplyr,
     tidyr,
     purrr,
@@ -31,5 +30,7 @@ Suggests:
     knitr,
     rmarkdown,
     lobstr,
-    usethis
+    usethis,
+    future,
+    furrr
 VignetteBuilder: knitr
