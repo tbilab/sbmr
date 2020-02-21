@@ -60,4 +60,4 @@ not_in <- function(a, b){
   !(a %in% b)
 }
 
-
+not_null <- function(x) !is.null(x)

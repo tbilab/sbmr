@@ -43,7 +43,6 @@ add_node.default <- function(sbm, id, type = NULL, show_messages = TRUE){
 
 #' @export
 add_node.sbm_network <- function(sbm, id, type = NULL, show_messages = TRUE){
-
   type_missing <- is.null(type)
   node_not_in_network <- not_in(id, sbm$nodes$id)
 
@@ -57,21 +56,25 @@ add_node.sbm_network <- function(sbm, id, type = NULL, show_messages = TRUE){
     }
 
     # Add node to nodes list
-    sbm$nodes <- dplyr::bind_rows(sbm$nodes,
-                                  dplyr::tibble(id = id, type = type))
+    sbm$nodes <- dplyr::bind_rows(sbm$nodes, dplyr::tibble(id = id, type = type))
 
+    # Update number of nodes
+    attr(sbm, "n_nodes") <- attr(sbm, "n_nodes") + 1
+
+    already_has_model <- !is.null(attr(sbm, 'model'))
 
     # Before we start modifying the model object, first verify it
     sbm <- verify_model(sbm)
 
-    # Add node to s4 model class
-    attr(sbm, 'model')$add_node(id, type, 0L)
+    # We only need to manually add node to model if the model existed already.
+    # (otherwise verify_model() will do it for us.)
+    if(already_has_model){
+      # Add node to s4 model class
+      attr(sbm, 'model')$add_node(id, type, 0L)
 
-    # Update state with new nodes [inefficient]
-    attr(sbm, "state") <- attr(sbm, 'model')$get_state()
-
-    # Update number of nodes
-    attr(sbm, "n_nodes") <- attr(sbm, "n_nodes") + 1
+      # Update state with new nodes [inefficient]
+      attr(sbm, "state") <- attr(sbm, 'model')$get_state()
+    }
 
   } else {
 
@@ -85,7 +88,6 @@ add_node.sbm_network <- function(sbm, id, type = NULL, show_messages = TRUE){
                         "Replacing with type with {type} would invalidate model state.",
                         "Try rebuilding model or using different node id"))
       }
-
 
     }
 

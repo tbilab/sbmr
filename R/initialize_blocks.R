@@ -84,7 +84,7 @@ initialize_blocks.sbm_network <- function(sbm, num_blocks = NULL, level = 0){
   }
 
   # Send message to RCPP class to initialize proper number of nodes
-  attr(sbm, 'model')$initialize_blocks(as.integer(num_blocks), as.integer(level))
+  attr(sbm, 'model')$initialize_blocks(as.integer(level), as.integer(num_blocks))
 
   # Update state attribute
   attr(sbm, "state") <- attr(sbm, 'model')$get_state()

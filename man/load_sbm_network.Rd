@@ -24,7 +24,7 @@ sbm_net <- new_sbm_network(edges = network$edges, nodes = network$nodes)
 temp <- tempfile()
 save_sbm_network(sbm_net, temp)
 
-loaded_sbm_net <- load_sbm_network(tmp)
+loaded_sbm_net <- load_sbm_network(temp)
 
 }
 \seealso{

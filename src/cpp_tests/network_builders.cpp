@@ -1,63 +1,6 @@
 #include "../SBM.h"
 
-// SBM build_simulated_SBM()
-// {
-//   // This function implements a network built using the bisbmsim package
-//   // produced for the TBI lab and is built using the R script at
-//   // /tools/simulate_test_network.R
-//   SBM my_SBM;
 
-//   my_SBM.add_node("a1", 1);
-//   my_SBM.add_node("a2", 1);
-//   my_SBM.add_node("a3", 1);
-//   my_SBM.add_node("a4", 1);
-//   my_SBM.add_node("a5", 1);
-//   my_SBM.add_node("a10", 1);
-//   my_SBM.add_node("a11", 1);
-//   my_SBM.add_node("a12", 1);
-//   my_SBM.add_node("a13", 1);
-//   my_SBM.add_node("a14", 1);
-//   my_SBM.add_node("a6", 1);
-//   my_SBM.add_node("a7", 1);
-//   my_SBM.add_node("a8", 1);
-//   my_SBM.add_node("a9", 1);
-//   my_SBM.add_node("b1", 0);
-//   my_SBM.add_node("b2", 0);
-//   my_SBM.add_node("b3", 0);
-//   my_SBM.add_node("b4", 0);
-
-//   my_SBM.add_edge("a1", "b1");
-//   my_SBM.add_edge("a2", "b1");
-//   my_SBM.add_edge("a3", "b1");
-//   my_SBM.add_edge("a4", "b1");
-//   my_SBM.add_edge("a5", "b1");
-//   my_SBM.add_edge("a1", "b2");
-//   my_SBM.add_edge("a2", "b2");
-//   my_SBM.add_edge("a3", "b2");
-//   my_SBM.add_edge("a4", "b2");
-//   my_SBM.add_edge("a5", "b2");
-//   my_SBM.add_edge("a10", "b2");
-//   my_SBM.add_edge("a11", "b2");
-//   my_SBM.add_edge("a12", "b2");
-//   my_SBM.add_edge("a13", "b2");
-//   my_SBM.add_edge("a14", "b2");
-//   my_SBM.add_edge("a6", "b3");
-//   my_SBM.add_edge("a7", "b3");
-//   my_SBM.add_edge("a8", "b3");
-//   my_SBM.add_edge("a9", "b3");
-//   my_SBM.add_edge("a10", "b3");
-//   my_SBM.add_edge("a11", "b3");
-//   my_SBM.add_edge("a12", "b3");
-//   my_SBM.add_edge("a13", "b3");
-//   my_SBM.add_edge("a14", "b3");
-//   my_SBM.add_edge("a10", "b4");
-//   my_SBM.add_edge("a11", "b4");
-//   my_SBM.add_edge("a12", "b4");
-//   my_SBM.add_edge("a13", "b4");
-//   my_SBM.add_edge("a14", "b4");
-
-//   return my_SBM;
-// }
 
 // Loads a simple bipartite sbm model with optional hierarchy added
 SBM build_simple_SBM()
@@ -89,36 +32,33 @@ SBM build_simple_SBM()
   SBM my_SBM;
 
   // Add nodes to graph first
-  NodePtr a1 = my_SBM.add_node("a1", 0);
-  NodePtr a2 = my_SBM.add_node("a2", 0);
-  NodePtr a3 = my_SBM.add_node("a3", 0);
-  NodePtr a4 = my_SBM.add_node("a4", 0);
+  NodePtr a1 = my_SBM.add_node("a1", "a");
+  NodePtr a2 = my_SBM.add_node("a2", "a");
+  NodePtr a3 = my_SBM.add_node("a3", "a");
+  NodePtr a4 = my_SBM.add_node("a4", "a");
 
-  NodePtr b1 = my_SBM.add_node("b1", 1);
-  NodePtr b2 = my_SBM.add_node("b2", 1);
-  NodePtr b3 = my_SBM.add_node("b3", 1);
-  NodePtr b4 = my_SBM.add_node("b4", 1);
+  NodePtr b1 = my_SBM.add_node("b1", "b");
+  NodePtr b2 = my_SBM.add_node("b2", "b");
+  NodePtr b3 = my_SBM.add_node("b3", "b");
+  NodePtr b4 = my_SBM.add_node("b4", "b");
 
   // Add edges
-  my_SBM.add_edge(a1, b2);
-
-  my_SBM.add_edge(a2, b1);
-  my_SBM.add_edge(a2, b2);
-
-  my_SBM.add_edge(a3, b1);
-  my_SBM.add_edge(a3, b2);
-  my_SBM.add_edge(a3, b4);
-
-  my_SBM.add_edge(a4, b3);
+  my_SBM.add_edge("a1", "b2");
+  my_SBM.add_edge("a2", "b1");
+  my_SBM.add_edge("a2", "b2");
+  my_SBM.add_edge("a3", "b1");
+  my_SBM.add_edge("a3", "b2");
+  my_SBM.add_edge("a3", "b4");
+  my_SBM.add_edge("a4", "b3");
 
   // Make 2 type 0/a blocks
-  NodePtr a11 = my_SBM.add_node("a11", 0, 1);
-  NodePtr a12 = my_SBM.add_node("a12", 0, 1);
-  NodePtr a13 = my_SBM.add_node("a13", 0, 1);
+  NodePtr a11 = my_SBM.add_node("a11", "a", 1);
+  NodePtr a12 = my_SBM.add_node("a12", "a", 1);
+  NodePtr a13 = my_SBM.add_node("a13", "a", 1);
 
-  NodePtr b11 = my_SBM.add_node("b11", 1, 1);
-  NodePtr b12 = my_SBM.add_node("b12", 1, 1);
-  NodePtr b13 = my_SBM.add_node("b13", 1, 1);
+  NodePtr b11 = my_SBM.add_node("b11", "b", 1);
+  NodePtr b12 = my_SBM.add_node("b12", "b", 1);
+  NodePtr b13 = my_SBM.add_node("b13", "b", 1);
 
   // Assign nodes to their blocks
   a1->set_parent(a11);
@@ -144,31 +84,30 @@ SBM build_simple_SBM_unipartite()
   SBM my_SBM;
 
   // Add nodes to graph first
-  NodePtr n1 = my_SBM.add_node("n1", 0);
-  NodePtr n2 = my_SBM.add_node("n2", 0);
-  NodePtr n3 = my_SBM.add_node("n3", 0);
-  NodePtr n4 = my_SBM.add_node("n4", 0);
-  NodePtr n5 = my_SBM.add_node("n5", 0);
-  NodePtr n6 = my_SBM.add_node("n6", 0);
-
-  // Add edges
-  my_SBM.add_edge(n1, n2);
-  my_SBM.add_edge(n1, n3);
-  my_SBM.add_edge(n1, n4);
-  my_SBM.add_edge(n1, n5);
-  my_SBM.add_edge(n2, n3);
-  my_SBM.add_edge(n2, n4);
-  my_SBM.add_edge(n2, n5);
-  my_SBM.add_edge(n3, n4);
-  my_SBM.add_edge(n3, n6);
-  my_SBM.add_edge(n4, n5);
-  my_SBM.add_edge(n4, n6);
-  my_SBM.add_edge(n5, n6);
+  NodePtr n1 = my_SBM.add_node("n1", "a");
+  NodePtr n2 = my_SBM.add_node("n2", "a");
+  NodePtr n3 = my_SBM.add_node("n3", "a");
+  NodePtr n4 = my_SBM.add_node("n4", "a");
+  NodePtr n5 = my_SBM.add_node("n5", "a");
+  NodePtr n6 = my_SBM.add_node("n6", "a");
+  // Add edge"a"
+  my_SBM.add_edge("n1", "n2");
+  my_SBM.add_edge("n1", "n3");
+  my_SBM.add_edge("n1", "n4");
+  my_SBM.add_edge("n1", "n5");
+  my_SBM.add_edge("n2", "n3");
+  my_SBM.add_edge("n2", "n4");
+  my_SBM.add_edge("n2", "n5");
+  my_SBM.add_edge("n3", "n4");
+  my_SBM.add_edge("n3", "n6");
+  my_SBM.add_edge("n4", "n5");
+  my_SBM.add_edge("n4", "n6");
+  my_SBM.add_edge("n5", "n6");
 
   // Make 3 blocks
-  NodePtr a = my_SBM.add_node("a", 0, 1);
-  NodePtr b = my_SBM.add_node("b", 0, 1);
-  NodePtr c = my_SBM.add_node("c", 0, 1);
+  NodePtr a = my_SBM.add_node("a", "a", 1);
+  NodePtr b = my_SBM.add_node("b", "a", 1);
+  NodePtr c = my_SBM.add_node("c", "a", 1);
 
   // Assign nodes to their blocks
   n1->set_parent(a);
@@ -190,56 +129,56 @@ SBM build_bipartite_simulated()
   // /tools/simulate_test_network.R
   SBM my_SBM;
 
-  my_SBM.add_node("a4", 1);
-  my_SBM.add_node("a5", 1);
-  my_SBM.add_node("a7", 1);
-  my_SBM.add_node("a10", 1);
-  my_SBM.add_node("a13", 1);
-  my_SBM.add_node("a22", 1);
-  my_SBM.add_node("a23", 1);
-  my_SBM.add_node("a24", 1);
-  my_SBM.add_node("a1", 1);
-  my_SBM.add_node("a2", 1);
-  my_SBM.add_node("a3", 1);
-  my_SBM.add_node("a6", 1);
-  my_SBM.add_node("a21", 1);
-  my_SBM.add_node("a25", 1);
-  my_SBM.add_node("a8", 1);
-  my_SBM.add_node("a9", 1);
-  my_SBM.add_node("a11", 1);
-  my_SBM.add_node("a12", 1);
-  my_SBM.add_node("a14", 1);
-  my_SBM.add_node("a15", 1);
-  my_SBM.add_node("a16", 1);
-  my_SBM.add_node("a17", 1);
-  my_SBM.add_node("a20", 1);
-  my_SBM.add_node("a18", 1);
-  my_SBM.add_node("a19", 1);
-  my_SBM.add_node("b1", 0);
-  my_SBM.add_node("b2", 0);
-  my_SBM.add_node("b3", 0);
-  my_SBM.add_node("b4", 0);
-  my_SBM.add_node("b5", 0);
-  my_SBM.add_node("b6", 0);
-  my_SBM.add_node("b7", 0);
-  my_SBM.add_node("b8", 0);
-  my_SBM.add_node("b9", 0);
-  my_SBM.add_node("b10", 0);
-  my_SBM.add_node("b11", 0);
-  my_SBM.add_node("b12", 0);
-  my_SBM.add_node("b13", 0);
-  my_SBM.add_node("b14", 0);
-  my_SBM.add_node("b15", 0);
-  my_SBM.add_node("b16", 0);
-  my_SBM.add_node("b17", 0);
-  my_SBM.add_node("b18", 0);
-  my_SBM.add_node("b19", 0);
-  my_SBM.add_node("b20", 0);
-  my_SBM.add_node("b21", 0);
-  my_SBM.add_node("b22", 0);
-  my_SBM.add_node("b23", 0);
-  my_SBM.add_node("b24", 0);
-  my_SBM.add_node("b25", 0);
+  my_SBM.add_node("a4",  "a");
+  my_SBM.add_node("a5",  "a");
+  my_SBM.add_node("a7",  "a");
+  my_SBM.add_node("a10", "a");
+  my_SBM.add_node("a13", "a");
+  my_SBM.add_node("a22", "a");
+  my_SBM.add_node("a23", "a");
+  my_SBM.add_node("a24", "a");
+  my_SBM.add_node("a1",  "a");
+  my_SBM.add_node("a2",  "a");
+  my_SBM.add_node("a3",  "a");
+  my_SBM.add_node("a6",  "a");
+  my_SBM.add_node("a21", "a");
+  my_SBM.add_node("a25", "a");
+  my_SBM.add_node("a8",  "a");
+  my_SBM.add_node("a9",  "a");
+  my_SBM.add_node("a11", "a");
+  my_SBM.add_node("a12", "a");
+  my_SBM.add_node("a14", "a");
+  my_SBM.add_node("a15", "a");
+  my_SBM.add_node("a16", "a");
+  my_SBM.add_node("a17", "a");
+  my_SBM.add_node("a20", "a");
+  my_SBM.add_node("a18", "a");
+  my_SBM.add_node("a19", "a");
+  my_SBM.add_node("b1",  "b");
+  my_SBM.add_node("b2",  "b");
+  my_SBM.add_node("b3",  "b");
+  my_SBM.add_node("b4",  "b");
+  my_SBM.add_node("b5",  "b");
+  my_SBM.add_node("b6",  "b");
+  my_SBM.add_node("b7",  "b");
+  my_SBM.add_node("b8",  "b");
+  my_SBM.add_node("b9",  "b");
+  my_SBM.add_node("b10", "b");
+  my_SBM.add_node("b11", "b");
+  my_SBM.add_node("b12", "b");
+  my_SBM.add_node("b13", "b");
+  my_SBM.add_node("b14", "b");
+  my_SBM.add_node("b15", "b");
+  my_SBM.add_node("b16", "b");
+  my_SBM.add_node("b17", "b");
+  my_SBM.add_node("b18", "b");
+  my_SBM.add_node("b19", "b");
+  my_SBM.add_node("b20", "b");
+  my_SBM.add_node("b21", "b");
+  my_SBM.add_node("b22", "b");
+  my_SBM.add_node("b23", "b");
+  my_SBM.add_node("b24", "b");
+  my_SBM.add_node("b25", "b");
 
   my_SBM.add_edge("a4", "b1");
   my_SBM.add_edge("a5", "b1");
@@ -511,51 +450,51 @@ SBM build_unipartite_simulated()
 {
   SBM my_SBM;
 
-  my_SBM.add_node("g1_1", 0);
-  my_SBM.add_node("g1_2", 0);
-  my_SBM.add_node("g1_3", 0);
-  my_SBM.add_node("g1_4", 0);
-  my_SBM.add_node("g1_5", 0);
-  my_SBM.add_node("g1_6", 0);
-  my_SBM.add_node("g1_7", 0);
-  my_SBM.add_node("g1_8", 0);
-  my_SBM.add_node("g1_9", 0);
-  my_SBM.add_node("g1_10", 0);
-  my_SBM.add_node("g1_11", 0);
-  my_SBM.add_node("g1_12", 0);
-  my_SBM.add_node("g1_13", 0);
-  my_SBM.add_node("g1_14", 0);
-  my_SBM.add_node("g1_15", 0);
-  my_SBM.add_node("g2_1", 0);
-  my_SBM.add_node("g2_2", 0);
-  my_SBM.add_node("g2_3", 0);
-  my_SBM.add_node("g2_4", 0);
-  my_SBM.add_node("g2_5", 0);
-  my_SBM.add_node("g2_6", 0);
-  my_SBM.add_node("g2_7", 0);
-  my_SBM.add_node("g2_8", 0);
-  my_SBM.add_node("g2_9", 0);
-  my_SBM.add_node("g2_10", 0);
-  my_SBM.add_node("g2_11", 0);
-  my_SBM.add_node("g2_12", 0);
-  my_SBM.add_node("g2_13", 0);
-  my_SBM.add_node("g2_14", 0);
-  my_SBM.add_node("g2_15", 0);
-  my_SBM.add_node("g3_1", 0);
-  my_SBM.add_node("g3_2", 0);
-  my_SBM.add_node("g3_3", 0);
-  my_SBM.add_node("g3_4", 0);
-  my_SBM.add_node("g3_5", 0);
-  my_SBM.add_node("g3_6", 0);
-  my_SBM.add_node("g3_7", 0);
-  my_SBM.add_node("g3_8", 0);
-  my_SBM.add_node("g3_9", 0);
-  my_SBM.add_node("g3_10", 0);
-  my_SBM.add_node("g3_11", 0);
-  my_SBM.add_node("g3_12", 0);
-  my_SBM.add_node("g3_13", 0);
-  my_SBM.add_node("g3_14", 0);
-  my_SBM.add_node("g3_15", 0);
+  my_SBM.add_node("g1_1");
+  my_SBM.add_node("g1_2");
+  my_SBM.add_node("g1_3");
+  my_SBM.add_node("g1_4");
+  my_SBM.add_node("g1_5");
+  my_SBM.add_node("g1_6");
+  my_SBM.add_node("g1_7");
+  my_SBM.add_node("g1_8");
+  my_SBM.add_node("g1_9");
+  my_SBM.add_node("g1_10");
+  my_SBM.add_node("g1_11");
+  my_SBM.add_node("g1_12");
+  my_SBM.add_node("g1_13");
+  my_SBM.add_node("g1_14");
+  my_SBM.add_node("g1_15");
+  my_SBM.add_node("g2_1");
+  my_SBM.add_node("g2_2");
+  my_SBM.add_node("g2_3");
+  my_SBM.add_node("g2_4");
+  my_SBM.add_node("g2_5");
+  my_SBM.add_node("g2_6");
+  my_SBM.add_node("g2_7");
+  my_SBM.add_node("g2_8");
+  my_SBM.add_node("g2_9");
+  my_SBM.add_node("g2_10");
+  my_SBM.add_node("g2_11");
+  my_SBM.add_node("g2_12");
+  my_SBM.add_node("g2_13");
+  my_SBM.add_node("g2_14");
+  my_SBM.add_node("g2_15");
+  my_SBM.add_node("g3_1");
+  my_SBM.add_node("g3_2");
+  my_SBM.add_node("g3_3");
+  my_SBM.add_node("g3_4");
+  my_SBM.add_node("g3_5");
+  my_SBM.add_node("g3_6");
+  my_SBM.add_node("g3_7");
+  my_SBM.add_node("g3_8");
+  my_SBM.add_node("g3_9");
+  my_SBM.add_node("g3_10");
+  my_SBM.add_node("g3_11");
+  my_SBM.add_node("g3_12");
+  my_SBM.add_node("g3_13");
+  my_SBM.add_node("g3_14");
+  my_SBM.add_node("g3_15");
 
   my_SBM.add_edge("g1_1", "g1_7");
   my_SBM.add_edge("g1_1", "g1_8");

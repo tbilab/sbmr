@@ -7,7 +7,10 @@ test_that("Proper number of edges happens", {
   sim_avg_con_count <- function(self_edges){
     1:n_samples %>%
       purrr::map_int(~{
-        nrow(sim_random_network(n_nodes, prob_of_edge, allow_self_edges = self_edges)$edges)
+        nrow(sim_random_network(n_nodes,
+                                prob_of_edge,
+                                allow_self_edges = self_edges,
+                                random_seed = 42)$edges)
       }) %>%
       mean()
   }

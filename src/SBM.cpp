@@ -1,22 +1,432 @@
 #include "SBM.h"
 
-#include "sbm_helpers.h"
+// =============================================================================
+// Grab reference to a desired level map. If level doesn't exist yet, it will be
+// created
+// =============================================================================
+LevelPtr SBM::get_level(const int& level)
+{
+  PROFILE_FUNCTION();
+  // Grab level for block node
+  LevelMap::iterator block_level = nodes.find(level);
+
+  // Is this a new level?
+  bool level_doesnt_exist = block_level == nodes.end();
+
+  if (level_doesnt_exist) {
+    // Add a new node level
+    nodes.emplace(level, std::make_shared<NodeLevel>());
+
+    // 'find' that new level
+    block_level = nodes.find(level);
+  }
+
+  return block_level->second;
+}
+
+// Const version that doesn't append level
+LevelPtr SBM::get_level(const int& level) const
+{
+  PROFILE_FUNCTION();
+  try {
+    return nodes.at(level);
+  }
+  catch (...) {
+    RANGE_ERROR("No nodes/ blocks at level " + std::to_string(level));
+  }
+}
+
+// =============================================================================
+// Find and return a node by its id
+// =============================================================================
+NodePtr SBM::get_node_by_id(const std::string& id,
+                            const int          level) const
+{
+  PROFILE_FUNCTION();
+  try {
+    // Attempt to find node on the 'node level' of the Network
+    return nodes.at(level)->at(id);
+  }
+  catch (...) {
+    // Throw informative error if it fails
+    RANGE_ERROR("Could not find node " + id + " in network");
+  }
+}
+
+// =============================================================================
+// Adds a node with an id and type to network
+// =============================================================================
+NodePtr SBM::add_node(const std::string& id,
+                      const std::string& type,
+                      const int          level)
+{
+  PROFILE_FUNCTION();
+  // Grab level
+  LevelPtr node_level = get_level(level);
+
+  // Check if we need to make the id or not
+  std::string node_id = id == "new block"
+      ? type + "-" + std::to_string(level) + "_" + std::to_string(node_level->size())
+      : id;
+
+  // Create node
+  NodePtr new_node = std::make_shared<Node>(node_id, level, type);
+
+  (*node_level)[node_id] = new_node;
+
+  // Add this node to node counting map
+  node_type_counts[type][level]++;
+
+  return new_node;
+};
+
+// =============================================================================
+// Creates a new block node and add it to its neccesary level
+// =============================================================================
+NodePtr SBM::create_block_node(const std::string& type, const int level)
+{
+  PROFILE_FUNCTION();
+
+  // Make sure requested level is not 0
+  if (level == 0) {
+    LOGIC_ERROR("Can't create block node at first level");
+  }
+
+  // Initialize new node
+  return add_node("new block", type, level);
+};
+
+// =============================================================================
+// Return nodes of a desired type from level.
+// =============================================================================
+NodeVec SBM::get_nodes_of_type_at_level(const std::string& type, const int& level) const
+{
+  PROFILE_FUNCTION();
+
+  // Grab desired level reference
+  LevelPtr node_level = nodes.at(level);
+
+  // Make sure level has nodes before looping through it
+  if (node_level->size() == 0) {
+
+    RANGE_ERROR("Requested level " + std::to_string(level)
+                + " is empty of nodes of type " + type + " when matching type");
+  }
+
+  // Where we will store all the nodes found from level
+  NodeVec nodes_to_return;
+  nodes_to_return.reserve(node_level->size());
+
+  // Loop through every node belonging to the desired level
+  for (const auto& node : *node_level) {
+
+    // Decide to keep the node or not based on if it matches or doesn't and our
+    // keeping preferance
+    bool keep_node = node.second->type == type;
+
+    if (keep_node) {
+      // ...Place it in returning list
+      nodes_to_return.push_back(node.second);
+    }
+  }
+
+  return nodes_to_return;
+}
+
+// =============================================================================
+// Adds a edge between two nodes based on their ids
+// =============================================================================
+void SBM::add_edge(const std::string& id_a, const std::string& id_b)
+{
+  PROFILE_FUNCTION();
+  const NodePtr node_a = get_node_by_id(id_a);
+  const NodePtr node_b = get_node_by_id(id_b);
+
+  // Check if we have an explicite list of allowed edge patterns or if we should
+  // add this edge as a possible pair.
+  // If the user has specified allowed edges explicitely, make sure that this edge follows protocol
+  if (specified_allowed_edges) {
+    const bool a_to_b_bad = !(edge_type_pairs.at(node_a->type).count(node_b->type));
+    const bool b_to_a_bad = !(edge_type_pairs.at(node_b->type).count(node_a->type));
+
+    if (a_to_b_bad | b_to_a_bad) {
+      LOGIC_ERROR("Edge of " + id_a + " - " + id_b + " does not fit allowed specified edge_types type combos.");
+    }
+  }
+  else {
+    add_edge_type(edge_type_pairs, node_a->type, node_b->type);
+  }
+
+  Node::connect_nodes(node_a, node_b);   // Connect nodes to eachother
+  edges.push_back(Edge(node_a, node_b)); // Add edge to edge tracking list
+};
+
+// Vectorized version of add edge types for when a whole set is passed at once
+void SBM::add_edge_types(const std::vector<std::string>& from_types, const std::vector<std::string>& to_types)
+{
+  // Clear old allowed pairs (if they exist)
+  edge_type_pairs.clear();
+
+  // Add pairs to network map of allowed pairs
+  const int num_pairs = from_types.size();
+  for (int i = 0; i < num_pairs; i++) {
+    add_edge_type(edge_type_pairs, from_types[i], to_types[i]);
+  }
+
+  // Let object know that we're working with specified types now.
+  specified_allowed_edges = true;
+}
+
+// =============================================================================
+// Adds a desired number of blocks and randomly assigns them for a given level
+// num_blocks = -1 means every node gets their own block
+// =============================================================================
+void SBM::initialize_blocks(const int level, const int num_blocks)
+{
+  PROFILE_FUNCTION();
+
+  const int block_level = level + 1;
+
+  // Clear all previous nodes in block level out
+  get_level(block_level)->clear();
+
+  // Grab all the nodes for the desired level
+  LevelPtr node_level = nodes.at(level);
+
+  const int num_nodes_in_level = node_level->size();
+
+  // Setup a sampler
+  Sampler block_sampler;
+
+  // Make sure level has nodes before looping through it
+  if (num_nodes_in_level == 0) {
+    RANGE_ERROR("Requested level (" + std::to_string(level) + ") is empty.");
+  }
+
+  // Figure out how we're making blocks, is it one block per node or a set number
+  // of blocks total?
+  bool one_block_per_node = num_blocks == -1;
+
+  // Make a map that gives us type -> array of new blocks
+  std::map<std::string, NodeVec> type_to_blocks;
+
+  // If we're randomly distributing nodes, we'll use this map to sample a random
+  // block for a given node by its type
+  if (!one_block_per_node) {
+    for (const auto& type : node_type_counts) {
+      // Reserve proper number of slots for new blocks
+      type_to_blocks[type.first].reserve(num_blocks);
+
+      // Buid new blocks to fill those slots
+      for (int i = 0; i < num_blocks; i++) {
+        // build a block node at the next level
+        type_to_blocks[type.first].push_back(create_block_node(type.first, level + 1));
+      }
+    }
+  }
+
+  // Loop through every node in the level and assign it its new parent
+  // Loop through each of the nodes,
+  for (const auto& node : *node_level) {
+
+    // build a block node at the next level
+    // We either build a new block for node if we're giving each node a block
+    // or sample new block from available list of blocks for this type
+    NodePtr new_block = one_block_per_node
+        ? create_block_node(node.second->type, level + 1)
+        : block_sampler.sample(type_to_blocks[node.second->type]);
+
+    // assign that block node to the node
+    node.second->set_parent(new_block);
+  }
+}
+
+// =============================================================================
+// Scan through entire Network and remove all block nodes that have no children.
+// Returns the number removed
+// =============================================================================
+NodeVec SBM::clean_empty_blocks()
+{
+  PROFILE_FUNCTION();
+  int num_levels    = nodes.size();
+  int total_deleted = 0;
+
+  NodeVec blocks_removed;
+
+  // Scan through all levels up to final
+  for (int level = 1; level < num_levels; ++level) {
+    // Grab desired level
+    LevelPtr block_level = nodes.at(level);
+
+    // Create a vector to store block ids that we want to delete
+    std::queue<std::string> blocks_to_delete;
+
+    // Loop through every node at level
+    for (const auto& block : *block_level) {
+
+      // If there are no children for the current block
+      if (block.second->children.size() == 0) {
+        // Remove block from children of its parent (if it has one)
+        if (block.second->parent) {
+          block.second->parent->remove_child(block.second);
+        }
+
+        blocks_removed.push_back(block.second);
+
+        // Add current block to the removal list
+        blocks_to_delete.push(block.second->id);
+
+        // Remove nodes contribution to node counts map
+        node_type_counts[block.second->type][level]--;
+      }
+    }
+
+    // Remove all the blocks in the removal list
+    while (!blocks_to_delete.empty()) {
+      block_level->erase(blocks_to_delete.front());
+
+      // Remove reference from queue
+      blocks_to_delete.pop();
+
+      // Increment total blocks deleted counter
+      total_deleted++;
+    }
+  }
+
+  return blocks_removed;
+}
+
+// =============================================================================
+// Export current state of nodes in model
+// =============================================================================
+State_Dump SBM::get_state() const
+{
+  PROFILE_FUNCTION();
+  // Initialize the return struct
+  State_Dump state;
+
+  // Keep track of how many nodes we've seen so we can preallocate vector sizes
+  int n_nodes_seen = 0;
+
+  for (const auto& level : nodes) {
+
+    // Add level's nodes to current total
+    n_nodes_seen += level.second->size();
+
+    // Update sizes of the state vectors
+    state.id.reserve(n_nodes_seen);
+    state.level.reserve(n_nodes_seen);
+    state.parent.reserve(n_nodes_seen);
+    state.type.reserve(n_nodes_seen);
+
+    // Loop through each node in level
+    for (const auto& node : *level.second) {
+
+      // Dump all its desired info into its element in the state vectors
+      state.id.push_back(node.second->id);
+      state.level.push_back(level.first);
+      state.type.push_back(node.second->type);
+
+      // Record parent if node has one
+      state.parent.push_back(node.second->parent ? node.second->parent->id : "none");
+
+    } // End node loop
+  }   // End level loop
+
+  return state;
+}
+
+// =============================================================================
+// Load current state of nodes in model from state dump given SBM::get_state()
+// =============================================================================
+void SBM::set_state(const std::vector<std::string>& id,
+                    const std::vector<std::string>& parent,
+                    const std::vector<int>&         level,
+                    const std::vector<std::string>& type)
+{
+  PROFILE_FUNCTION();
+
+  const int n = id.size();
+
+  for (int i = 0; i < n; i++) {
+    const std::string node_type    = type[i];
+    const std::string child_id     = id[i];
+    const int         child_level  = level[i];
+    const std::string parent_id    = parent[i];
+    const int         parent_level = child_level + 1;
+
+    auto aquire_node = [node_type, this](const std::string& node_id, const int& node_level) {
+      LevelPtr nodes_at_level = get_level(node_level);
+
+      // Attempt to find the node in the network
+      auto node_loc = nodes_at_level->find(node_id);
+
+      if (node_loc == nodes_at_level->end()) {
+        return add_node(node_id, node_type, node_level);
+      }
+      else {
+        return node_loc->second;
+      }
+    };
+
+    // "none" indicates the highest level has been reached
+    if (parent_id == "none") {
+      continue;
+    }
+
+    // Attempt to find the parent node in the network
+    // Next grab the child node (this one should exist...)
+    // Assign the parent node to the child node
+    aquire_node(child_id, child_level)->set_parent(aquire_node(parent_id, parent_level));
+  }
+
+  // Now clean up any potentially childless nodes that got kicked
+  // out by this process
+  clean_empty_blocks();
+}
+
+// Gathers counts of edges between all pairs of connected blocks in network
+BlockEdgeCounts SBM::get_block_edge_counts(const int& level) const
+{
+  BlockEdgeCounts block_counts;
+
+  // Make sure we have blocks at the level asked for before proceeding
+  if (nodes.count(level) == 0) {
+    RANGE_ERROR("Model has no blocks at level " + std::to_string(level));
+  }
+
+  // Loop through edges and gather at desired level
+  for (auto& edge : edges) {
+    block_counts[edge.at_level(level)]++;
+  }
+
+  return block_counts;
+}
+
+NodeEdgeMap SBM::get_node_to_block_edge_counts(const std::string& id,
+                                               const int&         node_level,
+                                               const int&         connections_level) const
+{
+  // Get edges to desired level
+  return get_node_by_id(id, node_level)->gather_edges_to_level(connections_level);
+}
 
 // =============================================================================
 // Propose a potential block move for a node.
 // =============================================================================
-NodePtr SBM::propose_move(const NodePtr node, const double eps)
+NodePtr SBM::propose_move(const NodePtr& node,
+                          const double&  eps,
+                          Sampler&       random) const
 {
   PROFILE_FUNCTION();
 
   const int block_level = node->level + 1;
-  const int node_type   = node->type;
 
   // Grab a list of all the blocks that the node could join
-  const NodeVec potential_blocks = get_nodes_of_type_at_level(node_type, block_level);
+  const NodeVec potential_blocks = get_nodes_of_type_at_level(node->type, block_level);
 
   // Sample a random neighbor of node
-  const NodePtr rand_neighbor = sampler.sample(node->edges)->get_parent_at_level(node->level);
+  const NodePtr rand_neighbor = random.sample(node->edges)->get_parent_at_level(node->level);
 
   // Get number total number edges for neighbor's block
   const int neighbor_block_degree = rand_neighbor->parent->degree;
@@ -26,16 +436,16 @@ NodePtr SBM::propose_move(const NodePtr node, const double eps)
   const double prob_of_random_block = ergo_amnt / (neighbor_block_degree + ergo_amnt);
 
   // Decide where we will get new block from and draw from potential candidates
-  return sampler.draw_unif() < prob_of_random_block ? sampler.sample(potential_blocks)
-                                                    : sampler.sample(rand_neighbor->get_edges_to_level(block_level, node_type));
+  return random.draw_unif() < prob_of_random_block ? random.sample(potential_blocks)
+                                                   : random.sample(rand_neighbor->get_edges_of_type(node->type, block_level));
 }
 
 // =============================================================================
 // Make a decision on the proposed new block for node
 // =============================================================================
-Proposal_Res SBM::make_proposal_decision(const NodePtr node,
-                                         const NodePtr new_block,
-                                         const double  eps)
+Proposal_Res SBM::make_proposal_decision(const NodePtr& node,
+                                         const NodePtr& new_block,
+                                         const double&  eps)
 {
   PROFILE_FUNCTION();
 
@@ -54,7 +464,7 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
     int new_to_neighbor  = 0;
     int node_to_neighbor = 0;
   };
-  std::unordered_map<NodePtr, Node_Move_Cons> move_edge_counts;
+  std::map<NodePtr, Node_Move_Cons> move_edge_counts;
 
   // Gather the node to edge counts together to one main map
   int node_to_old_block = 0;
@@ -166,12 +576,12 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr node,
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-MCMC_Sweeps SBM::mcmc_sweep(const int    level,
-                            const int    num_sweeps,
-                            const double eps,
-                            const bool   variable_num_blocks,
-                            const bool   track_pairs,
-                            const bool   verbose)
+MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
+                            const int&    num_sweeps,
+                            const double& eps,
+                            const bool&   variable_num_blocks,
+                            const bool&   track_pairs,
+                            const bool&   verbose)
 {
   PROFILE_FUNCTION();
 
@@ -185,12 +595,16 @@ MCMC_Sweeps SBM::mcmc_sweep(const int    level,
     results.block_consensus.initialize(get_level(level));
   }
 
-  // Grab level map
-  const LevelPtr node_map = get_level(level);
+  // Check if we have any blocks ready in the network...
+  const bool no_blocks_present = get_level(block_level)->size() == 0;
 
-  // Initialize vector to hold nodes in order of pass through for a sweep.
-  NodeVec node_vec;
-  node_vec.reserve(node_map->size());
+  if (no_blocks_present) {
+    initialize_blocks(level);
+
+    if (verbose) {
+      WARN_ABOUT("No blocks present. Initializing one block per node.");
+    }
+  }
 
   if (verbose) {
     std::cout << "sweep_num,"
@@ -202,19 +616,28 @@ MCMC_Sweeps SBM::mcmc_sweep(const int    level,
               << "move_accepted" << std::endl;
   }
 
+  // Initialize a vector of nodes that will be passed through for a sweep.
+  // Grab level map
+  const LevelPtr node_map = get_level(level);
+  NodeVec        nodes_to_sweep;
+  nodes_to_sweep.reserve(node_map->size());
+  for (const auto& node : *node_map) {
+    nodes_to_sweep.push_back(node.second);
+  }
+
   for (int i = 0; i < num_sweeps; i++) {
     // Book keeper variables for this sweeps stats
     int    num_nodes_moved = 0;
     double entropy_delta   = 0;
 
-    // Generate a random order of nodes to be run through for sweep
-    Sampler::shuffle_nodes(node_vec, node_map, sampler.int_gen);
+    // Shuffle order order of nodes to be run through for sweep
+    std::shuffle(nodes_to_sweep.begin(), nodes_to_sweep.end(), sampler.generator);
 
     // Setup container to track what pairs need to be updated for sweep
-    std::unordered_set<std::string> pair_moves;
+    std::set<std::string> pair_moves;
 
     // Loop through each node
-    for (const NodePtr& curr_node : node_vec) {
+    for (const NodePtr& curr_node : nodes_to_sweep) {
 
       // Check if we're running sweep with variable block numbers. If we are, we
       // need to make sure we don't have any extra unoccupied blocks floating around,
@@ -225,7 +648,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int    level,
       }
 
       // Get a move proposal
-      const NodePtr proposed_new_block = propose_move(curr_node, eps);
+      const NodePtr proposed_new_block = propose_move(curr_node, eps, sampler);
 
       // If the proposed block is the nodes current block, we don't need to waste
       // time checking because decision will always result in same state.
@@ -264,7 +687,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int    level,
         entropy_delta += proposal_results.entropy_delta;
 
         if (track_pairs) {
-          Block_Consensus::update_changed_pairs(curr_node, old_block->children, proposed_new_block->children,
+          Block_Consensus::update_changed_pairs(curr_node->id, old_block->children, proposed_new_block->children,
                                                 pair_moves);
         }
       } // End accepted if statement
@@ -287,7 +710,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int    level,
 // Compute microcononical entropy of current model state
 // Note that this is currently only the degree corrected entropy
 // =============================================================================
-double SBM::get_entropy(const int level)
+double SBM::get_entropy(const int level) const
 {
   PROFILE_FUNCTION();
   //============================================================================
@@ -301,6 +724,7 @@ double SBM::get_entropy(const int level)
 
   // Grab pointer to current level and start loop
   const LevelPtr node_level = get_level(level);
+
   for (const auto& node : *node_level) {
     const int node_degree = node.second->degree;
     n_total_edges += node_degree;
@@ -329,14 +753,14 @@ double SBM::get_entropy(const int level)
   const LevelPtr block_level = get_level(level + 1);
 
   if (block_level->size() == 0) {
-    throw "Can't compute entropy for network with no block structure.";
+    LOGIC_ERROR("Network has not had block structure initialized.");
   }
 
   // Now calculate the edge entropy betweeen nodes.
   double edge_entropy = 0.0;
 
   // Gather block-to-block edge counts
-  const std::map<Edge, int> block_edges = gather_block_counts_at_level(level + 1);
+  const std::map<Edge, int> block_edges = get_block_edge_counts(level + 1);
   for (const auto& block_edge : block_edges) {
     const NodePtr block_r = block_edge.first.node_a;
     const NodePtr block_s = block_edge.first.node_b;
@@ -366,11 +790,11 @@ double SBM::get_entropy(const int level)
 // Merge two blocks, placing all nodes that were under block_b under block_a and
 // deleting block_a from model.
 // =============================================================================
-void SBM::merge_blocks(NodePtr absorbing_block, NodePtr absorbed_block)
+void SBM::merge_blocks(const NodePtr& absorbing_block, const NodePtr& absorbed_block)
 {
   PROFILE_FUNCTION();
   // Place all the members of block b under block a
-  const ChildSet children_to_move = absorbed_block->children;
+  const NodeSet children_to_move = absorbed_block->children;
   for (const NodePtr& child_node : children_to_move) {
     child_node->set_parent(absorbing_block);
   }
@@ -391,15 +815,15 @@ void SBM::merge_blocks(NodePtr absorbing_block, NodePtr absorbed_block)
 // =============================================================================
 // Merge blocks at a given level based on the best probability of doing so
 // =============================================================================
-Merge_Step SBM::agglomerative_merge(const int    block_level,
-                                    const int    num_merges_to_make,
-                                    const int    num_checks_per_block,
-                                    const double eps)
+Merge_Step SBM::agglomerative_merge(const int&    block_level,
+                                    const int&    num_merges_to_make,
+                                    const int&    num_checks_per_block,
+                                    const double& eps)
 {
   PROFILE_FUNCTION();
   // Quick check to make sure reasonable request
   if (num_merges_to_make <= 0) {
-    throw "Zero merges requested.";
+    LOGIC_ERROR("Zero merges requested.");
   }
 
   // Level that the block metablocks will sit at
@@ -407,7 +831,7 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
 
   if (nodes.count(meta_level) < 1) {
     // Build a single meta-block for each block if they don't exist already
-    give_every_node_at_level_own_block(block_level);
+    initialize_blocks(block_level);
   }
 
   // Grab all the blocks we're looking to merge
@@ -417,12 +841,12 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
   std::priority_queue<std::pair<double, std::pair<NodePtr, NodePtr>>> best_moves_q;
 
   // Set to keep track of what pairs of nodes we have checked already so we dont double check
-  std::unordered_set<std::string> checked_pairs;
+  std::set<std::string> checked_pairs;
 
   // Make sure doing a merge makes sense by checking we have enough blocks of every type
-  for (int i = 0; i < node_type_counts.size(); i++) {
-    if (node_type_counts[i][block_level] < 2) {
-      throw "To few blocks to perform merge.";
+  for (const auto& type_count : node_type_counts) {
+    if (type_count.second.at(block_level) < 2) {
+      LOGIC_ERROR("To few blocks to perform merge.");
     }
   }
 
@@ -442,7 +866,7 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
       // Otherwise, we should sample a given number of blocks to check
       for (int i = 0; i < num_checks_per_block; i++) {
         // Sample a metablock from potentials
-        metablocks_to_search.push_back(propose_move(block.second, eps));
+        metablocks_to_search.push_back(propose_move(block.second, eps, sampler));
       }
     }
 
@@ -458,7 +882,7 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
       }
 
       // See if this combo of groups has already been looked at
-      const bool unchecked_pair = checked_pairs.insert(make_pair_key(merge_block, block.second)).second;
+      const bool unchecked_pair = checked_pairs.insert(make_pair_key(merge_block->id, block.second->id)).second;
 
       if (unchecked_pair) {
 
@@ -466,7 +890,7 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
         const NodePtr& block_b = block.second;
 
         // Build a map of neighbor to pair of both groups connections to that neighbor.
-        std::unordered_map<NodePtr, std::pair<int, int>> pair_counts_to_neighbor;
+        std::map<NodePtr, std::pair<int, int>> pair_counts_to_neighbor;
 
         int        e_ab_ab           = 0;
         int        times_merged_seen = 0;
@@ -528,8 +952,8 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
   Merge_Step results;
 
   // A set of the blocks that have been merged already this step and thus are off limits
-  std::unordered_set<NodePtr> merged_blocks;
-  int                         num_merges_made = 0;
+  std::set<NodePtr> merged_blocks;
+  int               num_merges_made = 0;
 
   // Start working our way through the queue of best moves and making merges
   while ((num_merges_made < num_merges_to_make) & (best_moves_q.size() != 0)) {
@@ -548,8 +972,6 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
 
       // Record pair for results
       results.entropy_delta += merge_entropy_delta;
-      results.from_node.push_back(best_merge.first->id);
-      results.to_node.push_back(best_merge.second->id);
       num_merges_made++;
     }
 
@@ -564,21 +986,21 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
 // Run mcmc chain initialization by finding best organization
 // of B' blocks for all B from B = N to B = 1.
 // =============================================================================
-std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
-                                             const int    num_mcmc_steps,
-                                             const int    desired_num_blocks,
-                                             const int    num_checks_per_block,
-                                             const double sigma,
-                                             const double eps,
-                                             const bool   report_all_steps)
+CollapseResults SBM::collapse_blocks(const int&    node_level,
+                                     const int&    num_mcmc_steps,
+                                     const int&    desired_num_blocks,
+                                     const int&    num_checks_per_block,
+                                     const double& sigma,
+                                     const double& eps,
+                                     const bool&   report_all_steps)
 {
   PROFILE_FUNCTION();
   const int block_level = node_level + 1;
 
   // Start by giving every node at the desired level its own block and every
   // one of those blocks its own metablock
-  give_every_node_at_level_own_block(node_level);
-  give_every_node_at_level_own_block(block_level);
+  initialize_blocks(node_level);
+  initialize_blocks(block_level);
 
   // Calculate initial entropy for model before merging is done
   const double initial_entropy = get_entropy(node_level);
@@ -595,7 +1017,7 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
   const int num_steps = curr_num_blocks - desired_num_blocks;
 
   // Setup vector to hold all merge step results.
-  std::vector<Merge_Step> step_results;
+  CollapseResults step_results;
   step_results.reserve(report_all_steps ? num_steps : 1);
 
   // Counter to calculate the total entropy delta of this collapse run. Only used when not reporting all results
@@ -618,8 +1040,7 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
       merge_results = agglomerative_merge(block_level, num_merges, num_checks_per_block, eps);
     }
     catch (...) {
-      std::cerr << "Collapsibility limit of network reached so we break early\n"
-                << "There are currently " << curr_num_blocks << " blocks left.\n";
+      WARN_ABOUT("Collapsibility limit of network reached so we break early\n There are currently " + std::to_string(curr_num_blocks) + " blocks left.");
 
       // We reached the collapsibility limit of our network so we break early
       break;
@@ -672,4 +1093,28 @@ std::vector<Merge_Step> SBM::collapse_blocks(const int    node_level,
   }
 
   return step_results;
+}
+
+// =============================================================================
+// Repeat the collapse_blocks method with a ranging number of desired blocks to
+// collapse to and report just the final result for all
+// =============================================================================
+CollapseResults SBM::collapse_run(const int&              node_level,
+                                  const int&              num_mcmc_steps,
+                                  const int&              num_checks_per_block,
+                                  const double&           sigma,
+                                  const double&           eps,
+                                  const std::vector<int>& block_nums)
+{
+  CollapseResults run_results;
+  for (const int& target_num : block_nums) {
+    run_results.push_back(collapse_blocks(node_level,
+                                          num_mcmc_steps,
+                                          target_num,
+                                          num_checks_per_block,
+                                          sigma,
+                                          eps,
+                                          false)[0]);
+  }
+  return run_results;
 }

@@ -1,6 +1,6 @@
 Package: sbmR
 Title: Fit and investigate Stochastic Block Models in R
-Version: 0.0.0.9000
+Version: 0.0.1.0000
 Authors@R: 
     person(given = "Nick",
            family = "Strayer",
@@ -19,10 +19,19 @@ Imports:
     rlang,
     magrittr,
     ggplot2,
-    future
+    dplyr,
+    tidyr,
+    purrr,
+    stringr,
+    readr,
+    glue,
+    r2d3
 Suggests: 
     testthat (>= 2.1.0),
     knitr,
     rmarkdown,
-    lobstr
+    lobstr,
+    usethis,
+    future,
+    furrr
 VignetteBuilder: knitr

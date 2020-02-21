@@ -8,7 +8,8 @@ sim_random_network(
   n_nodes = 5,
   prob_of_edge = 0.7,
   allow_self_edges = FALSE,
-  setup_model = FALSE
+  setup_model = FALSE,
+  random_seed = NULL
 )
 }
 \arguments{
@@ -22,6 +23,11 @@ themselves?}
 
 \item{setup_model}{Should an SBM model object be added? Set to \code{FALSE} if
 network is just being visualized or described.}
+
+\item{random_seed}{Integer seed to be passed to model's internal random
+sampling engine. Note that if the model is restored from a saved state this
+seed will be initialized again to the start value which will harm
+reproducability.}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see

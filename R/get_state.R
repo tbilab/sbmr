@@ -46,6 +46,7 @@ get_state.default <- function(x){
 
 #' @export
 get_state.sbm_network <- function(x){
+  # Grab state from attribute and then swap in the string types
   attr(verify_model(x), 'state')
 }
 

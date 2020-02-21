@@ -13,7 +13,8 @@ new_sbm_network(
   setup_model = TRUE,
   edge_types = NULL,
   default_node_type = "node",
-  show_warnings = interactive()
+  show_warnings = interactive(),
+  random_seed = NULL
 )
 }
 \arguments{
@@ -34,11 +35,11 @@ column?}
 \item{setup_model}{Should an SBM model object be added? Set to \code{FALSE} if
 network is just being visualized or described.}
 
-\item{edge_types}{A dataframe in the same format of as \code{edges} that
-contains allowed pairs (order does not matter) of possible node type
-combinations across edges. For instance: nodes of type polinator are
-allowed to connect to flower nodes but not to other pollinator nodes. If
-this is left undefined, it is inferred from edges.}
+\item{edge_types}{A dataframe in the same format of as \code{edges} that contains
+allowed pairs (order does not matter) of possible node type combinations
+across edges. For instance: nodes of type polinator are allowed to connect
+to flower nodes but not to other pollinator nodes. If this is left
+undefined, it is inferred from edges.}
 
 \item{default_node_type}{What should nodes that the type is generated for be
 called?}
@@ -46,6 +47,11 @@ called?}
 \item{show_warnings}{Do you want to be warned when minor problems are
 detected by function? Usefull to disable when not running in an interactive
 mode etc.}
+
+\item{random_seed}{Integer seed to be passed to model's internal random
+sampling engine. Note that if the model is restored from a saved state this
+seed will be initialized again to the start value which will harm
+reproducability.}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see

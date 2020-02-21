@@ -130,7 +130,8 @@ between two nodes with a uniform common probability.</p>
   <span class='kw'>n_nodes</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>prob_of_edge</span> <span class='kw'>=</span> <span class='fl'>0.7</span>,
   <span class='kw'>allow_self_edges</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>setup_model</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>setup_model</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>random_seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -154,6 +155,13 @@ themselves?</p></td>
       <th>setup_model</th>
       <td><p>Should an SBM model object be added? Set to <code>FALSE</code> if
 network is just being visualized or described.</p></td>
+    </tr>
+    <tr>
+      <th>random_seed</th>
+      <td><p>Integer seed to be passed to model's internal random
+sampling engine. Note that if the model is restored from a saved state this
+seed will be initialized again to the start value which will harm
+reproducability.</p></td>
     </tr>
     </table>
 

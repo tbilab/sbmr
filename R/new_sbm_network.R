@@ -62,6 +62,10 @@
 #' @param show_warnings Do you want to be warned when minor problems are
 #'   detected by function? Usefull to disable when not running in an interactive
 #'   mode etc.
+#' @param random_seed Integer seed to be passed to model's internal random
+#'   sampling engine. Note that if the model is restored from a saved state this
+#'   seed will be initialized again to the start value which will harm
+#'   reproducability.
 #'
 #' @return An S3 object of class `sbm_network`. For details see
 #'   \link{new_sbm_network} section "Class structure."
@@ -150,8 +154,8 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                             setup_model = TRUE,
                             edge_types = NULL,
                             default_node_type = "node",
-                            show_warnings = interactive()){
-
+                            show_warnings = interactive(),
+                            random_seed = NULL){
   # Setup some tidy eval stuff for the column names
   to_column <- rlang::enquo(edges_to_column)
   from_column <- rlang::enquo(edges_from_column)
@@ -282,7 +286,6 @@ new_sbm_network <- function(edges = dplyr::tibble(),
     nodes <- dplyr::filter(nodes, not_in(id, unconnected_nodes))
   }
 
-
   # Build object
   x <- structure(list(nodes = nodes,
                       edges = edges),
@@ -291,7 +294,8 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                  n_edges = nrow(edges),
                  from_column = from_column,
                  to_column = to_column,
-                 edge_types = edge_types )
+                 edge_types = edge_types,
+                 random_seed = random_seed)
 
   # Initialize a model if requested
   if (setup_model) {

@@ -8,8 +8,8 @@
 
 #include <random>
 
-typedef std::mt19937                     rand_int_gen;
-typedef std::uniform_real_distribution<> rand_unif_gen;
+// This is a mouthful and confusing
+using TwisterSeedMaker = std::mt19937::result_type;
 
 //=================================
 // Main class declaration
@@ -18,35 +18,30 @@ class Sampler {
   public:
   // Constructors
   // ===========================================================================
+
+  // Setup with a random seed based on clock
   Sampler()
+      : generator(TwisterSeedMaker(time(0)))
   {
-    // Setup with the default random seed
-    initialize_seed(-1);
   }
 
-  // When seed is provided, pass onto initialize seed
-  Sampler(int random_seed)
+  // Setup with a random seed based on passed seed
+  Sampler(int seed)
+      : generator(TwisterSeedMaker(seed))
   {
-    initialize_seed(random_seed);
   }
 
   // Attributes
   // ===========================================================================
-  rand_int_gen  int_gen;  // Generates random integers
-  rand_unif_gen unif_gen; // Generates random uniforms
+  std::mt19937                     generator; // Generates random unsigned ints
+  std::uniform_real_distribution<> unif_gen;  // Generates random uniforms
 
   // ==========================================
   // Methods
-
-  void    initialize_seed(int random_seed); // Used to decide if we want to have deterministic seeding
-  double  draw_unif();                      // Return random uniform value between 0 and 1.
-  int     sample(int max_val);              // Sample from discrete random uniform from 0 to max
-  NodePtr sample(NodeList nodes_to_sample); // Sample random node from a list of nodes
-  NodePtr sample(NodeVec nodes_to_sample);  // Sample random node from vector of nodes
-
-  static void shuffle_nodes(NodeVec&                                          node_vec,
-                            const std::shared_ptr<std::map<string, NodePtr>>& node_map,
-                            std::mt19937&                                     sampler);
+  double  draw_unif();                             // Return random uniform value between 0 and 1.
+  int     get_rand_int(const int& max_val);        // Sample from discrete random uniform from 0 to max
+  NodePtr sample(const NodeList& nodes_to_sample); // Sample random node from a list of nodes
+  NodePtr sample(const NodeVec& nodes_to_sample);  // Sample random node from vector of nodes
 };
 
 #endif

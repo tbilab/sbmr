@@ -10,7 +10,9 @@ sorted_block_collapse <- function(block_1, block_2){
 test_that("Mean of propensity distribution is reflected in draws", {
 
 
-  simulated <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 10)
+  simulated <- sim_basic_block_network(n_blocks = 4,
+                                       n_nodes_per_block = 10,
+                                       random_seed = 42)
   sim_nodes <- simulated$nodes
   sim_edges <- simulated$edges
   n_total_nodes <- 4*10

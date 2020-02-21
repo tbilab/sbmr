@@ -57,10 +57,11 @@ save_sbm_network.sbm_network <- function(x, loc){
 #' temp <- tempfile()
 #' save_sbm_network(sbm_net, temp)
 #'
-#' loaded_sbm_net <- load_sbm_network(tmp)
+#' loaded_sbm_net <- load_sbm_network(temp)
 #'
 load_sbm_network <- function(loc){
   x <- readr::read_rds(loc)
 
+  # Restart rcpp model object
   verify_model(x)
 }
