@@ -30,5 +30,6 @@ Suggests:
     testthat (>= 2.1.0),
     knitr,
     rmarkdown,
-    lobstr
+    lobstr,
+    usethis
 VignetteBuilder: knitr

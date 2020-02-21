@@ -1,6 +1,7 @@
 ## code to prepare `simulated_network` dataset goes here
 
 # Code to build the testing networks
+requireNamespace("usethis", quietly = TRUE)
 library(bisbmsim)
 library(tidyverse)
 
