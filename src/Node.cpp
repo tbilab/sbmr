@@ -125,7 +125,9 @@ inline void Node::add_child(const NodePtr& new_child_node)
 inline void Node::remove_child(const NodePtr& child_node)
 {
   //PROFILE_FUNCTION();
-  children.erase(children.find(child_node));
+
+  // children.erase(children.find(child_node));
+  children.erase(child_node);
 }
 
 // =============================================================================
