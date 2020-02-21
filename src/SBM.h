@@ -1,10 +1,10 @@
 #ifndef __NETWORK_INCLUDED__
 #define __NETWORK_INCLUDED__
 
-#include "Block_Consensus.h"
 #include "Edge.h"
 #include "Node.h"
 #include "Sampler.h"
+#include "Block_Consensus.h"
 #include "sbm_helpers.h"
 
 #include <math.h>
