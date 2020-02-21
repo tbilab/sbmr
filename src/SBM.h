@@ -22,8 +22,8 @@ struct State_Dump {
   std::vector<std::string> type;
   State_Dump() {};
   State_Dump(
-      std::vector<string>      i,
-      std::vector<string>      p,
+      std::vector<std::string>      i,
+      std::vector<std::string>      p,
       std::vector<int>         l,
       std::vector<std::string> t)
       : id(i)

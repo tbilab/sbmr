@@ -29,15 +29,14 @@
 
 #include <exception>
 #include <iostream>
-#include <list>
 #include <memory>
 #include <queue>
 #include <string>
+#include <list>
 #include <map>
 #include <unordered_set>
 #include <set>
 #include <vector>
-using std::string;
 
 // =============================================================================
 // What this file declares
@@ -51,7 +50,7 @@ using NodeVec     = std::vector<NodePtr>;
 using NodeList    = std::list<NodePtr>;
 using NodeEdgeMap = std::map<NodePtr, int>;
 using NodePtr     = std::shared_ptr<Node>;
-using NodeLevel   = std::map<string, NodePtr>;
+using NodeLevel   = std::map<std::string, NodePtr>;
 using LevelPtr    = std::shared_ptr<NodeLevel>;
 using LevelMap    = std::map<int, LevelPtr>;
 

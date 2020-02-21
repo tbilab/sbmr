@@ -65,7 +65,7 @@ NodePtr SBM::add_node(const std::string& id,
   LevelPtr node_level = get_level(level);
 
   // Check if we need to make the id or not
-  string node_id = id == "new block"
+  std::string node_id = id == "new block"
       ? type + "-" + std::to_string(level) + "_" + std::to_string(node_level->size())
       : id;
 
@@ -259,7 +259,7 @@ NodeVec SBM::clean_empty_blocks()
     LevelPtr block_level = nodes.at(level);
 
     // Create a vector to store block ids that we want to delete
-    std::queue<string> blocks_to_delete;
+    std::queue<std::string> blocks_to_delete;
 
     // Loop through every node at level
     for (const auto& block : *block_level) {
@@ -355,7 +355,7 @@ void SBM::set_state(const std::vector<std::string>& id,
     const std::string parent_id    = parent[i];
     const int         parent_level = child_level + 1;
 
-    auto aquire_node = [node_type, this](string node_id, int node_level) {
+    auto aquire_node = [node_type, this](const std::string& node_id, const int& node_level) {
       LevelPtr nodes_at_level = get_level(node_level);
 
       // Attempt to find the node in the network
