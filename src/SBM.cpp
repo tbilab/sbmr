@@ -794,7 +794,7 @@ void SBM::merge_blocks(const NodePtr& absorbing_block, const NodePtr& absorbed_b
 {
   PROFILE_FUNCTION();
   // Place all the members of block b under block a
-  const ChildSet children_to_move = absorbed_block->children;
+  const NodeSet children_to_move = absorbed_block->children;
   for (const NodePtr& child_node : children_to_move) {
     child_node->set_parent(absorbing_block);
   }

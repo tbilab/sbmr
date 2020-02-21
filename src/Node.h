@@ -45,11 +45,10 @@ class Node;
 
 // For a bit of clarity
 using NodePtr     = std::shared_ptr<Node>;
-using ChildSet    = std::unordered_set<NodePtr>;
+using NodeSet     = std::unordered_set<NodePtr>;
 using NodeVec     = std::vector<NodePtr>;
 using NodeList    = std::list<NodePtr>;
 using NodeEdgeMap = std::map<NodePtr, int>;
-using NodePtr     = std::shared_ptr<Node>;
 using NodeLevel   = std::map<std::string, NodePtr>;
 using LevelPtr    = std::shared_ptr<NodeLevel>;
 using LevelMap    = std::map<int, LevelPtr>;
@@ -96,7 +95,7 @@ class Node : public std::enable_shared_from_this<Node> {
   int         level;    // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
   NodeList    edges;    // Nodes that are connected to this node
   NodePtr     parent;   // What node contains this node (aka its cluster)
-  ChildSet    children; // Nodes that are contained within node (if node is cluster)
+  NodeSet     children; // Nodes that are contained within node (if node is cluster)
   int         degree;   // How many edges/ edges does this node have?
 
   // Methods

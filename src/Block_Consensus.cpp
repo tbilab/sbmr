@@ -40,8 +40,8 @@ void Block_Consensus::update_pair_tracking_map(const PairSet& updated_pairs)
 }
 
 void Block_Consensus::update_changed_pairs(const std::string& node_id,
-                                           const ChildSet&    old_connections,
-                                           const ChildSet&    new_connections,
+                                           const NodeSet&     old_connections,
+                                           const NodeSet&     new_connections,
                                            PairSet&           pair_moves)
 {
   // Loop through all the nodes in the previous group node changes

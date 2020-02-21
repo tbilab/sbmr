@@ -27,13 +27,12 @@ inline int get_edge_counts(const NodeEdgeMap& node_cons, const NodePtr& neighbor
       : count_to_neighbor_it->second;
 }
 
-
-// Adds an edge type the the edge type tracking map. 
+// Adds an edge type the the edge type tracking map.
 using EdgeTypes = std::map<std::string, std::set<std::string>>;
 
 inline void add_edge_type(EdgeTypes&         edge_type_pairs,
-                                   const std::string& from_type,
-                                   const std::string& to_type)
+                          const std::string& from_type,
+                          const std::string& to_type)
 {
   edge_type_pairs[from_type].insert(to_type);
   edge_type_pairs[to_type].insert(from_type);
