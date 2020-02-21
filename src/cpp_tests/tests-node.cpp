@@ -2,9 +2,6 @@
 #include "print_helpers.h"
 #include "catch.hpp"
 
-// Smart pointer to node instance
-typedef std::shared_ptr<Node> NodePtr;
-
 TEST_CASE("Basic Initialization", "[Node]")
 {
   NodePtr n1 = std::make_shared<Node>("n1", 0, "a");

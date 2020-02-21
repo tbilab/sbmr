@@ -11,7 +11,7 @@ struct Pair_Status {
       , times_connected(0) {};
 };
 
-typedef std::set<std::string> PairSet;
+using PairSet = std::set<std::string>;
 
 class Block_Consensus {
   public:

@@ -9,7 +9,7 @@
 #include <random>
 
 // This is a mouthful and confusing
-typedef std::mt19937::result_type TwisterSeedMaker;
+using TwisterSeedMaker = std::mt19937::result_type;
 
 //=================================
 // Main class declaration

@@ -9,6 +9,7 @@
 
 #include <math.h>
 
+
 // =============================================================================
 // What this file declares
 // =============================================================================
@@ -79,10 +80,8 @@ struct MCMC_Sweeps {
 };
 
 // Some type definitions for cleaning up ugly syntax
-typedef std::vector<Merge_Step> CollapseResults;
-typedef std::map<Edge, int>     BlockEdgeCounts;
-
-using std::string;
+using CollapseResults = std::vector<Merge_Step>;
+using BlockEdgeCounts = std::map<Edge, int>;
 
 // =============================================================================
 // Main node class declaration

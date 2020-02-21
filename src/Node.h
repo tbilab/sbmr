@@ -45,15 +45,15 @@ using std::string;
 class Node;
 
 // For a bit of clarity
-typedef std::shared_ptr<Node>            NodePtr;
-typedef std::unordered_set<NodePtr>      ChildSet;
-typedef std::vector<NodePtr>             NodeVec;
-typedef std::list<NodePtr>               NodeList;
-typedef std::map<NodePtr, int> NodeEdgeMap;
-typedef std::shared_ptr<Node>            NodePtr;
-typedef std::map<string, NodePtr>        NodeLevel;
-typedef std::shared_ptr<NodeLevel>       LevelPtr;
-typedef std::map<int, LevelPtr>          LevelMap;
+using NodePtr     = std::shared_ptr<Node>;
+using ChildSet    = std::unordered_set<NodePtr>;
+using NodeVec     = std::vector<NodePtr>;
+using NodeList    = std::list<NodePtr>;
+using NodeEdgeMap = std::map<NodePtr, int>;
+using NodePtr     = std::shared_ptr<Node>;
+using NodeLevel   = std::map<string, NodePtr>;
+using LevelPtr    = std::shared_ptr<NodeLevel>;
+using LevelMap    = std::map<int, LevelPtr>;
 
 //=================================
 // Main node class declaration
