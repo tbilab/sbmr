@@ -953,7 +953,7 @@ Merge_Step SBM::agglomerative_merge(const int&    block_level,
 
   // A set of the blocks that have been merged already this step and thus are off limits
   std::set<NodePtr> merged_blocks;
-  int                         num_merges_made = 0;
+  int               num_merges_made = 0;
 
   // Start working our way through the queue of best moves and making merges
   while ((num_merges_made < num_merges_to_make) & (best_moves_q.size() != 0)) {

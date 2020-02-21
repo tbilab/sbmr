@@ -8,7 +8,7 @@
 #if NO_RCPP
 #define LOGIC_ERROR(msg) throw std::logic_error(msg)
 #define RANGE_ERROR(msg) throw std::range_error(msg)
-#define WARN_ABOUT(msg)             \
+#define WARN_ABOUT(msg)          \
   const std::string w_msg = msg; \
   std::cerr << w_msg << std::endl
 #else
@@ -20,7 +20,7 @@
 #define RANGE_ERROR(msg)         \
   const std::string e_msg = msg; \
   throw Rcpp::exception(e_msg.c_str(), false)
-#define WARN_ABOUT(msg)             \
+#define WARN_ABOUT(msg)          \
   const std::string w_msg = msg; \
   Rcpp::warning(w_msg.c_str())
 #endif
@@ -29,13 +29,13 @@
 
 #include <exception>
 #include <iostream>
-#include <memory>
-#include <queue>
-#include <string>
 #include <list>
 #include <map>
-#include <unordered_set>
+#include <memory>
+#include <queue>
 #include <set>
+#include <string>
+#include <unordered_set>
 #include <vector>
 
 // =============================================================================
@@ -101,16 +101,16 @@ class Node : public std::enable_shared_from_this<Node> {
 
   // Methods
   // =========================================================================
-  NodePtr     this_ptr();                                                                // Gets a shared pointer to object (replaces this)
-  void        set_parent(NodePtr new_parent);                                            // Set current node parent/cluster
-  void        add_child(const NodePtr& new_child);                                              // Add a node to the children vector
-  void        remove_child(const NodePtr& child);                                               // Remove a child node
-  void        add_edge(const NodePtr& node);                                                    // Add edge to another node
-  void        update_edges_from_node(const NodePtr& node, const bool& remove);                         // Add or remove edges from nodes edge list
-  NodePtr     get_parent_at_level(const int& level);                                            // Get parent of node at a given level
+  NodePtr     this_ptr();                                                                      // Gets a shared pointer to object (replaces this)
+  void        set_parent(NodePtr new_parent);                                                  // Set current node parent/cluster
+  void        add_child(const NodePtr& new_child);                                             // Add a node to the children vector
+  void        remove_child(const NodePtr& child);                                              // Remove a child node
+  void        add_edge(const NodePtr& node);                                                   // Add edge to another node
+  void        update_edges_from_node(const NodePtr& node, const bool& remove);                 // Add or remove edges from nodes edge list
+  NodePtr     get_parent_at_level(const int& level);                                           // Get parent of node at a given level
   NodeVec     get_edges_of_type(const std::string& node_type, const int& desired_level) const; // Get all nodes connected to Node at a given level
-  NodeEdgeMap gather_edges_to_level(const int& level) const;                                          // Get a map keyed by node with value of number of edges for all of a nodes edges to a level
-  static void connect_nodes(const NodePtr& node_a, const NodePtr& node_b);                             // Static method to connect two nodes to each other with edge
+  NodeEdgeMap gather_edges_to_level(const int& level) const;                                   // Get a map keyed by node with value of number of edges for all of a nodes edges to a level
+  static void connect_nodes(const NodePtr& node_a, const NodePtr& node_b);                     // Static method to connect two nodes to each other with edge
 };
 
 #endif

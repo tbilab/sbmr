@@ -133,7 +133,7 @@ inline void Node::remove_child(const NodePtr& child_node)
 // =============================================================================
 // Get parent of current node at a given level
 // =============================================================================
-inline NodePtr Node::get_parent_at_level(const int& level_of_parent) 
+inline NodePtr Node::get_parent_at_level(const int& level_of_parent)
 {
   // First we need to make sure that the requested level is not less than that
   // of the current node.

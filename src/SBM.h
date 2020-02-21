@@ -1,14 +1,13 @@
 #ifndef __NETWORK_INCLUDED__
 #define __NETWORK_INCLUDED__
 
+#include "Block_Consensus.h"
 #include "Edge.h"
 #include "Node.h"
 #include "Sampler.h"
-#include "Block_Consensus.h"
 #include "sbm_helpers.h"
 
 #include <math.h>
-
 
 // =============================================================================
 // What this file declares
@@ -22,8 +21,8 @@ struct State_Dump {
   std::vector<std::string> type;
   State_Dump() {};
   State_Dump(
-      std::vector<std::string>      i,
-      std::vector<std::string>      p,
+      std::vector<std::string> i,
+      std::vector<std::string> p,
       std::vector<int>         l,
       std::vector<std::string> t)
       : id(i)
@@ -60,10 +59,10 @@ struct Proposal_Res {
 };
 
 struct Sweep_Res {
-  std::list<std::string>          nodes_moved;
-  std::list<std::string>          new_groups;
-  double                          entropy_delta = 0;
-  std::set<std::string> pair_moves;
+  std::list<std::string> nodes_moved;
+  std::list<std::string> new_groups;
+  double                 entropy_delta = 0;
+  std::set<std::string>  pair_moves;
 };
 
 struct MCMC_Sweeps {
@@ -89,8 +88,6 @@ using BlockEdgeCounts = std::map<Edge, int>;
 class SBM {
 
   private:
-
- 
   public:
   // Attributes
   // =========================================================================
@@ -135,7 +132,7 @@ class SBM {
   // Grabs pointer to level of nodes
   LevelPtr get_level(const int& level);
   // const version that wont append new level if it doesn't exist
-  LevelPtr get_level(const int& level) const; 
+  LevelPtr get_level(const int& level) const;
 
   // Export current state of nodes in model
   State_Dump get_state() const;
@@ -144,8 +141,8 @@ class SBM {
   NodePtr get_node_by_id(const std::string& id,
                          const int          level = 0) const;
 
- // Return nodes of a desired type from level matching type
-  NodeVec get_nodes_of_type_at_level(const std::string& type, const int& level) const; 
+  // Return nodes of a desired type from level matching type
+  NodeVec get_nodes_of_type_at_level(const std::string& type, const int& level) const;
 
   // Gathers counts of edges between any two blocks in network
   BlockEdgeCounts get_block_edge_counts(const int& level) const;
@@ -154,24 +151,21 @@ class SBM {
   NodeEdgeMap get_node_to_block_edge_counts(const std::string& id,
                                             const int&         node_level        = 0,
                                             const int&         connections_level = 1) const;
-  
+
   // Load a level blocking from a state dump
   void set_state(const std::vector<std::string>& id,
-                       const std::vector<std::string>& parent,
-                       const std::vector<int>&         level,
-                       const std::vector<std::string>& types);
+                 const std::vector<std::string>& parent,
+                 const std::vector<int>&         level,
+                 const std::vector<std::string>& types);
 
- 
   // Adds a num_blocks to model and randomly assigns them for a given level (-1 means every node gets their own block)
   void initialize_blocks(int level, int num_blocks = -1);
 
   // Scan through levels and remove all block nodes that have no children. Returns # of blocks removed
   NodeVec clean_empty_blocks();
 
-
   // Compute microcononical entropy of current model state at a level
   double get_entropy(int level) const;
-
 
   // Use model state to propose a potential block move for a node.
   NodePtr propose_move(const NodePtr& node,
