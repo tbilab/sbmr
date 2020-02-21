@@ -48,25 +48,25 @@ build_score_fn <- function(heuristic){
     # needs entropy and number of blocks
     just_entropy <- length(formals(heuristic)) == 1
 
-    score_func <- function(entropy, num_blocks){
+    score_func <- function(value, k){
       if(just_entropy){
-        res <- heuristic(entropy)
+        res <- heuristic(value)
       } else {
-        res <- heuristic(entropy, num_blocks)
+        res <- heuristic(value, k)
       }
       res
     }
   } else {
     if(heuristic == 'lowest'){
-      score_func <-  function(e, n) -e
+      score_func <-  function(value, k) -value
     } else
     if(heuristic == 'dev_from_rolling_mean'){
-      score_func <- function(e,n) rolling_mean(e) - e
+      score_func <- function(value, k) rolling_mean(k) - value
     } else
     if(heuristic == 'nls_residual'){
-      score_func <- function(e, k){
-         entropy_model <- nls(e ~ a + b * log(k), start = list(a = max(e), b = -25))
-         -residuals(entropy_model)
+      score_func <- function(value, k){
+         entropy_model <- stats::nls(value ~ a + b * log(k), start = list(a = max(value), b = -25))
+         -stats::residuals(entropy_model)
        }
     } else
     if(heuristic == 'delta_ratio'){
@@ -80,10 +80,10 @@ build_score_fn <- function(heuristic){
     if(heuristic == 'trend_deviation'){
 
       score_func <- function(value, k){
-        x1 <- lag(k)
-        y1 <- lag(value)
-        x2 <- lead(k)
-        y2 <- lead(value)
+        x1 <- dplyr::lag(k)
+        y1 <- dplyr::lag(value)
+        x2 <- dplyr::lead(k)
+        y2 <- dplyr::lead(value)
         px <- k
         py <- value
         # Distance between a line defined by two points and a given point
