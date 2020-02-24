@@ -16,6 +16,9 @@ collapse_blocks(
 )
 }
 \arguments{
+\item{sbm}{\code{sbm_network} object as created by
+\code{\link{new_sbm_network()}}.}
+
 \item{desired_num_blocks}{How many blocks should this given merge drop down
 to. If the network has more than one node type this number is multiplied by
 the total number of types.}

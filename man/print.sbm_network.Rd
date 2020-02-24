@@ -29,7 +29,7 @@ small_edges <- dplyr::tribble(
      "a3",    "b1"
 )
 
-sbm_net <- new_sbm_network(small_edges, edges_from_col = a_node, edges_to_col = b_node)
+sbm_net <- new_sbm_network(small_edges, edges_from_col = "a_node", edges_to_col = "b_node")
 print(sbm_net)
 
 }

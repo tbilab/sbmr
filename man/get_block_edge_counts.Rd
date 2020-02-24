@@ -9,6 +9,9 @@ get_block_edge_counts(sbm, level = 1)
 \arguments{
 \item{sbm}{\code{sbm_network} object as created by
 \code{\link{new_sbm_network()}}.}
+
+\item{level}{Level of nodes who's blocks will have their block membership run
+through MCMC proposal-accept routine.}
 }
 \value{
 Dataframe of block pairs (\code{block_a} and \code{block_b}) and the number of edges between them (\code{count}).

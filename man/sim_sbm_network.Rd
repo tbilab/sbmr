@@ -7,7 +7,7 @@
 sim_sbm_network(
   block_info,
   edge_propensities,
-  edge_dist = rpois,
+  edge_dist = stats::rpois,
   allow_self_edges = FALSE,
   keep_edge_counts = TRUE,
   setup_model = FALSE,

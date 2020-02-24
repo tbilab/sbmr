@@ -77,7 +77,9 @@ sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 40)
 sim_basic_block_network(n_blocks = 8, n_nodes_per_block = 20)
 
 # Can save the generating edge propensities as well
-net <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 20, return_edge_propensities = TRUE)
+net <- sim_basic_block_network(n_blocks = 4,
+                               n_nodes_per_block = 20,
+                               return_edge_propensities = TRUE)
 net$edge_propensities
 
 
