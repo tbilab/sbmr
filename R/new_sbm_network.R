@@ -21,7 +21,7 @@
 #'   object then a `$sweep_result` slot will be added. For more info see
 #'   \code{\link{mcmc_sweep}}.
 #'
-#'   If either of the methods \code{\link{collapse_groups}} or
+#'   If either of the methods \code{\link{collapse_blocks}} or
 #'   \code{\link{collapse_run}} have been applied to the `sbm_network` object
 #'   then the slot `$collapse_result` will be append.
 #'
