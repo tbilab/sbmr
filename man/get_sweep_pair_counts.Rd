@@ -7,11 +7,11 @@
 get_sweep_pair_counts(sbm)
 }
 \value{
-
+pairwise connection propensity counts from latest MCMC sweep
 }
 \description{
 Retrieves the pairwise connection propensity counts from latest MCMC sweep on an \code{sbm_network} object. Needs to have
-\code{\link{mcmc_sweep(track_pairs = TRUE)}} run on the object before.
+\code{\link{mcmc_sweep}}\code{(track_pairs = TRUE)} run on the object before.
 }
 \examples{
 

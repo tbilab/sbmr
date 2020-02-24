@@ -13,7 +13,7 @@ choose_best_collapse_state(
 }
 \arguments{
 \item{sbm}{\code{sbm_network} object as created by
-\code{\link{new_sbm_network()}}.}
+\code{\link{new_sbm_network}}.}
 
 \item{use_entropy_value_for_score}{If set to \code{TRUE} then instead of the merge
 results entropy delta being used for the score function the entropy will
@@ -30,7 +30,7 @@ location, or a string labeling algorithm. Currently only \code{"lowest"},
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
-\link{new_sbm_network} section "Class structure."
+\code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
 Choose and load best model state from agglomerative collapsing algorithm

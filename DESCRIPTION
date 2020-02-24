@@ -26,7 +26,8 @@ Imports:
     stringr,
     readr,
     glue,
-    r2d3
+    r2d3,
+    methods
 Suggests: 
     testthat (>= 2.1.0),
     knitr,

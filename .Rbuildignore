@@ -6,3 +6,6 @@
 ^docs$
 ^pkgdown$
 ^\.github/workflows/R-CMD-check\.yaml$
+^src/cpp_tests
+^src/.clang-format
+^.vscode

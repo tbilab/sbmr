@@ -7,8 +7,8 @@
 sim_basic_block_network(
   n_blocks = 2,
   n_nodes_per_block = 5,
-  propensity_drawer = function(n) {     sample(seq(rbeta(1, 1, 5), rbeta(1, 5, 1),
-    length.out = n)) },
+  propensity_drawer = function(n) {     sample(seq(stats::rbeta(1, 1, 5),
+    stats::rbeta(1, 5, 1), length.out = n)) },
   edge_dist = purrr::rbernoulli,
   allow_self_edges = FALSE,
   keep_edge_counts = FALSE,
@@ -43,7 +43,7 @@ want to set this to \code{TRUE}.}
 
 \item{return_edge_propensities}{If set to \code{TRUE} the returned list will
 also include the simulated edge propensities dataframe. This can be
-used for recreating draws using \code{\link{sim_sbm_network()}}.}
+used for recreating draws using \code{\link{sim_sbm_network}}.}
 
 \item{setup_model}{Should an SBM model object be added? Set to \code{FALSE} if
 network is just being visualized or described.}
@@ -55,7 +55,7 @@ reproducability.}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
-\link{new_sbm_network} section "Class structure."
+\code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
 Simulates a simple block structured network with a desired number of constant

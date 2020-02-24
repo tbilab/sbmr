@@ -48,7 +48,7 @@ reproducability.}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
-\link{new_sbm_network} section "Class structure."
+\code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
 Simulates nodes and edges from a network where edge edges are derived

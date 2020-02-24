@@ -25,9 +25,8 @@ Plots entropy against number of blocks left for a collapse run. If
 each merger step according to the heuristic provided is also shown.
 }
 \details{
-Either \link{\code{collapse_run}}, or
-\link{\code{collapse_blocks(report_all_steps = TRUE)}} must be run prior to
-calling this function.
+Either \link{\code{collapse_run}}, or \code{collapse_blocks(report_all_steps = TRUE)} must be run prior to calling this function. (See
+\link{\code{collapse_blocks}}.)
 }
 \examples{
 

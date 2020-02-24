@@ -4,7 +4,7 @@
 \alias{print.sbm_network}
 \title{Print network}
 \usage{
-\method{print}{sbm_network}(x, rows_for_preview = 5)
+\method{print}{sbm_network}(x, ...)
 }
 \arguments{
 \item{x}{Object of class \code{sbm_network}.}
@@ -14,7 +14,7 @@ Output of the number of nodes and edges in model along with
 indication of if a model has been initialized
 }
 \description{
-Print network
+Addition arguments get passed to \code{head()} function.
 }
 \examples{
 

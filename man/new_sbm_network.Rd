@@ -55,7 +55,7 @@ reproducability.}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
-\link{new_sbm_network} section "Class structure."
+\code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
 Constructs an object with the \code{sbm_network} class. Takes as input at a
@@ -79,7 +79,7 @@ If the method \code{\link{mcmc_sweep}} has been run on the \code{sbm_network}
 object then a \verb{$sweep_result} slot will be added. For more info see
 \code{\link{mcmc_sweep}}.
 
-If either of the methods \code{\link{collapse_groups}} or
+If either of the methods \code{\link{collapse_blocks}} or
 \code{\link{collapse_run}} have been applied to the \code{sbm_network} object
 then the slot \verb{$collapse_result} will be append.
 

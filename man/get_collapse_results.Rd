@@ -15,7 +15,7 @@ new groups in that sweep. If \code{track_pairs = TRUE}, then an additional
 }
 \description{
 Retrieves the dataframe recording the results of running either
-\code{\link{collapse_groups()}} or \code{\link{collapse_run()}} on
+\code{\link{collapse_blocks}} or \code{\link{collapse_run}} on
 \code{sbm_network} object.
 }
 \examples{

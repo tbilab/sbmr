@@ -8,7 +8,7 @@ add_node(sbm, id, type = NULL, show_messages = TRUE)
 }
 \arguments{
 \item{sbm}{\code{sbm_network} object as created by
-\code{\link{new_sbm_network()}}.}
+\code{\link{new_sbm_network}}.}
 
 \item{id}{Unique identifying name for node.}
 
@@ -20,7 +20,7 @@ model already exists so no changes are made?}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
-\link{new_sbm_network} section "Class structure."
+\code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
 Add a node to the network. Takes the node id (string), the node type

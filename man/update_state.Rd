@@ -11,7 +11,7 @@ update_state(sbm, state_df)
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
-\link{new_sbm_network} section "Class structure."
+\code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
 Updates the state of the internal S4 class along with the state holder of the s3 class.

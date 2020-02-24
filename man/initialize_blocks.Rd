@@ -8,7 +8,7 @@ initialize_blocks(sbm, num_blocks = NULL, level = 0)
 }
 \arguments{
 \item{sbm}{\code{sbm_network} object as created by
-\code{\link{new_sbm_network()}}.}
+\code{\link{new_sbm_network}}.}
 
 \item{num_blocks}{Total number of blocks to initialize for each unique node
 type. If set to \code{-1}, then a single block is made for every node.}
@@ -18,7 +18,7 @@ value of \code{0}.}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
-\link{new_sbm_network} section "Class structure."
+\code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
 Initializes blocks for a given level of network. When \code{num_blocks = -1} (the

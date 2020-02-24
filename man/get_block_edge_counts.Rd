@@ -8,7 +8,7 @@ get_block_edge_counts(sbm, level = 1)
 }
 \arguments{
 \item{sbm}{\code{sbm_network} object as created by
-\code{\link{new_sbm_network()}}.}
+\code{\link{new_sbm_network}}.}
 
 \item{level}{Level of nodes who's blocks will have their block membership run
 through MCMC proposal-accept routine.}
@@ -30,7 +30,7 @@ net \%>\% get_block_edge_counts()
 
 }
 \seealso{
-\code{\link{get_node_edge_counts}}
+\code{\link{get_node_to_block_edge_counts}}
 
 Other modeling: 
 \code{\link{choose_best_collapse_state}()},
