@@ -9,3 +9,5 @@
 ^src/cpp_tests
 ^src/.clang-format
 ^.vscode
+^README.Rmd
+^README.MD
