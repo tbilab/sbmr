@@ -609,12 +609,12 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
 
   if (verbose) {
     OUT_MSG << "sweep_num,"
-              << "node,"
-              << "current_block,"
-              << "proposed_block,"
-              << "entropy_delta,"
-              << "prob_of_accept,"
-              << "move_accepted" << std::endl;
+            << "node,"
+            << "current_block,"
+            << "proposed_block,"
+            << "entropy_delta,"
+            << "prob_of_accept,"
+            << "move_accepted" << std::endl;
   }
 
   // Initialize a vector of nodes that will be passed through for a sweep.
@@ -659,10 +659,10 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
 
       if (verbose) {
         OUT_MSG << i
-                  << "," << curr_node->id
-                  << "," << (curr_node->parent)->id
-                  << "," << proposed_new_block->id
-                  << ",";
+                << "," << curr_node->id
+                << "," << (curr_node->parent)->id
+                << "," << proposed_new_block->id
+                << ",";
       }
       // Calculate acceptance probability based on posterior changes
       Proposal_Res proposal_results = make_proposal_decision(curr_node, proposed_new_block, eps);
@@ -672,7 +672,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
 
       if (verbose) {
         OUT_MSG << proposal_results.entropy_delta << "," << proposal_results.prob_of_accept << ","
-                  << move_accepted << std::endl;
+                << move_accepted << std::endl;
       }
 
       // Is the move accepted?

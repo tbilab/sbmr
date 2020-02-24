@@ -89,7 +89,6 @@ void Node::set_parent(NodePtr parent_node_ptr)
     LOGIC_ERROR("Parent node must be one level above child");
   }
 
-
   // Remove self from previous parents children list (if it existed)
   if (parent) {
     // Remove this node's edges contribution from parent's
@@ -120,7 +119,6 @@ inline void Node::add_child(const NodePtr& new_child_node)
   (this_ptr()->children).insert(new_child_node);
 }
 
-
 // =============================================================================
 // Find and erase a child node
 // =============================================================================
@@ -128,7 +126,6 @@ void Node::remove_child(const NodePtr& child_node)
 {
   children.erase(child_node);
 }
-
 
 // =============================================================================
 // Get parent of current node at a given level

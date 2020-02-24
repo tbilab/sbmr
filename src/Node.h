@@ -34,14 +34,11 @@
 #include <iostream>
 #include <list>
 #include <map>
-#include <set>
-// #include <unordered_set>
 #include <memory>
 #include <queue>
+#include <set>
 #include <string>
 #include <vector>
-
-
 
 // =============================================================================
 // What this file declares
@@ -52,13 +49,11 @@ class Node;
 using NodePtr     = std::shared_ptr<Node>;
 using NodeVec     = std::vector<NodePtr>;
 using NodeList    = std::list<NodePtr>;
-// using NodeSet     = std::unordered_set<NodePtr>;
 using NodeSet     = std::set<NodePtr>;
 using NodeEdgeMap = std::map<NodePtr, int>;
 using NodeLevel   = std::map<std::string, NodePtr>;
 using LevelPtr    = std::shared_ptr<NodeLevel>;
 using LevelMap    = std::map<int, LevelPtr>;
-
 
 //=================================
 // Main node class declaration
