@@ -6,6 +6,9 @@
 \usage{
 get_num_blocks(sbm)
 }
+\arguments{
+\item{sbm}{Object of class \code{sbm_network}.}
+}
 \value{
 Number of clusters in current model state
 }

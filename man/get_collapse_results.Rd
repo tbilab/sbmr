@@ -6,6 +6,9 @@
 \usage{
 get_collapse_results(sbm)
 }
+\arguments{
+\item{sbm}{Object of class \code{sbm_network}.}
+}
 \value{
 List with two dataframes. The first telling for all sweeps everytime
 a node was moved and what group it was moved to. The second telling for

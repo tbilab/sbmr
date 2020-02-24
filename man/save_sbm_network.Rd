@@ -4,10 +4,10 @@
 \alias{save_sbm_network}
 \title{Save sbm_network object}
 \usage{
-save_sbm_network(x, loc)
+save_sbm_network(sbm, loc)
 }
 \arguments{
-\item{x}{Object of class \code{sbm_network}.}
+\item{sbm}{Object of class \code{sbm_network}.}
 
 \item{loc}{Location on computer of saved model \code{.rds} file.}
 }
@@ -26,7 +26,7 @@ sbm_net <- new_sbm_network(edges = network$edges, nodes = network$nodes)
 temp <- tempfile()
 save_sbm_network(sbm_net, temp)
 
-loaded_sbm_net <- load_sbm_network(tmp)
+loaded_sbm_net <- load_sbm_network(temp)
 
 }
 \seealso{

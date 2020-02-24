@@ -21,6 +21,9 @@ mcmc_sweep(
 \item{num_sweeps}{Number of times all nodes are passed through for move
 proposals.}
 
+\item{eps}{Controls randomness of move proposals. Effects both the block
+merging and mcmc sweeps.}
+
 \item{variable_num_blocks}{Should the model allow new blocks to be created or
 empty blocks removed while sweeping or should number of blocks remain
 constant?}

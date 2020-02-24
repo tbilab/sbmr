@@ -7,7 +7,11 @@
 \method{print}{sbm_network}(x, ...)
 }
 \arguments{
-\item{x}{Object of class \code{sbm_network}.}
+\item{x}{Object of class \code{sbm_network}. (See \code{\link{new_sbm_network}}
+for more info.)}
+
+\item{...}{Arguments passed to \code{\link[utils]{head}} that are used to
+control preview of node and edge data frames.}
 }
 \value{
 Output of the number of nodes and edges in model along with
@@ -29,7 +33,7 @@ small_edges <- dplyr::tribble(
      "a3",    "b1"
 )
 
-sbm_net <- new_sbm_network(small_edges, edges_from_col = "a_node", edges_to_col = "b_node")
+sbm_net <- new_sbm_network(small_edges, edges_from_col = a_node, edges_to_col = b_node)
 print(sbm_net)
 
 }

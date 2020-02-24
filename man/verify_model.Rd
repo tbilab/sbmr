@@ -4,10 +4,10 @@
 \alias{verify_model}
 \title{Verify model for sbm_network object exists}
 \usage{
-verify_model(x, show_messages = FALSE, warn_about_random_seed = TRUE)
+verify_model(sbm, show_messages = FALSE, warn_about_random_seed = TRUE)
 }
 \arguments{
-\item{x}{Object of class \code{sbm_network}.}
+\item{sbm}{Object of class \code{sbm_network}.}
 
 \item{show_messages}{Should function inform of its actions such as when a
 model already exists so no changes are made?}

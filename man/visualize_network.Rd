@@ -13,6 +13,8 @@ visualize_network(
 )
 }
 \arguments{
+\item{sbm}{Object of class \code{sbm_network}.}
+
 \item{node_color_col}{Name of column in the \code{nodes} dataframe that should be
 encoded with color of nodes in the plot. If this value is numeric (defined
 as more than 10 unique values that are numbers) the network will color

@@ -6,6 +6,9 @@
 \usage{
 get_sweep_pair_counts(sbm)
 }
+\arguments{
+\item{sbm}{Object of class \code{sbm_network}.}
+}
 \value{
 pairwise connection propensity counts from latest MCMC sweep
 }

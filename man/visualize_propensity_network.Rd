@@ -7,6 +7,8 @@
 visualize_propensity_network(sbm, proportion_threshold = 0.2)
 }
 \arguments{
+\item{sbm}{Object of class \code{sbm_network}.}
+
 \item{proportion_threshold}{Threshold of pairwise propensity to consider two nodes linked. Choose carefully!}
 }
 \value{

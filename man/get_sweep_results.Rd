@@ -6,6 +6,9 @@
 \usage{
 get_sweep_results(sbm)
 }
+\arguments{
+\item{sbm}{Object of class \code{sbm_network}.}
+}
 \value{
 MCMC sweep results from an \code{sbm_network} object
 }

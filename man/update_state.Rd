@@ -7,6 +7,8 @@
 update_state(sbm, state_df)
 }
 \arguments{
+\item{sbm}{Object of class \code{sbm_network}.}
+
 \item{state_df}{A state dataframe with \code{id}, \code{parent}, \code{level}, and \code{type} columns for all nodes in network (along with block nodes).}
 }
 \value{
