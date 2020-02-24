@@ -4,7 +4,7 @@
 #'
 #' @family helpers
 #'
-#' @inheritParams verify_model
+#' @param x Object of class `sbm_network`. (See \code{\link{new_sbm_network}} for more info.)
 #'
 #' @return Output of the number of nodes and edges in model along with
 #'   indication of if a model has been initialized
