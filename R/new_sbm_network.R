@@ -141,10 +141,11 @@
 #' edge_types <- dplyr::tribble(~from, ~to,
 #'                                        "a", "b",
 #'                                        "a", "c")
-#'
+#' \dontrun{
 #' new_sbm_network(edges = edges_tripartite,
 #'                 nodes = nodes_tripartite,
 #'                 edge_types = edge_types)
+#' }
 #'
 new_sbm_network <- function(edges = dplyr::tibble(),
                             nodes = NULL,
