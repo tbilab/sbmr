@@ -4,7 +4,10 @@
 #'
 #' @family helpers
 #'
-#' @param x Object of class `sbm_network`. (See \code{\link{new_sbm_network}} for more info.)
+#' @param x Object of class `sbm_network`. (See \code{\link{new_sbm_network}}
+#'   for more info.)
+#' @param ... Arguments passed to \code{\link[utils]{head}} that are used to
+#'   control preview of node and edge data frames.
 #'
 #' @return Output of the number of nodes and edges in model along with
 #'   indication of if a model has been initialized
