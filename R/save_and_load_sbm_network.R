@@ -18,7 +18,7 @@
 #' temp <- tempfile()
 #' save_sbm_network(sbm_net, temp)
 #'
-#' loaded_sbm_net <- load_sbm_network(tmp)
+#' loaded_sbm_net <- load_sbm_network(temp)
 #'
 save_sbm_network <- function(sbm, loc){
   UseMethod("save_sbm_network")
