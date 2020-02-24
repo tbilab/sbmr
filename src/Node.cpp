@@ -96,7 +96,7 @@ void Node::set_parent(NodePtr parent_node_ptr)
     parent->update_edges_from_node(this_ptr(), true);
 
     // Remove self from previous children
-    parent->children.erase(this_ptr());
+    parent->remove_child(this_ptr());
   }
 
   // Set this node's parent
@@ -118,6 +118,15 @@ inline void Node::add_child(const NodePtr& new_child_node)
   // Add new child node to the set of children. An unordered set is used because
   // repeat children can't happen.
   (this_ptr()->children).insert(new_child_node);
+}
+
+
+// =============================================================================
+// Find and erase a child node
+// =============================================================================
+void Node::remove_child(const NodePtr& child_node)
+{
+  children.erase(child_node);
 }
 
 

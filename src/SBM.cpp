@@ -268,8 +268,8 @@ NodeVec SBM::clean_empty_blocks()
       if (block.second->children.size() == 0) {
         // Remove block from children of its parent (if it has one)
         if (block.second->parent) {
-          NodePtr parent_node = block.second->parent;
-          parent_node->children.erase(block.second);
+          const NodePtr parent_node = block.second->parent;
+          parent_node->remove_child(block.second);
         }
 
         blocks_removed.push_back(block.second);
