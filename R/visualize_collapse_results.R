@@ -14,6 +14,7 @@
 #'   results entropy delta being used for the score function the entropy will
 #'   be. Typically the heuristics work better on entropy delta values.
 #' @inheritParams verify_model
+#' @inheritParams build_score_fn
 #'
 #' @return GGplot object comparing the fit results and each step's deviance from
 #'   the rolling mean
