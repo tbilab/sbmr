@@ -1,7 +1,7 @@
 #' Get collapse results from model
 #'
 #' Retrieves the dataframe recording the results of running either
-#' \code{\link{collapse_groups}} or \code{\link{collapse_run}} on
+#' \code{\link{collapse_blocks}} or \code{\link{collapse_run}} on
 #' `sbm_network` object.
 #'
 #' @inheritParams verify_model
@@ -35,7 +35,7 @@ get_collapse_results.default <- function(sbm){
 get_collapse_results.sbm_network <- function(sbm){
   collapse_results <- sbm$collapse_results
   if(is.null(collapse_results)) {
-    stop("Need to run collapse_groups() or collapse_run() on network before retrieving collapse results")
+    stop("Need to run collapse_blocks() or collapse_run() on network before retrieving collapse results")
   }
   collapse_results
 }

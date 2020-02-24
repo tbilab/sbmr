@@ -4,9 +4,9 @@
 #' `heuristic` is set to value other than `NULL` a second plot of the score for
 #' each merger step according to the heuristic provided is also shown.
 #'
-#' Either \link{\code{collapse_run}}, or
-#' `collapse_blocks(report_all_steps = TRUE)`` must be run prior to
-#' calling this function. (See \link{\code{collapse_blocks}}.)
+#' Either \link{\code{collapse_run}}, or `collapse_blocks(report_all_steps =
+#' TRUE)` must be run prior to calling this function. (See
+#' \link{\code{collapse_blocks}}.)
 #'
 #' @family visualizations
 #'
