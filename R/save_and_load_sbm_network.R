@@ -48,16 +48,7 @@ save_sbm_network.sbm_network <- function(sbm, loc){
 #' @return New `sbm_network` object copy in same state as when model was saved.
 #' @export
 #'
-#' @examples
-#'
-#' network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 40)
-#'
-#' sbm_net <- new_sbm_network(edges = network$edges, nodes = network$nodes)
-#'
-#' temp <- tempfile()
-#' save_sbm_network(sbm_net, temp)
-#'
-#' loaded_sbm_net <- load_sbm_network(temp)
+#' @inherit save_sbm_network examples
 #'
 load_sbm_network <- function(loc){
   x <- readr::read_rds(loc)
