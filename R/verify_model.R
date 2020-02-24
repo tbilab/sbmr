@@ -5,7 +5,7 @@
 #'
 #' @family helpers
 #'
-#' @param x Object of class `sbm_network`.
+#' @param sbm Object of class `sbm_network`.
 #' @param show_messages Should function inform of its actions such as when a
 #'   model already exists so no changes are made?
 #' @param warn_about_random_seed Should the model warn about cases when set seed
@@ -26,22 +26,22 @@
 #' net <- net %>% verify_model()
 #' net
 #'
-verify_model <- function(x, show_messages = FALSE, warn_about_random_seed = TRUE){
+verify_model <- function(sbm, show_messages = FALSE, warn_about_random_seed = TRUE){
   UseMethod("verify_model")
 }
 
 
 #' @export
-verify_model.sbm_network <- function(x, show_messages = FALSE, warn_about_random_seed = TRUE){
-  has_model_already <- not_null(attr(x, 'model'))
-  has_state_already <- not_null(attr(x, "state"))
-  has_random_seed <- not_null(attr(x, 'random_seed'))
+verify_model.sbm_network <- function(sbm, show_messages = FALSE, warn_about_random_seed = TRUE){
+  has_model_already <- not_null(attr(sbm, 'model'))
+  has_state_already <- not_null(attr(sbm, "state"))
+  has_random_seed <- not_null(attr(sbm, 'random_seed'))
 
   if (has_model_already){
     model_is_stale <- tryCatch(
       error = function(err) TRUE,
       {
-        attr(x, 'model')$get_state()
+        attr(sbm, 'model')$get_state()
         FALSE
       })
 
@@ -49,7 +49,7 @@ verify_model.sbm_network <- function(x, show_messages = FALSE, warn_about_random
     # it is stale and needs to be rebuilt
     if(has_model_already & !model_is_stale){
       if(show_messages) message("Object already has model initialized. No changes made")
-      return(x)
+      return(sbm)
     }
 
     if(has_random_seed & warn_about_random_seed){
@@ -59,7 +59,7 @@ verify_model.sbm_network <- function(x, show_messages = FALSE, warn_about_random
 
   if(has_random_seed){
     # Instantiate instance of sbm class with random seed
-    sbm_model <- methods::new(SBM, as.integer(attr(x, 'random_seed')))
+    sbm_model <- methods::new(SBM, as.integer(attr(sbm, 'random_seed')))
   } else {
     # Instantiate instance of sbm class with no random seed
     sbm_model <- methods::new(SBM)
@@ -68,19 +68,19 @@ verify_model.sbm_network <- function(x, show_messages = FALSE, warn_about_random
 
   # Fill in all the needed nodes
   # bind the integer types to nodes before sending them to model
-  purrr::walk2(x$nodes$id, x$nodes$type, function(id, type){ sbm_model$add_node(id, type, 0L) })
+  purrr::walk2(sbm$nodes$id, sbm$nodes$type, function(id, type){ sbm_model$add_node(id, type, 0L) })
 
   # If the model has a allowed node pairs list, let model know before adding edges
-  allowed_pairs <- attr(x, 'edge_types')
+  allowed_pairs <- attr(sbm, 'edge_types')
   if(not_null(allowed_pairs)){
-    sbm_model$add_edge_types(dplyr::pull(allowed_pairs, !!attr(x, "from_column")),
-                             dplyr::pull(allowed_pairs, !!attr(x, "to_column")))
+    sbm_model$add_edge_types(dplyr::pull(allowed_pairs, !!attr(sbm, "from_column")),
+                             dplyr::pull(allowed_pairs, !!attr(sbm, "to_column")))
   }
 
   # Fill in the edges
-  from_nodes <- dplyr::pull(x$edges, !!attr(x, "from_column"))
-  to_nodes <- dplyr::pull(x$edges, !!attr(x, "to_column"))
-  for(i in 1:attr(x, "n_edges")){
+  from_nodes <- dplyr::pull(sbm$edges, !!attr(sbm, "from_column"))
+  to_nodes <- dplyr::pull(sbm$edges, !!attr(sbm, "to_column"))
+  for(i in 1:attr(sbm, "n_edges")){
     sbm_model$add_edge(from_nodes[i],
                        to_nodes[i])
   }
@@ -89,7 +89,7 @@ verify_model.sbm_network <- function(x, show_messages = FALSE, warn_about_random
     if(show_messages) message("Reloading saved model state.")
 
     # Reload using saved state to get model back to working condition
-    previous_state <- attr(x, "state")
+    previous_state <- attr(sbm, "state")
 
     # Reload state using the s4 method for doing so exposed by rcpp
     sbm_model$set_state(previous_state$id,
@@ -99,12 +99,12 @@ verify_model.sbm_network <- function(x, show_messages = FALSE, warn_about_random
   } else {
     if(show_messages) message("New SBM model object initialized.")
     # Update object state with newly created state
-    attr(x, "state") <- sbm_model$get_state()
+    attr(sbm, "state") <- sbm_model$get_state()
   }
 
   # Assign sbm_model object to name model in sbm_network object
-  attr(x, 'model') <- sbm_model
+  attr(sbm, 'model') <- sbm_model
 
   # Give back sbm_network object
-  x
+  sbm
 }
