@@ -12,6 +12,7 @@
 #'   is present for cached model?
 #'
 #' @inherit new_sbm_network return
+#'
 #' @export
 #'
 #' @examples
@@ -58,10 +59,10 @@ verify_model.sbm_network <- function(x, show_messages = FALSE, warn_about_random
 
   if(has_random_seed){
     # Instantiate instance of sbm class with random seed
-    sbm_model <- new(SBM, as.integer(attr(x, 'random_seed')))
+    sbm_model <- methods::new(SBM, as.integer(attr(x, 'random_seed')))
   } else {
     # Instantiate instance of sbm class with no random seed
-    sbm_model <- new(SBM)
+    sbm_model <- methods::new(SBM)
   }
 
 
