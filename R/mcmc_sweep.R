@@ -23,6 +23,8 @@
 #' @param verbose If set to `TRUE` then each proposed move for all sweeps will
 #'   have information given on entropy delta, probability of moving, and if the
 #'   move were accepted printed to the console.
+#' @param eps Controls randomness of move proposals. Effects both the block
+#'   merging and mcmc sweeps.
 #'
 #' @inherit new_sbm_network return
 #'
