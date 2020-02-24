@@ -10,7 +10,7 @@
 #'
 #' @return Dataframe of block pairs (`block_a` and `block_b`) and the number of edges between them (`count`).
 #' @export
-#' @NoRd
+#'
 #' @examples
 #'
 #' # A small simulated network with random block assignment
