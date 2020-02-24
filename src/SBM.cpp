@@ -268,7 +268,8 @@ NodeVec SBM::clean_empty_blocks()
       if (block.second->children.size() == 0) {
         // Remove block from children of its parent (if it has one)
         if (block.second->parent) {
-          block.second->parent->remove_child(block.second);
+          NodePtr parent_node = block.second->parent;
+          parent_node->children.erase(block.second);
         }
 
         blocks_removed.push_back(block.second);
@@ -687,7 +688,9 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
         entropy_delta += proposal_results.entropy_delta;
 
         if (track_pairs) {
-          Block_Consensus::update_changed_pairs(curr_node->id, old_block->children, proposed_new_block->children,
+          Block_Consensus::update_changed_pairs(curr_node->id,
+                                                old_block->children,
+                                                proposed_new_block->children,
                                                 pair_moves);
         }
       } // End accepted if statement

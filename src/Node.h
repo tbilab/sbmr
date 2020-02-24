@@ -34,12 +34,14 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <set>
+// #include <unordered_set>
 #include <memory>
 #include <queue>
-#include <set>
 #include <string>
-#include <unordered_set>
 #include <vector>
+
+
 
 // =============================================================================
 // What this file declares
@@ -48,13 +50,15 @@ class Node;
 
 // For a bit of clarity
 using NodePtr     = std::shared_ptr<Node>;
-using NodeSet     = std::unordered_set<NodePtr>;
 using NodeVec     = std::vector<NodePtr>;
 using NodeList    = std::list<NodePtr>;
+// using NodeSet     = std::unordered_set<NodePtr>;
+using NodeSet     = std::set<NodePtr>;
 using NodeEdgeMap = std::map<NodePtr, int>;
 using NodeLevel   = std::map<std::string, NodePtr>;
 using LevelPtr    = std::shared_ptr<NodeLevel>;
 using LevelMap    = std::map<int, LevelPtr>;
+
 
 //=================================
 // Main node class declaration
@@ -106,7 +110,6 @@ class Node : public std::enable_shared_from_this<Node> {
   NodePtr     this_ptr();                                                                      // Gets a shared pointer to object (replaces this)
   void        set_parent(NodePtr new_parent);                                                  // Set current node parent/cluster
   void        add_child(const NodePtr& new_child);                                             // Add a node to the children vector
-  void        remove_child(const NodePtr& child);                                              // Remove a child node
   void        add_edge(const NodePtr& node);                                                   // Add edge to another node
   void        update_edges_from_node(const NodePtr& node, const bool& remove);                 // Add or remove edges from nodes edge list
   NodePtr     get_parent_at_level(const int& level);                                           // Get parent of node at a given level
