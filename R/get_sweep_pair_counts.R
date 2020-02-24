@@ -7,7 +7,7 @@
 #'
 #' @inheritParams verify_model
 #'
-#' @return
+#' @return pairwise connection propensity counts from latest MCMC sweep
 #' @export
 #'
 #' @examples

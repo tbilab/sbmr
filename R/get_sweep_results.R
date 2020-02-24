@@ -7,7 +7,7 @@
 #'
 #' @inheritParams verify_model
 #'
-#' @return
+#' @return MCMC sweep results from an `sbm_network` object
 #' @export
 #'
 #' @examples
