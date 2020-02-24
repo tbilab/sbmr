@@ -5,8 +5,8 @@
 #' each merger step according to the heuristic provided is also shown.
 #'
 #' Either \link{\code{collapse_run}}, or
-#' \link{\code{collapse_blocks(report_all_steps = TRUE)}} must be run prior to
-#' calling this function.
+#' `collapse_blocks(report_all_steps = TRUE)`` must be run prior to
+#' calling this function. (See \link{\code{collapse_blocks}}.)
 #'
 #' @family visualizations
 #'
@@ -91,5 +91,5 @@ visualize_collapse_results.sbm_network <- function(sbm,
     ggplot2::labs(x = "number of blocks", y = "")
 }
 
-utils::globalVariables(c("entropy", "num_blocks"))
+utils::globalVariables(c("entropy", "num_blocks", "state", "name"))
 
