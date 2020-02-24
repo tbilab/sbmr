@@ -157,6 +157,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                             show_warnings = interactive(),
                             random_seed = NULL){
 
+
   # Setup some tidy eval stuff for the column names
   to_column <- rlang::enquo(edges_to_column)
   from_column <- rlang::enquo(edges_from_column)
@@ -306,3 +307,6 @@ new_sbm_network <- function(edges = dplyr::tibble(),
   # Return
   x
 }
+
+utils::globalVariables(c("from", "to"))
+
