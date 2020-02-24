@@ -97,8 +97,8 @@ mcmc_sweep.sbm_network <- function(sbm,
   if (track_pairs) {
     # Clean up pair connections results
     results$pairing_counts <- results$pairing_counts %>%
-      tidyr::separate(.data$node_pair, into = c("node_a", "node_b"), sep = "--") %>%
-      dplyr::mutate(proportion_connected = .data$times_connected/num_sweeps)
+      tidyr::separate(node_pair, into = c("node_a", "node_b"), sep = "--") %>%
+      dplyr::mutate(proportion_connected = times_connected/num_sweeps)
   } else {
     # Remove the empty pair counts results
     results['pairing_counts'] <- NULL
@@ -112,4 +112,4 @@ mcmc_sweep.sbm_network <- function(sbm,
 
   sbm
 }
-
+utils::globalVariables(c("node_pair", "times_connected"))

@@ -189,9 +189,9 @@ new_sbm_network <- function(edges = dplyr::tibble(),
 
     # Combine and count duplicates
     all_unique <- dplyr::bind_rows(unique_to_nodes, unique_from_nodes) %>%
-      dplyr::group_by(.data$id) %>%
-      dplyr::summarise(n_types = length(unique(.data$type)),
-                       type = dplyr::first(.data$type) ) %>%
+      dplyr::group_by(id) %>%
+      dplyr::summarise(n_types = length(unique(type)),
+                       type = dplyr::first(type) ) %>%
       dplyr::ungroup()
 
     # Check for nodes that have multiple types
@@ -201,7 +201,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
     }
 
     # Return built nodes, removing the n_types column
-    all_unique %>% dplyr::select(-.data$n_types)
+    all_unique %>% dplyr::select(-n_types)
   }
 
   # Make sure nodes dataframe is properly formatted
@@ -308,5 +308,5 @@ new_sbm_network <- function(edges = dplyr::tibble(),
   x
 }
 
-utils::globalVariables(c("from", "to"))
+utils::globalVariables(c("from", "to", "id", "type", "n_types"))
 

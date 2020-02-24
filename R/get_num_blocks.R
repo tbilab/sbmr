@@ -44,6 +44,9 @@ get_num_blocks.default <- function(sbm){
 get_num_blocks.sbm_network <- function(sbm){
   verify_model(sbm) %>%
     get_state() %>%
-    dplyr::filter(.data$level == 1) %>%
+    dplyr::filter(level == 1) %>%
     nrow()
 }
+
+
+utils::globalVariables(c("level"))

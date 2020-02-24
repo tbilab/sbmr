@@ -129,3 +129,5 @@ sim_sbm_network <- function(
     random_seed = random_seed
   )
 }
+
+utils::globalVariables(c("block_1", "block_2", "propensity", "node_1", "node_2"))

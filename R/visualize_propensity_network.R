@@ -59,3 +59,5 @@ visualize_propensity_network.sbm_network <- function(sbm, proportion_threshold =
 
 }
 
+utils::globalVariables(c("proportion_connected", "node_a", "node_b", "avg_prop_connection"))
+
