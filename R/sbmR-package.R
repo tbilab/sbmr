@@ -19,6 +19,7 @@ Rcpp::loadModule("SBM", TRUE)
 #' users. Documentation of all available methods is available in the c++ wrapper
 #' code using the RCPP module protocol. See \code{\link[Rcpp]{loadModule}} for more info.
 #'
+#' @aliases SBM
 setClass("Rcpp_SBM")
 
 
