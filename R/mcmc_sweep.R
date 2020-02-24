@@ -11,7 +11,6 @@
 #' @family modeling
 #'
 #' @inheritParams add_node
-#' @inheritParams collapse_blocks
 #' @param num_sweeps Number of times all nodes are passed through for move
 #'   proposals.
 #' @param level Level of nodes who's blocks will have their block membership run
@@ -98,8 +97,8 @@ mcmc_sweep.sbm_network <- function(sbm,
   if (track_pairs) {
     # Clean up pair connections results
     results$pairing_counts <- results$pairing_counts %>%
-      tidyr::separate(node_pair, into = c("node_a", "node_b"), sep = "--") %>%
-      dplyr::mutate(proportion_connected = times_connected/num_sweeps)
+      tidyr::separate(.data$node_pair, into = c("node_a", "node_b"), sep = "--") %>%
+      dplyr::mutate(proportion_connected = .data$times_connected/num_sweeps)
   } else {
     # Remove the empty pair counts results
     results['pairing_counts'] <- NULL

@@ -21,7 +21,7 @@
 #'      "a3",    "b1"
 #' )
 #'
-#' sbm_net <- new_sbm_network(small_edges, edges_from_col = a_node, edges_to_col = b_node)
+#' sbm_net <- new_sbm_network(small_edges, edges_from_col = "a_node", edges_to_col = "b_node")
 #' print(sbm_net)
 #'
 print.sbm_network <- function(x, rows_for_preview = 5){
@@ -32,11 +32,11 @@ print.sbm_network <- function(x, rows_for_preview = 5){
   cat(glue::glue("SBM Network with {N} nodes {type_msg} and {E} edges."), "\n", "\n")
 
   cat("Nodes: ")
-  print(head(x$nodes, rows_for_preview))
+  print(utils::head(x$nodes, rows_for_preview))
   cat("...", "\n","\n")
 
   cat("Edges: ")
-  print(head(x$edges, rows_for_preview))
+  print(utils::head(x$edges, rows_for_preview))
   cat("...", "\n","\n")
 
   if (!is.null(attr(x, 'model'))){

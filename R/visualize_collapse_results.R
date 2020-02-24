@@ -69,22 +69,22 @@ visualize_collapse_results.sbm_network <- function(sbm,
   if(!is.null(heuristic)){
 
     collapse_results <- collapse_results %>%
-      dplyr::arrange(num_blocks)
+      dplyr::arrange(.data$num_blocks)
 
     if (use_entropy_value_for_score){
-      collapse_results <- dplyr::mutate(collapse_results, score = build_score_fn(heuristic)(entropy, num_blocks))
+      collapse_results <- dplyr::mutate(collapse_results, score = build_score_fn(heuristic)(.data$entropy, .data$num_blocks))
     } else {
-      collapse_results <- dplyr::mutate(collapse_results, score = build_score_fn(heuristic)(entropy_delta, num_blocks))
+      collapse_results <- dplyr::mutate(collapse_results, score = build_score_fn(heuristic)(.data$entropy_delta, .data$num_blocks))
     }
   }
 
   collapse_results %>%
     dplyr::select(-state) %>%
-    tidyr::pivot_longer(-num_blocks) %>%
+    tidyr::pivot_longer(-.data$num_blocks) %>%
     dplyr::mutate(
       name = stringr::str_replace_all(name, "_", " ")
     ) %>%
-    ggplot2::ggplot(ggplot2::aes(x = num_blocks, y = value)) +
+    ggplot2::ggplot(ggplot2::aes(x = .data$num_blocks, y = value)) +
     ggplot2::geom_point() +
     ggplot2::geom_line() +
     ggplot2::facet_grid(name~., scales = 'free_y') +

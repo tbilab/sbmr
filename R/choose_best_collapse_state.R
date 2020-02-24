@@ -6,7 +6,8 @@
 #' @inheritParams mcmc_sweep
 #' @inheritParams build_score_fn
 #' @inheritParams visualize_collapse_results
-#' @param verbose Should model tell you what step was chosen (`TRUE` or `FALSE`)?
+#' @param verbose Should model tell you what step was chosen (`TRUE` or
+#'   `FALSE`)?
 #'
 #'
 #' @inherit new_sbm_network return
@@ -22,7 +23,8 @@
 #' # Choose best result with default heuristic
 #' net <- choose_best_collapse_state(net, verbose = TRUE)
 #'
-#' # Score heuristic that fits a nonlinear model to observed values and chooses by largest negative residual
+#' # Score heuristic that fits a nonlinear model to observed values and chooses by
+#' # largest negative residual
 #' nls_score <- function(e, k){
 #'   entropy_model <- nls(e ~ a + b * log(k), start = list(a = max(e), b = -25))
 #'   -residuals(entropy_model)
@@ -55,23 +57,23 @@ choose_best_collapse_state.sbm_network <- function(sbm,
   collapse_results <- get_collapse_results(sbm)
   # Apply the heuristic on the entropy column and choose the higheset value
   best_state <- collapse_results %>%
-    dplyr::arrange(num_blocks)
+    dplyr::arrange(.data$num_blocks)
 
   missing_entropy_delta <- !("entropy_delta" %in% colnames(best_state))
 
   if(missing_entropy_delta & !use_entropy_value_for_score){
     best_state <- best_state %>%
       dplyr::mutate(entropy_delta = dplyr::lag(entropy) - entropy) %>%
-      dplyr::filter(!is.na(entropy_delta))
+      dplyr::filter(!is.na(.data$entropy_delta))
   }
 
   if (use_entropy_value_for_score){
     best_state <- dplyr::mutate(best_state, score = build_score_fn(heuristic)(entropy, num_blocks))
   } else {
-    best_state <- dplyr::mutate(best_state, score = build_score_fn(heuristic)(entropy_delta, num_blocks))
+    best_state <- dplyr::mutate(best_state, score = build_score_fn(heuristic)(.data$entropy_delta, .data$num_blocks))
   }
 
-  best_state <- dplyr::filter(best_state, score == max(score, na.rm = TRUE))
+  best_state <- dplyr::filter(best_state, .data$score == max(score, na.rm = TRUE))
 
   if(verbose){
     n <- best_state$num_blocks[1]
