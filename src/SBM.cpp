@@ -607,7 +607,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
   }
 
   if (verbose) {
-    std::cout << "sweep_num,"
+    OUT_MSG << "sweep_num,"
               << "node,"
               << "current_block,"
               << "proposed_block,"
@@ -657,7 +657,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
       }
 
       if (verbose) {
-        std::cout << i
+        OUT_MSG << i
                   << "," << curr_node->id
                   << "," << (curr_node->parent)->id
                   << "," << proposed_new_block->id
@@ -670,7 +670,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
       const bool move_accepted = proposal_results.prob_of_accept > sampler.draw_unif();
 
       if (verbose) {
-        std::cout << proposal_results.entropy_delta << "," << proposal_results.prob_of_accept << ","
+        OUT_MSG << proposal_results.entropy_delta << "," << proposal_results.prob_of_accept << ","
                   << move_accepted << std::endl;
       }
 

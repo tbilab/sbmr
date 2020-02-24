@@ -11,6 +11,7 @@
 #define WARN_ABOUT(msg)          \
   const std::string w_msg = msg; \
   std::cerr << w_msg << std::endl
+#define OUT_MSG std::cout
 #else
 #include <Rcpp.h>
 // Eases the process of wrapping functions to get errors forwarded to R
@@ -23,6 +24,8 @@
 #define WARN_ABOUT(msg)          \
   const std::string w_msg = msg; \
   Rcpp::warning(w_msg.c_str())
+
+#define OUT_MSG Rcpp::Rcout
 #endif
 
 #include "profiling/Instrument.h"
