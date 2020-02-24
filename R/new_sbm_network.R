@@ -68,7 +68,7 @@
 #'   reproducability.
 #'
 #' @return An S3 object of class `sbm_network`. For details see
-#'   \link{new_sbm_network} section "Class structure."
+#'   \code{\link{new_sbm_network}} section "Class structure."
 #' @export
 #'
 #' @examples

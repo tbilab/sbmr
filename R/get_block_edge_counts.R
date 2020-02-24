@@ -4,7 +4,7 @@
 #'
 #' @family modeling
 #'
-#' @seealso \code{\link{get_node_edge_counts}}
+#' @seealso \code{\link{get_node_to_block_edge_counts}}
 #' @inheritParams mcmc_sweep
 #' @inheritParams get_node_to_block_edge_counts
 #'

@@ -6,7 +6,7 @@
 #' @family advanced
 #'
 #' @param sbm `sbm_network` object as created by
-#'   \code{\link{new_sbm_network()}}.
+#'   \code{\link{new_sbm_network}}.
 #' @param id Unique identifying name for node.
 #' @param type Type of node (string). This is used to distinguish multipartite
 #'   networks. E.g. "person", or "publication", etc..

@@ -20,7 +20,7 @@
 #'   draws propensity from `n` evenly spaced values in the 0-1 range.
 #' @param return_edge_propensities If set to `TRUE` the returned list will
 #'   also include the simulated edge propensities dataframe. This can be
-#'   used for recreating draws using \code{\link{sim_sbm_network()}}.
+#'   used for recreating draws using \code{\link{sim_sbm_network}}.
 #' @inheritParams sim_sbm_network
 #'
 #' @seealso \code{\link{sim_sbm_network}} \code{\link{sim_random_network}}

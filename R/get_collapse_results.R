@@ -1,7 +1,7 @@
 #' Get collapse results from model
 #'
 #' Retrieves the dataframe recording the results of running either
-#' \code{\link{collapse_groups()}} or \code{\link{collapse_run()}} on
+#' \code{\link{collapse_groups}} or \code{\link{collapse_run}} on
 #' `sbm_network` object.
 #'
 #' @inheritParams verify_model
