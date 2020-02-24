@@ -36,5 +36,6 @@ Suggests:
     lobstr,
     usethis,
     future,
-    furrr
+    furrr,
+    forcats
 VignetteBuilder: knitr
