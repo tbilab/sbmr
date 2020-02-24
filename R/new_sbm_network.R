@@ -139,8 +139,8 @@
 #' # connect to a.
 #'
 #' edge_types <- dplyr::tribble(~from, ~to,
-#'                                        "a", "b",
-#'                                        "a", "c")
+#'                                "a", "b",
+#'                                "a", "c")
 #' \dontrun{
 #' new_sbm_network(edges = edges_tripartite,
 #'                 nodes = nodes_tripartite,
