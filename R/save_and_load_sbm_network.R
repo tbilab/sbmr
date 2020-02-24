@@ -20,21 +20,21 @@
 #'
 #' loaded_sbm_net <- load_sbm_network(tmp)
 #'
-save_sbm_network <- function(x, loc){
+save_sbm_network <- function(sbm, loc){
   UseMethod("save_sbm_network")
 }
 
-save_sbm_network.default <- function(x){
+save_sbm_network.default <- function(sbm){
   cat("Model saving generic.")
 }
 
 #' @export
-save_sbm_network.sbm_network <- function(x, loc){
+save_sbm_network.sbm_network <- function(sbm, loc){
   # Remove the s4 model object
-  attr(x, 'model') <- NULL
+  attr(sbm, 'model') <- NULL
 
   # Write object to RDS
-  readr::write_rds(x, loc)
+  readr::write_rds(sbm, loc)
 }
 
 #' Load sbm_network object
