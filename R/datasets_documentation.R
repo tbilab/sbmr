@@ -4,8 +4,8 @@
 #' pollination. An outline of the ecology of flowers and insects.", by Clements,
 #' R. E., and F. L. Long.
 #'
-#' From the \href{Interaction Web DataBase
-#' entry:}{https://www.nceas.ucsb.edu/interactionweb/html/clements_1923.html}
+#' From the \href{https://www.nceas.ucsb.edu/interactionweb/html/clements_1923.html}{Interaction Web DataBase
+#' entry:}
 #' "The study took place on Pikes Peak in Colorado, U.S.A., in the early 1920's.
 #' The authors recorded the identities of flower visitors to 94 native and two
 #' exotic plant species."
@@ -21,6 +21,6 @@
 #'   \item{flower}{Scientific name of the flower that the polinator visited}
 #' }
 #'
-#' @source \href{Interaction Web DataBase
-#'   entry:}{https://www.nceas.ucsb.edu/interactionweb/html/clements_1923.html}
+#' @source \href{https://www.nceas.ucsb.edu/interactionweb/html/clements_1923.html}{Interaction Web DataBase
+#' entry:}
 "clements_polinators"
