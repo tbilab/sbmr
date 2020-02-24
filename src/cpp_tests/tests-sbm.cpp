@@ -156,12 +156,6 @@ TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
       if (true_delta != 0)
         all_zeros = false;
 
-      // std::cout << node_to_move->id << ": ("
-      //           << pre_move_group_id << " -> "
-      //           << group_to_move_to->id << "): delta = "
-      //           << std::to_string(differences)
-      //           << std::endl;
-
       // // They should be the same
       const double thresh = 0.1;
       REQUIRE(((differences < thresh) & (differences > -thresh)));
@@ -219,11 +213,7 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
       if (true_delta != 0)
         all_zeros = false;
 
-      // std::cout << node_to_move->id << ": ("
-      //           << pre_move_group_id << " -> "
-      //           << group_to_move_to->id << "): delta = "
-      //           << std::to_string(differences)
-      //           << std::endl;
+  
 
       // // They should be the same
       const double thresh = 0.1;
