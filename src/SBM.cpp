@@ -106,7 +106,7 @@ NodeVec SBM::get_nodes_of_type_at_level(const std::string& type, const int& leve
   PROFILE_FUNCTION();
 
   // Grab desired level reference
-  LevelPtr node_level = nodes.at(level);
+  LevelPtr node_level = get_level(level);
 
   // Make sure level has nodes before looping through it
   if (node_level->size() == 0) {
@@ -193,7 +193,7 @@ void SBM::initialize_blocks(const int level, const int num_blocks)
   get_level(block_level)->clear();
 
   // Grab all the nodes for the desired level
-  LevelPtr node_level = nodes.at(level);
+  LevelPtr node_level = get_level(level);
 
   const int num_nodes_in_level = node_level->size();
 
@@ -255,7 +255,7 @@ NodeVec SBM::clean_empty_blocks()
   // Scan through all levels up to final
   for (int level = 1; level < num_levels; ++level) {
     // Grab desired level
-    LevelPtr block_level = nodes.at(level);
+    LevelPtr block_level = get_level(level);
 
     // Create a vector to store block ids that we want to delete
     std::queue<std::string> blocks_to_delete;
