@@ -627,13 +627,14 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
     // Book keeper variables for this sweeps stats
     int    num_nodes_moved = 0;
     double entropy_delta   = 0;
-    
+
     // Shuffle order order of nodes to be run through for sweep
     std::shuffle(nodes_to_sweep.begin(), nodes_to_sweep.end(), sampler.generator);
 
     // Setup container to track what pairs need to be updated for sweep
     std::set<std::string> pair_moves;
 
+    int steps_taken = 0;
     // Loop through each node
     for (const NodePtr& curr_node : nodes_to_sweep) {
       // Check if we're running sweep with variable block numbers. If we are, we
@@ -691,6 +692,12 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
                                                 pair_moves);
         }
       } // End accepted if statement
+
+      // Check for user breakout every 100 iterations.
+      steps_taken = (steps_taken + 1) % 100;
+      if(steps_taken == 0){
+        ALLOW_USER_BREAKOUT;
+      }
     }   // End current sweep
 
     // Update results for this sweep
@@ -701,6 +708,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
     if (track_pairs) {
       results.block_consensus.update_pair_tracking_map(pair_moves);
     }
+    ALLOW_USER_BREAKOUT; // Let R used break out of loop if need be
   } // End multi-sweep loop
 
   return results;
