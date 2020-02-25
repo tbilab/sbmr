@@ -41,7 +41,7 @@ In this document we will explore how to use the function `mcmc_sweep()` to sampl
 
 First we will generate our simulated network. First we set a seed to make the structure reproducable and then we draw our random network using the `sim_basic_block_network()` function to draw from a network with 3 groups and 40 nodes per group. 
 
-```{r}
+```{r simulate-data}
 set.seed(42)
 
 n_blocks <- 4    # Total number of blocks
@@ -58,7 +58,7 @@ network <- sim_basic_block_network(
 
 First we can make sure our edge propensities look reasonable 
 
-```{r}
+```{r plot-edge-propensities}
 network$edge_propensities %>% 
   ggplot(aes(x = block_1, y = block_2)) +
   geom_tile(aes(fill = propensity)) +
@@ -68,7 +68,7 @@ network$edge_propensities %>%
 
 Next, we can visualize the actual drawn network. 
 
-```{r}
+```{r visualize-raw-network, eval=FALSE}
 visualize_network(network, width = '100%')
 ```
 
@@ -79,13 +79,13 @@ We can see a decent amount of separation with perhaps more cohesion between the 
 
 In an attempt to set our initial chain location to an optimal position we will agglomeratively merge the network using the collapse groups function. This will return a list of results for different model sizes. 
 
-```{r}
+```{r collapse-blocks}
 network <- network %>%
   collapse_blocks(report_all_steps = TRUE, sigma = 1.1)
 ```
 
 
-```{r}
+```{r visualize-collapse-result}
 network %>% 
   visualize_collapse_results(heuristic = 'dev_from_rolling_mean') +
   geom_vline(xintercept = n_blocks, color = 'orangered') +
@@ -97,7 +97,7 @@ So we can use the helper function `choose_best_collapse_state()` to scan through
 
 Right now we will stick with the deviation from rolling mean to choose the best number of blocks. 
 
-```{r}
+```{r choose-best-collapse}
 network <- network %>% 
   choose_best_collapse_state(heuristic = "dev_from_rolling_mean", verbose = TRUE)
 ```
@@ -127,7 +127,7 @@ So we already have an almost perfect separation into the `r n_blocks` blocks. Th
 
 Now that we have our model in a starting place hopefully close to the median of the posterior we can initiate the MCMC sampling. We will start by doing a few sweeps to see if our model shape has stabalized at all. 
 
-```{r}
+```{r sample-from-posterior-low-eps}
 num_sweeps <- 20
 
 network <- network %>%
@@ -147,7 +147,7 @@ So we get almost no movement at all, indicating the model has stuck into a local
 
 We can force it to explore a bit more by upping the epsilon value for the model. 
 
-```{r}
+```{r sample-from-posterior-high-eps}
 num_sweeps <- 20
 
 network <- network %>% 
@@ -174,7 +174,7 @@ This increased epsilon value resulted in one block being split into two smaller 
 
 Let's run 50 sweeps for a few different epsilon values and see how the traces compare. 
 
-```{r}
+```{r compare-eps-values}
 # Function to run n sweeps from a freshly initialized model
 run_sweeps_at_eps <- function(eps, num_sweeps = 50){
   # Refresh sbm to right after collapsing initialization
@@ -204,7 +204,7 @@ The `mcmc_sweep()` method has an option to keep track of how connected each node
 
 First we will run one hundred sweeps for nodes with epsilon set to 0.5. 
 
-```{r}
+```{r full-run-eps-med}
 network <- network %>% 
   choose_best_collapse_state(heuristic = "dev_from_rolling_mean") %>% 
   mcmc_sweep(num_sweeps = 100, eps = 0.5, track_pairs = TRUE)
@@ -212,7 +212,7 @@ network <- network %>%
 
 Then we can look at the supplied `pairing_counts` dataframe to see how often pairwise nodes are connected to eachother. 
 
-```{r}
+```{r visualize-pair-matrix}
 network %>% 
   get_sweep_pair_counts() %>% 
   ggplot(aes(x = node_a, y = node_b, fill = proportion_connected)) +
@@ -233,7 +233,7 @@ Another method to investigate these block concensus results is to look at the EC
 A good behavior indicating there are strong clusters in your data is an ECDF that has a large flat section in the middle, indicating that almost all of your node connection propensities are close to zero or close to one. We can look at this for our mcmc results as well. This functionality is supplied with the function `visualize_propensity_dist()`. 
 
 
-```{r}
+```{r visualize-pair-dist}
 visualize_propensity_dist(network)
 ```
 
@@ -243,7 +243,7 @@ A last way of looking at this is to create a new network from our data. This tim
 
 Let's check our MCMC sweep results with it...
 
-```{r}
+```{r visualize-pair-network, eval = FALSE}
 visualize_propensity_network(network)
 ```
 
