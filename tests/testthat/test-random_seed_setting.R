@@ -1,4 +1,4 @@
-test_that("multiplication works", {
+test_that("Random seeds make reproducable SBMS works", {
 
   seed <- 42
 
