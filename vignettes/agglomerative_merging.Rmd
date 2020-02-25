@@ -188,7 +188,6 @@ state_to_truth_table(network)
 
 
 
-
 So we can see that the merging algorithm perfectly separated our nodes into their true groups. 
 
 
@@ -223,7 +222,7 @@ network %>%
   state_to_truth_table()
 ```
 
-Again we got an almost perfect collapsing into the `n_block` generating blocks. 
+After adding the sweeps we again get a perfect collapsing into the `n_block` generating blocks. 
 
 
 
@@ -406,7 +405,7 @@ Epsilon controls how conservative the model is when generating those proposals. 
 
 ```{r, toggling_epsilon}
 # Get logaritmically spaced epsilon range
-eps_vals <- exp(seq(log(0.1), log(15), length.out = 9))
+eps_vals <- exp(seq(log(0.1), log(15), length.out = 8))
 
 eps_sweep_results <- purrr::map_dfr(
   eps_vals, 

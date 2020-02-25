@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sbmR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.0</span>
       </span>
     </div>
 
@@ -101,7 +101,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/nstrayer/sbmR">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -116,7 +121,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Choose and load best model state from agglomerative collapsing algorithm</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/choose_best_collapse_state.R'><code>R/choose_best_collapse_state.R</code></a></small>
     <div class="hidden name"><code>choose_best_collapse_state.Rd</code></div>
     </div>
 
@@ -137,7 +142,7 @@
     <tr>
       <th>sbm</th>
       <td><p><code>sbm_network</code> object as created by
-<code><a href='new_sbm_network.html'>new_sbm_network()</a></code>.</p></td>
+<code><a href='new_sbm_network.html'>new_sbm_network</a></code>.</p></td>
     </tr>
     <tr>
       <th>use_entropy_value_for_score</th>
@@ -155,14 +160,15 @@ location, or a string labeling algorithm. Currently only <code>"lowest"</code>,
     </tr>
     <tr>
       <th>verbose</th>
-      <td><p>Should model tell you what step was chosen (<code>TRUE</code> or <code>FALSE</code>)?</p></td>
+      <td><p>Should model tell you what step was chosen (<code>TRUE</code> or
+<code>FALSE</code>)?</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An S3 object of class <code>sbm_network</code>. For details see
-<a href='new_sbm_network.html'>new_sbm_network</a> section "Class structure."</p>
+<code><a href='new_sbm_network.html'>new_sbm_network</a></code> section "Class structure."</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>visualize_collapse_results</p>
@@ -183,8 +189,9 @@ location, or a string labeling algorithm. Currently only <code>"lowest"</code>,
   <span class='fu'><a href='collapse_blocks.html'>collapse_blocks</a></span>(<span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>2</span>)
 
 <span class='co'># Choose best result with default heuristic</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>net</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 2 blocks and an entropy of 2224.2576.</div><div class='input'>
-<span class='co'># Score heuristic that fits a nonlinear model to observed values and chooses by largest negative residual</span>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>net</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 2150.6219.</div><div class='input'>
+<span class='co'># Score heuristic that fits a nonlinear model to observed values and chooses by</span>
+<span class='co'># largest negative residual</span>
 <span class='no'>nls_score</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>e</span>, <span class='no'>k</span>){
   <span class='no'>entropy_model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/nls.html'>nls</a></span>(<span class='no'>e</span> ~ <span class='no'>a</span> + <span class='no'>b</span> * <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='no'>k</span>), <span class='kw'>start</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span>(<span class='no'>e</span>), <span class='kw'>b</span> <span class='kw'>=</span> -<span class='fl'>25</span>))
   -<span class='fu'><a href='https://rdrr.io/r/stats/residuals.html'>residuals</a></span>(<span class='no'>entropy_model</span>)
@@ -193,7 +200,7 @@ location, or a string labeling algorithm. Currently only <code>"lowest"</code>,
 <span class='co'># Choose result using custom heuristic function</span>
 <span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>net</span>,
                                      <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='no'>nls_score</span>,
-                                     <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 14 blocks and an entropy of 2050.9563.</div><div class='input'>
+                                     <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 4 blocks and an entropy of 2140.167.</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

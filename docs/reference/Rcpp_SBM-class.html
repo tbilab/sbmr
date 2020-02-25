@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Visualize pairwise propensity distribution — visualize_propensity_dist • sbmR</title>
+<title>SBM C++ class — Rcpp_SBM-class • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,10 +35,12 @@
 
 
 
-<meta property="og:title" content="Visualize pairwise propensity distribution — visualize_propensity_dist" />
-<meta property="og:description" content="Investigate the results of cluster stability from MCMC sweeps. Shows the
-empirical CDF of the pairwise probability/proportion of two nodes residing in
-the same block over the given MCMC sweeps." />
+<meta property="og:title" content="SBM C++ class — Rcpp_SBM-class" />
+<meta property="og:description" content="This is the R reference to the c++ class that implements SBM functionality.
+Almost all interfacing with this methods will be taken care of with the s3
+class sbm_network and thus this should be ignored for the vast majority of
+users. Documentation of all available methods is available in the c++ wrapper
+code using the RCPP module protocol. See loadModule for more info." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -122,61 +124,26 @@ the same block over the given MCMC sweeps." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Visualize pairwise propensity distribution</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/visualize_propensity_dist.R'><code>R/visualize_propensity_dist.R</code></a></small>
-    <div class="hidden name"><code>visualize_propensity_dist.Rd</code></div>
+    <h1>SBM C++ class</h1>
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/sbmR-package.R'><code>R/sbmR-package.R</code></a></small>
+    <div class="hidden name"><code>Rcpp_SBM-class.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Investigate the results of cluster stability from MCMC sweeps. Shows the
-empirical CDF of the pairwise probability/proportion of two nodes residing in
-the same block over the given MCMC sweeps.</p>
+    <p>This is the R reference to the c++ class that implements SBM functionality.
+Almost all interfacing with this methods will be taken care of with the s3
+class <code>sbm_network</code> and thus this should be ignored for the vast majority of
+users. Documentation of all available methods is available in the c++ wrapper
+code using the RCPP module protocol. See <code><a href='https://rdrr.io/pkg/Rcpp/man/loadModule.html'>loadModule</a></code> for more info.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>visualize_propensity_dist</span>(<span class='no'>sbm</span>)</pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>sbm</th>
-      <td><p>Object of class <code>sbm_network</code>.</p></td>
-    </tr>
-    </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>GGplot2 plot containing ECDF of the pairwise propensities of residing in same block for MCMC sweeps.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p><code><a href='mcmc_sweep.html'>sbmR::mcmc_sweep(sbm, track_pairs = TRUE, ...)</a></code> must be run on object before this function.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p>Other visualizations: 
-<code><a href='visualize_collapse_results.html'>visualize_collapse_results</a>()</code>,
-<code><a href='visualize_mcmc_trace.html'>visualize_mcmc_trace</a>()</code>,
-<code><a href='visualize_network.html'>visualize_network</a>()</code>,
-<code><a href='visualize_propensity_network.html'>visualize_propensity_network</a>()</code></p></div>
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='co'># Simulate a model</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>25</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='fl'>3</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='mcmc_sweep.html'>mcmc_sweep</a></span>(<span class='kw'>num_sweeps</span> <span class='kw'>=</span> <span class='fl'>75</span>, <span class='kw'>track_pairs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-
-<span class='co'># Plot results</span>
-<span class='fu'>visualize_propensity_dist</span>(<span class='no'>net</span>)</div><div class='img'><img src='visualize_propensity_dist-1.png' alt='' width='700' height='433' /></div><div class='input'>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#see-also">See also</a></li>
-      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>

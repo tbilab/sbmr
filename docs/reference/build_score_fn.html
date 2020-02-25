@@ -104,7 +104,12 @@ algorithms." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/nstrayer/sbmR">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -119,7 +124,7 @@ algorithms." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Build score function from heuristic</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/build_score_fn.R'><code>R/build_score_fn.R</code></a></small>
     <div class="hidden name"><code>build_score_fn.Rd</code></div>
     </div>
 
@@ -171,18 +176,18 @@ returns a score for partitioning (higher = better)</p>
   -<span class='fu'><a href='https://rdrr.io/r/stats/residuals.html'>residuals</a></span>(<span class='no'>entropy_model</span>)
 }
 
-<span class='fu'>build_score_fn</span>(<span class='no'>nls_score</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1] -1438.4277   289.1629   881.3891  1012.2056   889.3759   606.3158
-#&gt;  [7]   211.0680  -265.4833  -798.8062 -1386.7989
+<span class='fu'>build_score_fn</span>(<span class='no'>nls_score</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1] -1436.2854   286.8878   879.0978  1013.5037   888.4070   607.3817
+#&gt;  [7]   211.9168  -263.7188  -801.3782 -1385.8106
 #&gt; attr(,"label")
 #&gt; [1] "Residuals"</div><div class='input'>
 <span class='co'># Works with functions that take one argument</span>
 <span class='no'>invert_score</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>e</span>) -<span class='no'>e</span>/<span class='fl'>2</span>
-<span class='fu'>build_score_fn</span>(<span class='no'>invert_score</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1] 4899.4258 4400.9109 3900.1237 3400.1221 2900.1414 2400.2768 1899.6855
-#&gt;  [8] 1398.9675  900.8155  399.7438</div><div class='input'>
+<span class='fu'>build_score_fn</span>(<span class='no'>invert_score</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1] 4900.2768 4399.6855 3898.9675 3400.8155 2899.7438 2400.9315 1900.2610
+#&gt;  [8] 1400.0263  899.7285  400.4570</div><div class='input'>
 <span class='co'># Works with predefined strings</span>
-<span class='fu'>build_score_fn</span>(<span class='st'>"dev_from_rolling_mean"</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1]     0.0000  -498.5149 -1000.0596 -1500.0470 -1500.3663 -1499.7783
-#&gt;  [7] -1500.7419 -1501.6006 -1498.2417 -1500.1186</div><div class='input'><span class='fu'>build_score_fn</span>(<span class='st'>"lowest"</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1] 9798.8516 8801.8218 7800.2473 6800.2442 5800.2827 4800.5537 3799.3710
-#&gt;  [8] 2797.9350 1801.6310  799.4876</div><div class='input'>
+<span class='fu'>build_score_fn</span>(<span class='st'>"dev_from_rolling_mean"</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1]     0.0000  -500.5913 -1001.3516 -1498.2417 -1500.1186 -1498.3661
+#&gt;  [7] -1500.3539 -1500.4287 -1501.0167 -1499.3223</div><div class='input'><span class='fu'>build_score_fn</span>(<span class='st'>"lowest"</span>)(<span class='no'>entropy</span>, <span class='no'>num_blocks</span>)</div><div class='output co'>#&gt;  [1] 9800.5537 8799.3710 7797.9350 6801.6310 5799.4876 4801.8630 3800.5220
+#&gt;  [8] 2800.0526 1799.4570  800.9141</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

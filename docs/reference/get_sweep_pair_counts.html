@@ -70,7 +70,7 @@ mcmc_sweep(track_pairs = TRUE) run on the object before." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sbmR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.0</span>
       </span>
     </div>
 
@@ -102,7 +102,12 @@ mcmc_sweep(track_pairs = TRUE) run on the object before." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/nstrayer/sbmR">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -117,23 +122,29 @@ mcmc_sweep(track_pairs = TRUE) run on the object before." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Get pairwise group sharing counts from model</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/get_sweep_pair_counts.R'><code>R/get_sweep_pair_counts.R</code></a></small>
     <div class="hidden name"><code>get_sweep_pair_counts.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>Retrieves the pairwise connection propensity counts from latest MCMC sweep on an <code>sbm_network</code> object. Needs to have
-<code><a href='mcmc_sweep.html'>mcmc_sweep(track_pairs = TRUE)</a></code> run on the object before.</p>
+<code><a href='mcmc_sweep.html'>mcmc_sweep</a></code><code>(track_pairs = TRUE)</code> run on the object before.</p>
     </div>
 
     <pre class="usage"><span class='fu'>get_sweep_pair_counts</span>(<span class='no'>sbm</span>)</pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>sbm</th>
+      <td><p>Object of class <code>sbm_network</code>.</p></td>
+    </tr>
+    </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    
-
-
+    <p>pairwise connection propensity counts from latest MCMC sweep</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other helpers: 
@@ -153,30 +164,27 @@ mcmc_sweep(track_pairs = TRUE) run on the object before." />
 
 <span class='co'># Retrieve the sweep results from network</span>
 <span class='fu'><a href='get_sweep_results.html'>get_sweep_results</a></span>(<span class='no'>net</span>)</div><div class='output co'>#&gt; $nodes_moved
-#&gt;  [1] "g3_2"  "g1_2"  "g2_13" "g2_2"  "g2_6"  "g2_9"  "g3_11" "g2_5"  "g2_8" 
-#&gt; [10] "g2_3"  "g2_7"  "g3_13" "g3_6"  "g1_12" "g3_8"  "g1_14" "g1_1"  "g1_15"
-#&gt; [19] "g2_1"  "g3_7"  "g3_3"  "g3_14" "g2_12" "g2_3"  "g1_2"  "g3_12" "g2_5" 
-#&gt; [28] "g1_12" "g1_7"  "g1_9"  "g3_4"  "g3_8"  "g2_4"  "g1_13" "g3_9"  "g2_13"
-#&gt; [37] "g1_15" "g1_10" "g3_7"  "g2_14" "g1_5"  "g1_11" "g1_14" "g1_1"  "g3_2" 
-#&gt; [46] "g2_8"  "g1_6"  "g1_8"  "g3_11" "g3_10" "g1_6"  "g1_1"  "g1_11" "g2_1" 
-#&gt; [55] "g1_5"  "g1_12" "g2_12" "g2_4"  "g2_13" "g3_6"  "g2_11" "g2_8"  "g1_13"
-#&gt; [64] "g3_3"  "g2_15" "g1_3"  "g3_11" "g3_8"  "g1_9"  "g1_15" "g2_5"  "g2_3" 
-#&gt; [73] "g2_2"  "g2_11" "g2_14" "g1_13" "g2_5"  "g3_3"  "g1_2"  "g1_7"  "g3_2" 
-#&gt; [82] "g2_2"  "g3_5"  "g1_5"  "g1_9"  "g2_4"  "g1_1"  "g3_7"  "g1_12" "g1_8" 
-#&gt; [91] "g3_15"
+#&gt;  [1] "g1_8"  "g2_3"  "g3_9"  "g3_13" "g3_11" "g1_13" "g1_9"  "g3_1"  "g1_2" 
+#&gt; [10] "g3_8"  "g3_3"  "g3_15" "g3_12" "g3_10" "g3_5"  "g1_5"  "g2_14" "g3_6" 
+#&gt; [19] "g2_7"  "g1_2"  "g3_11" "g3_10" "g3_1"  "g2_2"  "g2_7"  "g3_4"  "g2_8" 
+#&gt; [28] "g3_13" "g3_15" "g3_14" "g3_6"  "g3_5"  "g1_7"  "g3_10" "g3_7"  "g2_10"
+#&gt; [37] "g1_2"  "g3_4"  "g2_1"  "g1_3"  "g1_13" "g3_1"  "g3_15" "g1_9"  "g2_14"
+#&gt; [46] "g3_6"  "g1_10" "g3_8"  "g2_13" "g1_7"  "g1_5"  "g3_7"  "g1_15" "g3_5" 
+#&gt; [55] "g3_4"  "g3_13"
 #&gt; 
 #&gt; $sweep_info
 #&gt;   entropy_delta num_nodes_moved
-#&gt; 1    0.72052708              21
-#&gt; 2    0.03176672              29
-#&gt; 3   -2.02793663              23
-#&gt; 4  -15.97594358              18
+#&gt; 1   -11.9101128              19
+#&gt; 2   -23.1109183              14
+#&gt; 3     0.9113516              13
+#&gt; 4     1.7059270              10
 #&gt; </div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
       <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>

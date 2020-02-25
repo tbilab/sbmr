@@ -2,7 +2,6 @@ pandoc: 2.3.1
 pkgdown: 1.4.1
 pkgdown_sha: ~
 articles:
-  _benchmarking: _benchmarking.html
   agglomerative_merging: agglomerative_merging.html
   sampling_from_posterior: sampling_from_posterior.html
 

@@ -103,7 +103,12 @@ each merger step according to the heuristic provided is also shown." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/nstrayer/sbmR">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -118,7 +123,7 @@ each merger step according to the heuristic provided is also shown." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Visualize agglomerative collapse results</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/visualize_collapse_results.R'><code>R/visualize_collapse_results.R</code></a></small>
     <div class="hidden name"><code>visualize_collapse_results.Rd</code></div>
     </div>
 
@@ -138,10 +143,22 @@ each merger step according to the heuristic provided is also shown.</p>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>sbm</th>
+      <td><p>Object of class <code>sbm_network</code>.</p></td>
+    </tr>
+    <tr>
       <th>use_entropy_value_for_score</th>
       <td><p>If set to <code>TRUE</code> then instead of the merge
 results entropy delta being used for the score function the entropy will
 be. Typically the heuristics work better on entropy delta values.</p></td>
+    </tr>
+    <tr>
+      <th>heuristic</th>
+      <td><p>How the best partitioning is defined. Takes either a
+function that takes one/two arguments: an entropy vector and an optional
+number of blocks vector with each element corresponding to a given
+location, or a string labeling algorithm. Currently only <code>"lowest"</code>,
+<code>"dev_from_rolling_mean"</code>, <code>"delta_ratio"</code>, <code>"trend_deviation"</code>, and <code>"nls_residual"</code> are supported.</p></td>
     </tr>
     </table>
 
@@ -151,9 +168,8 @@ be. Typically the heuristics work better on entropy delta values.</p></td>
 the rolling mean</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Either <code>collapse_run</code>, or
-<code><a href='collapse_blocks.html'>collapse_blocks(report_all_steps = TRUE)</a></code> must be run prior to
-calling this function.</p>
+    <p>Either <code><a href='collapse_run.html'>collapse_run</a></code>, or <code><a href='collapse_blocks.html'>collapse_blocks(report_all_steps = TRUE)</a></code> must be run prior to calling this function. (See
+<code><a href='collapse_blocks.html'>collapse_blocks</a></code>.)</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other visualizations: 
