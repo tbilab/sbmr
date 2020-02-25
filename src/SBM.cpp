@@ -46,11 +46,12 @@ NodePtr SBM::get_node_by_id(const std::string& id,
 {
   PROFILE_FUNCTION();
   const auto node_level = get_level(level);
-  const auto node_loc = node_level->find(id);
+  const auto node_loc   = node_level->find(id);
 
-  if(node_loc == node_level->end()){
+  if (node_loc == node_level->end()) {
     RANGE_ERROR("Could not find node " + id + " in network");
-  } else {
+  }
+  else {
     return node_loc->second;
   }
 }
@@ -65,10 +66,10 @@ NodePtr SBM::add_node(const std::string& id,
   PROFILE_FUNCTION();
   // Grab level
   LevelPtr node_level = get_level(level);
-  
+
   const auto assign_result = node_level->emplace(id, std::make_shared<Node>(id, level, type));
 
-  if (!assign_result.second){
+  if (!assign_result.second) {
     LOGIC_ERROR("Tried to insert node that already exists in network");
   }
 
@@ -183,7 +184,7 @@ void SBM::initialize_blocks(const int level, const int num_blocks)
 {
   PROFILE_FUNCTION();
 
-  const int block_level = level + 1;
+  const int      block_level       = level + 1;
   const LevelPtr block_level_nodes = get_level(block_level);
 
   // Clear all previous nodes in block level out
@@ -615,7 +616,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
 
   // Initialize a vector of nodes that will be passed through for a sweep.
   // Grab level map
-  const LevelPtr node_map  = get_level(level);
+  const LevelPtr node_map = get_level(level);
   NodeVec        nodes_to_sweep;
   nodes_to_sweep.reserve(node_map->size());
   for (const auto& node : *node_map) {
@@ -666,7 +667,6 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
       // Make movement decision
       const bool move_accepted = proposal_results.prob_of_accept > sampler.draw_unif();
 
-
       if (verbose) {
         OUT_MSG << proposal_results.entropy_delta << "," << proposal_results.prob_of_accept << ","
                 << move_accepted << std::endl;
@@ -694,10 +694,10 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
 
       // Check for user breakout every 100 iterations.
       steps_taken = (steps_taken + 1) % 100;
-      if(steps_taken == 0){
+      if (steps_taken == 0) {
         ALLOW_USER_BREAKOUT;
       }
-    }   // End current sweep
+    } // End current sweep
 
     // Update results for this sweep
     results.sweep_num_nodes_moved.push_back(num_nodes_moved);
@@ -708,7 +708,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
       results.block_consensus.update_pair_tracking_map(pair_moves);
     }
     ALLOW_USER_BREAKOUT; // Let R used break out of loop if need be
-  } // End multi-sweep loop
+  }                      // End multi-sweep loop
 
   return results;
 }
@@ -951,13 +951,12 @@ Merge_Step SBM::agglomerative_merge(const int&    block_level,
         }
 
         // Calculate entropy delta for move and place this move's results in the queue.
-        best_moves_q.push(std::make_pair(
-            -entropy_delta,
-            std::make_pair(block.second, merge_block)));
+        best_moves_q.push(std::make_pair(-entropy_delta,
+                                         std::make_pair(block.second,
+                                                        merge_block)));
       }
     }
   }
-
 
   // Now we find the top merges...
   // Start by initializing a merge result struct
@@ -1044,17 +1043,8 @@ CollapseResults SBM::collapse_blocks(const int&    node_level,
 
     Merge_Step merge_results;
 
-    // Attempt merge step
-    try {
-      // Perform next best merge and record results
-      merge_results = agglomerative_merge(block_level, num_merges, num_checks_per_block, eps);
-    }
-    catch (...) {
-      WARN_ABOUT("Collapsibility limit of network reached so we break early\n There are currently " + std::to_string(curr_num_blocks) + " blocks left.");
-
-      // We reached the collapsibility limit of our network so we break early
-      break;
-    }
+    // Perform next best merge and record results
+    merge_results = agglomerative_merge(block_level, num_merges, num_checks_per_block, eps);
 
     if (num_mcmc_steps != 0) {
       // Let model equilibriate with new block layout...
@@ -1117,25 +1107,22 @@ CollapseResults SBM::collapse_run(const int&              node_level,
                                   const std::vector<int>& block_nums)
 {
   CollapseResults run_results;
-  for (const int& target_num : block_nums) {
-    try {
-      auto collapse_results = collapse_blocks(node_level,
-                                              num_mcmc_steps,
-                                              target_num,
-                                              num_checks_per_block,
-                                              sigma,
-                                              eps,
-                                              false);
+  run_results.reserve(block_nums.size());
 
-      if (collapse_results.size() < 1) {
-        LOGIC_ERROR("Collapse result has zero entries");
-      }
-      else {
-        run_results.push_back(collapse_results[0]);
-      }
+  for (const int& target_num : block_nums) {
+    auto collapse_results = collapse_blocks(node_level,
+                                            num_mcmc_steps,
+                                            target_num,
+                                            num_checks_per_block,
+                                            sigma,
+                                            eps,
+                                            false);
+
+    if (collapse_results.size() < 1) {
+      LOGIC_ERROR("Collapse result has zero entries");
     }
-    catch (...) {
-      LOGIC_ERROR("Something went wrong in collapse blocks run...");
+    else {
+      run_results.push_back(collapse_results[0]);
     }
   }
   return run_results;
