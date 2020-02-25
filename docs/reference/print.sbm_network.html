@@ -36,7 +36,7 @@
 
 
 <meta property="og:title" content="Print network — print.sbm_network" />
-<meta property="og:description" content="Print network" />
+<meta property="og:description" content="Addition arguments get passed to head() function." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sbmR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.0</span>
       </span>
     </div>
 
@@ -101,7 +101,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/nstrayer/sbmR">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -116,23 +121,29 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Print network</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/print_sbm_network.R'><code>R/print_sbm_network.R</code></a></small>
     <div class="hidden name"><code>print.sbm_network.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Print network</p>
+    <p>Addition arguments get passed to <code><a href='https://rdrr.io/r/utils/head.html'>head()</a></code> function.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for sbm_network</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='kw'>rows_for_preview</span> <span class='kw'>=</span> <span class='fl'>5</span>)</pre>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>Object of class <code>sbm_network</code>.</p></td>
+      <td><p>Object of class <code>sbm_network</code>. (See <code><a href='new_sbm_network.html'>new_sbm_network</a></code>
+for more info.)</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Arguments passed to <code><a href='https://rdrr.io/r/utils/head.html'>head</a></code> that are used to
+control preview of node and edge data frames.</p></td>
     </tr>
     </table>
 
@@ -166,24 +177,26 @@ indication of if a model has been initialized</p>
 <span class='no'>sbm_net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='new_sbm_network.html'>new_sbm_network</a></span>(<span class='no'>small_edges</span>, <span class='kw'>edges_from_col</span> <span class='kw'>=</span> <span class='no'>a_node</span>, <span class='kw'>edges_to_col</span> <span class='kw'>=</span> <span class='no'>b_node</span>)
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>sbm_net</span>)</div><div class='output co'>#&gt; SBM Network with 7 nodes of a single type and 6 edges. 
 #&gt;  
-#&gt; Nodes: <span style='color: #949494;'># A tibble: 5 x 2</span><span>
+#&gt; Nodes: <span style='color: #555555;'># A tibble: 6 x 2</span><span>
 #&gt;   id    type 
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> a1    node 
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> a2    node 
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span> a3    node 
-#&gt; </span><span style='color: #BCBCBC;'>4</span><span> b1    node 
-#&gt; </span><span style='color: #BCBCBC;'>5</span><span> b2    node 
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> a1    node 
+#&gt; </span><span style='color: #555555;'>2</span><span> a2    node 
+#&gt; </span><span style='color: #555555;'>3</span><span> a3    node 
+#&gt; </span><span style='color: #555555;'>4</span><span> b1    node 
+#&gt; </span><span style='color: #555555;'>5</span><span> b2    node 
+#&gt; </span><span style='color: #555555;'>6</span><span> b3    node 
 #&gt; ... 
 #&gt;  
-#&gt; Edges: </span><span style='color: #949494;'># A tibble: 5 x 2</span><span>
+#&gt; Edges: </span><span style='color: #555555;'># A tibble: 6 x 2</span><span>
 #&gt;   a_node b_node
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> 
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> a1     b1    
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> a1     b2    
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span> a1     b3    
-#&gt; </span><span style='color: #BCBCBC;'>4</span><span> a2     b1    
-#&gt; </span><span style='color: #BCBCBC;'>5</span><span> a2     b4    
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> 
+#&gt; </span><span style='color: #555555;'>1</span><span> a1     b1    
+#&gt; </span><span style='color: #555555;'>2</span><span> a1     b2    
+#&gt; </span><span style='color: #555555;'>3</span><span> a1     b3    
+#&gt; </span><span style='color: #555555;'>4</span><span> a2     b1    
+#&gt; </span><span style='color: #555555;'>5</span><span> a2     b4    
+#&gt; </span><span style='color: #555555;'>6</span><span> a3     b1    
 #&gt; ... 
 #&gt;  
 #&gt; Model

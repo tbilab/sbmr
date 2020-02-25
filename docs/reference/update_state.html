@@ -101,7 +101,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/nstrayer/sbmR">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -116,7 +121,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Update SBM model state</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/update_state.R'><code>R/update_state.R</code></a></small>
     <div class="hidden name"><code>update_state.Rd</code></div>
     </div>
 
@@ -130,6 +135,10 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>sbm</th>
+      <td><p>Object of class <code>sbm_network</code>.</p></td>
+    </tr>
+    <tr>
       <th>state_df</th>
       <td><p>A state dataframe with <code>id</code>, <code>parent</code>, <code>level</code>, and <code>type</code> columns for all nodes in network (along with block nodes).</p></td>
     </tr>
@@ -138,7 +147,7 @@
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An S3 object of class <code>sbm_network</code>. For details see
-<a href='new_sbm_network.html'>new_sbm_network</a> section "Class structure."</p>
+<code><a href='new_sbm_network.html'>new_sbm_network</a></code> section "Class structure."</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other advanced: 

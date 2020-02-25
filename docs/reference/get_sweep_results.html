@@ -37,7 +37,7 @@
 
 <meta property="og:title" content="Get mcmc sweep results — get_sweep_results" />
 <meta property="og:description" content="Retrieves the MCMC sweep results from an sbm_network object. Needs to have
-mcmc_sweep() run on the object before." />
+mcmc_sweep run on the object before." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -70,7 +70,7 @@ mcmc_sweep() run on the object before." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sbmR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.0</span>
       </span>
     </div>
 
@@ -102,7 +102,12 @@ mcmc_sweep() run on the object before." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/nstrayer/sbmR">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -117,23 +122,29 @@ mcmc_sweep() run on the object before." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Get mcmc sweep results</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/get_sweep_results.R'><code>R/get_sweep_results.R</code></a></small>
     <div class="hidden name"><code>get_sweep_results.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>Retrieves the MCMC sweep results from an <code>sbm_network</code> object. Needs to have
-<code><a href='mcmc_sweep.html'>mcmc_sweep()</a></code> run on the object before.</p>
+<code><a href='mcmc_sweep.html'>mcmc_sweep</a></code> run on the object before.</p>
     </div>
 
     <pre class="usage"><span class='fu'>get_sweep_results</span>(<span class='no'>sbm</span>)</pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>sbm</th>
+      <td><p>Object of class <code>sbm_network</code>.</p></td>
+    </tr>
+    </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    
-
-
+    <p>MCMC sweep results from an <code>sbm_network</code> object</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other helpers: 
@@ -153,30 +164,30 @@ mcmc_sweep() run on the object before." />
 
 <span class='co'># Retrieve the sweep results from network</span>
 <span class='fu'>get_sweep_results</span>(<span class='no'>net</span>)</div><div class='output co'>#&gt; $nodes_moved
-#&gt;  [1] "g1_3"  "g2_4"  "g2_2"  "g3_1"  "g1_13" "g1_5"  "g2_6"  "g2_9"  "g3_15"
-#&gt; [10] "g3_11" "g3_5"  "g3_10" "g2_5"  "g1_10" "g2_8"  "g2_3"  "g1_9"  "g3_13"
-#&gt; [19] "g1_12" "g3_8"  "g2_10" "g2_15" "g1_14" "g1_11" "g2_14" "g1_15" "g2_1" 
-#&gt; [28] "g3_7"  "g3_3"  "g3_6"  "g2_11" "g3_4"  "g3_15" "g2_14" "g1_6"  "g1_7" 
-#&gt; [37] "g3_10" "g1_14" "g1_3"  "g1_1"  "g3_11" "g3_8"  "g1_11" "g3_3"  "g3_14"
-#&gt; [46] "g1_9"  "g3_13" "g1_13" "g2_6"  "g2_2"  "g3_7"  "g2_9"  "g1_11" "g3_6" 
-#&gt; [55] "g2_3"  "g1_8"  "g3_8"  "g3_3"  "g2_12" "g1_5"  "g2_10" "g1_12" "g3_10"
-#&gt; [64] "g1_7"  "g2_8"  "g1_2"  "g3_5"  "g2_7"  "g1_10" "g3_5"  "g3_11" "g3_9" 
-#&gt; [73] "g1_3"  "g3_4"  "g1_4"  "g1_9"  "g1_1"  "g2_3"  "g3_7"  "g1_11" "g1_6" 
-#&gt; [82] "g3_8"  "g2_8"  "g3_2"  "g1_14" "g3_12" "g2_11" "g3_14" "g2_4"  "g2_13"
-#&gt; [91] "g2_9"  "g3_10"
+#&gt;  [1] "g1_10" "g2_11" "g2_1"  "g2_13" "g3_3"  "g1_14" "g2_2"  "g1_12" "g3_12"
+#&gt; [10] "g1_8"  "g2_14" "g3_8"  "g2_8"  "g1_2"  "g1_4"  "g3_1"  "g2_15" "g1_1" 
+#&gt; [19] "g2_4"  "g3_2"  "g1_5"  "g1_15" "g1_15" "g2_15" "g1_7"  "g2_5"  "g1_1" 
+#&gt; [28] "g2_12" "g2_1"  "g2_3"  "g2_14" "g3_7"  "g2_10" "g3_2"  "g3_3"  "g1_8" 
+#&gt; [37] "g1_2"  "g1_4"  "g3_5"  "g1_6"  "g1_13" "g1_3"  "g1_9"  "g3_6"  "g2_11"
+#&gt; [46] "g3_9"  "g2_4"  "g3_9"  "g3_4"  "g3_1"  "g1_9"  "g2_13" "g3_5"  "g1_15"
+#&gt; [55] "g1_3"  "g3_7"  "g1_1"  "g2_14" "g2_4"  "g2_8"  "g2_10" "g2_11" "g1_4" 
+#&gt; [64] "g3_11" "g2_3"  "g2_12" "g2_7"  "g1_15" "g1_4"  "g3_7"  "g2_5"  "g1_5" 
+#&gt; [73] "g3_5"  "g1_12" "g1_11" "g3_4"  "g3_2"  "g3_6"  "g1_2"  "g2_13" "g1_1" 
+#&gt; [82] "g1_8" 
 #&gt; 
 #&gt; $sweep_info
 #&gt;   entropy_delta num_nodes_moved
-#&gt; 1    -1.3235111              29
-#&gt; 2    -0.7921142              19
-#&gt; 3     0.2600722              20
-#&gt; 4     0.4568198              24
+#&gt; 1    -1.1917674              22
+#&gt; 2    -4.9070218              25
+#&gt; 3    -0.7144661              18
+#&gt; 4     1.3216878              17
 #&gt; </div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
       <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>

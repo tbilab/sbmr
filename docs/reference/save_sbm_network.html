@@ -101,7 +101,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/nstrayer/sbmR">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -116,7 +121,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Save sbm_network object</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/save_and_load_sbm_network.R'><code>R/save_and_load_sbm_network.R</code></a></small>
     <div class="hidden name"><code>save_sbm_network.Rd</code></div>
     </div>
 
@@ -124,13 +129,13 @@
     <p>Saves an SBM Network object to local disk for use accross sessions without instantiating again. Opened with <code><a href='load_sbm_network.html'>load_sbm_network</a></code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>save_sbm_network</span>(<span class='no'>x</span>, <span class='no'>loc</span>)</pre>
+    <pre class="usage"><span class='fu'>save_sbm_network</span>(<span class='no'>sbm</span>, <span class='no'>loc</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
+      <th>sbm</th>
       <td><p>Object of class <code>sbm_network</code>.</p></td>
     </tr>
     <tr>
@@ -157,8 +162,7 @@
 <span class='no'>temp</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span>()
 <span class='fu'>save_sbm_network</span>(<span class='no'>sbm_net</span>, <span class='no'>temp</span>)
 
-<span class='no'>loaded_sbm_net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_sbm_network.html'>load_sbm_network</a></span>(<span class='no'>tmp</span>)</div><div class='output co'>#&gt; <span class='error'>Error in readRDS(path): object 'tmp' not found</span></div><div class='input'>
-</div></pre>
+<span class='no'>loaded_sbm_net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='load_sbm_network.html'>load_sbm_network</a></span>(<span class='no'>temp</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

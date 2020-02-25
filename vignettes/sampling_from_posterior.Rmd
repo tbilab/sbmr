@@ -42,7 +42,7 @@ In this document we will explore how to use the function `mcmc_sweep()` to sampl
 First we will generate our simulated network. First we set a seed to make the structure reproducable and then we draw our random network using the `sim_basic_block_network()` function to draw from a network with 3 groups and 40 nodes per group. 
 
 ```{r}
-set.seed(312)
+set.seed(42)
 
 n_blocks <- 4    # Total number of blocks
 block_size <- 50 # How many nodes in each block
@@ -51,7 +51,7 @@ network <- sim_basic_block_network(
   n_blocks = n_blocks,     
   n_nodes_per_block = block_size,  
   return_edge_propensities = TRUE,
-  random_seed = 312
+  random_seed = 42
 )
 ```
 
@@ -120,7 +120,7 @@ true_to_inferred_table <- function(network){
 true_to_inferred_table(network)
 ```
 
-So we already have a perfect separation into the `r n_blocks` blocks. This should be a good starting place for our sampling.
+So we already have an almost perfect separation into the `r n_blocks` blocks. This should be a good starting place for our sampling.
 
 
 ## Sampling from the posterior
@@ -168,7 +168,7 @@ network %>%
 true_to_inferred_table(network)
 ```
 
-This increased epsilon value resulted mostly in some small groups being split of of the larger ones. A thing to note however, even though we have more groups than we should, never have an infered group that spans more than a single true group. 
+This increased epsilon value resulted in one block being split into two smaller ones. A thing to note however, even though we have more groups than we should, never have an infered group that spans more than a single true group. 
 
 ### Comparing different epsilons
 

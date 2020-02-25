@@ -71,7 +71,7 @@ block." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sbmR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.0</span>
       </span>
     </div>
 
@@ -103,7 +103,12 @@ block." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/nstrayer/sbmR">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -118,7 +123,7 @@ block." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Get node's edge counts to blocks</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/get_node_to_block_edge_counts.R'><code>R/get_node_to_block_edge_counts.R</code></a></small>
     <div class="hidden name"><code>get_node_to_block_edge_counts.Rd</code></div>
     </div>
 
@@ -136,7 +141,7 @@ block.</p>
     <tr>
       <th>sbm</th>
       <td><p><code>sbm_network</code> object as created by
-<code><a href='new_sbm_network.html'>new_sbm_network()</a></code>.</p></td>
+<code><a href='new_sbm_network.html'>new_sbm_network</a></code>.</p></td>
     </tr>
     <tr>
       <th>node_id</th>
@@ -170,9 +175,9 @@ block.</p>
 <span class='co'># Get a random node's edge counts to blocks</span>
 <span class='no'>node_id</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='no'>net</span>$<span class='no'>nodes</span>$<span class='no'>id</span>, <span class='fl'>1</span>)
 <span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'>get_node_to_block_edge_counts</span>(<span class='no'>node_id</span>, <span class='kw'>connection_level</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt;         id count
-#&gt; 1 node-1_0     6
-#&gt; 2 node-1_1     4
-#&gt; 3 node-1_2     9</div><div class='input'>
+#&gt; 1 node-1_0     7
+#&gt; 2 node-1_1     7
+#&gt; 3 node-1_2     5</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
