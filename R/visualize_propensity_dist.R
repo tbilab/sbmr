@@ -48,3 +48,5 @@ visualize_propensity_dist.sbm_network <- function(sbm){
     )
 }
 
+utils::globalVariables(c("proportion_connected"))
+

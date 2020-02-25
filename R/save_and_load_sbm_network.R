@@ -18,23 +18,23 @@
 #' temp <- tempfile()
 #' save_sbm_network(sbm_net, temp)
 #'
-#' loaded_sbm_net <- load_sbm_network(tmp)
+#' loaded_sbm_net <- load_sbm_network(temp)
 #'
-save_sbm_network <- function(x, loc){
+save_sbm_network <- function(sbm, loc){
   UseMethod("save_sbm_network")
 }
 
-save_sbm_network.default <- function(x){
+save_sbm_network.default <- function(sbm){
   cat("Model saving generic.")
 }
 
 #' @export
-save_sbm_network.sbm_network <- function(x, loc){
+save_sbm_network.sbm_network <- function(sbm, loc){
   # Remove the s4 model object
-  attr(x, 'model') <- NULL
+  attr(sbm, 'model') <- NULL
 
   # Write object to RDS
-  readr::write_rds(x, loc)
+  readr::write_rds(sbm, loc)
 }
 
 #' Load sbm_network object
@@ -48,19 +48,11 @@ save_sbm_network.sbm_network <- function(x, loc){
 #' @return New `sbm_network` object copy in same state as when model was saved.
 #' @export
 #'
-#' @examples
-#'
-#' network <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 40)
-#'
-#' sbm_net <- new_sbm_network(edges = network$edges, nodes = network$nodes)
-#'
-#' temp <- tempfile()
-#' save_sbm_network(sbm_net, temp)
-#'
-#' loaded_sbm_net <- load_sbm_network(tmp)
+#' @inherit save_sbm_network examples
 #'
 load_sbm_network <- function(loc){
   x <- readr::read_rds(loc)
 
+  # Restart rcpp model object
   verify_model(x)
 }

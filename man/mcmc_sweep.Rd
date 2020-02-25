@@ -11,13 +11,12 @@ mcmc_sweep(
   variable_num_blocks = TRUE,
   track_pairs = FALSE,
   level = 0,
-  verbose = FALSE,
-  return_sbm_network = TRUE
+  verbose = FALSE
 )
 }
 \arguments{
 \item{sbm}{\code{sbm_network} object as created by
-\code{\link{new_sbm_network()}}.}
+\code{\link{new_sbm_network}}.}
 
 \item{num_sweeps}{Number of times all nodes are passed through for move
 proposals.}
@@ -41,7 +40,7 @@ move were accepted printed to the console.}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
-\link{new_sbm_network} section "Class structure."
+\code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
 Runs a single Metropolis Hastings MCMC sweep across all nodes at specified

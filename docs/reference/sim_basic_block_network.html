@@ -74,7 +74,7 @@ average of a 50% chance of edge." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sbmR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.0</span>
       </span>
     </div>
 
@@ -106,7 +106,12 @@ average of a 50% chance of edge." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/nstrayer/sbmR">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -121,7 +126,7 @@ average of a 50% chance of edge." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Simulate stochastic block model of given number of blocks</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/sim_basic_block_network.R'><code>R/sim_basic_block_network.R</code></a></small>
     <div class="hidden name"><code>sim_basic_block_network.Rd</code></div>
     </div>
 
@@ -137,13 +142,14 @@ average of a 50% chance of edge.</p>
     <pre class="usage"><span class='fu'>sim_basic_block_network</span>(
   <span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>2</span>,
   <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>propensity_drawer</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>n</span>) {     <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span>(<span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>5</span>), <span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span>(<span class='fl'>1</span>, <span class='fl'>5</span>, <span class='fl'>1</span>),
-    <span class='kw'>length.out</span> <span class='kw'>=</span> <span class='no'>n</span>)) },
+  <span class='kw'>propensity_drawer</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>n</span>) {     <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span>(<span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>5</span>),
+    <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span>(<span class='fl'>1</span>, <span class='fl'>5</span>, <span class='fl'>1</span>), <span class='kw'>length.out</span> <span class='kw'>=</span> <span class='no'>n</span>)) },
   <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='no'><a href='https://purrr.tidyverse.org/reference/rbernoulli.html'>rbernoulli</a></span>,
   <span class='kw'>allow_self_edges</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>keep_edge_counts</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>return_edge_propensities</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>setup_model</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>setup_model</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>random_seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -188,19 +194,26 @@ want to set this to <code>TRUE</code>.</p></td>
       <th>return_edge_propensities</th>
       <td><p>If set to <code>TRUE</code> the returned list will
 also include the simulated edge propensities dataframe. This can be
-used for recreating draws using <code><a href='sim_sbm_network.html'>sim_sbm_network()</a></code>.</p></td>
+used for recreating draws using <code><a href='sim_sbm_network.html'>sim_sbm_network</a></code>.</p></td>
     </tr>
     <tr>
       <th>setup_model</th>
       <td><p>Should an SBM model object be added? Set to <code>FALSE</code> if
 network is just being visualized or described.</p></td>
     </tr>
+    <tr>
+      <th>random_seed</th>
+      <td><p>Integer seed to be passed to model's internal random
+sampling engine. Note that if the model is restored from a saved state this
+seed will be initialized again to the start value which will harm
+reproducability.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An S3 object of class <code>sbm_network</code>. For details see
-<a href='new_sbm_network.html'>new_sbm_network</a> section "Class structure."</p>
+<code><a href='new_sbm_network.html'>new_sbm_network</a></code> section "Class structure."</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>If <code>return_edge_propensities == TRUE</code>: an <code>$edge_propensities</code> slot is added
@@ -217,7 +230,7 @@ randomly drawn edge propensities between blocks.</p>
     <pre class="examples"><div class='input'>
 <span class='fu'>sim_basic_block_network</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>40</span>)</div><div class='output co'>#&gt; SBM Network with 160 nodes of a single type and 9902 edges. 
 #&gt;  
-#&gt; Nodes: <span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt; Nodes: <span style='color: #555555;'># A tibble: 6 x 3</span><span>
 #&gt;   id    block type 
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1    node 
@@ -225,9 +238,10 @@ randomly drawn edge propensities between blocks.</p>
 #&gt; </span><span style='color: #555555;'>3</span><span> g1_3  g1    node 
 #&gt; </span><span style='color: #555555;'>4</span><span> g1_4  g1    node 
 #&gt; </span><span style='color: #555555;'>5</span><span> g1_5  g1    node 
+#&gt; </span><span style='color: #555555;'>6</span><span> g1_6  g1    node 
 #&gt; ... 
 #&gt;  
-#&gt; Edges: </span><span style='color: #555555;'># A tibble: 5 x 2</span><span>
+#&gt; Edges: </span><span style='color: #555555;'># A tibble: 6 x 2</span><span>
 #&gt;   from  to   
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1_3 
@@ -235,11 +249,12 @@ randomly drawn edge propensities between blocks.</p>
 #&gt; </span><span style='color: #555555;'>3</span><span> g1_1  g1_7 
 #&gt; </span><span style='color: #555555;'>4</span><span> g1_1  g1_8 
 #&gt; </span><span style='color: #555555;'>5</span><span> g1_1  g1_9 
+#&gt; </span><span style='color: #555555;'>6</span><span> g1_1  g1_10
 #&gt; ... 
 #&gt;  </div><div class='input'>
 <span class='fu'>sim_basic_block_network</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>8</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>20</span>)</div><div class='output co'>#&gt; SBM Network with 160 nodes of a single type and 4092 edges. 
 #&gt;  
-#&gt; Nodes: </span><span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt; Nodes: </span><span style='color: #555555;'># A tibble: 6 x 3</span><span>
 #&gt;   id    block type 
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1    node 
@@ -247,9 +262,10 @@ randomly drawn edge propensities between blocks.</p>
 #&gt; </span><span style='color: #555555;'>3</span><span> g1_3  g1    node 
 #&gt; </span><span style='color: #555555;'>4</span><span> g1_4  g1    node 
 #&gt; </span><span style='color: #555555;'>5</span><span> g1_5  g1    node 
+#&gt; </span><span style='color: #555555;'>6</span><span> g1_6  g1    node 
 #&gt; ... 
 #&gt;  
-#&gt; Edges: </span><span style='color: #555555;'># A tibble: 5 x 2</span><span>
+#&gt; Edges: </span><span style='color: #555555;'># A tibble: 6 x 2</span><span>
 #&gt;   from  to   
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1_3 
@@ -257,10 +273,13 @@ randomly drawn edge propensities between blocks.</p>
 #&gt; </span><span style='color: #555555;'>3</span><span> g1_1  g1_5 
 #&gt; </span><span style='color: #555555;'>4</span><span> g1_1  g1_6 
 #&gt; </span><span style='color: #555555;'>5</span><span> g1_1  g1_7 
+#&gt; </span><span style='color: #555555;'>6</span><span> g1_1  g1_9 
 #&gt; ... 
 #&gt;  </div><div class='input'>
 <span class='co'># Can save the generating edge propensities as well</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'>sim_basic_block_network</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>return_edge_propensities</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'>sim_basic_block_network</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>,
+                               <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>20</span>,
+                               <span class='kw'>return_edge_propensities</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 <span class='no'>net</span>$<span class='no'>edge_propensities</span></div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 10 x 3</span><span>
 #&gt;    block_1 block_2 propensity
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>

@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sbmR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.0</span>
       </span>
     </div>
 
@@ -62,7 +62,14 @@
   </ul>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/nstrayer/sbmR">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -78,7 +85,7 @@
       <h1>Agglomerative Merging</h1>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/nstrayer/sbmR/blob/master/vignettes/agglomerative_merging.Rmd"><code>vignettes/agglomerative_merging.Rmd</code></a></small>
       <div class="hidden name"><code>agglomerative_merging.Rmd</code></div>
 
     </div>
@@ -93,7 +100,10 @@
 <a href="#setup" class="anchor"></a>Setup</h2>
 <p>First we load the <code>sbmR</code> package along with the <code>tidyverse</code> package.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(sbmR)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(tidyverse)</a></code></pre></div>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(tidyr)</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(purrr)</a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(ggplot2)</a></code></pre></div>
 <div id="data" class="section level3">
 <h3 class="hasAnchor">
 <a href="#data" class="anchor"></a>Data</h3>
@@ -106,12 +116,13 @@
 <a class="sourceLine" id="cb2-6" data-line-number="6">network &lt;-<span class="st"> </span><span class="kw"><a href="../reference/sim_basic_block_network.html">sim_basic_block_network</a></span>(</a>
 <a class="sourceLine" id="cb2-7" data-line-number="7">  <span class="dt">n_blocks =</span> n_blocks,     </a>
 <a class="sourceLine" id="cb2-8" data-line-number="8">  <span class="dt">n_nodes_per_block =</span> group_size,  </a>
-<a class="sourceLine" id="cb2-9" data-line-number="9">  <span class="dt">return_edge_propensities =</span> <span class="ot">TRUE</span></a>
-<a class="sourceLine" id="cb2-10" data-line-number="10">)</a></code></pre></div>
+<a class="sourceLine" id="cb2-9" data-line-number="9">  <span class="dt">return_edge_propensities =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb2-10" data-line-number="10">  <span class="dt">random_seed =</span> <span class="dv">42</span> <span class="co"># This is the internal model seed (not same as set.seed())</span></a>
+<a class="sourceLine" id="cb2-11" data-line-number="11">)</a></code></pre></div>
 <p>We can investigate the simulated network’s true block structure by visualizing the edge propensities between the groups.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">network<span class="op">$</span>edge_propensities <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> block_<span class="dv">1</span>, <span class="dt">y =</span> block_<span class="dv">2</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_tile</span>(<span class="kw">aes</span>(<span class="dt">fill =</span> propensity))</a></code></pre></div>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="dt">x =</span> block_<span class="dv">1</span>, <span class="dt">y =</span> block_<span class="dv">2</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/geom_tile.html">geom_tile</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="dt">fill =</span> propensity))</a></code></pre></div>
 <p><img src="agglomerative_merging_files/figure-html/visualize_propensities-1.png" width="576"></p>
 <p>We can also visualise the simulated data directly using the <code><a href="../reference/visualize_network.html">visualize_network()</a></code> function.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="../reference/visualize_network.html">visualize_network</a></span>(network)</a></code></pre></div>
@@ -151,12 +162,12 @@
 <a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; # A tibble: 6 x 4</span></a>
 <a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt;   entropy entropy_delta num_blocks state             </span></a>
 <a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt;     &lt;dbl&gt;         &lt;dbl&gt;      &lt;int&gt; &lt;list&gt;            </span></a>
-<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt; 1   3567.          12.3        119 &lt;df[,4] [358 × 4]&gt;</span></a>
-<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; 2   3578.          10.9        118 &lt;df[,4] [356 × 4]&gt;</span></a>
-<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt; 3   3593.          15.0        117 &lt;df[,4] [354 × 4]&gt;</span></a>
-<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; 4   3608.          14.5        116 &lt;df[,4] [352 × 4]&gt;</span></a>
-<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt; 5   3623.          14.9        115 &lt;df[,4] [350 × 4]&gt;</span></a>
-<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt; 6   3638.          15.1        114 &lt;df[,4] [348 × 4]&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt; 1   3568.          13.1        119 &lt;df[,4] [358 × 4]&gt;</span></a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; 2   3582.          14.1        118 &lt;df[,4] [356 × 4]&gt;</span></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt; 3   3596.          13.6        117 &lt;df[,4] [354 × 4]&gt;</span></a>
+<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; 4   3609.          13.1        116 &lt;df[,4] [352 × 4]&gt;</span></a>
+<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt; 5   3625.          15.9        115 &lt;df[,4] [350 × 4]&gt;</span></a>
+<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt; 6   3639.          14.4        114 &lt;df[,4] [348 × 4]&gt;</span></a></code></pre></div>
 <p>The results of the collapse function are a column with entropy of the model at a given state, entropy delta caused by that move, and the number of groups in the model at that state. We can plot these using the included <code><a href="../reference/visualize_collapse_results.html">visualize_collapse_results()</a></code> function to check for patterns.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="../reference/visualize_collapse_results.html">visualize_collapse_results</a></span>(network)</a></code></pre></div>
 <p><img src="agglomerative_merging_files/figure-html/plot_default_collapse-1.png" width="576"></p>
@@ -172,13 +183,13 @@
 <h4 class="hasAnchor">
 <a href="#visualizing-collapse-results-scores" class="anchor"></a>Visualizing Collapse Results Scores</h4>
 <p>We can check out what a given heuristic looks like on our data by simply telling the <code><a href="../reference/visualize_collapse_results.html">visualize_collapse_results()</a></code> function which one we want.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">axis_limits &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/graphics/plot.window.html">xlim</a></span>(<span class="dv">0</span>,<span class="dv">20</span>)</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">true_num_clusters_line &lt;-<span class="st"> </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> n_blocks, <span class="dt">color =</span> <span class="st">'orangered'</span>)</a>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">axis_limits &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/lims.html">xlim</a></span>(<span class="dv">0</span>,<span class="dv">20</span>)</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">true_num_clusters_line &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/geom_abline.html">geom_vline</a></span>(<span class="dt">xintercept =</span> n_blocks, <span class="dt">color =</span> <span class="st">'orangered'</span>)</a>
 <a class="sourceLine" id="cb7-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb7-4" data-line-number="4"><span class="kw"><a href="../reference/visualize_collapse_results.html">visualize_collapse_results</a></span>(network, <span class="dt">heuristic =</span> <span class="st">"delta_ratio"</span>) <span class="op">+</span></a>
 <a class="sourceLine" id="cb7-5" data-line-number="5"><span class="st">  </span>axis_limits <span class="op">+</span></a>
 <a class="sourceLine" id="cb7-6" data-line-number="6"><span class="st">  </span>true_num_clusters_line <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"Delta ratio heuristic score"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ggtitle</a></span>(<span class="st">"Delta ratio heuristic score"</span>)</a></code></pre></div>
 <p><img src="agglomerative_merging_files/figure-html/unnamed-chunk-3-1.png" width="576"></p>
 <p>So we see that the true number of clusters corresponds to the highest heuristic score, we can use this to automatically select our best grouping. First let’s look at the other heuristic options.</p>
 <p><strong>Non-linear least-squares residual</strong></p>
@@ -186,13 +197,13 @@
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="../reference/visualize_collapse_results.html">visualize_collapse_results</a></span>(network, <span class="dt">heuristic =</span> <span class="st">"nls_residual"</span>) <span class="op">+</span></a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"><span class="st">  </span>axis_limits <span class="op">+</span></a>
 <a class="sourceLine" id="cb8-3" data-line-number="3"><span class="st">  </span>true_num_clusters_line <span class="op">+</span></a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"NLS residual heuristic score"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ggtitle</a></span>(<span class="st">"NLS residual heuristic score"</span>)</a></code></pre></div>
 <p><img src="agglomerative_merging_files/figure-html/unnamed-chunk-4-1.png" width="576"></p>
 <p><strong>Deviation from rolling mean</strong></p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="../reference/visualize_collapse_results.html">visualize_collapse_results</a></span>(network, <span class="dt">heuristic =</span> <span class="st">"dev_from_rolling_mean"</span>) <span class="op">+</span></a>
 <a class="sourceLine" id="cb9-2" data-line-number="2"><span class="st">  </span>axis_limits <span class="op">+</span></a>
 <a class="sourceLine" id="cb9-3" data-line-number="3"><span class="st">  </span>true_num_clusters_line <span class="op">+</span></a>
-<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"Deviation from rolling mean"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ggtitle</a></span>(<span class="st">"Deviation from rolling mean"</span>)</a></code></pre></div>
 <p><img src="agglomerative_merging_files/figure-html/unnamed-chunk-5-1.png" width="576"></p>
 <p>The deviation from the rolling mean function works similar to the NLS fit but uses a non-parametric smoother in a windowed mean that averages the last three values.</p>
 </div>
@@ -202,7 +213,7 @@
 <p>The function <code><a href="../reference/choose_best_collapse_state.html">choose_best_collapse_state()</a></code> will take a collapse results object and your model and use your heuristic of choice to find the best partitioning and then set the model to that. The same heuristics work for the <code><a href="../reference/visualize_collapse_results.html">visualize_collapse_results()</a></code> and <code><a href="../reference/choose_best_collapse_state.html">choose_best_collapse_state()</a></code> functions. Lets choose our results using the deviation from rolling mean hueristic…</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">network &lt;-<span class="st"> </span>network <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb10-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/choose_best_collapse_state.html">choose_best_collapse_state</a></span>(<span class="dt">heuristic =</span> <span class="st">"delta_ratio"</span>, <span class="dt">verbose =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="co">#&gt; Choosing collapse with 3 blocks and an entropy of 5430.7706.</span></a></code></pre></div>
+<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="co">#&gt; Choosing collapse with 3 blocks and an entropy of 5423.9858.</span></a></code></pre></div>
 <p>So, as expected, the chosen best fit is the correct <code>n_blocks</code> blocks.</p>
 </div>
 </div>
@@ -211,21 +222,21 @@
 <a href="#investigating-results" class="anchor"></a>Investigating Results</h3>
 <p>Since we have the true groups for our nodes we can check to see how well the merging did. To do that we just need to merge our results and the raw network data and look at the contingency table of truth to inferred groups.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">state_to_truth_table &lt;-<span class="st"> </span><span class="cf">function</span>(net){</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2">  <span class="kw">right_join</span>(<span class="kw"><a href="../reference/get_state.html">get_state</a></span>(net),</a>
+<a class="sourceLine" id="cb11-2" data-line-number="2">  <span class="kw"><a href="https://rdrr.io/pkg/dplyr/man/join.html">right_join</a></span>(<span class="kw"><a href="../reference/get_state.html">get_state</a></span>(net),</a>
 <a class="sourceLine" id="cb11-3" data-line-number="3">             net<span class="op">$</span>nodes,</a>
 <a class="sourceLine" id="cb11-4" data-line-number="4">             <span class="dt">by =</span> <span class="st">'id'</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb11-5" data-line-number="5"><span class="st">    </span><span class="kw"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span>(level <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="st">    </span><span class="kw">rename</span>(<span class="dt">inferred =</span> parent) <span class="op">%&gt;%</span><span class="st"> </span>{</a>
+<a class="sourceLine" id="cb11-5" data-line-number="5"><span class="st">    </span><span class="kw"><a href="https://rdrr.io/pkg/dplyr/man/filter.html">filter</a></span>(level <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="st">    </span><span class="kw"><a href="https://rdrr.io/pkg/dplyr/man/select.html">rename</a></span>(<span class="dt">inferred =</span> parent) <span class="op">%&gt;%</span><span class="st"> </span>{</a>
 <a class="sourceLine" id="cb11-7" data-line-number="7">      <span class="kw"><a href="https://rdrr.io/r/base/table.html">table</a></span>(.<span class="op">$</span>inferred, .<span class="op">$</span>block)</a>
 <a class="sourceLine" id="cb11-8" data-line-number="8">    }</a>
 <a class="sourceLine" id="cb11-9" data-line-number="9">}</a>
 <a class="sourceLine" id="cb11-10" data-line-number="10"></a>
 <a class="sourceLine" id="cb11-11" data-line-number="11"><span class="kw">state_to_truth_table</span>(network)</a>
-<a class="sourceLine" id="cb11-12" data-line-number="12"><span class="co">#&gt;          </span></a>
-<a class="sourceLine" id="cb11-13" data-line-number="13"><span class="co">#&gt;           g1 g2 g3</span></a>
-<a class="sourceLine" id="cb11-14" data-line-number="14"><span class="co">#&gt;   0-1_118  0  0 40</span></a>
-<a class="sourceLine" id="cb11-15" data-line-number="15"><span class="co">#&gt;   0-1_50   0 40  0</span></a>
-<a class="sourceLine" id="cb11-16" data-line-number="16"><span class="co">#&gt;   0-1_6   40  0  0</span></a></code></pre></div>
+<a class="sourceLine" id="cb11-12" data-line-number="12"><span class="co">#&gt;            </span></a>
+<a class="sourceLine" id="cb11-13" data-line-number="13"><span class="co">#&gt;             g1 g2 g3</span></a>
+<a class="sourceLine" id="cb11-14" data-line-number="14"><span class="co">#&gt;   node-1_31 40  0  0</span></a>
+<a class="sourceLine" id="cb11-15" data-line-number="15"><span class="co">#&gt;   node-1_70  0 40  0</span></a>
+<a class="sourceLine" id="cb11-16" data-line-number="16"><span class="co">#&gt;   node-1_90  0  0 40</span></a></code></pre></div>
 <p>So we can see that the merging algorithm perfectly separated our nodes into their true groups.</p>
 </div>
 <div id="allowing-for-node-shuffling" class="section level3">
@@ -243,19 +254,19 @@
 <a class="sourceLine" id="cb12-6" data-line-number="6"><span class="kw"><a href="../reference/visualize_collapse_results.html">visualize_collapse_results</a></span>(network, <span class="dt">heuristic =</span> <span class="st">'dev_from_rolling_mean'</span>) <span class="op">+</span></a>
 <a class="sourceLine" id="cb12-7" data-line-number="7"><span class="st">  </span>axis_limits <span class="op">+</span></a>
 <a class="sourceLine" id="cb12-8" data-line-number="8"><span class="st">  </span>true_num_clusters_line <span class="op">+</span></a>
-<a class="sourceLine" id="cb12-9" data-line-number="9"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"num_mcmc_sweeps = 10"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb12-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ggtitle</a></span>(<span class="st">"num_mcmc_sweeps = 10"</span>)</a></code></pre></div>
 <p><img src="agglomerative_merging_files/figure-html/collapse_w_shuffle-1.png" width="576"></p>
 <p>Now that we have allowed node shuffling the nice monotonicly decreasing entropy as the number of groups increases has gone away because our mcmc sweeps have the potential to improve the model fit more than the previous merge harmed it. We still however see a strong indicator of where our true number of blocks is. Let’s select that value and see how the model performed.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">network <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb13-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/choose_best_collapse_state.html">choose_best_collapse_state</a></span>(<span class="dt">heuristic =</span> <span class="st">"dev_from_rolling_mean"</span>, <span class="dt">verbose =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb13-3" data-line-number="3"><span class="st">  </span><span class="kw">state_to_truth_table</span>()</a>
-<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co">#&gt; Choosing collapse with 3 blocks and an entropy of 4604.9569.</span></a>
-<a class="sourceLine" id="cb13-5" data-line-number="5"><span class="co">#&gt;         </span></a>
-<a class="sourceLine" id="cb13-6" data-line-number="6"><span class="co">#&gt;          g1 g2 g3</span></a>
-<a class="sourceLine" id="cb13-7" data-line-number="7"><span class="co">#&gt;   0-1_28 40  0  0</span></a>
-<a class="sourceLine" id="cb13-8" data-line-number="8"><span class="co">#&gt;   0-1_41  0 40  0</span></a>
-<a class="sourceLine" id="cb13-9" data-line-number="9"><span class="co">#&gt;   0-1_59  0  0 40</span></a></code></pre></div>
-<p>Again we got a perfect collapsing into the <code>n_block</code> generating blocks.</p>
+<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co">#&gt; Choosing collapse with 3 blocks and an entropy of 4685.2715.</span></a>
+<a class="sourceLine" id="cb13-5" data-line-number="5"><span class="co">#&gt;            </span></a>
+<a class="sourceLine" id="cb13-6" data-line-number="6"><span class="co">#&gt;             g1 g2 g3</span></a>
+<a class="sourceLine" id="cb13-7" data-line-number="7"><span class="co">#&gt;   node-1_37 40  0  0</span></a>
+<a class="sourceLine" id="cb13-8" data-line-number="8"><span class="co">#&gt;   node-1_80  0 40  0</span></a>
+<a class="sourceLine" id="cb13-9" data-line-number="9"><span class="co">#&gt;   node-1_85  0  0 40</span></a></code></pre></div>
+<p>After adding the sweeps we again get a perfect collapsing into the <code>n_block</code> generating blocks.</p>
 </div>
 </div>
 <div id="raising-sigma" class="section level2">
@@ -268,25 +279,25 @@
 <p>We can see that at after around <code>sigma = 1.3</code> the algorithm takes very few steps to collapse the network even as the network gets large.</p>
 <p>If we pin the network size at a constant (here 150) we can see the path of collapsing in terms of groups remaining for a variety of sigmas…</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="fl">1.1</span>), <span class="kw"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="fl">2.5</span>), <span class="dt">length.out =</span> <span class="dv">6</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="st">  </span><span class="kw">map_dfr</span>(<span class="cf">function</span>(sigma, <span class="dt">starting_num =</span> <span class="dv">150</span>, <span class="dt">num_steps =</span> <span class="dv">15</span>){</a>
+<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/purrr/man/map.html">map_dfr</a></span>(<span class="cf">function</span>(sigma, <span class="dt">starting_num =</span> <span class="dv">150</span>, <span class="dt">num_steps =</span> <span class="dv">15</span>){</a>
 <a class="sourceLine" id="cb14-3" data-line-number="3">    steps &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span>(num_steps<span class="dv">-1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-4" data-line-number="4"><span class="st">      </span><span class="kw">reduce</span>(<span class="cf">function</span>(group_nums, i){</a>
+<a class="sourceLine" id="cb14-4" data-line-number="4"><span class="st">      </span><span class="kw"><a href="https://rdrr.io/pkg/purrr/man/reduce.html">reduce</a></span>(<span class="cf">function</span>(group_nums, i){</a>
 <a class="sourceLine" id="cb14-5" data-line-number="5">        curr_num_blocks &lt;-<span class="st"> </span>group_nums[i]</a>
 <a class="sourceLine" id="cb14-6" data-line-number="6">        merges_to_make &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(<span class="dv">1</span>, <span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(curr_num_blocks<span class="op">*</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>(<span class="dv">1</span><span class="op">/</span>sigma))))</a>
 <a class="sourceLine" id="cb14-7" data-line-number="7">        <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(group_nums, <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span>(curr_num_blocks <span class="op">-</span><span class="st"> </span>merges_to_make, <span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb14-8" data-line-number="8">      },</a>
 <a class="sourceLine" id="cb14-9" data-line-number="9">      <span class="dt">.init =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(starting_num))</a>
 <a class="sourceLine" id="cb14-10" data-line-number="10">    </a>
-<a class="sourceLine" id="cb14-11" data-line-number="11">    <span class="kw">tibble</span>(</a>
+<a class="sourceLine" id="cb14-11" data-line-number="11">    <span class="kw"><a href="https://rdrr.io/pkg/dplyr/man/reexports.html">tibble</a></span>(</a>
 <a class="sourceLine" id="cb14-12" data-line-number="12">      <span class="dt">size =</span> steps, </a>
 <a class="sourceLine" id="cb14-13" data-line-number="13">      <span class="dt">sigma =</span> <span class="kw"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(sigma, <span class="dv">3</span>), </a>
 <a class="sourceLine" id="cb14-14" data-line-number="14">      <span class="dt">step =</span> <span class="dv">1</span><span class="op">:</span>num_steps</a>
 <a class="sourceLine" id="cb14-15" data-line-number="15">    )</a>
 <a class="sourceLine" id="cb14-16" data-line-number="16">  }) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-17" data-line-number="17"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> step, <span class="dt">y =</span> size)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb14-18" data-line-number="18"><span class="st">  </span><span class="kw">geom_line</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb14-19" data-line-number="19"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>sigma) <span class="op">+</span></a>
-<a class="sourceLine" id="cb14-20" data-line-number="20"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">"Number of clusters remaining by merge step for different sigma values"</span>,</a>
+<a class="sourceLine" id="cb14-17" data-line-number="17"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="dt">x =</span> step, <span class="dt">y =</span> size)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb14-18" data-line-number="18"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/geom_path.html">geom_line</a></span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb14-19" data-line-number="19"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/facet_wrap.html">facet_wrap</a></span>(<span class="op">~</span>sigma) <span class="op">+</span></a>
+<a class="sourceLine" id="cb14-20" data-line-number="20"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">labs</a></span>(<span class="dt">title =</span> <span class="st">"Number of clusters remaining by merge step for different sigma values"</span>,</a>
 <a class="sourceLine" id="cb14-21" data-line-number="21">       <span class="dt">y =</span> <span class="st">"Number of clusters remaining"</span>,</a>
 <a class="sourceLine" id="cb14-22" data-line-number="22">       <span class="dt">x =</span> <span class="st">"Step Number"</span>)</a></code></pre></div>
 <p><img src="agglomerative_merging_files/figure-html/merge_traces-1.png" width="576"></p>
@@ -301,7 +312,7 @@
 <a class="sourceLine" id="cb15-4" data-line-number="4"></a>
 <a class="sourceLine" id="cb15-5" data-line-number="5">full_collapse_time</a>
 <a class="sourceLine" id="cb15-6" data-line-number="6"><span class="co">#&gt;    user  system elapsed </span></a>
-<a class="sourceLine" id="cb15-7" data-line-number="7"><span class="co">#&gt;   1.996   0.001   1.998</span></a></code></pre></div>
+<a class="sourceLine" id="cb15-7" data-line-number="7"><span class="co">#&gt;   1.786   0.003   1.792</span></a></code></pre></div>
 <p>Now raise sigma to 1.5 and time…</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">raised_sigma_collapse_time &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>({</a>
 <a class="sourceLine" id="cb16-2" data-line-number="2">  <span class="kw"><a href="../reference/collapse_blocks.html">collapse_blocks</a></span>(network, <span class="dt">sigma =</span> <span class="fl">1.5</span>, <span class="dt">report_all_steps =</span> <span class="ot">TRUE</span>)</a>
@@ -309,27 +320,27 @@
 <a class="sourceLine" id="cb16-4" data-line-number="4"></a>
 <a class="sourceLine" id="cb16-5" data-line-number="5">raised_sigma_collapse_time</a>
 <a class="sourceLine" id="cb16-6" data-line-number="6"><span class="co">#&gt;    user  system elapsed </span></a>
-<a class="sourceLine" id="cb16-7" data-line-number="7"><span class="co">#&gt;   0.261   0.000   0.262</span></a></code></pre></div>
-<p>Just by increasing sigma to 1.5 we have sped up the collapsing by 7.65 times.</p>
+<a class="sourceLine" id="cb16-7" data-line-number="7"><span class="co">#&gt;   0.232   0.000   0.232</span></a></code></pre></div>
+<p>Just by increasing sigma to 1.5 we have sped up the collapsing by 7.7 times.</p>
 <p>Speed isn’t important if the model isnt working properly, however. So let’s see how the collapse worked.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">network &lt;-<span class="st"> </span><span class="kw"><a href="../reference/collapse_blocks.html">collapse_blocks</a></span>(network, <span class="dt">sigma =</span> <span class="fl">1.5</span>, <span class="dt">report_all_steps =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb17-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb17-3" data-line-number="3"><span class="kw"><a href="../reference/visualize_collapse_results.html">visualize_collapse_results</a></span>(network, <span class="dt">heuristic =</span> <span class="st">"dev_from_rolling_mean"</span>) <span class="op">+</span></a>
 <a class="sourceLine" id="cb17-4" data-line-number="4"><span class="st">  </span>axis_limits <span class="op">+</span></a>
 <a class="sourceLine" id="cb17-5" data-line-number="5"><span class="st">  </span>true_num_clusters_line <span class="op">+</span></a>
-<a class="sourceLine" id="cb17-6" data-line-number="6"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"Collapse with sigma = 1.5"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb17-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ggtitle</a></span>(<span class="st">"Collapse with sigma = 1.5"</span>)</a></code></pre></div>
 <p><img src="agglomerative_merging_files/figure-html/unnamed-chunk-11-1.png" width="576"></p>
 <p>So even with this speedup we are finding the proper number of clusters. Let’s see if the separation is good.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">network <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb18-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/choose_best_collapse_state.html">choose_best_collapse_state</a></span>(<span class="dt">heuristic =</span> <span class="st">"dev_from_rolling_mean"</span>, </a>
 <a class="sourceLine" id="cb18-3" data-line-number="3">                             <span class="dt">verbose =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb18-4" data-line-number="4"><span class="st">  </span><span class="kw">state_to_truth_table</span>()</a>
-<a class="sourceLine" id="cb18-5" data-line-number="5"><span class="co">#&gt; Choosing collapse with 3 blocks and an entropy of 5573.4237.</span></a>
-<a class="sourceLine" id="cb18-6" data-line-number="6"><span class="co">#&gt;         </span></a>
-<a class="sourceLine" id="cb18-7" data-line-number="7"><span class="co">#&gt;          g1 g2 g3</span></a>
-<a class="sourceLine" id="cb18-8" data-line-number="8"><span class="co">#&gt;   0-1_39 40  0  0</span></a>
-<a class="sourceLine" id="cb18-9" data-line-number="9"><span class="co">#&gt;   0-1_62  0 40  0</span></a>
-<a class="sourceLine" id="cb18-10" data-line-number="10"><span class="co">#&gt;   0-1_94  0  0 40</span></a></code></pre></div>
+<a class="sourceLine" id="cb18-5" data-line-number="5"><span class="co">#&gt; Choosing collapse with 3 blocks and an entropy of 5562.2989.</span></a>
+<a class="sourceLine" id="cb18-6" data-line-number="6"><span class="co">#&gt;            </span></a>
+<a class="sourceLine" id="cb18-7" data-line-number="7"><span class="co">#&gt;             g1 g2 g3</span></a>
+<a class="sourceLine" id="cb18-8" data-line-number="8"><span class="co">#&gt;   node-1_23 40  0  0</span></a>
+<a class="sourceLine" id="cb18-9" data-line-number="9"><span class="co">#&gt;   node-1_55  0 40  0</span></a>
+<a class="sourceLine" id="cb18-10" data-line-number="10"><span class="co">#&gt;   node-1_80  0  0 40</span></a></code></pre></div>
 <p>So again we are getting extremely good performance. Often a balance between allowing MCMC sweeps and a moderate sigma value will return very good and very fast collapsing results.</p>
 </div>
 <div id="collapse-runs" class="section level2">
@@ -356,17 +367,17 @@
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1">network <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb20-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/visualize_collapse_results.html">visualize_collapse_results</a></span>(<span class="dt">heuristic =</span> <span class="st">"nls_residual"</span>) <span class="op">+</span></a>
 <a class="sourceLine" id="cb20-3" data-line-number="3"><span class="st">  </span>true_num_clusters_line <span class="op">+</span></a>
-<a class="sourceLine" id="cb20-4" data-line-number="4"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"Collapse run"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb20-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ggtitle</a></span>(<span class="st">"Collapse run"</span>)</a></code></pre></div>
 <p><img src="agglomerative_merging_files/figure-html/unnamed-chunk-13-1.png" width="576"></p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">network <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb21-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/choose_best_collapse_state.html">choose_best_collapse_state</a></span>(<span class="dt">heuristic =</span> <span class="st">"nls_residual"</span>, <span class="dt">verbose =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb21-3" data-line-number="3"><span class="st">  </span><span class="kw">state_to_truth_table</span>()</a>
-<a class="sourceLine" id="cb21-4" data-line-number="4"><span class="co">#&gt; Choosing collapse with 3 blocks and an entropy of 5439.3022.</span></a>
-<a class="sourceLine" id="cb21-5" data-line-number="5"><span class="co">#&gt;         </span></a>
-<a class="sourceLine" id="cb21-6" data-line-number="6"><span class="co">#&gt;          g1 g2 g3</span></a>
-<a class="sourceLine" id="cb21-7" data-line-number="7"><span class="co">#&gt;   0-1_4  40  0  0</span></a>
-<a class="sourceLine" id="cb21-8" data-line-number="8"><span class="co">#&gt;   0-1_76  0 40  0</span></a>
-<a class="sourceLine" id="cb21-9" data-line-number="9"><span class="co">#&gt;   0-1_98  0  0 40</span></a></code></pre></div>
+<a class="sourceLine" id="cb21-4" data-line-number="4"><span class="co">#&gt; Choosing collapse with 3 blocks and an entropy of 5287.1628.</span></a>
+<a class="sourceLine" id="cb21-5" data-line-number="5"><span class="co">#&gt;            </span></a>
+<a class="sourceLine" id="cb21-6" data-line-number="6"><span class="co">#&gt;             g1 g2 g3</span></a>
+<a class="sourceLine" id="cb21-7" data-line-number="7"><span class="co">#&gt;   node-1_19 40  0  0</span></a>
+<a class="sourceLine" id="cb21-8" data-line-number="8"><span class="co">#&gt;   node-1_77  0 40  0</span></a>
+<a class="sourceLine" id="cb21-9" data-line-number="9"><span class="co">#&gt;   node-1_94  0  0 40</span></a></code></pre></div>
 <p>So we can get MCMC sweeps and moderate sigma values and maintain rather fast collapsing. The nice thing is every end point is targeted directly so the model has the best chance to find the optimal partition for that given number of blocks.</p>
 </div>
 <div id="effects-of-other-parameters-on-merge-paths" class="section level2">
@@ -379,9 +390,9 @@
 <a href="#epsilon-values" class="anchor"></a>Epsilon values</h2>
 <p>Epsilon controls how conservative the model is when generating those proposals. As epsilon goes to infinity the moves proposed by the model approach randomness. When epsilon is zero a node can only move to groups that nodes it is connected belong to.</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="co"># Get logaritmically spaced epsilon range</span></a>
-<a class="sourceLine" id="cb22-2" data-line-number="2">eps_vals &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="fl">0.1</span>), <span class="kw"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="dv">15</span>), <span class="dt">length.out =</span> <span class="dv">9</span>))</a>
+<a class="sourceLine" id="cb22-2" data-line-number="2">eps_vals &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="fl">0.1</span>), <span class="kw"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="dv">15</span>), <span class="dt">length.out =</span> <span class="dv">8</span>))</a>
 <a class="sourceLine" id="cb22-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb22-4" data-line-number="4">eps_sweep_results &lt;-<span class="st"> </span>purrr<span class="op">::</span><span class="kw"><a href="https://purrr.tidyverse.org/reference/map.html">map_dfr</a></span>(</a>
+<a class="sourceLine" id="cb22-4" data-line-number="4">eps_sweep_results &lt;-<span class="st"> </span>purrr<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/purrr/man/map.html">map_dfr</a></span>(</a>
 <a class="sourceLine" id="cb22-5" data-line-number="5">  eps_vals, </a>
 <a class="sourceLine" id="cb22-6" data-line-number="6">  <span class="cf">function</span>(eps){</a>
 <a class="sourceLine" id="cb22-7" data-line-number="7">    <span class="kw"><a href="../reference/collapse_run.html">collapse_run</a></span>(</a>
@@ -391,16 +402,16 @@
 <a class="sourceLine" id="cb22-11" data-line-number="11">      <span class="dt">parallel =</span> <span class="ot">TRUE</span></a>
 <a class="sourceLine" id="cb22-12" data-line-number="12">    ) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb22-13" data-line-number="13"><span class="st">      </span><span class="kw"><a href="../reference/get_collapse_results.html">get_collapse_results</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb22-14" data-line-number="14"><span class="st">      </span><span class="kw">mutate</span>(<span class="dt">epsilon =</span> eps)</a>
+<a class="sourceLine" id="cb22-14" data-line-number="14"><span class="st">      </span><span class="kw"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span>(<span class="dt">epsilon =</span> eps)</a>
 <a class="sourceLine" id="cb22-15" data-line-number="15">  }</a>
 <a class="sourceLine" id="cb22-16" data-line-number="16">)</a>
 <a class="sourceLine" id="cb22-17" data-line-number="17"></a>
 <a class="sourceLine" id="cb22-18" data-line-number="18">eps_sweep_results <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb22-19" data-line-number="19"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> num_blocks, <span class="dt">y =</span> entropy, <span class="dt">color =</span> epsilon)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb22-20" data-line-number="20"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">group =</span> epsilon)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb22-21" data-line-number="21"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb22-22" data-line-number="22"><span class="st">  </span><span class="kw">scale_y_log10</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb22-23" data-line-number="23"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"Collapse results by epsilon value"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb22-19" data-line-number="19"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="dt">x =</span> num_blocks, <span class="dt">y =</span> entropy, <span class="dt">color =</span> epsilon)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb22-20" data-line-number="20"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/geom_path.html">geom_line</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="dt">group =</span> epsilon)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb22-21" data-line-number="21"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb22-22" data-line-number="22"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/scale_continuous.html">scale_y_log10</a></span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb22-23" data-line-number="23"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">ggtitle</a></span>(<span class="st">"Collapse results by epsilon value"</span>)</a></code></pre></div>
 <p><img src="agglomerative_merging_files/figure-html/toggling_epsilon-1.png" width="576"></p>
 <p>While the results are close to eachother, there seems to be a trend of higher epsilon values getting better results.</p>
 </div>
@@ -420,10 +431,11 @@
 <a class="sourceLine" id="cb23-10" data-line-number="10"></a>
 <a class="sourceLine" id="cb23-11" data-line-number="11">network <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb23-12" data-line-number="12"><span class="st">  </span><span class="kw"><a href="../reference/get_collapse_results.html">get_collapse_results</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb23-13" data-line-number="13"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> num_blocks, <span class="dt">y =</span> entropy)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb23-14" data-line-number="14"><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">size =</span> <span class="dv">0</span>, <span class="dt">method =</span> <span class="st">'loess'</span>, <span class="dt">span =</span> <span class="fl">0.75</span>, <span class="dt">fill =</span> <span class="st">'steelblue'</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb23-15" data-line-number="15"><span class="st">  </span><span class="kw">geom_jitter</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>, <span class="dt">height =</span> <span class="dv">0</span>, <span class="dt">width =</span> <span class="fl">0.2</span>)  <span class="op">+</span></a>
-<a class="sourceLine" id="cb23-16" data-line-number="16"><span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">breaks =</span> group_nums)</a></code></pre></div>
+<a class="sourceLine" id="cb23-13" data-line-number="13"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span>(<span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span>(<span class="dt">x =</span> num_blocks, <span class="dt">y =</span> entropy)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb23-14" data-line-number="14"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span>(<span class="dt">size =</span> <span class="dv">0</span>, <span class="dt">method =</span> <span class="st">'loess'</span>, <span class="dt">span =</span> <span class="fl">0.75</span>, <span class="dt">fill =</span> <span class="st">'steelblue'</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb23-15" data-line-number="15"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/geom_jitter.html">geom_jitter</a></span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>, <span class="dt">height =</span> <span class="dv">0</span>, <span class="dt">width =</span> <span class="fl">0.2</span>)  <span class="op">+</span></a>
+<a class="sourceLine" id="cb23-16" data-line-number="16"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/ggplot2/man/scale_continuous.html">scale_x_continuous</a></span>(<span class="dt">breaks =</span> group_nums)</a>
+<a class="sourceLine" id="cb23-17" data-line-number="17"><span class="co">#&gt; `geom_smooth()` using formula 'y ~ x'</span></a></code></pre></div>
 <p><img src="agglomerative_merging_files/figure-html/run_stability-1.png" width="576"></p>
 <p>We can see that the results are very stable with relatively minescule for values greater than 3 groups and no variation in the others (indicating they acheived the same partitioning every time).</p>
 </div>

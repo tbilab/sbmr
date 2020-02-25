@@ -11,9 +11,17 @@ visualize_collapse_results(
 )
 }
 \arguments{
+\item{sbm}{Object of class \code{sbm_network}.}
+
 \item{use_entropy_value_for_score}{If set to \code{TRUE} then instead of the merge
 results entropy delta being used for the score function the entropy will
 be. Typically the heuristics work better on entropy delta values.}
+
+\item{heuristic}{How the best partitioning is defined. Takes either a
+function that takes one/two arguments: an entropy vector and an optional
+number of blocks vector with each element corresponding to a given
+location, or a string labeling algorithm. Currently only \code{"lowest"},
+\code{"dev_from_rolling_mean"}, \code{"delta_ratio"}, \code{"trend_deviation"}, and \code{"nls_residual"} are supported.}
 }
 \value{
 GGplot object comparing the fit results and each step's deviance from
@@ -25,9 +33,8 @@ Plots entropy against number of blocks left for a collapse run. If
 each merger step according to the heuristic provided is also shown.
 }
 \details{
-Either \link{\code{collapse_run}}, or
-\link{\code{collapse_blocks(report_all_steps = TRUE)}} must be run prior to
-calling this function.
+Either \code{\link{collapse_run}}, or \code{collapse_blocks(report_all_steps = TRUE)} must be run prior to calling this function. (See
+\code{\link{collapse_blocks}}.)
 }
 \examples{
 

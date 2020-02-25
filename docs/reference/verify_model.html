@@ -70,7 +70,7 @@ exists and is usable. If it isn't it is created." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sbmR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.0</span>
       </span>
     </div>
 
@@ -102,7 +102,12 @@ exists and is usable. If it isn't it is created." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/nstrayer/sbmR">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -117,7 +122,7 @@ exists and is usable. If it isn't it is created." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Verify model for sbm_network object exists</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/verify_model.R'><code>R/verify_model.R</code></a></small>
     <div class="hidden name"><code>verify_model.Rd</code></div>
     </div>
 
@@ -126,13 +131,13 @@ exists and is usable. If it isn't it is created." />
 exists and is usable. If it isn't it is created.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>verify_model</span>(<span class='no'>x</span>, <span class='kw'>show_messages</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>verify_model</span>(<span class='no'>sbm</span>, <span class='kw'>show_messages</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>warn_about_random_seed</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
+      <th>sbm</th>
       <td><p>Object of class <code>sbm_network</code>.</p></td>
     </tr>
     <tr>
@@ -140,12 +145,17 @@ exists and is usable. If it isn't it is created.</p>
       <td><p>Should function inform of its actions such as when a
 model already exists so no changes are made?</p></td>
     </tr>
+    <tr>
+      <th>warn_about_random_seed</th>
+      <td><p>Should the model warn about cases when set seed
+is present for cached model?</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An S3 object of class <code>sbm_network</code>. For details see
-<a href='new_sbm_network.html'>new_sbm_network</a> section "Class structure."</p>
+<code><a href='new_sbm_network.html'>new_sbm_network</a></code> section "Class structure."</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other helpers: 
@@ -163,7 +173,7 @@ model already exists so no changes are made?</p></td>
 
 <span class='no'>net</span></div><div class='output co'>#&gt; SBM Network with 60 nodes of a single type and 903 edges. 
 #&gt;  
-#&gt; Nodes: <span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt; Nodes: <span style='color: #555555;'># A tibble: 6 x 3</span><span>
 #&gt;   id    block type 
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1    node 
@@ -171,9 +181,10 @@ model already exists so no changes are made?</p></td>
 #&gt; </span><span style='color: #555555;'>3</span><span> g1_3  g1    node 
 #&gt; </span><span style='color: #555555;'>4</span><span> g1_4  g1    node 
 #&gt; </span><span style='color: #555555;'>5</span><span> g1_5  g1    node 
+#&gt; </span><span style='color: #555555;'>6</span><span> g1_6  g1    node 
 #&gt; ... 
 #&gt;  
-#&gt; Edges: </span><span style='color: #555555;'># A tibble: 5 x 2</span><span>
+#&gt; Edges: </span><span style='color: #555555;'># A tibble: 6 x 2</span><span>
 #&gt;   from  to   
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1_2 
@@ -181,13 +192,14 @@ model already exists so no changes are made?</p></td>
 #&gt; </span><span style='color: #555555;'>3</span><span> g1_1  g1_6 
 #&gt; </span><span style='color: #555555;'>4</span><span> g1_1  g1_7 
 #&gt; </span><span style='color: #555555;'>5</span><span> g1_1  g1_10
+#&gt; </span><span style='color: #555555;'>6</span><span> g1_1  g1_14
 #&gt; ... 
 #&gt;  </div><div class='input'>
 <span class='co'># Run verify model and the model should now be initialized</span>
 <span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'>verify_model</span>()
 <span class='no'>net</span></div><div class='output co'>#&gt; SBM Network with 60 nodes of a single type and 903 edges. 
 #&gt;  
-#&gt; Nodes: </span><span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt; Nodes: </span><span style='color: #555555;'># A tibble: 6 x 3</span><span>
 #&gt;   id    block type 
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1    node 
@@ -195,9 +207,10 @@ model already exists so no changes are made?</p></td>
 #&gt; </span><span style='color: #555555;'>3</span><span> g1_3  g1    node 
 #&gt; </span><span style='color: #555555;'>4</span><span> g1_4  g1    node 
 #&gt; </span><span style='color: #555555;'>5</span><span> g1_5  g1    node 
+#&gt; </span><span style='color: #555555;'>6</span><span> g1_6  g1    node 
 #&gt; ... 
 #&gt;  
-#&gt; Edges: </span><span style='color: #555555;'># A tibble: 5 x 2</span><span>
+#&gt; Edges: </span><span style='color: #555555;'># A tibble: 6 x 2</span><span>
 #&gt;   from  to   
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1_2 
@@ -205,6 +218,7 @@ model already exists so no changes are made?</p></td>
 #&gt; </span><span style='color: #555555;'>3</span><span> g1_1  g1_6 
 #&gt; </span><span style='color: #555555;'>4</span><span> g1_1  g1_7 
 #&gt; </span><span style='color: #555555;'>5</span><span> g1_1  g1_10
+#&gt; </span><span style='color: #555555;'>6</span><span> g1_1  g1_14
 #&gt; ... 
 #&gt;  
 #&gt; Model

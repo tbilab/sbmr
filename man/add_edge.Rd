@@ -16,7 +16,7 @@ add_edge(
 }
 \arguments{
 \item{sbm}{\code{sbm_network} object as created by
-\code{\link{new_sbm_network()}}.}
+\code{\link{new_sbm_network}}.}
 
 \item{from_node}{Id of first node in edge}
 
@@ -35,7 +35,7 @@ warning for unipartite networks set this to \code{TRUE}.}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
-\link{new_sbm_network} section "Class structure."
+\code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
 Connects two nodes in network (at level 0) by their ids (string).

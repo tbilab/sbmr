@@ -7,7 +7,7 @@
 
 TEST_CASE("Generate Node move proposals", "[SBM]")
 {
-  double tol    = 0.01;
+  double tol    = 0.05;
   double eps    = 0.01;
   SBM    my_SBM = build_simple_SBM();
 
@@ -23,7 +23,7 @@ TEST_CASE("Generate Node move proposals", "[SBM]")
   // Run multiple trials and of move and see how often a given node is moved
   for (int i = 0; i < num_trials; ++i) {
     // Do move attempt (dry run)
-    NodePtr new_block = my_SBM.propose_move(a1, eps);
+    NodePtr new_block = my_SBM.propose_move(a1, eps, my_SBM.sampler);
 
     if (new_block->id == old_block->id)
       num_times_no_move++;
@@ -124,7 +124,7 @@ TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
   bool all_zeros = true;
 
   // Give it some random groupings of the correct number of groups
-  my_SBM.initialize_blocks(3, 0);
+  my_SBM.initialize_blocks(0, 3);
 
   auto all_nodes = my_SBM.get_level(0);
 
@@ -156,12 +156,6 @@ TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
       if (true_delta != 0)
         all_zeros = false;
 
-      // std::cout << node_to_move->id << ": ("
-      //           << pre_move_group_id << " -> "
-      //           << group_to_move_to->id << "): delta = "
-      //           << std::to_string(differences)
-      //           << std::endl;
-
       // // They should be the same
       const double thresh = 0.1;
       REQUIRE(((differences < thresh) & (differences > -thresh)));
@@ -181,7 +175,7 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
   SBM my_SBM = build_bipartite_simulated();
 
   // Give it some random groupings of the correct number of groups
-  my_SBM.initialize_blocks(3, 0);
+  my_SBM.initialize_blocks(0, 3);
 
   auto all_nodes = my_SBM.get_level(0);
 
@@ -219,11 +213,7 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
       if (true_delta != 0)
         all_zeros = false;
 
-      // std::cout << node_to_move->id << ": ("
-      //           << pre_move_group_id << " -> "
-      //           << group_to_move_to->id << "): delta = "
-      //           << std::to_string(differences)
-      //           << std::endl;
+  
 
       // // They should be the same
       const double thresh = 0.1;

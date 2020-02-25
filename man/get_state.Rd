@@ -4,7 +4,11 @@
 \alias{get_state}
 \title{Dump state of current SBM model to dataframe}
 \usage{
-get_state(x)
+get_state(sbm)
+}
+\arguments{
+\item{sbm}{\code{sbm_network} object as created by
+\code{\link{new_sbm_network}}.}
 }
 \value{
 A dataframe describing the current state of the network: \describe{

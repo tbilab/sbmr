@@ -13,7 +13,7 @@ inline NodePtr Node::this_ptr()
 // =============================================================================
 // Add edge to another node
 // =============================================================================
-inline void Node::add_edge(const NodePtr node)
+inline void Node::add_edge(const NodePtr& node)
 {
   //PROFILE_FUNCTION();
 
@@ -33,7 +33,7 @@ inline void Node::add_edge(const NodePtr node)
 // =============================================================================
 // Add or remove edges from nodes edge list
 // =============================================================================
-void Node::update_edges_from_node(const NodePtr node, const bool remove)
+void Node::update_edges_from_node(const NodePtr& node, const bool& remove)
 {
   // PROFILE_FUNCTION();
 
@@ -86,7 +86,7 @@ void Node::set_parent(NodePtr parent_node_ptr)
   //PROFILE_FUNCTION();
 
   if (level != parent_node_ptr->level - 1) {
-    throw std::logic_error("Parent node must be one level above child");
+    LOGIC_ERROR("Parent node must be one level above child");
   }
 
   // Remove self from previous parents children list (if it existed)
@@ -111,7 +111,7 @@ void Node::set_parent(NodePtr parent_node_ptr)
 // =============================================================================f
 // Add a node to the children vector
 // =============================================================================
-inline void Node::add_child(const NodePtr new_child_node)
+inline void Node::add_child(const NodePtr& new_child_node)
 {
   //PROFILE_FUNCTION();
   // Add new child node to the set of children. An unordered set is used because
@@ -122,23 +122,20 @@ inline void Node::add_child(const NodePtr new_child_node)
 // =============================================================================
 // Find and erase a child node
 // =============================================================================
-inline void Node::remove_child(const NodePtr child_node)
+void Node::remove_child(const NodePtr& child_node)
 {
-  //PROFILE_FUNCTION();
-  children.erase(children.find(child_node));
+  children.erase(child_node);
 }
 
 // =============================================================================
 // Get parent of current node at a given level
 // =============================================================================
-inline NodePtr Node::get_parent_at_level(const int level_of_parent)
+inline NodePtr Node::get_parent_at_level(const int& level_of_parent)
 {
   // First we need to make sure that the requested level is not less than that
   // of the current node.
   if (level_of_parent < level) {
-    std::string error_msg = "Requested parent level (" + std::to_string(level_of_parent) + ") lower than current node level (" + std::to_string(level) + ").";
-    std::cerr << error_msg;
-    throw std::logic_error(error_msg);
+    LOGIC_ERROR("Requested parent level (" + std::to_string(level_of_parent) + ") lower than current node level (" + std::to_string(level) + ").");
   }
 
   // Start with this node as current node
@@ -146,9 +143,7 @@ inline NodePtr Node::get_parent_at_level(const int level_of_parent)
 
   while (current_node->level != level_of_parent) {
     if (!parent) {
-      std::string error_msg = "No parent at level " + std::to_string(level_of_parent) + " for " + id;
-      std::cerr << error_msg;
-      throw std::range_error(error_msg);
+      RANGE_ERROR("No parent at level " + std::to_string(level_of_parent) + " for " + id);
     }
 
     // Traverse up parents until we've reached just below where we want to go
@@ -160,21 +155,24 @@ inline NodePtr Node::get_parent_at_level(const int level_of_parent)
 }
 
 // =============================================================================
-// Get all nodes connected to Node at a given level.
+// Get all nodes connected to Node at a given level with specified type
 // We return a vector because we need random access to elements in this array
 // and that isn't provided to us with the list format.
 // =============================================================================
-NodeVec Node::get_edges_to_level(const int desired_level)
+NodeVec Node::get_edges_of_type(const std::string& node_type, const int& desired_level) const
 {
-  //PROFILE_FUNCTION();
   // Vector to return containing parents at desired level for edges
   NodeVec level_cons;
+
+  // Conservatively assume all edges will be taken
   level_cons.reserve(edges.size());
 
   // Go through every child node's edges list, find parent at
   // desired level and place in connected nodes vector
   for (const auto& edge : edges) {
-    level_cons.push_back(edge->get_parent_at_level(desired_level));
+    if (edge->type == node_type) {
+      level_cons.push_back(edge->get_parent_at_level(desired_level));
+    }
   }
 
   return level_cons;
@@ -184,19 +182,17 @@ NodeVec Node::get_edges_to_level(const int desired_level)
 // Collapse a nodes edge to a given level into a map of
 // connected block id->count
 // =============================================================================
-NodeEdgeMap Node::gather_edges_to_level(const int level)
+NodeEdgeMap Node::gather_edges_to_level(const int& level) const
 {
-  // PROFILE_FUNCTION();
-  // Gather all edges from the moved node to the level of the blocks we're
-  // working with
-  NodeVec all_edges = get_edges_to_level(level);
-
   // Setup an edge count map for node
   NodeEdgeMap edges_counts;
 
-  // Fill out edge count map
-  for (const NodePtr& curr_edge : all_edges) {
-    edges_counts[curr_edge]++;
+  // Fill out edge count map by
+  // - looping over all edges
+  // - mapping them to the desired level
+  // - and adding to their counts
+  for (const NodePtr& curr_edge : edges) {
+    edges_counts[curr_edge->get_parent_at_level(level)]++;
   }
 
   return edges_counts;
@@ -205,7 +201,7 @@ NodeEdgeMap Node::gather_edges_to_level(const int level)
 // =============================================================================
 // Static method to connect two nodes to each other with edge
 // =============================================================================
-void Node::connect_nodes(NodePtr node1_ptr, NodePtr node2_ptr)
+void Node::connect_nodes(const NodePtr& node1_ptr, const NodePtr& node2_ptr)
 {
   //PROFILE_FUNCTION();
   node1_ptr->add_edge(node2_ptr);

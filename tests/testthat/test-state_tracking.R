@@ -23,19 +23,19 @@ test_that("State tracking returns the correct state", {
     "b4", "node"
   )
 
-  net <- new_sbm_network(edges = edges, nodes = nodes)
+  net <- new_sbm_network(edges = edges, nodes = nodes, random_seed = 42)
 
   expect_equal(
     dplyr::as_tibble(attr(net, 'model')$get_state()),
     dplyr::tribble(
        ~id, ~parent,  ~type, ~level,
-      "a1",  "none", "node",      0L,
-      "a2",  "none", "node",      0L,
-      "a3",  "none", "node",      0L,
-      "b1",  "none", "node",      0L,
-      "b2",  "none", "node",      0L,
-      "b3",  "none", "node",      0L,
-      "b4",  "none", "node",      0L
+      "a1",  "none", "node",     0L,
+      "a2",  "none", "node",     0L,
+      "a3",  "none", "node",     0L,
+      "b1",  "none", "node",     0L,
+      "b2",  "none", "node",     0L,
+      "b3",  "none", "node",     0L,
+      "b4",  "none", "node",     0L
     )
   )
 
@@ -67,39 +67,48 @@ test_that("State updating method", {
   )
 
   new_state <- dplyr::tribble(
-     ~id,          ~parent,   ~type,  ~level,
-    "a1",       "a_parent",  "node",      0L,
-    "a2",       "a_parent",  "node",      0L,
-    "a3",       "a_parent",  "node",      0L,
-    "b1",       "b_parent",  "node",      0L,
-    "b2",       "b_parent",  "node",      0L,
-    "b3",       "b_parent",  "node",      0L,
-    "b4",       "b_parent",  "node",      0L,
-    "a_parent", "none",      "node",      1L,
-    "b_parent", "none",      "node",      1L,
+     ~id,          ~parent,   ~type, ~level,
+    "a1",       "a_parent",  "node",     0L,
+    "a2",       "a_parent",  "node",     0L,
+    "a3",       "a_parent",  "node",     0L,
+    "b1",       "b_parent",  "node",     0L,
+    "b2",       "b_parent",  "node",     0L,
+    "b3",       "b_parent",  "node",     0L,
+    "b4",       "b_parent",  "node",     0L,
+    "a_parent", "none",      "node",     1L,
+    "b_parent", "none",      "node",     1L,
   )
 
-  net <- new_sbm_network(edges = edges, nodes = nodes)
 
-  # before updating state the state should not equal the desired new state
-  expect_false( isTRUE(dplyr::all_equal(new_state, attr(net, 'state'))))
-  expect_false( isTRUE(dplyr::all_equal(new_state, attr(net, 'model')$get_state())))
+  net <- new_sbm_network(edges = edges,
+                         nodes = nodes,
+                         random_seed = 42)
 
   # Update state using update_state() method
-
   net <- net %>% update_state(new_state)
 
   # Now the states should be identical
   expect_true( dplyr::all_equal(new_state, attr(net, 'state')))
   expect_true( dplyr::all_equal(new_state, attr(net, 'model')$get_state()))
 
+
+  # Now to updating using a integer-typed dataframe
+  net <- new_sbm_network(edges = edges, nodes = nodes, random_seed = 42)
+
+  # Update state using update_state() method
+  net <- net %>% update_state(new_state)
+
+  # Now the states should be identical
+  expect_true( dplyr::all_equal(new_state, attr(net, 'state')))
+  expect_true( dplyr::all_equal(new_state, attr(net, 'model')$get_state()))
 })
 
 test_that("No costly duplication of S4 class is done when assigning s3 class copies.", {
 
   net <- sim_basic_block_network(n_blocks = 3,
                                  n_nodes_per_block = 40,
-                                 setup_model = TRUE) %>%
+                                 setup_model = TRUE,
+                                 random_seed = 42) %>%
     initialize_blocks(num_blocks = 5)
 
   # Take snapshot of model and state before sweep
@@ -118,8 +127,9 @@ test_that("No costly duplication of S4 class is done when assigning s3 class cop
 test_that("S3 class attributes are immutable", {
 
   net <- sim_basic_block_network(n_blocks = 3,
-                                     n_nodes_per_block = 40,
-                                     setup_model = TRUE) %>%
+                                 n_nodes_per_block = 40,
+                                 setup_model = TRUE,
+                                 random_seed = 42) %>%
     initialize_blocks(num_blocks = 5)
 
   # Take snapshot of model and state before sweep

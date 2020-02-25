@@ -73,7 +73,7 @@ who's main parameter the propensity value defines are needed." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sbmR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.0</span>
       </span>
     </div>
 
@@ -105,7 +105,12 @@ who's main parameter the propensity value defines are needed." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/nstrayer/sbmR">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -120,7 +125,7 @@ who's main parameter the propensity value defines are needed." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Simulate network using stochastic block model</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/sim_sbm_network.R'><code>R/sim_sbm_network.R</code></a></small>
     <div class="hidden name"><code>sim_sbm_network.Rd</code></div>
     </div>
 
@@ -135,10 +140,11 @@ who's main parameter the <code>propensity</code> value defines are needed.</p>
     <pre class="usage"><span class='fu'>sim_sbm_network</span>(
   <span class='no'>block_info</span>,
   <span class='no'>edge_propensities</span>,
-  <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='no'>rpois</span>,
+  <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='kw pkg'>stats</span><span class='kw ns'>::</span><span class='no'><a href='https://rdrr.io/r/stats/Poisson.html'>rpois</a></span>,
   <span class='kw'>allow_self_edges</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>keep_edge_counts</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>setup_model</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>setup_model</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>random_seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -182,12 +188,19 @@ want to set this to <code>TRUE</code>.</p></td>
       <td><p>Should an SBM model object be added? Set to <code>FALSE</code> if
 network is just being visualized or described.</p></td>
     </tr>
+    <tr>
+      <th>random_seed</th>
+      <td><p>Integer seed to be passed to model's internal random
+sampling engine. Note that if the model is restored from a saved state this
+seed will be initialized again to the start value which will harm
+reproducability.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An S3 object of class <code>sbm_network</code>. For details see
-<a href='new_sbm_network.html'>new_sbm_network</a> section "Class structure."</p>
+<code><a href='new_sbm_network.html'>new_sbm_network</a></code> section "Class structure."</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other simulations: 
@@ -214,7 +227,7 @@ network is just being visualized or described.</p></td>
 
 <span class='fu'>sim_sbm_network</span>(<span class='no'>block_info</span>, <span class='no'>edge_propensities</span>, <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='no'><a href='https://purrr.tidyverse.org/reference/rbernoulli.html'>rbernoulli</a></span>)</div><div class='output co'>#&gt; SBM Network with 37 nodes of a single type and 245 edges. 
 #&gt;  
-#&gt; Nodes: <span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt; Nodes: <span style='color: #555555;'># A tibble: 6 x 3</span><span>
 #&gt;   id    block type 
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> a_1   a     node 
@@ -222,9 +235,10 @@ network is just being visualized or described.</p></td>
 #&gt; </span><span style='color: #555555;'>3</span><span> a_3   a     node 
 #&gt; </span><span style='color: #555555;'>4</span><span> a_4   a     node 
 #&gt; </span><span style='color: #555555;'>5</span><span> a_5   a     node 
+#&gt; </span><span style='color: #555555;'>6</span><span> a_6   a     node 
 #&gt; ... 
 #&gt;  
-#&gt; Edges: </span><span style='color: #555555;'># A tibble: 5 x 3</span><span>
+#&gt; Edges: </span><span style='color: #555555;'># A tibble: 6 x 3</span><span>
 #&gt;   from  to    edges
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> a_1   a_2       1
@@ -232,6 +246,7 @@ network is just being visualized or described.</p></td>
 #&gt; </span><span style='color: #555555;'>3</span><span> a_1   a_4       1
 #&gt; </span><span style='color: #555555;'>4</span><span> a_1   a_9       1
 #&gt; </span><span style='color: #555555;'>5</span><span> a_1   a_10      1
+#&gt; </span><span style='color: #555555;'>6</span><span> a_1   b_2       1
 #&gt; ... 
 #&gt;  </div><div class='input'>
 </div></span></pre>

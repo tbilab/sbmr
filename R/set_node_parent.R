@@ -47,7 +47,6 @@ set_node_parent.default <- function(sbm, child_id, parent_id, level = 0){
 
 #' @export
 set_node_parent.sbm_network <- function(sbm, child_id, parent_id, level = 0){
-
   # Grab current state of model
   state <- attr(sbm, 'state')
 
@@ -58,9 +57,9 @@ set_node_parent.sbm_network <- function(sbm, child_id, parent_id, level = 0){
   }
 
   # Get basic info about child
-  child_index <- which(state$id == child_id)
-  child_type <- state$type[child_index]
-  child_level <- state$level[child_index]
+  child_index      <- which(state$id == child_id)
+  child_type       <- state$type[child_index]
+  child_level      <- state$level[child_index]
 
   # Modify the child's entry to have the new parent
   state$parent[child_index] <- parent_id
@@ -70,19 +69,20 @@ set_node_parent.sbm_network <- function(sbm, child_id, parent_id, level = 0){
 
   # Build parent entry in state if need be
   if(parent_missing){
-    new_parent_entry <- dplyr::tibble(id = parent_id,
-                                      parent = "none",
-                                      type = child_type,
-                                      level = child_level + 1)
 
-    state <- dplyr::bind_rows(state,new_parent_entry)
+    # Update state data
+    state <- state %>%
+      dplyr::bind_rows(dplyr::tibble(id = parent_id,
+                                     parent = "none",
+                                     type = child_type,
+                                     level = child_level + 1))
   }
 
   # Force model to rebuild with the new state
-  attr(sbm, 'model')$load_from_state(state$id,
-                            state$parent,
-                            state$level,
-                            state$type)
+  attr(sbm, 'model')$set_state(state$id,
+                                     state$parent,
+                                     state$level,
+                                     state$type)
 
   # Make sure state attribute is updated
   attr(sbm, 'state') <- state

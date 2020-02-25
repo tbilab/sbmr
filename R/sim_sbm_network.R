@@ -54,10 +54,11 @@
 sim_sbm_network <- function(
   block_info,
   edge_propensities,
-  edge_dist = rpois,
+  edge_dist = stats::rpois,
   allow_self_edges = FALSE,
   keep_edge_counts = TRUE,
-  setup_model = FALSE){
+  setup_model = FALSE,
+  random_seed = NULL){
 
   # Generate all the node names and their blocks
   nodes <- purrr::map2_dfr(
@@ -124,6 +125,9 @@ sim_sbm_network <- function(
   new_sbm_network(
     edges = edges,
     nodes = nodes,
-    setup_model = setup_model
+    setup_model = setup_model,
+    random_seed = random_seed
   )
 }
+
+utils::globalVariables(c("block_1", "block_2", "propensity", "node_1", "node_2"))

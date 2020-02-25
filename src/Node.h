@@ -5,6 +5,29 @@
 #ifndef __NODE_INCLUDED__
 #define __NODE_INCLUDED__
 
+#if NO_RCPP
+#define LOGIC_ERROR(msg) throw std::logic_error(msg)
+#define RANGE_ERROR(msg) throw std::range_error(msg)
+#define WARN_ABOUT(msg)          \
+  const std::string w_msg = msg; \
+  std::cerr << w_msg << std::endl
+#define OUT_MSG std::cout
+#else
+#include <Rcpp.h>
+// Eases the process of wrapping functions to get errors forwarded to R
+#define LOGIC_ERROR(msg)         \
+  const std::string e_msg = msg; \
+  throw Rcpp::exception(e_msg.c_str(), false)
+#define RANGE_ERROR(msg)         \
+  const std::string e_msg = msg; \
+  throw Rcpp::exception(e_msg.c_str(), false)
+#define WARN_ABOUT(msg)          \
+  const std::string w_msg = msg; \
+  Rcpp::warning(w_msg.c_str())
+
+#define OUT_MSG Rcpp::Rcout
+#endif
+
 #include "profiling/Instrument.h"
 
 #include <exception>
@@ -13,11 +36,9 @@
 #include <map>
 #include <memory>
 #include <queue>
+#include <set>
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
 #include <vector>
-using std::string;
 
 // =============================================================================
 // What this file declares
@@ -25,12 +46,14 @@ using std::string;
 class Node;
 
 // For a bit of clarity
-typedef std::shared_ptr<Node>       NodePtr;
-typedef std::unordered_set<NodePtr> ChildSet;
-typedef std::vector<NodePtr>        NodeVec;
-typedef std::list<NodePtr>          NodeList;
-// typedef std::map<NodePtr, int>      NodeEdgeMap;
-typedef std::unordered_map<NodePtr, int> NodeEdgeMap;
+using NodePtr     = std::shared_ptr<Node>;
+using NodeVec     = std::vector<NodePtr>;
+using NodeList    = std::list<NodePtr>;
+using NodeSet     = std::set<NodePtr>;
+using NodeEdgeMap = std::map<NodePtr, int>;
+using NodeLevel   = std::map<std::string, NodePtr>;
+using LevelPtr    = std::shared_ptr<NodeLevel>;
+using LevelMap    = std::map<int, LevelPtr>;
 
 //=================================
 // Main node class declaration
@@ -40,46 +63,55 @@ class Node : public std::enable_shared_from_this<Node> {
   // Constructors
   // =========================================================================
 
-  // Takes ID, node hiearchy level, and assumes default 0 for type
-  Node(string node_id, int level)
+  // Takes ID, node hiearchy level, and assumes default 'a' for type
+  Node(std::string node_id, int level)
       : id(node_id)
+      , type("a")
       , level(level)
-      , type(0)
       , degree(0)
   {
   }
 
   // Takes the node's id, level, and type.
-  Node(string node_id, int level, int type)
+  Node(std::string node_id, int level, std::string type)
       : id(node_id)
-      , level(level)
       , type(type)
+      , level(level)
+      , degree(0)
+  {
+  }
+
+  // Takes the node's id, level, and type as integer (for legacy api compatability)
+  Node(std::string node_id, int level, int type)
+      : id(node_id)
+      , type(std::to_string(type))
+      , level(level)
       , degree(0)
   {
   }
 
   // Attributes
   // =========================================================================
-  string   id;       // Unique integer id for node
-  NodeList edges;    // Nodes that are connected to this node
-  int      level;    // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
-  NodePtr  parent;   // What node contains this node (aka its cluster)
-  ChildSet children; // Nodes that are contained within node (if node is cluster)
-  int      type;     // What type of node is this?
-  int      degree;   // How many edges/ edges does this node have?
+  std::string id;       // Unique integer id for node
+  std::string type;     // What type of node is this?
+  int         level;    // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
+  NodeList    edges;    // Nodes that are connected to this node
+  NodePtr     parent;   // What node contains this node (aka its cluster)
+  NodeSet     children; // Nodes that are contained within node (if node is cluster)
+  int         degree;   // How many edges/ edges does this node have?
 
   // Methods
   // =========================================================================
-  NodePtr     this_ptr();                                        // Gets a shared pointer to object (replaces this)
-  void        set_parent(NodePtr new_parent);                    // Set current node parent/cluster
-  void        add_child(NodePtr new_child);                      // Add a node to the children vector
-  void        remove_child(NodePtr child);                       // Remove a child node
-  void        add_edge(NodePtr node);                            // Add edge to another node
-  void        update_edges_from_node(NodePtr node, bool remove); // Add or remove edges from nodes edge list
-  NodePtr     get_parent_at_level(int level);                    // Get parent of node at a given level
-  NodeVec     get_edges_to_level(int level);                     // Get all nodes connected to Node at a given level
-  NodeEdgeMap gather_edges_to_level(int level);                  // Get a map keyed by node with value of number of edges for all of a nodes edges to a level
-  static void connect_nodes(NodePtr node_a, NodePtr node_b);     // Static method to connect two nodes to each other with edge
+  NodePtr     this_ptr();                                                                      // Gets a shared pointer to object (replaces this)
+  void        set_parent(NodePtr new_parent);                                                  // Set current node parent/cluster
+  void        add_child(const NodePtr& new_child);                                             // Add a node to the children vector
+  void        remove_child(const NodePtr& child);                                              // Remove a child node
+  void        add_edge(const NodePtr& node);                                                   // Add edge to another node
+  void        update_edges_from_node(const NodePtr& node, const bool& remove);                 // Add or remove edges from nodes edge list
+  NodePtr     get_parent_at_level(const int& level);                                           // Get parent of node at a given level
+  NodeVec     get_edges_of_type(const std::string& node_type, const int& desired_level) const; // Get all nodes connected to Node at a given level
+  NodeEdgeMap gather_edges_to_level(const int& level) const;                                   // Get a map keyed by node with value of number of edges for all of a nodes edges to a level
+  static void connect_nodes(const NodePtr& node_a, const NodePtr& node_b);                     // Static method to connect two nodes to each other with edge
 };
 
 #endif

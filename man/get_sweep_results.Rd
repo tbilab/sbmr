@@ -6,12 +6,15 @@
 \usage{
 get_sweep_results(sbm)
 }
+\arguments{
+\item{sbm}{Object of class \code{sbm_network}.}
+}
 \value{
-
+MCMC sweep results from an \code{sbm_network} object
 }
 \description{
 Retrieves the MCMC sweep results from an \code{sbm_network} object. Needs to have
-\code{\link{mcmc_sweep()}} run on the object before.
+\code{\link{mcmc_sweep}} run on the object before.
 }
 \examples{
 

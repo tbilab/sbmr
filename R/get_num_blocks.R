@@ -47,3 +47,6 @@ get_num_blocks.sbm_network <- function(sbm){
     dplyr::filter(level == 1) %>%
     nrow()
 }
+
+
+utils::globalVariables(c("level"))

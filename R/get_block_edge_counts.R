@@ -4,7 +4,8 @@
 #'
 #' @family modeling
 #'
-#' @seealso \code{\link{get_node_edge_counts}}
+#' @seealso \code{\link{get_node_to_block_edge_counts}}
+#' @inheritParams mcmc_sweep
 #' @inheritParams get_node_to_block_edge_counts
 #'
 #' @return Dataframe of block pairs (`block_a` and `block_b`) and the number of edges between them (`count`).

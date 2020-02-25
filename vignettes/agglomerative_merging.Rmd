@@ -16,7 +16,10 @@ knitr::opts_chunk$set(
 )
 
 library(sbmR)
-library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
 ```
 
 One technique of finding the optimal number of clusters/ best partitioning is using the efficient agglomerative merging algorithm. This is typically used to find the initial state for MCMC chains but can stand on its own as a clustering method. 
@@ -31,7 +34,10 @@ First we load the `sbmR` package along with the `tidyverse` package.
 
 ```{r, eval = FALSE}
 library(sbmR)
-library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
 ```
 
 ### Data
@@ -47,7 +53,8 @@ group_size <- 40 # W/ 50 nodes in each
 network <- sim_basic_block_network(
   n_blocks = n_blocks,     
   n_nodes_per_block = group_size,  
-  return_edge_propensities = TRUE
+  return_edge_propensities = TRUE,
+  random_seed = 42 # This is the internal model seed (not same as set.seed())
 )
 ```
 
@@ -181,7 +188,6 @@ state_to_truth_table(network)
 
 
 
-
 So we can see that the merging algorithm perfectly separated our nodes into their true groups. 
 
 
@@ -216,7 +222,7 @@ network %>%
   state_to_truth_table()
 ```
 
-Again we got a perfect collapsing into the `n_block` generating blocks. 
+After adding the sweeps we again get a perfect collapsing into the `n_block` generating blocks. 
 
 
 
@@ -399,7 +405,7 @@ Epsilon controls how conservative the model is when generating those proposals. 
 
 ```{r, toggling_epsilon}
 # Get logaritmically spaced epsilon range
-eps_vals <- exp(seq(log(0.1), log(15), length.out = 9))
+eps_vals <- exp(seq(log(0.1), log(15), length.out = 8))
 
 eps_sweep_results <- purrr::map_dfr(
   eps_vals, 

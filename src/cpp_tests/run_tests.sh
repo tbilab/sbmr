@@ -8,7 +8,9 @@ OPTIMIZATION_LEVEL=""
 # OPTIMIZATION_LEVEL=-O2
 
 # Compile the main classes
-g++ -std=c++11 ${OPTIMIZATION_LEVEL} -c Node.cpp Network.cpp SBM.cpp Sampler.cpp Block_Consensus.cpp
+g++ -std=c++11 ${OPTIMIZATION_LEVEL} -c \
+  -DNO_RCPP=1 \
+  Node.cpp Block_Consensus.cpp SBM.cpp Sampler.cpp 
 
 
 echo "=============================================================================\nCompiling Tests..."
@@ -22,8 +24,9 @@ fi
 
 
 # Compile all the tests
-g++ -std=c++11 ${OPTIMIZATION_LEVEL} cpp_tests/tests-main.o \
-  Node.o Network.o SBM.o Sampler.o Block_Consensus.o \
+g++ -std=c++11 ${OPTIMIZATION_LEVEL} -DNO_RCPP=1\
+  cpp_tests/tests-main.o \
+  Node.o SBM.o Sampler.o Block_Consensus.o \
   cpp_tests/tests-node.cpp \
   cpp_tests/tests-edge.cpp \
   cpp_tests/tests-sampler.cpp \

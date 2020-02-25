@@ -20,7 +20,7 @@
 #'   draws propensity from `n` evenly spaced values in the 0-1 range.
 #' @param return_edge_propensities If set to `TRUE` the returned list will
 #'   also include the simulated edge propensities dataframe. This can be
-#'   used for recreating draws using \code{\link{sim_sbm_network()}}.
+#'   used for recreating draws using \code{\link{sim_sbm_network}}.
 #' @inheritParams sim_sbm_network
 #'
 #' @seealso \code{\link{sim_sbm_network}} \code{\link{sim_random_network}}
@@ -36,7 +36,9 @@
 #' sim_basic_block_network(n_blocks = 8, n_nodes_per_block = 20)
 #'
 #' # Can save the generating edge propensities as well
-#' net <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 20, return_edge_propensities = TRUE)
+#' net <- sim_basic_block_network(n_blocks = 4,
+#'                                n_nodes_per_block = 20,
+#'                                return_edge_propensities = TRUE)
 #' net$edge_propensities
 #'
 #'
@@ -52,12 +54,13 @@
 sim_basic_block_network <- function(
   n_blocks = 2,
   n_nodes_per_block = 5,
-  propensity_drawer = function(n){sample(seq(rbeta(1, 1, 5),rbeta(1, 5, 1),length.out = n))},
+  propensity_drawer = function(n){sample(seq(stats::rbeta(1, 1, 5), stats::rbeta(1, 5, 1),length.out = n))},
   edge_dist = purrr::rbernoulli,
   allow_self_edges = FALSE,
   keep_edge_counts = FALSE,
   return_edge_propensities = FALSE,
-  setup_model = FALSE){
+  setup_model = FALSE,
+  random_seed = NULL){
 
   # Build blocks option with a constant number of nodes per block
   blocks <- dplyr::tibble(
@@ -84,7 +87,8 @@ sim_basic_block_network <- function(
     edge_dist = purrr::rbernoulli,
     allow_self_edges = allow_self_edges,
     keep_edge_counts = keep_edge_counts,
-    setup_model = setup_model
+    setup_model = setup_model,
+    random_seed = random_seed
   )
 
   if (return_edge_propensities){

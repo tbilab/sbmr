@@ -3,7 +3,9 @@ test_that("Agglomerative merging with MCMC works", {
   n_blocks <- 2
   n_nodes_per_block <- 30
 
-  net <- sim_basic_block_network(n_blocks = n_blocks, n_nodes_per_block = n_nodes_per_block) %>%
+  net <- sim_basic_block_network(n_blocks = n_blocks,
+                                 n_nodes_per_block = n_nodes_per_block,
+                                 random_seed = 42) %>%
     collapse_blocks(num_mcmc_sweeps = 1, report_all_steps = TRUE)
 
   blocks_per_collapse <- net$collapse_results$num_blocks
@@ -18,7 +20,9 @@ test_that("Agglomerative merging with MCMC works", {
 test_that("Agglomerative merging without MCMC works", {
 
   # Start with a random network
-  net <- sim_basic_block_network(n_blocks = 2, n_nodes_per_block = 30) %>%
+  net <- sim_basic_block_network(n_blocks = 2,
+                                 n_nodes_per_block = 30,
+                                 random_seed = 42) %>%
       collapse_blocks(num_mcmc_sweeps = 0, report_all_steps = TRUE)
 
   blocks_per_collapse <- net$collapse_results$num_blocks
@@ -33,7 +37,9 @@ test_that("Agglomerative merging without MCMC works", {
 
 test_that("Requesting just the final merge step returns just the final merge step", {
 
-  net <- sim_basic_block_network(n_blocks = 2,n_nodes_per_block = 30) %>%
+  net <- sim_basic_block_network(n_blocks = 2,
+                                 n_nodes_per_block = 30,
+                                 random_seed = 42) %>%
     collapse_blocks(desired_num_blocks = 4,
                     num_mcmc_sweeps = 0,
                     report_all_steps = FALSE)
@@ -43,7 +49,9 @@ test_that("Requesting just the final merge step returns just the final merge ste
 
 test_that("Collapse run works in sequential mode", {
 
-  net <- sim_basic_block_network(n_blocks = 2, n_nodes_per_block = 30) %>%
+  net <- sim_basic_block_network(n_blocks = 2,
+                                 n_nodes_per_block = 30,
+                                 random_seed = 42) %>%
     collapse_run(num_final_blocks = 1:5, num_mcmc_sweeps = 3)
 
   expect_equal(nrow(net$collapse_results), 5)

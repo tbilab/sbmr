@@ -4,9 +4,9 @@
 #' `heuristic` is set to value other than `NULL` a second plot of the score for
 #' each merger step according to the heuristic provided is also shown.
 #'
-#' Either \link{\code{collapse_run}}, or
-#' \link{\code{collapse_blocks(report_all_steps = TRUE)}} must be run prior to
-#' calling this function.
+#' Either \code{\link{collapse_run}}, or `collapse_blocks(report_all_steps =
+#' TRUE)` must be run prior to calling this function. (See
+#' \code{\link{collapse_blocks}}.)
 #'
 #' @family visualizations
 #'
@@ -14,6 +14,7 @@
 #'   results entropy delta being used for the score function the entropy will
 #'   be. Typically the heuristics work better on entropy delta values.
 #' @inheritParams verify_model
+#' @inheritParams build_score_fn
 #'
 #' @return GGplot object comparing the fit results and each step's deviance from
 #'   the rolling mean
@@ -91,4 +92,5 @@ visualize_collapse_results.sbm_network <- function(sbm,
     ggplot2::labs(x = "number of blocks", y = "")
 }
 
+utils::globalVariables(c("entropy", "num_blocks", "state", "name"))
 

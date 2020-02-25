@@ -7,13 +7,14 @@
 sim_basic_block_network(
   n_blocks = 2,
   n_nodes_per_block = 5,
-  propensity_drawer = function(n) {     sample(seq(rbeta(1, 1, 5), rbeta(1, 5, 1),
-    length.out = n)) },
+  propensity_drawer = function(n) {     sample(seq(stats::rbeta(1, 1, 5),
+    stats::rbeta(1, 5, 1), length.out = n)) },
   edge_dist = purrr::rbernoulli,
   allow_self_edges = FALSE,
   keep_edge_counts = FALSE,
   return_edge_propensities = FALSE,
-  setup_model = FALSE
+  setup_model = FALSE,
+  random_seed = NULL
 )
 }
 \arguments{
@@ -42,14 +43,19 @@ want to set this to \code{TRUE}.}
 
 \item{return_edge_propensities}{If set to \code{TRUE} the returned list will
 also include the simulated edge propensities dataframe. This can be
-used for recreating draws using \code{\link{sim_sbm_network()}}.}
+used for recreating draws using \code{\link{sim_sbm_network}}.}
 
 \item{setup_model}{Should an SBM model object be added? Set to \code{FALSE} if
 network is just being visualized or described.}
+
+\item{random_seed}{Integer seed to be passed to model's internal random
+sampling engine. Note that if the model is restored from a saved state this
+seed will be initialized again to the start value which will harm
+reproducability.}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
-\link{new_sbm_network} section "Class structure."
+\code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
 Simulates a simple block structured network with a desired number of constant
@@ -71,7 +77,9 @@ sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 40)
 sim_basic_block_network(n_blocks = 8, n_nodes_per_block = 20)
 
 # Can save the generating edge propensities as well
-net <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 20, return_edge_propensities = TRUE)
+net <- sim_basic_block_network(n_blocks = 4,
+                               n_nodes_per_block = 20,
+                               return_edge_propensities = TRUE)
 net$edge_propensities
 
 

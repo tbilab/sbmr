@@ -1,5 +1,9 @@
 # SBMR
 
+<!-- badges: start -->
+[![R build status](https://github.com/nstrayer/sbmR/workflows/R-CMD-check/badge.svg)](https://github.com/nstrayer/sbmR/actions)
+<!-- badges: end -->
+
 An R package for fitting and exploring the results of Stochastic Block Models for network data. 
 
 ## What are SBMs?

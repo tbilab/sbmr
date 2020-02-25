@@ -6,6 +6,9 @@
 \usage{
 visualize_mcmc_trace(sbm)
 }
+\arguments{
+\item{sbm}{Object of class \code{sbm_network}.}
+}
 \value{
 GGplot line plot with x-axis as sweep number and y-axes as sweep
 entropy delta and number of nodes moved during sweep.

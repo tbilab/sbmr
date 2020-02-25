@@ -1,6 +1,8 @@
 test_that("computing entropy", {
   # Start with nodes 3 nodes attached to 2 blocks
-  net <- sim_random_network(n_nodes = 25, prob_of_edge = 0.5) %>%
+  net <- sim_random_network(n_nodes = 25,
+                            prob_of_edge = 0.5,
+                            random_seed = 42) %>%
     initialize_blocks(10)
 
   first_entropy <- net %>% get_entropy()

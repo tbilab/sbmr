@@ -4,17 +4,20 @@
 \alias{verify_model}
 \title{Verify model for sbm_network object exists}
 \usage{
-verify_model(x, show_messages = FALSE)
+verify_model(sbm, show_messages = FALSE, warn_about_random_seed = TRUE)
 }
 \arguments{
-\item{x}{Object of class \code{sbm_network}.}
+\item{sbm}{Object of class \code{sbm_network}.}
 
 \item{show_messages}{Should function inform of its actions such as when a
 model already exists so no changes are made?}
+
+\item{warn_about_random_seed}{Should the model warn about cases when set seed
+is present for cached model?}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
-\link{new_sbm_network} section "Class structure."
+\code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
 Takes data from sbm_network object and checks S4 \code{SBM} class model object

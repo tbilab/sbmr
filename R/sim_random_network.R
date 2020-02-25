@@ -24,7 +24,8 @@
 sim_random_network <- function(n_nodes = 5,
                                prob_of_edge = 0.7,
                                allow_self_edges = FALSE,
-                               setup_model = FALSE){
+                               setup_model = FALSE,
+                               random_seed = NULL){
 
   sim_sbm_network(
     block_info = dplyr::tibble(
@@ -38,6 +39,7 @@ sim_random_network <- function(n_nodes = 5,
     ),
     edge_dist = purrr::rbernoulli,
     allow_self_edges = allow_self_edges,
-    setup_model = setup_model
+    setup_model = setup_model,
+    random_seed = random_seed
   )
 }

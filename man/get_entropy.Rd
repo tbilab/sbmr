@@ -8,7 +8,7 @@ get_entropy(sbm)
 }
 \arguments{
 \item{sbm}{\code{sbm_network} object as created by
-\code{\link{new_sbm_network()}}.}
+\code{\link{new_sbm_network}}.}
 }
 \value{
 Entropy value (numeric).

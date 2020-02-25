@@ -71,7 +71,7 @@ propensity to be in the same block is above some threshold." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sbmR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.0</span>
       </span>
     </div>
 
@@ -103,7 +103,12 @@ propensity to be in the same block is above some threshold." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/nstrayer/sbmR">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -118,7 +123,7 @@ propensity to be in the same block is above some threshold." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Plot network of nodes connected by pairwise block propensity</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/visualize_propensity_network.R'><code>R/visualize_propensity_network.R</code></a></small>
     <div class="hidden name"><code>visualize_propensity_network.Rd</code></div>
     </div>
 
@@ -133,6 +138,10 @@ propensity to be in the same block is above some threshold.</p>
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>sbm</th>
+      <td><p>Object of class <code>sbm_network</code>.</p></td>
+    </tr>
     <tr>
       <th>proportion_threshold</th>
       <td><p>Threshold of pairwise propensity to consider two nodes linked. Choose carefully!</p></td>
@@ -157,7 +166,7 @@ propensity to be in the same block is above some threshold.</p>
 <span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>30</span>) <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='collapse_blocks.html'>collapse_blocks</a></span>(<span class='kw'>desired_num_blocks</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>1.1</span>) <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a></span>(<span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='mcmc_sweep.html'>mcmc_sweep</a></span>(<span class='kw'>num_sweeps</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>0.4</span>, <span class='kw'>track_pairs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 3043.1369.</div><div class='input'>
+  <span class='fu'><a href='mcmc_sweep.html'>mcmc_sweep</a></span>(<span class='kw'>num_sweeps</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>0.4</span>, <span class='kw'>track_pairs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 3034.5888.</div><div class='input'>
 <span class='co'># Plot connection propensity network</span>
 <span class='fu'>visualize_propensity_network</span>(<span class='no'>net</span>, <span class='kw'>proportion_threshold</span> <span class='kw'>=</span> <span class='fl'>0.4</span>)</div></pre>
   </div>

@@ -19,7 +19,7 @@ edge_propensities <- dplyr::tribble(
 
 test_that("Expected number of nodes returned", {
   expect_equal(
-    attr(sim_sbm_network(block_info, edge_propensities), 'n_nodes'),
+    attr(sim_sbm_network(block_info, edge_propensities, random_seed = 42), 'n_nodes'),
     sum(block_info$n_nodes)
   )
 })
@@ -41,7 +41,7 @@ test_that("Partite structure can be reflected by zeroing out or ommitting block 
     "a2",         "b2",         7,
   )
 
-  simulated_edges <- sim_sbm_network(block_info, edge_propensities)$edges
+  simulated_edges <- sim_sbm_network(block_info, edge_propensities, random_seed = 42)$edges
 
   # There should be no edges between any nodes that have the same type as
   # encoded in letter before block name
@@ -57,9 +57,9 @@ test_that("Partite structure can be reflected by zeroing out or ommitting block 
 test_that("Higher propensity block combos should be reflected with more edges", {
   block_info <- dplyr::tribble(
     ~block, ~n_nodes,
-    "a",       50,
-    "b",       50,
-    "c",       50
+    "a",       70,
+    "b",       70,
+    "c",       70
   )
 
   edge_propensities <- dplyr::tribble(
@@ -68,8 +68,7 @@ test_that("Higher propensity block combos should be reflected with more edges", 
     "a",      "b",         0.5,
     "a",      "c",         0.3,
     "b",      "b",         0.7,
-    "b",      "c",         0.1,
-    "c",      "c",         0.4,
+    "b",      "c",         0.1
   )
 
   # Helper function to collapse blocks into order-independent form and remove block from generated node name
@@ -88,7 +87,7 @@ test_that("Higher propensity block combos should be reflected with more edges", 
   # First get the observed ordering of least likely to connect to most likely to
   # connect pairs of blocks
   # Note that these are zero censored values so true mean will be different than real Lambda
-  observed_pair_order <- sim_sbm_network(block_info, edge_propensities)$edges %>%
+  observed_pair_order <- sim_sbm_network(block_info, edge_propensities, random_seed = 42)$edges %>%
     dplyr::mutate(
       blocks = sorted_block_collapse(get_block(from),get_block(to))
     ) %>%

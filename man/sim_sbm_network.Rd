@@ -7,10 +7,11 @@
 sim_sbm_network(
   block_info,
   edge_propensities,
-  edge_dist = rpois,
+  edge_dist = stats::rpois,
   allow_self_edges = FALSE,
   keep_edge_counts = TRUE,
-  setup_model = FALSE
+  setup_model = FALSE,
+  random_seed = NULL
 )
 }
 \arguments{
@@ -39,10 +40,15 @@ want to set this to \code{TRUE}.}
 
 \item{setup_model}{Should an SBM model object be added? Set to \code{FALSE} if
 network is just being visualized or described.}
+
+\item{random_seed}{Integer seed to be passed to model's internal random
+sampling engine. Note that if the model is restored from a saved state this
+seed will be initialized again to the start value which will harm
+reproducability.}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
-\link{new_sbm_network} section "Class structure."
+\code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
 Simulates nodes and edges from a network where edge edges are derived

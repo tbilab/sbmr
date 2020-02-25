@@ -7,11 +7,13 @@
 update_state(sbm, state_df)
 }
 \arguments{
+\item{sbm}{Object of class \code{sbm_network}.}
+
 \item{state_df}{A state dataframe with \code{id}, \code{parent}, \code{level}, and \code{type} columns for all nodes in network (along with block nodes).}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
-\link{new_sbm_network} section "Class structure."
+\code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
 Updates the state of the internal S4 class along with the state holder of the s3 class.

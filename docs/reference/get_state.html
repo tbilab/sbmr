@@ -71,7 +71,7 @@ accomplished by attr(sbm, 'state')." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sbmR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.0</span>
       </span>
     </div>
 
@@ -103,7 +103,12 @@ accomplished by attr(sbm, 'state')." />
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/nstrayer/sbmR">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -118,7 +123,7 @@ accomplished by attr(sbm, 'state')." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Dump state of current SBM model to dataframe</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/get_state.R'><code>R/get_state.R</code></a></small>
     <div class="hidden name"><code>get_state.Rd</code></div>
     </div>
 
@@ -128,8 +133,17 @@ and columns for node id, parent id, node type, and node level. Can also be
 accomplished by <code><a href='https://rdrr.io/r/base/attr.html'>attr(sbm, 'state')</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_state</span>(<span class='no'>x</span>)</pre>
+    <pre class="usage"><span class='fu'>get_state</span>(<span class='no'>sbm</span>)</pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>sbm</th>
+      <td><p><code>sbm_network</code> object as created by
+<code><a href='new_sbm_network.html'>new_sbm_network</a></code>.</p></td>
+    </tr>
+    </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
@@ -175,21 +189,22 @@ hierarchy</p></dd>
 #&gt; 6 b3   none node     0
 #&gt; 7 b4   none node     0</div><div class='input'>
 <span class='co'># Add some blocks and state will reflect</span>
-<span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='fl'>2</span>) <span class='kw'>%&gt;%</span> <span class='fu'>get_state</span>()</div><div class='output co'>#&gt;      id parent type level
-#&gt; 1    a1  0-1_0 node     0
-#&gt; 2    a2  0-1_0 node     0
-#&gt; 3    a3  0-1_0 node     0
-#&gt; 4    b1  0-1_1 node     0
-#&gt; 5    b2  0-1_0 node     0
-#&gt; 6    b3  0-1_1 node     0
-#&gt; 7    b4  0-1_1 node     0
-#&gt; 8 0-1_0   none node     1
-#&gt; 9 0-1_1   none node     1</div><div class='input'>
+<span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='fl'>2</span>) <span class='kw'>%&gt;%</span> <span class='fu'>get_state</span>()</div><div class='output co'>#&gt;         id   parent type level
+#&gt; 1       a1 node-1_1 node     0
+#&gt; 2       a2 node-1_1 node     0
+#&gt; 3       a3 node-1_1 node     0
+#&gt; 4       b1 node-1_1 node     0
+#&gt; 5       b2 node-1_1 node     0
+#&gt; 6       b3 node-1_1 node     0
+#&gt; 7       b4 node-1_1 node     0
+#&gt; 8 node-1_0     none node     1
+#&gt; 9 node-1_1     none node     1</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
       <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>

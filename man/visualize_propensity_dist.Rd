@@ -6,6 +6,9 @@
 \usage{
 visualize_propensity_dist(sbm)
 }
+\arguments{
+\item{sbm}{Object of class \code{sbm_network}.}
+}
 \value{
 GGplot2 plot containing ECDF of the pairwise propensities of residing in same block for MCMC sweeps.
 }

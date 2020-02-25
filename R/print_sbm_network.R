@@ -1,8 +1,13 @@
 #' Print network
 #'
+#' Addition arguments get passed to `head()` function.
+#'
 #' @family helpers
 #'
-#' @inheritParams verify_model
+#' @param x Object of class `sbm_network`. (See \code{\link{new_sbm_network}}
+#'   for more info.)
+#' @param ... Arguments passed to \code{\link[utils]{head}} that are used to
+#'   control preview of node and edge data frames.
 #'
 #' @return Output of the number of nodes and edges in model along with
 #'   indication of if a model has been initialized
@@ -24,7 +29,7 @@
 #' sbm_net <- new_sbm_network(small_edges, edges_from_col = a_node, edges_to_col = b_node)
 #' print(sbm_net)
 #'
-print.sbm_network <- function(x, rows_for_preview = 5){
+print.sbm_network <- function(x, ...){
   N <- attr(x, "n_nodes")
   E <- attr(x, "n_edges")
   n_types <- length(unique(x$nodes$type))
@@ -32,11 +37,11 @@ print.sbm_network <- function(x, rows_for_preview = 5){
   cat(glue::glue("SBM Network with {N} nodes {type_msg} and {E} edges."), "\n", "\n")
 
   cat("Nodes: ")
-  print(head(x$nodes, rows_for_preview))
+  print(utils::head(x$nodes, ...))
   cat("...", "\n","\n")
 
   cat("Edges: ")
-  print(head(x$edges, rows_for_preview))
+  print(utils::head(x$edges, ...))
   cat("...", "\n","\n")
 
   if (!is.null(attr(x, 'model'))){
