@@ -31,42 +31,44 @@ inline void Node::add_edge(const NodePtr& node)
 }
 
 // =============================================================================
-// Add or remove edges from nodes edge list
+// Add or remove edges from a nodes edge list
 // =============================================================================
-void Node::update_edges_from_node(const NodePtr& node, const bool& remove)
+void Node::update_edges_from_node(const NodePtr& node_being_moved, const bool& remove)
 {
   // PROFILE_FUNCTION();
 
-  // Grab list of nodes from node being removed or added we are updating
-  const auto changed_node_edges = node->edges;
+  // Grab list nodes connected to the node being moved
+  const NodeList& moved_node_edges = node_being_moved->edges;
 
-  // Keep track of which node in the hierarchy is being updated.
-  // Starts with this node
+  // We will scan upward from the this node up through all its parents
+  // First, we start with this node
   auto node_being_updated = this_ptr();
 
   // While we still have a node to continue to in the hierarchy...
   while (node_being_updated) {
     // Loop through all the edges that are being updated...
     // Grab reference to the current nodes edges list
-    NodeList& curr_edges = node_being_updated->edges;
+    NodeList& updated_node_edges = node_being_updated->edges;
 
-    for (const auto& edge_to_update : changed_node_edges) {
+    // Loop through all the edges from the node being moved
+    for (const auto& edge_to_update : moved_node_edges) {
       if (remove) {
         // Scan through this nodes edges untill we find the first instance
         // of the connected node we want to remove
-        auto last_place = curr_edges.end();
-        for (auto con_it = curr_edges.begin();
-             con_it != last_place;
-             con_it++) {
-          if (*con_it == edge_to_update) {
-            curr_edges.erase(con_it);
-            break;
-          }
+        auto loc_of_edge = std::find(updated_node_edges.begin(),
+                                     updated_node_edges.end(),
+                                     edge_to_update);
+
+        if (loc_of_edge != updated_node_edges.end()) {
+          updated_node_edges.erase(loc_of_edge);
+        }
+        else {
+          LOGIC_ERROR("Trying to erase non-existant edge from parent node.");
         }
       }
       else {
         // Just add this edge to nodes edges
-        curr_edges.push_back(edge_to_update);
+        updated_node_edges.push_back(edge_to_update);
       }
     }
 
