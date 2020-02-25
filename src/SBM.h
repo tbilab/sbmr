@@ -1,5 +1,5 @@
-#ifndef __NETWORK_INCLUDED__
-#define __NETWORK_INCLUDED__
+#ifndef __SBM_INCLUDED__
+#define __SBM_INCLUDED__
 
 #include "Block_Consensus.h"
 #include "Edge.h"
@@ -81,6 +81,8 @@ struct MCMC_Sweeps {
 // Some type definitions for cleaning up ugly syntax
 using CollapseResults = std::vector<Merge_Step>;
 using BlockEdgeCounts = std::map<Edge, int>;
+using NodeTypeCounts  = std::map<std::string, std::map<int, int>>;
+using EdgeTypes       = std::map<std::string, std::set<std::string>>;
 
 // =============================================================================
 // Main node class declaration
@@ -91,12 +93,12 @@ class SBM {
   public:
   // Attributes
   // =========================================================================
-  LevelMap                                  nodes;            // A kmap keyed by level integer of each level of nodes
-  std::map<std::string, std::map<int, int>> node_type_counts; // A map keyed by type to a map keyed by level of node counts
-  std::list<Edge>                           edges;            // Each pair of edges in the network
+  LevelMap        nodes;            // A kmap keyed by level integer of each level of nodes
+  NodeTypeCounts  node_type_counts; // A map keyed by type to a map keyed by level of node counts
+  std::list<Edge> edges;            // Each pair of edges in the network
 
   // Map keyed by a node type. Value is the types of nodes the key type is allowed to connect to.
-  std::map<std::string, std::set<std::string>> edge_type_pairs;
+  EdgeTypes edge_type_pairs;
 
   // Do we have an explicitely set list of allowed edges or should we build this list ourselves?
   bool specified_allowed_edges = false;
