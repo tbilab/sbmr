@@ -30,6 +30,24 @@ inline void Node::add_edge(const NodePtr& node)
   }
 }
 
+inline void remove_edge(NodeList& edge_list, const NodePtr& node_to_remove)
+{
+  // Scan through this nodes edges untill we find the first instance
+  // of the connected node we want to remove
+  auto loc_of_edge = std::find(edge_list.begin(),
+                               edge_list.end(),
+                               node_to_remove);
+
+  if (loc_of_edge != edge_list.end()) {
+    edge_list.erase(loc_of_edge);
+  }
+  else {
+    LOGIC_ERROR("Trying to erase non-existant edge from parent node.");
+  }
+}
+
+
+
 // =============================================================================
 // Add or remove edges from a nodes edge list
 // =============================================================================
@@ -52,23 +70,17 @@ void Node::update_edges_from_node(const NodePtr& node_being_moved, const Update_
 
     // Loop through all the edges from the node being moved
     for (const auto& edge_to_update : moved_node_edges) {
-      if (update_type == Remove) {
-        // Scan through this nodes edges untill we find the first instance
-        // of the connected node we want to remove
-        auto loc_of_edge = std::find(updated_node_edges.begin(),
-                                     updated_node_edges.end(),
-                                     edge_to_update);
 
-        if (loc_of_edge != updated_node_edges.end()) {
-          updated_node_edges.erase(loc_of_edge);
-        }
-        else {
-          LOGIC_ERROR("Trying to erase non-existant edge from parent node.");
-        }
-      }
-      else {
-        // Just add this edge to nodes edges
+      switch (update_type) {
+      case Remove:
+        remove_edge(updated_node_edges, edge_to_update);
+        break;
+      case Add:
         updated_node_edges.push_back(edge_to_update);
+        break;
+      default:
+        LOGIC_ERROR("Something went wrong in edge adjustment");
+        break;
       }
     }
 
