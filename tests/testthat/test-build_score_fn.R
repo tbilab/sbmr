@@ -18,6 +18,18 @@ test_that("Rolling mean deviance method works", {
   expect_equal(which(score == max(score)), 4)
 })
 
+test_that("A bad heuristic gives informative error", {
+
+  y <- sin(x)
+
+  expect_error(
+    build_score_fn('non-existant-heuristic'),
+    "Hueristic must be either a function or one of {lowest, dev_from_rolling_mean, nls_residual, delta_ratio, trend_deviation}",
+    fixed = TRUE
+  )
+
+})
+
 
 test_that("NLS residual method works", {
 

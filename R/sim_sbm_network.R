@@ -54,7 +54,7 @@
 sim_sbm_network <- function(
   block_info,
   edge_propensities,
-  edge_dist = rpois,
+  edge_dist = stats::rpois,
   allow_self_edges = FALSE,
   keep_edge_counts = TRUE,
   setup_model = FALSE,
@@ -129,3 +129,5 @@ sim_sbm_network <- function(
     random_seed = random_seed
   )
 }
+
+utils::globalVariables(c("block_1", "block_2", "propensity", "node_1", "node_2"))

@@ -15,6 +15,9 @@ collapse_run(
 )
 }
 \arguments{
+\item{sbm}{\code{sbm_network} object as created by
+\code{\link{new_sbm_network}}.}
+
 \item{num_final_blocks}{Array of integers corresponding to number of blocks to check in run.}
 
 \item{num_mcmc_sweeps}{How many MCMC sweeps the model does at each
@@ -39,7 +42,7 @@ searched exhaustively.}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
-\link{new_sbm_network} section "Class structure."
+\code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
 Run Agglomerative Merging to target a range of block numbers

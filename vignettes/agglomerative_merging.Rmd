@@ -16,7 +16,10 @@ knitr::opts_chunk$set(
 )
 
 library(sbmR)
-library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
 ```
 
 One technique of finding the optimal number of clusters/ best partitioning is using the efficient agglomerative merging algorithm. This is typically used to find the initial state for MCMC chains but can stand on its own as a clustering method. 
@@ -31,7 +34,10 @@ First we load the `sbmR` package along with the `tidyverse` package.
 
 ```{r, eval = FALSE}
 library(sbmR)
-library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
 ```
 
 ### Data

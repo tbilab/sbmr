@@ -13,7 +13,7 @@ choose_best_collapse_state(
 }
 \arguments{
 \item{sbm}{\code{sbm_network} object as created by
-\code{\link{new_sbm_network()}}.}
+\code{\link{new_sbm_network}}.}
 
 \item{use_entropy_value_for_score}{If set to \code{TRUE} then instead of the merge
 results entropy delta being used for the score function the entropy will
@@ -25,11 +25,12 @@ number of blocks vector with each element corresponding to a given
 location, or a string labeling algorithm. Currently only \code{"lowest"},
 \code{"dev_from_rolling_mean"}, \code{"delta_ratio"}, \code{"trend_deviation"}, and \code{"nls_residual"} are supported.}
 
-\item{verbose}{Should model tell you what step was chosen (\code{TRUE} or \code{FALSE})?}
+\item{verbose}{Should model tell you what step was chosen (\code{TRUE} or
+\code{FALSE})?}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
-\link{new_sbm_network} section "Class structure."
+\code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
 Choose and load best model state from agglomerative collapsing algorithm
@@ -44,7 +45,8 @@ net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) \%>\%
 # Choose best result with default heuristic
 net <- choose_best_collapse_state(net, verbose = TRUE)
 
-# Score heuristic that fits a nonlinear model to observed values and chooses by largest negative residual
+# Score heuristic that fits a nonlinear model to observed values and chooses by
+# largest negative residual
 nls_score <- function(e, k){
   entropy_model <- nls(e ~ a + b * log(k), start = list(a = max(e), b = -25))
   -residuals(entropy_model)

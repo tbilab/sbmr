@@ -14,6 +14,8 @@
 #'
 #' @inherit new_sbm_network return
 #'
+#' @importFrom rlang :=
+#'
 #' @export
 #'
 #' @examples
@@ -60,6 +62,7 @@ add_edge.default <- function(sbm,
 }
 
 #' @export
+#' @importFrom rlang :=
 add_edge.sbm_network <- function(sbm,
                                  from_node,
                                  to_node,

@@ -57,9 +57,9 @@ test_that("Partite structure can be reflected by zeroing out or ommitting block 
 test_that("Higher propensity block combos should be reflected with more edges", {
   block_info <- dplyr::tribble(
     ~block, ~n_nodes,
-    "a",       50,
-    "b",       50,
-    "c",       50
+    "a",       70,
+    "b",       70,
+    "c",       70
   )
 
   edge_propensities <- dplyr::tribble(
@@ -68,8 +68,7 @@ test_that("Higher propensity block combos should be reflected with more edges", 
     "a",      "b",         0.5,
     "a",      "c",         0.3,
     "b",      "b",         0.7,
-    "b",      "c",         0.1,
-    "c",      "c",         0.4,
+    "b",      "c",         0.1
   )
 
   # Helper function to collapse blocks into order-independent form and remove block from generated node name

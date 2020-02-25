@@ -29,8 +29,6 @@
 #' @param sigma Controls the rate of collapse. At each step of the collapsing
 #'   the model will try and remove `current_num_nodes(1 - 1/sigma)` nodes from
 #'   the model. So a larger sigma means a faster collapse rate.
-#' @param eps Controls randomness of move proposals. Effects both the block
-#'   merging and mcmc sweeps.
 #'
 #' @inherit new_sbm_network return
 #' @export

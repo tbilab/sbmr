@@ -13,15 +13,24 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.width = 7
 )
-library(tidyverse)
-library(glue)
+
 library(sbmR)
+library(glue)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
+library(forcats)
 ```
 
 ```{r, eval = FALSE}
 library(sbmR)
 library(glue)
-library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
+library(forcats)
 ```
 
 

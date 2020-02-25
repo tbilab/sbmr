@@ -16,6 +16,9 @@ collapse_blocks(
 )
 }
 \arguments{
+\item{sbm}{\code{sbm_network} object as created by
+\code{\link{new_sbm_network}}.}
+
 \item{desired_num_blocks}{How many blocks should this given merge drop down
 to. If the network has more than one node type this number is multiplied by
 the total number of types.}
@@ -49,7 +52,7 @@ transfer.}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
-\link{new_sbm_network} section "Class structure."
+\code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
 Performs agglomerative merging on network, starting with each block has a

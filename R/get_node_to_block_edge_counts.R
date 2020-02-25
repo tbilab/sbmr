@@ -47,3 +47,5 @@ get_node_to_block_edge_counts.sbm_network <- function(sbm, node_id, connection_l
                                                                  as.integer(connection_level))
 }
 
+utils::globalVariables(c("id", "level"))
+

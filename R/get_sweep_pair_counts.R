@@ -1,13 +1,13 @@
 #' Get pairwise group sharing counts from model
 #'
 #' Retrieves the pairwise connection propensity counts from latest MCMC sweep on an `sbm_network` object. Needs to have
-#' \code{\link{mcmc_sweep(track_pairs = TRUE)}} run on the object before.
+#' \code{\link{mcmc_sweep}}`(track_pairs = TRUE)` run on the object before.
 #'
 #' @family helpers
 #'
 #' @inheritParams verify_model
 #'
-#' @return
+#' @return pairwise connection propensity counts from latest MCMC sweep
 #' @export
 #'
 #' @examples

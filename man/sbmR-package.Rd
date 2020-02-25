@@ -11,6 +11,14 @@ Inference and visualization of network data using the Stochastic Block Model.
 \details{
 Imports
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{http://nickstrayer.me/sbmR/}
+  \item \url{https://github.com/nstrayer/sbmR}
+}
+
+}
 \author{
 \strong{Maintainer}: Nick Strayer \email{nick.strayer@gmail.com}
 

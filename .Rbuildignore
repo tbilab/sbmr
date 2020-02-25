@@ -5,3 +5,9 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^\.github/workflows/R-CMD-check\.yaml$
+^src/cpp_tests
+^src/.clang-format
+^.vscode
+^README.Rmd
+^README.MD

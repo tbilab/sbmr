@@ -21,7 +21,7 @@
 #'   object then a `$sweep_result` slot will be added. For more info see
 #'   \code{\link{mcmc_sweep}}.
 #'
-#'   If either of the methods \code{\link{collapse_groups}} or
+#'   If either of the methods \code{\link{collapse_blocks}} or
 #'   \code{\link{collapse_run}} have been applied to the `sbm_network` object
 #'   then the slot `$collapse_result` will be append.
 #'
@@ -68,7 +68,7 @@
 #'   reproducability.
 #'
 #' @return An S3 object of class `sbm_network`. For details see
-#'   \link{new_sbm_network} section "Class structure."
+#'   \code{\link{new_sbm_network}} section "Class structure."
 #' @export
 #'
 #' @examples
@@ -139,12 +139,13 @@
 #' # connect to a.
 #'
 #' edge_types <- dplyr::tribble(~from, ~to,
-#'                                        "a", "b",
-#'                                        "a", "c")
-#'
+#'                                "a", "b",
+#'                                "a", "c")
+#' \dontrun{
 #' new_sbm_network(edges = edges_tripartite,
 #'                 nodes = nodes_tripartite,
 #'                 edge_types = edge_types)
+#' }
 #'
 new_sbm_network <- function(edges = dplyr::tibble(),
                             nodes = NULL,
@@ -156,6 +157,8 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                             default_node_type = "node",
                             show_warnings = interactive(),
                             random_seed = NULL){
+
+
   # Setup some tidy eval stuff for the column names
   to_column <- rlang::enquo(edges_to_column)
   from_column <- rlang::enquo(edges_from_column)
@@ -305,3 +308,6 @@ new_sbm_network <- function(edges = dplyr::tibble(),
   # Return
   x
 }
+
+utils::globalVariables(c("from", "to", "id", "type", "n_types"))
+

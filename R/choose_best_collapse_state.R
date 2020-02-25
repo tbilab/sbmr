@@ -6,7 +6,8 @@
 #' @inheritParams mcmc_sweep
 #' @inheritParams build_score_fn
 #' @inheritParams visualize_collapse_results
-#' @param verbose Should model tell you what step was chosen (`TRUE` or `FALSE`)?
+#' @param verbose Should model tell you what step was chosen (`TRUE` or
+#'   `FALSE`)?
 #'
 #'
 #' @inherit new_sbm_network return
@@ -22,7 +23,8 @@
 #' # Choose best result with default heuristic
 #' net <- choose_best_collapse_state(net, verbose = TRUE)
 #'
-#' # Score heuristic that fits a nonlinear model to observed values and chooses by largest negative residual
+#' # Score heuristic that fits a nonlinear model to observed values and chooses by
+#' # largest negative residual
 #' nls_score <- function(e, k){
 #'   entropy_model <- nls(e ~ a + b * log(k), start = list(a = max(e), b = -25))
 #'   -residuals(entropy_model)
@@ -52,6 +54,7 @@ choose_best_collapse_state.sbm_network <- function(sbm,
                                                    use_entropy_value_for_score = FALSE,
                                                    heuristic = 'dev_from_rolling_mean',
                                                    verbose = FALSE){
+
   collapse_results <- get_collapse_results(sbm)
   # Apply the heuristic on the entropy column and choose the higheset value
   best_state <- collapse_results %>%
@@ -82,4 +85,6 @@ choose_best_collapse_state.sbm_network <- function(sbm,
   # Update the model and s3 class states and return
   verify_model(sbm) %>% update_state(best_state$state[[1]])
 }
+
+utils::globalVariables(c("num_blocks", "entropy_delta", "score"))
 

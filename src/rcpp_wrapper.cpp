@@ -13,7 +13,6 @@ namespace Rcpp {
   template <> SEXP wrap(const NodeEdgeMap&);
 }
 
-#include <Rcpp.h>
 using namespace Rcpp;
 
 inline DataFrame state_to_df(const State_Dump& state)
@@ -51,7 +50,6 @@ SEXP wrap(const NodePtr& node_ref)
 template <>
 SEXP wrap(const BlockEdgeCounts& block_edge_counts)
 {
-
   const int n_pairs = block_edge_counts.size();
 
   // Initialize some vectors to return results with

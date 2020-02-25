@@ -1,13 +1,13 @@
 #' Get mcmc sweep results
 #'
 #' Retrieves the MCMC sweep results from an `sbm_network` object. Needs to have
-#' \code{\link{mcmc_sweep()}} run on the object before.
+#' \code{\link{mcmc_sweep}} run on the object before.
 #'
 #' @family helpers
 #'
 #' @inheritParams verify_model
 #'
-#' @return
+#' @return MCMC sweep results from an `sbm_network` object
 #' @export
 #'
 #' @examples

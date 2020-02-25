@@ -122,11 +122,8 @@ inline void Node::add_child(const NodePtr& new_child_node)
 // =============================================================================
 // Find and erase a child node
 // =============================================================================
-inline void Node::remove_child(const NodePtr& child_node)
+void Node::remove_child(const NodePtr& child_node)
 {
-  //PROFILE_FUNCTION();
-
-  // children.erase(children.find(child_node));
   children.erase(child_node);
 }
 

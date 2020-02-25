@@ -42,54 +42,53 @@
 build_score_fn <- function(heuristic){
 
   heuristic_is_function <- 'function' %in% class(heuristic)
+  allowed_heuristics <- c('lowest', 'dev_from_rolling_mean', 'nls_residual',
+                          'delta_ratio', 'trend_deviation')
 
-  if(heuristic_is_function){
-    # If heuristic function only takes one argument its entropy, otherwise it
-    # needs entropy and number of blocks
-    just_entropy <- length(formals(heuristic)) == 1
-
-    score_func <- function(entropy, num_blocks){
-      if(just_entropy){
-        res <- heuristic(entropy)
-      } else {
-        res <- heuristic(entropy, num_blocks)
-      }
-      res
+  if(!heuristic_is_function){
+    if(heuristic %>% not_in(allowed_heuristics)){
+      stop(glue::glue(
+        "Hueristic must be either a function or one of {{",
+        paste(allowed_heuristics, collapse = ", "),
+        "}}."
+      ))
     }
-  } else {
-    if(heuristic == 'lowest'){
-      score_func <-  function(e, n) -e
-    } else
-    if(heuristic == 'dev_from_rolling_mean'){
-      score_func <- function(e,n) rolling_mean(e) - e
-    } else
-    if(heuristic == 'nls_residual'){
-      score_func <- function(e, k){
-         entropy_model <- nls(e ~ a + b * log(k), start = list(a = max(e), b = -25))
-         -residuals(entropy_model)
-       }
-    } else
-    if(heuristic == 'delta_ratio'){
-      score_func <- function(value, k){
-        window_size <- 2
-        rolling_avg_at_k <- rolling_mean(value, window = window_size)
-        rolling_avg_after <- dplyr::lead(rolling_avg_at_k, window_size)
-        rolling_avg_at_k/rolling_avg_after
-      }
-    } else
-    if(heuristic == 'trend_deviation'){
+  }
 
-      score_func <- function(value, k){
-        x1 <- lag(k)
-        y1 <- lag(value)
-        x2 <- lead(k)
-        y2 <- lead(value)
-        px <- k
-        py <- value
-        # Distance between a line defined by two points and a given point
-        abs((y2 - y1)*px - (x2 - x1)*py + x2*y1 - y2*x1)/sqrt( (y2-y1)^2 + (x2-x1)^2 )
+  function(value = NULL, k = NULL){
+    if(heuristic_is_function){
+      # If heuristic function only takes one argument its entropy, otherwise it
+      # needs entropy and number of blocks
+      just_entropy <- length(formals(heuristic)) == 1
+
+      if(just_entropy){
+        res <- heuristic(value)
+      } else {
+        res <- heuristic(value, k)
       }
-    } else
-    {stop("Hueristic must be either a function or one of {\"lowest\", \"dev_from_rolling_mean\", \"nls_residual\"}.")}
+    } else if (heuristic == 'lowest') {
+      res <- -value
+    } else if(heuristic == 'dev_from_rolling_mean'){
+      res <- rolling_mean(value) - value
+    } else if(heuristic == 'nls_residual'){
+      entropy_model <- stats::nls(value ~ a + b * log(k), start = list(a = max(value), b = -25))
+      res <- as.numeric(-stats::residuals(entropy_model))
+    } else if(heuristic == 'delta_ratio'){
+      window_size <- 2
+      rolling_avg_at_k <- rolling_mean(value, window = window_size)
+      rolling_avg_after <- dplyr::lead(rolling_avg_at_k, window_size)
+      res <- rolling_avg_at_k/rolling_avg_after
+    } else if(heuristic == 'trend_deviation'){
+      x1 <- dplyr::lag(k)
+      y1 <- dplyr::lag(value)
+      x2 <- dplyr::lead(k)
+      y2 <- dplyr::lead(value)
+      # Distance between a line defined by two points and a given point
+      res <- abs((y2 - y1)*k - (x2 - x1)*value + x2*y1 - y2*x1)/sqrt( (y2-y1)^2 + (x2-x1)^2 )
+    } else {
+      warning("Unrecognized heuristic. Returning untransformed value.")
+      res <- value
+    }
+    res
   }
 }

@@ -11,7 +11,6 @@
 #' @family modeling
 #'
 #' @inheritParams add_node
-#' @inheritParams collapse_blocks
 #' @param num_sweeps Number of times all nodes are passed through for move
 #'   proposals.
 #' @param level Level of nodes who's blocks will have their block membership run
@@ -24,9 +23,12 @@
 #' @param verbose If set to `TRUE` then each proposed move for all sweeps will
 #'   have information given on entropy delta, probability of moving, and if the
 #'   move were accepted printed to the console.
+#' @param eps Controls randomness of move proposals. Effects both the block
+#'   merging and mcmc sweeps.
 #'
 #' @inherit new_sbm_network return
 #'
+#' @importFrom rlang .data
 #' @export
 #'
 #' @examples
@@ -62,8 +64,7 @@ mcmc_sweep <- function(sbm,
                        variable_num_blocks = TRUE,
                        track_pairs = FALSE,
                        level = 0,
-                       verbose = FALSE,
-                       return_sbm_network = TRUE){
+                       verbose = FALSE){
   UseMethod("mcmc_sweep")
 }
 
@@ -73,8 +74,7 @@ mcmc_sweep.default <- function(sbm,
                                variable_num_blocks = TRUE,
                                track_pairs = FALSE,
                                level = 0,
-                               verbose = FALSE,
-                               return_sbm_network = TRUE){
+                               verbose = FALSE){
   cat("mcmc_sweep generic")
 }
 
@@ -98,8 +98,8 @@ mcmc_sweep.sbm_network <- function(sbm,
   if (track_pairs) {
     # Clean up pair connections results
     results$pairing_counts <- results$pairing_counts %>%
-      tidyr::separate(node_pair, into = c("node_a", "node_b"), sep = "--") %>%
-      dplyr::mutate(proportion_connected = times_connected/num_sweeps)
+      tidyr::separate(.data$node_pair, into = c("node_a", "node_b"), sep = "--") %>%
+      dplyr::mutate(proportion_connected = .data$times_connected/num_sweeps)
   } else {
     # Remove the empty pair counts results
     results['pairing_counts'] <- NULL
@@ -113,4 +113,3 @@ mcmc_sweep.sbm_network <- function(sbm,
 
   sbm
 }
-

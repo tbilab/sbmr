@@ -195,9 +195,6 @@ void SBM::initialize_blocks(const int level, const int num_blocks)
 
   const int num_nodes_in_level = node_level->size();
 
-  // Setup a sampler
-  Sampler block_sampler;
-
   // Make sure level has nodes before looping through it
   if (num_nodes_in_level == 0) {
     RANGE_ERROR("Requested level (" + std::to_string(level) + ") is empty.");
@@ -234,7 +231,7 @@ void SBM::initialize_blocks(const int level, const int num_blocks)
     // or sample new block from available list of blocks for this type
     NodePtr new_block = one_block_per_node
         ? create_block_node(node.second->type, level + 1)
-        : block_sampler.sample(type_to_blocks[node.second->type]);
+        : sampler.sample(type_to_blocks[node.second->type]);
 
     // assign that block node to the node
     node.second->set_parent(new_block);
@@ -268,7 +265,8 @@ NodeVec SBM::clean_empty_blocks()
       if (block.second->children.size() == 0) {
         // Remove block from children of its parent (if it has one)
         if (block.second->parent) {
-          block.second->parent->remove_child(block.second);
+          const NodePtr parent_node = block.second->parent;
+          parent_node->remove_child(block.second);
         }
 
         blocks_removed.push_back(block.second);
@@ -607,18 +605,18 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
   }
 
   if (verbose) {
-    std::cout << "sweep_num,"
-              << "node,"
-              << "current_block,"
-              << "proposed_block,"
-              << "entropy_delta,"
-              << "prob_of_accept,"
-              << "move_accepted" << std::endl;
+    OUT_MSG << "sweep_num,"
+            << "node,"
+            << "current_block,"
+            << "proposed_block,"
+            << "entropy_delta,"
+            << "prob_of_accept,"
+            << "move_accepted" << std::endl;
   }
 
   // Initialize a vector of nodes that will be passed through for a sweep.
   // Grab level map
-  const LevelPtr node_map = get_level(level);
+  const LevelPtr node_map  = get_level(level);
   NodeVec        nodes_to_sweep;
   nodes_to_sweep.reserve(node_map->size());
   for (const auto& node : *node_map) {
@@ -629,7 +627,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
     // Book keeper variables for this sweeps stats
     int    num_nodes_moved = 0;
     double entropy_delta   = 0;
-
+    
     // Shuffle order order of nodes to be run through for sweep
     std::shuffle(nodes_to_sweep.begin(), nodes_to_sweep.end(), sampler.generator);
 
@@ -638,7 +636,6 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
 
     // Loop through each node
     for (const NodePtr& curr_node : nodes_to_sweep) {
-
       // Check if we're running sweep with variable block numbers. If we are, we
       // need to make sure we don't have any extra unoccupied blocks floating around,
       // then we need to add a new block as a potential for the node to enter
@@ -657,11 +654,11 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
       }
 
       if (verbose) {
-        std::cout << i
-                  << "," << curr_node->id
-                  << "," << (curr_node->parent)->id
-                  << "," << proposed_new_block->id
-                  << ",";
+        OUT_MSG << i
+                << "," << curr_node->id
+                << "," << (curr_node->parent)->id
+                << "," << proposed_new_block->id
+                << ",";
       }
       // Calculate acceptance probability based on posterior changes
       Proposal_Res proposal_results = make_proposal_decision(curr_node, proposed_new_block, eps);
@@ -669,9 +666,10 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
       // Make movement decision
       const bool move_accepted = proposal_results.prob_of_accept > sampler.draw_unif();
 
+
       if (verbose) {
-        std::cout << proposal_results.entropy_delta << "," << proposal_results.prob_of_accept << ","
-                  << move_accepted << std::endl;
+        OUT_MSG << proposal_results.entropy_delta << "," << proposal_results.prob_of_accept << ","
+                << move_accepted << std::endl;
       }
 
       // Is the move accepted?
@@ -687,7 +685,9 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
         entropy_delta += proposal_results.entropy_delta;
 
         if (track_pairs) {
-          Block_Consensus::update_changed_pairs(curr_node->id, old_block->children, proposed_new_block->children,
+          Block_Consensus::update_changed_pairs(curr_node->id,
+                                                old_block->children,
+                                                proposed_new_block->children,
                                                 pair_moves);
         }
       } // End accepted if statement

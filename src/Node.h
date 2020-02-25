@@ -11,6 +11,7 @@
 #define WARN_ABOUT(msg)          \
   const std::string w_msg = msg; \
   std::cerr << w_msg << std::endl
+#define OUT_MSG std::cout
 #else
 #include <Rcpp.h>
 // Eases the process of wrapping functions to get errors forwarded to R
@@ -23,6 +24,8 @@
 #define WARN_ABOUT(msg)          \
   const std::string w_msg = msg; \
   Rcpp::warning(w_msg.c_str())
+
+#define OUT_MSG Rcpp::Rcout
 #endif
 
 #include "profiling/Instrument.h"
@@ -35,7 +38,6 @@
 #include <queue>
 #include <set>
 #include <string>
-#include <unordered_set>
 #include <vector>
 
 // =============================================================================
@@ -45,9 +47,9 @@ class Node;
 
 // For a bit of clarity
 using NodePtr     = std::shared_ptr<Node>;
-using NodeSet     = std::unordered_set<NodePtr>;
 using NodeVec     = std::vector<NodePtr>;
 using NodeList    = std::list<NodePtr>;
+using NodeSet     = std::set<NodePtr>;
 using NodeEdgeMap = std::map<NodePtr, int>;
 using NodeLevel   = std::map<std::string, NodePtr>;
 using LevelPtr    = std::shared_ptr<NodeLevel>;
