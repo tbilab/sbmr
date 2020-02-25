@@ -33,7 +33,7 @@ inline void Node::add_edge(const NodePtr& node)
 // =============================================================================
 // Add or remove edges from a nodes edge list
 // =============================================================================
-void Node::update_edges_from_node(const NodePtr& node_being_moved, const bool& remove)
+void Node::update_edges_from_node(const NodePtr& node_being_moved, const Update_Type& update_type)
 {
   // PROFILE_FUNCTION();
 
@@ -52,7 +52,7 @@ void Node::update_edges_from_node(const NodePtr& node_being_moved, const bool& r
 
     // Loop through all the edges from the node being moved
     for (const auto& edge_to_update : moved_node_edges) {
-      if (remove) {
+      if (update_type == Remove) {
         // Scan through this nodes edges untill we find the first instance
         // of the connected node we want to remove
         auto loc_of_edge = std::find(updated_node_edges.begin(),
@@ -94,7 +94,7 @@ void Node::set_parent(NodePtr parent_node_ptr)
   // Remove self from previous parents children list (if it existed)
   if (parent) {
     // Remove this node's edges contribution from parent's
-    parent->update_edges_from_node(this_ptr(), true);
+    parent->update_edges_from_node(this_ptr(), Remove);
 
     // Remove self from previous children
     parent->children.erase(this_ptr());
@@ -104,7 +104,7 @@ void Node::set_parent(NodePtr parent_node_ptr)
   parent = parent_node_ptr;
 
   // Add this node's edges to parent's degree count
-  parent->update_edges_from_node(this_ptr(), false);
+  parent->update_edges_from_node(this_ptr(), Add);
 
   // Add this node to new parent's children list
   parent_node_ptr->children.insert(this_ptr());
