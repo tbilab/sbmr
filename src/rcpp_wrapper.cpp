@@ -172,19 +172,19 @@ RCPP_MODULE(SBM)
       .method("initialize_blocks",
               &SBM ::initialize_blocks,
               "Adds a desired number of blocks and randomly assigns them for a given level. num_blocks = -1 means every node gets their own block")
-      .method("get_state",
+      .const_method("get_state",
               &SBM ::get_state,
               "Exports the current state of the network as dataframe with each node as a row and columns for node id, parent id, node type, and node level.")
-      .method("get_node_to_block_edge_counts",
+      .const_method("get_node_to_block_edge_counts",
               &SBM ::get_node_to_block_edge_counts,
               "Returns a dataframe with the requested nodes connection counts to all blocks/nodes at a desired level.")
-      .method("get_block_edge_counts",
+      .const_method("get_block_edge_counts",
               &SBM ::get_block_edge_counts,
               "Returns a dataframe of counts of edges between all connected pairs of blocks at given level.")
       .method("set_state",
               &SBM ::set_state,
               "Takes model state export as given by SBM$get_state() and returns model to specified state. This is useful for resetting model before running various algorithms such as agglomerative merging.")
-      .method("get_entropy",
+      .const_method("get_entropy",
               &SBM ::get_entropy,
               "Computes the (degree-corrected) entropy for the network at the specified level (int).")
       .method("mcmc_sweep",
