@@ -96,7 +96,7 @@ class SBM {
   LevelMap        nodes;            // A kmap keyed by level integer of each level of nodes
   NodeTypeCounts  node_type_counts; // A map keyed by type to a map keyed by level of node counts
   std::list<Edge> edges;            // Each pair of edges in the network
-
+  int id_counter = 0;               // Iterates up everytime a node is created so we don't have naming collissions.
   // Map keyed by a node type. Value is the types of nodes the key type is allowed to connect to.
   EdgeTypes edge_type_pairs;
 

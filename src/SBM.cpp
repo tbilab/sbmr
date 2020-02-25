@@ -65,21 +65,17 @@ NodePtr SBM::add_node(const std::string& id,
   PROFILE_FUNCTION();
   // Grab level
   LevelPtr node_level = get_level(level);
+  
+  const auto assign_result = node_level->emplace(id, std::make_shared<Node>(id, level, type));
 
-  // Check if we need to make the id or not
-  std::string node_id = id == "new block"
-      ? type + "-" + std::to_string(level) + "_" + std::to_string(node_level->size())
-      : id;
-
-  // Create node
-  NodePtr new_node = std::make_shared<Node>(node_id, level, type);
-
-  (*node_level)[node_id] = new_node;
+  if (!assign_result.second){
+    LOGIC_ERROR("Tried to insert node that already exists in network");
+  }
 
   // Add this node to node counting map
   node_type_counts[type][level]++;
 
-  return new_node;
+  return assign_result.first->second;
 };
 
 // =============================================================================
@@ -94,8 +90,8 @@ NodePtr SBM::create_block_node(const std::string& type, const int level)
     LOGIC_ERROR("Can't create block node at first level");
   }
 
-  // Initialize new node
-  return add_node("new block", type, level);
+  // Create new block id and iterate id counter forward
+  return add_node(type + "-" + std::to_string(level) + "_" + std::to_string(id_counter++), type, level);
 };
 
 // =============================================================================
@@ -188,12 +184,13 @@ void SBM::initialize_blocks(const int level, const int num_blocks)
   PROFILE_FUNCTION();
 
   const int block_level = level + 1;
+  const LevelPtr block_level_nodes = get_level(block_level);
 
   // Clear all previous nodes in block level out
-  get_level(block_level)->clear();
+  block_level_nodes->clear();
 
   // Grab all the nodes for the desired level
-  LevelPtr node_level = get_level(level);
+  const LevelPtr node_level = get_level(level);
 
   const int num_nodes_in_level = node_level->size();
 
@@ -204,7 +201,7 @@ void SBM::initialize_blocks(const int level, const int num_blocks)
 
   // Figure out how we're making blocks, is it one block per node or a set number
   // of blocks total?
-  bool one_block_per_node = num_blocks == -1;
+  const bool one_block_per_node = num_blocks == -1;
 
   // Make a map that gives us type -> array of new blocks
   std::map<std::string, NodeVec> type_to_blocks;
@@ -812,13 +809,16 @@ void SBM::merge_blocks(const NodePtr& absorbing_block, const NodePtr& absorbed_b
   // Remove node and all its parents from their respective level blocks
   NodePtr current_node = absorbed_block;
   while (current_node) {
+    const std::string node_type  = current_node->type;
+    const int         node_level = current_node->level;
+    const std::string node_id    = current_node->id;
+    current_node                 = current_node->parent;
+
+    // Remove node's contribution to node counts map
+    node_type_counts[node_type][node_level]--;
+
     // Delete the now absorbed block from level map
-    get_level(current_node->level)->erase(current_node->id);
-
-    // Remove nodes contribution to node counts map
-    node_type_counts[current_node->type][current_node->level]--;
-
-    current_node = current_node->parent;
+    get_level(node_level)->erase(node_id);
   }
 }
 
@@ -867,6 +867,7 @@ Merge_Step SBM::agglomerative_merge(const int&    block_level,
 
     // No point in running M checks if there are < M blocks left.
     const bool less_blocks_than_checks = node_type_counts[block.second->type][meta_level] <= num_checks_per_block;
+
     if (less_blocks_than_checks) {
       // Get a list of all the potential metablocks for block
       metablocks_to_search = get_nodes_of_type_at_level(block.second->type, meta_level);
@@ -957,6 +958,7 @@ Merge_Step SBM::agglomerative_merge(const int&    block_level,
     }
   }
 
+
   // Now we find the top merges...
   // Start by initializing a merge result struct
   Merge_Step results;
@@ -1036,11 +1038,9 @@ CollapseResults SBM::collapse_blocks(const int&    node_level,
   while (curr_num_blocks > desired_num_blocks) {
     // Decide how many merges we should do. Make sure we don't overstep the goal
     // number of blocks and we need to remove at least 1 block
-    const int num_merges = std::max(
-        std::min(
-            curr_num_blocks - desired_num_blocks,
-            int(curr_num_blocks - (curr_num_blocks / sigma))),
-        1);
+    const int delta_to_desired    = curr_num_blocks - desired_num_blocks;
+    const int sigma_derived_delta = std::floor(curr_num_blocks - (curr_num_blocks / sigma));
+    const int num_merges          = std::max(std::min(delta_to_desired, sigma_derived_delta), 1);
 
     Merge_Step merge_results;
 
@@ -1116,10 +1116,8 @@ CollapseResults SBM::collapse_run(const int&              node_level,
                                   const double&           eps,
                                   const std::vector<int>& block_nums)
 {
-  OUT_MSG << "Running collapse_run..." << std::endl;
   CollapseResults run_results;
   for (const int& target_num : block_nums) {
-    OUT_MSG << "   Collapse of " << target_num << " groups..." << std::endl;
     try {
       auto collapse_results = collapse_blocks(node_level,
                                               num_mcmc_steps,
