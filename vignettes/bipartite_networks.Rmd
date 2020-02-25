@@ -1,0 +1,47 @@
+---
+title: "bipartite_networks"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{bipartite_newtorks}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(sbmR)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+```
+
+
+Start with the package included polinators network.
+
+```{r load-data}
+clements_polinators %>% head()
+
+bind_rows(
+  count(clements_polinators, polinator) %>% 
+    transmute(id = polinator, degree = n, type = "polinator"),
+  count(clements_polinators, flower) %>% 
+    transmute(id = flower, degree = n, type = "flower")
+) %>% 
+  ggplot(aes(x = degree)) +
+  scale_x_log10() +
+  # geom_density(fill = "steelblue") +
+  geom_histogram(bins = 100) +
+  facet_grid(rows = "type")
+
+
+
+  
+```
+
