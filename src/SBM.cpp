@@ -195,9 +195,6 @@ void SBM::initialize_blocks(const int level, const int num_blocks)
 
   const int num_nodes_in_level = node_level->size();
 
-  // Setup a sampler
-  Sampler block_sampler;
-
   // Make sure level has nodes before looping through it
   if (num_nodes_in_level == 0) {
     RANGE_ERROR("Requested level (" + std::to_string(level) + ") is empty.");
@@ -234,7 +231,7 @@ void SBM::initialize_blocks(const int level, const int num_blocks)
     // or sample new block from available list of blocks for this type
     NodePtr new_block = one_block_per_node
         ? create_block_node(node.second->type, level + 1)
-        : block_sampler.sample(type_to_blocks[node.second->type]);
+        : sampler.sample(type_to_blocks[node.second->type]);
 
     // assign that block node to the node
     node.second->set_parent(new_block);
@@ -619,7 +616,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
 
   // Initialize a vector of nodes that will be passed through for a sweep.
   // Grab level map
-  const LevelPtr node_map = get_level(level);
+  const LevelPtr node_map  = get_level(level);
   NodeVec        nodes_to_sweep;
   nodes_to_sweep.reserve(node_map->size());
   for (const auto& node : *node_map) {
@@ -630,7 +627,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
     // Book keeper variables for this sweeps stats
     int    num_nodes_moved = 0;
     double entropy_delta   = 0;
-
+    
     // Shuffle order order of nodes to be run through for sweep
     std::shuffle(nodes_to_sweep.begin(), nodes_to_sweep.end(), sampler.generator);
 
@@ -639,7 +636,6 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
 
     // Loop through each node
     for (const NodePtr& curr_node : nodes_to_sweep) {
-
       // Check if we're running sweep with variable block numbers. If we are, we
       // need to make sure we don't have any extra unoccupied blocks floating around,
       // then we need to add a new block as a potential for the node to enter
@@ -669,6 +665,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
 
       // Make movement decision
       const bool move_accepted = proposal_results.prob_of_accept > sampler.draw_unif();
+
 
       if (verbose) {
         OUT_MSG << proposal_results.entropy_delta << "," << proposal_results.prob_of_accept << ","
