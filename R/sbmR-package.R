@@ -31,5 +31,9 @@ setMethod( "show", "Rcpp_SBM" , function(object) {
 
 
 
+# On package unload make sure to unlink the dynamic c++ library
+.onUnload <- function(libpath){
+  library.dynam.unload("sbmR", libpath)
+}
 
 
