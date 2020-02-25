@@ -28,11 +28,13 @@ LevelPtr SBM::get_level(const int& level)
 LevelPtr SBM::get_level(const int& level) const
 {
   PROFILE_FUNCTION();
-  try {
-    return nodes.at(level);
-  }
-  catch (...) {
+  const auto level_loc = nodes.find(level);
+
+  if (level_loc == nodes.end()) {
     RANGE_ERROR("No nodes/ blocks at level " + std::to_string(level));
+  }
+  else {
+    return level_loc->second;
   }
 }
 
@@ -43,13 +45,13 @@ NodePtr SBM::get_node_by_id(const std::string& id,
                             const int          level) const
 {
   PROFILE_FUNCTION();
-  try {
-    // Attempt to find node on the 'node level' of the Network
-    return nodes.at(level)->at(id);
-  }
-  catch (...) {
-    // Throw informative error if it fails
+  const auto node_level = get_level(level);
+  const auto node_loc = node_level->find(id);
+
+  if(node_loc == node_level->end()){
     RANGE_ERROR("Could not find node " + id + " in network");
+  } else {
+    return node_loc->second;
   }
 }
 
@@ -1114,15 +1116,29 @@ CollapseResults SBM::collapse_run(const int&              node_level,
                                   const double&           eps,
                                   const std::vector<int>& block_nums)
 {
+  OUT_MSG << "Running collapse_run..." << std::endl;
   CollapseResults run_results;
   for (const int& target_num : block_nums) {
-    run_results.push_back(collapse_blocks(node_level,
-                                          num_mcmc_steps,
-                                          target_num,
-                                          num_checks_per_block,
-                                          sigma,
-                                          eps,
-                                          false)[0]);
+    OUT_MSG << "   Collapse of " << target_num << " groups..." << std::endl;
+    try {
+      auto collapse_results = collapse_blocks(node_level,
+                                              num_mcmc_steps,
+                                              target_num,
+                                              num_checks_per_block,
+                                              sigma,
+                                              eps,
+                                              false);
+
+      if (collapse_results.size() < 1) {
+        LOGIC_ERROR("Collapse result has zero entries");
+      }
+      else {
+        run_results.push_back(collapse_results[0]);
+      }
+    }
+    catch (...) {
+      LOGIC_ERROR("Something went wrong in collapse blocks run...");
+    }
   }
   return run_results;
 }
