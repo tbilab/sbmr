@@ -95,7 +95,7 @@ void Node::set_parent(NodePtr parent_node_ptr)
     parent->update_edges_from_node(this_ptr(), true);
 
     // Remove self from previous children
-    parent->remove_child(this_ptr());
+    parent->children.erase(this_ptr());
   }
 
   // Set this node's parent
@@ -105,26 +105,7 @@ void Node::set_parent(NodePtr parent_node_ptr)
   parent->update_edges_from_node(this_ptr(), false);
 
   // Add this node to new parent's children list
-  parent_node_ptr->add_child(this_ptr());
-}
-
-// =============================================================================f
-// Add a node to the children vector
-// =============================================================================
-inline void Node::add_child(const NodePtr& new_child_node)
-{
-  //PROFILE_FUNCTION();
-  // Add new child node to the set of children. An unordered set is used because
-  // repeat children can't happen.
-  (this_ptr()->children).insert(new_child_node);
-}
-
-// =============================================================================
-// Find and erase a child node
-// =============================================================================
-void Node::remove_child(const NodePtr& child_node)
-{
-  children.erase(child_node);
+  parent_node_ptr->children.insert(this_ptr());
 }
 
 // =============================================================================
@@ -206,4 +187,19 @@ void Node::connect_nodes(const NodePtr& node1_ptr, const NodePtr& node2_ptr)
   //PROFILE_FUNCTION();
   node1_ptr->add_edge(node2_ptr);
   node2_ptr->add_edge(node1_ptr);
+}
+
+
+// Destructor!
+Node::~Node(){
+  // OUT_MSG << "Node " << id << " is going away!" << std::endl;
+
+  // Remove the children list
+  // delete children;
+  
+  // Make sure parent removes this node from its children
+  // parent->remove_child(this_ptr());
+
+
+
 }

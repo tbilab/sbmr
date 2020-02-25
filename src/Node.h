@@ -90,6 +90,8 @@ class Node : public std::enable_shared_from_this<Node> {
   {
   }
 
+  ~Node();
+
   // Attributes
   // =========================================================================
   std::string id;       // Unique integer id for node
@@ -104,8 +106,6 @@ class Node : public std::enable_shared_from_this<Node> {
   // =========================================================================
   NodePtr     this_ptr();                                                                      // Gets a shared pointer to object (replaces this)
   void        set_parent(NodePtr new_parent);                                                  // Set current node parent/cluster
-  void        add_child(const NodePtr& new_child);                                             // Add a node to the children vector
-  void        remove_child(const NodePtr& child);                                              // Remove a child node
   void        add_edge(const NodePtr& node);                                                   // Add edge to another node
   void        update_edges_from_node(const NodePtr& node, const bool& remove);                 // Add or remove edges from nodes edge list
   NodePtr     get_parent_at_level(const int& level);                                           // Get parent of node at a given level
