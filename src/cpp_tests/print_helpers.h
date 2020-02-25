@@ -83,7 +83,7 @@ inline std::string print_node_ids(NodeVec nodes)
 
 // =======================================================
 // Map version
-inline std::string print_node_ids(std::map<std::string, NodePtr> nodes)
+inline std::string print_node_ids(NodeLevel nodes)
 {
   // Vector of node ids to be filled in
   std::vector<std::string> node_ids;
