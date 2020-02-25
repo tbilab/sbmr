@@ -93,8 +93,6 @@ class Node : public std::enable_shared_from_this<Node> {
   {
   }
 
-  ~Node();
-
   // Attributes
   // =========================================================================
   std::string id;       // Unique integer id for node

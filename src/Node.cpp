@@ -30,6 +30,7 @@ inline void Node::add_edge(const NodePtr& node)
   }
 }
 
+
 inline void remove_edge(NodeList& edge_list, const NodePtr& node_to_remove)
 {
   // Scan through this nodes edges untill we find the first instance
@@ -45,8 +46,6 @@ inline void remove_edge(NodeList& edge_list, const NodePtr& node_to_remove)
     LOGIC_ERROR("Trying to erase non-existant edge from parent node.");
   }
 }
-
-
 
 // =============================================================================
 // Add or remove edges from a nodes edge list
@@ -79,7 +78,7 @@ void Node::update_edges_from_node(const NodePtr& node_being_moved, const Update_
         updated_node_edges.push_back(edge_to_update);
         break;
       default:
-        LOGIC_ERROR("Something went wrong in edge adjustment");
+        LOGIC_ERROR("Something went wrong in edge updating");
         break;
       }
     }
@@ -203,17 +202,3 @@ void Node::connect_nodes(const NodePtr& node1_ptr, const NodePtr& node2_ptr)
   node2_ptr->add_edge(node1_ptr);
 }
 
-
-// Destructor!
-Node::~Node(){
-  // OUT_MSG << "Node " << id << " is going away!" << std::endl;
-
-  // Remove the children list
-  // delete children;
-  
-  // Make sure parent removes this node from its children
-  // parent->remove_child(this_ptr());
-
-
-
-}
