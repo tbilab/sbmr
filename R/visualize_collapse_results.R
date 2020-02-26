@@ -67,6 +67,14 @@ visualize_collapse_results.sbm_network <- function(sbm,
                                                    heuristic = NULL){
   collapse_results <- get_collapse_results(sbm)
 
+  missing_entropy_delta <- !("entropy_delta" %in% colnames(collapse_results))
+
+  if(missing_entropy_delta & !use_entropy_value_for_score){
+    collapse_results <- collapse_results %>%
+      dplyr::mutate(entropy_delta = dplyr::lag(entropy) - entropy) %>%
+      dplyr::filter(!is.na(entropy_delta))
+  }
+
   if(!is.null(heuristic)){
 
     collapse_results <- collapse_results %>%
