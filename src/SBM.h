@@ -90,6 +90,9 @@ using EdgeTypes       = std::map<std::string, std::set<std::string>>;
 class SBM {
 
   private:
+    // const version that wont append new level if it doesn't exist
+  LevelPtr get_level(const int& level) const;
+
   public:
   // Attributes
   // =========================================================================
@@ -111,12 +114,14 @@ class SBM {
   // Adds a node of specified id of a type at desired level.
   SBM()
   {
+    // OUT_MSG << "Starting without random seed" << std::endl;
   }
 
   // Sets default seed to specified value
   SBM(int sampler_seed)
       : sampler(sampler_seed)
   {
+    // OUT_MSG << "Starting with random seed " << sampler_seed << std::endl;
   }
 
   NodePtr add_node(const std::string& id,
@@ -133,8 +138,6 @@ class SBM {
 
   // Grabs pointer to level of nodes
   LevelPtr get_level(const int& level);
-  // const version that wont append new level if it doesn't exist
-  LevelPtr get_level(const int& level) const;
 
   // Export current state of nodes in model
   State_Dump get_state() const;
@@ -144,7 +147,7 @@ class SBM {
                          const int          level = 0) const;
 
   // Return nodes of a desired type from level matching type
-  NodeVec get_nodes_of_type_at_level(const std::string& type, const int& level) const;
+  NodeVec get_nodes_of_type_at_level(const std::string& type, const int& level);
 
   // Gathers counts of edges between any two blocks in network
   BlockEdgeCounts get_block_edge_counts(const int& level) const;
@@ -161,7 +164,7 @@ class SBM {
                  const std::vector<std::string>& types);
 
   // Adds a num_blocks to model and randomly assigns them for a given level (-1 means every node gets their own block)
-  void initialize_blocks(int level, int num_blocks = -1);
+  void initialize_blocks(const int& level, const int& num_blocks = -1);
 
   // Scan through levels and remove all block nodes that have no children. Returns # of blocks removed
   NodeVec clean_empty_blocks();
@@ -170,9 +173,11 @@ class SBM {
   double get_entropy(int level) const;
 
   // Use model state to propose a potential block move for a node.
-  NodePtr propose_move(const NodePtr& node,
-                       const double&  eps,
-                       Sampler&       node_chooser) const;
+  NodePtr propose_move(const NodePtr& node, const double&  eps);
+
+  NodeVec propose_moves(const NodePtr& node,
+                        const int&     num_moves,
+                        const double&  eps);
 
   // Make a decision on the proposed new block for node
   Proposal_Res make_proposal_decision(const NodePtr& node,

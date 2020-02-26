@@ -98,7 +98,7 @@ NodePtr SBM::create_block_node(const std::string& type, const int level)
 // =============================================================================
 // Return nodes of a desired type from level.
 // =============================================================================
-NodeVec SBM::get_nodes_of_type_at_level(const std::string& type, const int& level) const
+NodeVec SBM::get_nodes_of_type_at_level(const std::string& type, const int& level)
 {
   PROFILE_FUNCTION();
 
@@ -180,7 +180,7 @@ void SBM::add_edge_types(const std::vector<std::string>& from_types, const std::
 // Adds a desired number of blocks and randomly assigns them for a given level
 // num_blocks = -1 means every node gets their own block
 // =============================================================================
-void SBM::initialize_blocks(const int level, const int num_blocks)
+void SBM::initialize_blocks(const int& level, const int& num_blocks)
 {
   PROFILE_FUNCTION();
 
@@ -207,6 +207,7 @@ void SBM::initialize_blocks(const int level, const int num_blocks)
   // Make a map that gives us type -> array of new blocks
   std::map<std::string, NodeVec> type_to_blocks;
 
+
   // If we're randomly distributing nodes, we'll use this map to sample a random
   // block for a given node by its type
   if (!one_block_per_node) {
@@ -221,6 +222,8 @@ void SBM::initialize_blocks(const int level, const int num_blocks)
       }
     }
   }
+   // Keep track of the assigned blocks to make sure all are assigned
+  std::set<std::string> assigned_blocks;
 
   // Loop through every node in the level and assign it its new parent
   // Loop through each of the nodes,
@@ -229,13 +232,19 @@ void SBM::initialize_blocks(const int level, const int num_blocks)
     // build a block node at the next level
     // We either build a new block for node if we're giving each node a block
     // or sample new block from available list of blocks for this type
-    NodePtr new_block = one_block_per_node
-        ? create_block_node(node.second->type, level + 1)
-        : sampler.sample(type_to_blocks[node.second->type]);
+    NodePtr new_block;
+    if (one_block_per_node) {
+      new_block = create_block_node(node.second->type, level + 1);
+    }
+    else {
+      new_block = sampler.sample(type_to_blocks[node.second->type]);
+      assigned_blocks.insert(new_block->id);
+    }
 
     // assign that block node to the node
     node.second->set_parent(new_block);
   }
+
 }
 
 // =============================================================================
@@ -412,9 +421,7 @@ NodeEdgeMap SBM::get_node_to_block_edge_counts(const std::string& id,
 // =============================================================================
 // Propose a potential block move for a node.
 // =============================================================================
-NodePtr SBM::propose_move(const NodePtr& node,
-                          const double&  eps,
-                          Sampler&       random) const
+NodePtr SBM::propose_move(const NodePtr& node, const double&  eps)
 {
   PROFILE_FUNCTION();
 
@@ -424,7 +431,7 @@ NodePtr SBM::propose_move(const NodePtr& node,
   const NodeVec potential_blocks = get_nodes_of_type_at_level(node->type, block_level);
 
   // Sample a random neighbor of node
-  const NodePtr rand_neighbor = random.sample(node->edges)->get_parent_at_level(node->level);
+  const NodePtr rand_neighbor = sampler.sample(node->edges)->get_parent_at_level(node->level);
 
   // Get number total number edges for neighbor's block
   const int neighbor_block_degree = rand_neighbor->parent->degree;
@@ -434,8 +441,59 @@ NodePtr SBM::propose_move(const NodePtr& node,
   const double prob_of_random_block = ergo_amnt / (neighbor_block_degree + ergo_amnt);
 
   // Decide where we will get new block from and draw from potential candidates
-  return random.draw_unif() < prob_of_random_block ? random.sample(potential_blocks)
-                                                   : random.sample(rand_neighbor->get_edges_of_type(node->type, block_level));
+  return sampler.draw_unif() < prob_of_random_block ? sampler.sample(potential_blocks)
+                                                    : sampler.sample(rand_neighbor->get_edges_of_type(node->type, block_level));
+}
+
+inline void print_node_info(const NodePtr& node){
+  OUT_MSG << "\nID:" << node->id << ", "
+          << "Level:" << node->level << ", "
+          << "N-Children:" << node->children.size() << ", "
+          << "Parent:" << node->parent->id << std::endl;
+}
+
+NodeVec SBM::propose_moves(const NodePtr& node,
+                           const int&     num_moves,
+                           const double&  eps)
+{
+  NodeVec proposed_moves;
+  proposed_moves.reserve(num_moves);
+
+  const int block_level = node->level + 1;
+
+  // Grab a list of all the blocks that the node could join
+  const NodeVec potential_blocks = get_nodes_of_type_at_level(node->type, block_level);
+
+  for (int i = 0; i < num_moves; i++)
+  {
+    // Sample a random neighbor of node
+
+    if(node->edges.size() == 0){
+      print_node_info(node);
+      LOGIC_ERROR("Trying to sample edges from " + node->id + " but no edges were found");
+    }
+    const NodePtr rand_neighbor = sampler.sample(node->edges)->get_parent_at_level(node->level);
+
+    // Get number total number edges for neighbor's block
+    const int neighbor_block_degree = rand_neighbor->parent->degree;
+    // OUT_MSG << " with parent block degree of: " << neighbor_block_degree <<std::endl;
+
+    // Decide if we are going to choose a random block for our node
+    const double ergo_amnt            = eps * potential_blocks.size();
+    const double prob_of_random_block = ergo_amnt / (neighbor_block_degree + ergo_amnt);
+
+    // OUT_MSG << "Prob of random block is " << std::to_string(prob_of_random_block) << std::endl;
+    // Decide where we will get new block from and draw from potential candidates
+
+    const NodePtr chosen_move = sampler.draw_unif() < prob_of_random_block
+            ? sampler.sample(potential_blocks)
+            : sampler.sample(rand_neighbor->get_edges_of_type(node->type, block_level));
+
+    // OUT_MSG << "Chose of move block: " << chosen_move->id << std::endl;
+    proposed_moves.push_back(chosen_move);
+  }
+
+  return proposed_moves;
 }
 
 // =============================================================================
@@ -646,7 +704,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int&    level,
       }
 
       // Get a move proposal
-      const NodePtr proposed_new_block = propose_move(curr_node, eps, sampler);
+      const NodePtr proposed_new_block = propose_move(curr_node, eps);
 
       // If the proposed block is the nodes current block, we don't need to waste
       // time checking because decision will always result in same state.
@@ -844,6 +902,8 @@ Merge_Step SBM::agglomerative_merge(const int&    block_level,
     initialize_blocks(block_level);
   }
 
+  // clean_empty_blocks();
+
   // Grab all the blocks we're looking to merge
   const LevelPtr all_blocks = get_level(block_level);
 
@@ -863,22 +923,29 @@ Merge_Step SBM::agglomerative_merge(const int&    block_level,
   // Loop over each block and find best merge option
   for (const auto& block : *all_blocks) {
 
+    if(block.second->children.size() == 0){
+      // We may have old block nodes floating around that have yet to be cleaned up 
+      // if we encounter these, just ignore them. This is cheaper than running
+      // clean_empty_blocks() every time. 
+      break;
+    }
+
     NodeVec metablocks_to_search;
 
+    if(block.second->children.size() == 0){
+      LOGIC_ERROR("Block " + block.second->id + " with no childen found in search");
+    }
+
     // No point in running M checks if there are < M blocks left.
-    const bool less_blocks_than_checks = node_type_counts[block.second->type][meta_level] <= num_checks_per_block;
+    const bool less_blocks_than_checks = node_type_counts.at(block.second->type).at(meta_level) <= num_checks_per_block;
 
     if (less_blocks_than_checks) {
       // Get a list of all the potential metablocks for block
       metablocks_to_search = get_nodes_of_type_at_level(block.second->type, meta_level);
     }
     else {
-      metablocks_to_search.reserve(num_checks_per_block);
       // Otherwise, we should sample a given number of blocks to check
-      for (int i = 0; i < num_checks_per_block; i++) {
-        // Sample a metablock from potentials
-        metablocks_to_search.push_back(propose_move(block.second, eps, sampler));
-      }
+      metablocks_to_search = propose_moves(block.second, num_checks_per_block, eps);
     }
 
     // Now that we have gathered all the merges to check, we can loop
@@ -1011,6 +1078,7 @@ CollapseResults SBM::collapse_blocks(const int&    node_level,
   // Start by giving every node at the desired level its own block and every
   // one of those blocks its own metablock
   initialize_blocks(node_level);
+
   initialize_blocks(block_level);
 
   // Calculate initial entropy for model before merging is done
@@ -1041,10 +1109,9 @@ CollapseResults SBM::collapse_blocks(const int&    node_level,
     const int sigma_derived_delta = std::floor(curr_num_blocks - (curr_num_blocks / sigma));
     const int num_merges          = std::max(std::min(delta_to_desired, sigma_derived_delta), 1);
 
-    Merge_Step merge_results;
-
     // Perform next best merge and record results
-    merge_results = agglomerative_merge(block_level, num_merges, num_checks_per_block, eps);
+    Merge_Step merge_results = agglomerative_merge(block_level, num_merges, num_checks_per_block, eps);
+
 
     if (num_mcmc_steps != 0) {
       // Let model equilibriate with new block layout...
@@ -1081,7 +1148,7 @@ CollapseResults SBM::collapse_blocks(const int&    node_level,
   if (!report_all_steps) {
     // Gather info for return
     step_results.push_back(Merge_Step(total_entropy_delta, get_state(), curr_num_blocks));
-    step_results[0].entropy = initial_entropy + total_entropy_delta;
+    step_results.at(0).entropy = initial_entropy + total_entropy_delta;
   }
   else {
     // Update the results entropy values with the true entropy rather than the delta provided.
@@ -1106,10 +1173,13 @@ CollapseResults SBM::collapse_run(const int&              node_level,
                                   const double&           eps,
                                   const std::vector<int>& block_nums)
 {
+  OUT_MSG << "Started collapse run..." << std::endl;
+
   CollapseResults run_results;
   run_results.reserve(block_nums.size());
 
   for (const int& target_num : block_nums) {
+
     auto collapse_results = collapse_blocks(node_level,
                                             num_mcmc_steps,
                                             target_num,
@@ -1118,12 +1188,16 @@ CollapseResults SBM::collapse_run(const int&              node_level,
                                             eps,
                                             false);
 
+   
+
     if (collapse_results.size() < 1) {
       LOGIC_ERROR("Collapse result has zero entries");
     }
     else {
-      run_results.push_back(collapse_results[0]);
+      run_results.push_back(collapse_results.at(0));
     }
   }
+
+  OUT_MSG << "Finished collapse run..." << std::endl;
   return run_results;
 }
