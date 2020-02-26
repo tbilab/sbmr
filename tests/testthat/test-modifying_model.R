@@ -147,7 +147,7 @@ test_that("Randomly initializing blocks in network", {
 
   # Can also specify number of blocks
   expect_equal(
-    sim_random_network(n_nodes = 5,
+    sim_random_network(n_nodes = 15,
                        prob_of_edge = 1,
                        random_seed = 42) %>%
       initialize_blocks(num_blocks = 3) %>%
