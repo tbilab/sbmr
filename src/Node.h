@@ -108,7 +108,7 @@ class Node : public std::enable_shared_from_this<Node> {
   // Methods
   // =========================================================================
   NodePtr     this_ptr();                                                                      // Gets a shared pointer to object (replaces this)
-  void        set_parent(NodePtr new_parent);                                                  // Set current node parent/cluster
+  void        set_parent(const NodePtr& new_parent);                                                  // Set current node parent/cluster
   void        add_edge(const NodePtr& node);                                                   // Add edge to another node
   void        update_edges_from_node(const NodePtr& node, const Update_Type& update_type);     // Add or remove edges from nodes edge list
   NodePtr     get_parent_at_level(const int& level);                                           // Get parent of node at a given level

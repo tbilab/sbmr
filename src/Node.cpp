@@ -94,31 +94,31 @@ void Node::update_edges_from_node(const NodePtr& node_being_moved, const Update_
 // =============================================================================
 // Set current node parent/cluster
 // =============================================================================
-void Node::set_parent(NodePtr parent_node_ptr)
+void Node::set_parent(const NodePtr& new_parent)
 {
-  //PROFILE_FUNCTION();
-
-  if (level != parent_node_ptr->level - 1) {
+  if (level != new_parent->level - 1) {
     LOGIC_ERROR("Parent node must be one level above child");
   }
 
+  const NodePtr old_parent = parent;
+
   // Remove self from previous parents children list (if it existed)
-  if (parent) {
+  if (old_parent) {
     // Remove this node's edges contribution from parent's
-    parent->update_edges_from_node(this_ptr(), Remove);
+    old_parent->update_edges_from_node(this_ptr(), Remove);
 
     // Remove self from previous children
-    parent->children.erase(this_ptr());
+    old_parent->children.erase(this_ptr());
   }
 
-  // Set this node's parent
-  parent = parent_node_ptr;
-
   // Add this node's edges to parent's degree count
-  parent->update_edges_from_node(this_ptr(), Add);
+  new_parent->update_edges_from_node(this_ptr(), Add);
 
   // Add this node to new parent's children list
-  parent_node_ptr->children.insert(this_ptr());
+  new_parent->children.insert(this_ptr());
+ 
+  // Set this node's parent
+  parent = new_parent;
 }
 
 // =============================================================================
