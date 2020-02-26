@@ -110,8 +110,7 @@ NodeVec SBM::get_nodes_of_type_at_level(const std::string& type, const int& leve
   // Make sure level has nodes before looping through it
   if (node_level->size() == 0) {
 
-    RANGE_ERROR("Requested level " + std::to_string(level)
-                + " is empty of nodes of type " + type + " when matching type");
+    RANGE_ERROR("Requested level " + std::to_string(level) + " is empty.");
   }
 
   // Where we will store all the nodes found from level
@@ -123,9 +122,7 @@ NodeVec SBM::get_nodes_of_type_at_level(const std::string& type, const int& leve
 
     // Decide to keep the node or not based on if it matches or doesn't and our
     // keeping preferance
-    bool keep_node = node.second->type == type;
-
-    if (keep_node) {
+    if (node.second->type == type) {
       // ...Place it in returning list
       nodes_to_return.push_back(node.second);
     }
@@ -206,11 +203,19 @@ void SBM::initialize_blocks(const int& level, const int& num_blocks)
   // block for a given node by its type
   if (!one_block_per_node) {
     for (const auto& type : node_type_counts) {
+      int num_blocks_to_build = num_blocks;
+
+      // Check to make sure there are enough nodes of this type at the desired level to fill them with this many blocks
+      if(type.second.at(level) < num_blocks){
+        num_blocks_to_build = type.second.at(level);
+        WARN_ABOUT("Fewer nodes of type " + type.first + " at level " + std::to_string(level) + "(" + std::to_string(num_blocks_to_build) + ") than requested number of groups (" + std::to_string(num_blocks) + ")");
+      }
+      
       // Reserve proper number of slots for new blocks
-      type_to_blocks[type.first].reserve(num_blocks);
+      type_to_blocks[type.first].reserve(num_blocks_to_build);
 
       // Buid new blocks to fill those slots
-      for (int i = 0; i < num_blocks; i++) {
+      for (int i = 0; i < num_blocks_to_build; i++) {
         // build a block node at the next level
         type_to_blocks[type.first].push_back(create_block_node(type.first, level + 1));
       }
