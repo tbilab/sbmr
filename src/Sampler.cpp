@@ -25,14 +25,19 @@ int Sampler::get_rand_int(const int& max_val)
 // =============================================================================
 NodePtr Sampler::sample(const NodeList& node_list)
 {
+  const int size_of_list = node_list.size();
+
+  if (size_of_list == 0) {
+    LOGIC_ERROR("List to sample has no elements.");
+  }
+
   // Start an iterator at begining of list
   auto block_it = node_list.begin();
   
-  // Select a random index to grab and advance list iterator till we've walked 
+  // Select a random index to grab and advance list iterator till we've walked
   // the desired number of steps
   std::advance(block_it, get_rand_int(node_list.size() - 1));
 
-  // Return current element for iterator
   return *block_it;
 }
 
