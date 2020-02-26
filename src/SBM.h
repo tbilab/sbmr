@@ -167,7 +167,7 @@ class SBM {
   void initialize_blocks(const int& level, const int& num_blocks = -1);
 
   // Scan through levels and remove all block nodes that have no children. Returns # of blocks removed
-  NodeVec clean_empty_blocks();
+  void clean_empty_blocks(const int& start_level = 1);
 
   // Compute microcononical entropy of current model state at a level
   double get_entropy(int level) const;
