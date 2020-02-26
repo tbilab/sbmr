@@ -69,12 +69,11 @@ NodePtr SBM::add_node(const std::string& id,
 
   const auto assign_result = node_level->emplace(id, std::make_shared<Node>(id, level, type));
 
-  if (!assign_result.second) {
-    LOGIC_ERROR("Tried to insert node that already exists in network");
+  const bool node_is_new = assign_result.second;
+  if (node_is_new) {
+    // Add this node to node counting map
+    node_type_counts[type][level]++;
   }
-
-  // Add this node to node counting map
-  node_type_counts[type][level]++;
 
   return assign_result.first->second;
 };
