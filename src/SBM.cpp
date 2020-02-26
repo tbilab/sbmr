@@ -178,7 +178,6 @@ void SBM::add_edge_types(const std::vector<std::string>& from_types, const std::
   specified_allowed_edges = true;
 }
 
-
 // =============================================================================
 // Adds a desired number of blocks and randomly assigns them for a given level
 // num_blocks = -1 means every node gets their own block
@@ -188,8 +187,8 @@ void SBM::initialize_blocks(const int& level, const int& num_blocks)
   PROFILE_FUNCTION();
 
   // Grab all the nodes for the desired level
-  const LevelPtr nodes = get_level(level);
-  const int num_nodes_in_level = nodes->size();
+  const LevelPtr nodes              = get_level(level);
+  const int      num_nodes_in_level = nodes->size();
 
   // Make sure level has nodes before looping through it
   if (num_nodes_in_level == 0) {
@@ -276,7 +275,6 @@ void SBM::clean_empty_blocks(const int& start_level)
 
         // Remove nodes contribution to node counts map
         node_type_counts[block.second->type][level]--;
-
       }
     }
 
@@ -411,7 +409,7 @@ NodeEdgeMap SBM::get_node_to_block_edge_counts(const std::string& id,
 // =============================================================================
 // Propose a potential block move for a node.
 // =============================================================================
-NodePtr SBM::propose_move(const NodePtr& node, const double&  eps)
+NodePtr SBM::propose_move(const NodePtr& node, const double& eps)
 {
   PROFILE_FUNCTION();
 
@@ -435,7 +433,8 @@ NodePtr SBM::propose_move(const NodePtr& node, const double&  eps)
                                                     : sampler.sample(rand_neighbor->get_edges_of_type(node->type, block_level));
 }
 
-inline void print_node_info(const NodePtr& node){
+inline void print_node_info(const NodePtr& node)
+{
   OUT_MSG << "\nID:" << node->id << ", "
           << "Level:" << node->level << ", "
           << "N-Children:" << node->children.size() << ", "
@@ -454,11 +453,10 @@ NodeVec SBM::propose_moves(const NodePtr& node,
   // Grab a list of all the blocks that the node could join
   const NodeVec potential_blocks = get_nodes_of_type_at_level(node->type, block_level);
 
-  for (int i = 0; i < num_moves; i++)
-  {
+  for (int i = 0; i < num_moves; i++) {
     // Sample a random neighbor of node
 
-    if(node->edges.size() == 0){
+    if (node->edges.size() == 0) {
       print_node_info(node);
       LOGIC_ERROR("Trying to sample edges from " + node->id + " but no edges were found");
     }
@@ -473,8 +471,8 @@ NodeVec SBM::propose_moves(const NodePtr& node,
 
     // Decide where we will get new block from and draw from potential candidates
     const NodePtr chosen_move = sampler.draw_unif() < prob_of_random_block
-            ? sampler.sample(potential_blocks)
-            : sampler.sample(rand_neighbor->get_edges_of_type(node->type, block_level));
+        ? sampler.sample(potential_blocks)
+        : sampler.sample(rand_neighbor->get_edges_of_type(node->type, block_level));
 
     proposed_moves.push_back(chosen_move);
   }
@@ -914,7 +912,7 @@ Merge_Step SBM::agglomerative_merge(const int&    block_level,
 
     NodeVec metablocks_to_search;
 
-    if(block.second->children.size() == 0){
+    if (block.second->children.size() == 0) {
       LOGIC_ERROR("Block " + block.second->id + " with no childen found in search");
     }
 
@@ -1164,8 +1162,6 @@ CollapseResults SBM::collapse_run(const int&              node_level,
                                             sigma,
                                             eps,
                                             false);
-
-
 
     if (collapse_results.size() < 1) {
       LOGIC_ERROR("Collapse result has zero entries");
