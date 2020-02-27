@@ -23,7 +23,7 @@ TEST_CASE("Generate Node move proposals", "[SBM]")
   // Run multiple trials and of move and see how often a given node is moved
   for (int i = 0; i < num_trials; ++i) {
     // Do move attempt (dry run)
-    NodePtr new_block = my_SBM.propose_move(a1, eps);
+    NodePtr new_block = my_SBM.propose_move(*a1, eps);
 
     if (new_block->id == old_block->id)
       num_times_no_move++;
@@ -87,7 +87,7 @@ TEST_CASE("Move proposal returns values are correct (simple unipartite)", "[SBM"
   const NodePtr n4 = unipartite_sbm.get_node_by_id("n4", 0);
   const NodePtr c  = unipartite_sbm.get_node_by_id("c", 1);
 
-  const auto proposal_results = unipartite_sbm.make_proposal_decision(n4, c, 0.1);
+  const auto proposal_results = unipartite_sbm.make_proposal_decision(*n4, *c, 0.1);
 
   // Delta from hand calculation
   REQUIRE(proposal_results.entropy_delta == Approx(-0.1117765).epsilon(0.1));
@@ -105,7 +105,7 @@ TEST_CASE("Move proposal returns values are correct (simple bipartite)", "[SBM")
   NodePtr a2  = my_SBM.get_node_by_id("a2");
   NodePtr a11 = my_SBM.get_node_by_id("a11", 1);
 
-  const auto proposal_results = my_SBM.make_proposal_decision(a2, a11, 0.1);
+  const auto proposal_results = my_SBM.make_proposal_decision(*a2, *a11, 0.1);
 
   // Delta from hand calculation
   REQUIRE(proposal_results.entropy_delta == Approx(-0.5924696).epsilon(0.1));
@@ -143,7 +143,7 @@ TEST_CASE("Move proposal entropy delta is correct (Unipartite)", "[SBM]")
       const NodePtr group_to_move_to = random.sample(my_SBM.get_nodes_of_type_at_level(node_to_move->type, 1));
 
       // Get move proposal report for move
-      const Proposal_Res proposal_vals = my_SBM.make_proposal_decision(node_to_move, group_to_move_to, 0.1);
+      const Proposal_Res proposal_vals = my_SBM.make_proposal_decision(*node_to_move, *group_to_move_to, 0.1);
 
       const double reported_entropy_delta = proposal_vals.entropy_delta;
 
@@ -199,7 +199,7 @@ TEST_CASE("Move proposal entropy delta is correct (Bipartite)", "[SBM]")
       NodePtr group_to_move_to = random.sample(my_SBM.get_nodes_of_type_at_level(node_to_move->type, 1));
 
       // Get move proposal report for move
-      Proposal_Res proposal_vals = my_SBM.make_proposal_decision(node_to_move, group_to_move_to, 0.1);
+      Proposal_Res proposal_vals = my_SBM.make_proposal_decision(*node_to_move, *group_to_move_to, 0.1);
 
       double reported_entropy_delta = proposal_vals.entropy_delta;
 
@@ -238,7 +238,7 @@ TEST_CASE("Simple move decision matches brute force calculation", "[SBM]")
   // Grab the new group for the node
   NodePtr b = my_SBM.get_node_by_id("b", 1);
 
-  const double expected_delta = my_SBM.make_proposal_decision(n5, b, 0.1).entropy_delta;
+  const double expected_delta = my_SBM.make_proposal_decision(*n5, *b, 0.1).entropy_delta;
 
   n5->set_parent(b);
   const double post_entropy   = my_SBM.get_entropy(0);
