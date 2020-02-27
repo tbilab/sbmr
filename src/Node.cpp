@@ -120,7 +120,7 @@ void Node::set_parent(NodePtr new_parent)
 // =============================================================================
 // Get parent of current node at a given level
 // =============================================================================
-inline NodePtr Node::get_parent_at_level(const int& level_of_parent)
+inline NodePtr Node::get_parent_at_level(const int level_of_parent)
 {
   // First we need to make sure that the requested level is not less than that
   // of the current node.
@@ -149,7 +149,7 @@ inline NodePtr Node::get_parent_at_level(const int& level_of_parent)
 // We return a vector because we need random access to elements in this array
 // and that isn't provided to us with the list format.
 // =============================================================================
-NodeVec Node::get_edges_of_type(const std::string& node_type, const int& desired_level) const
+NodeVec Node::get_edges_of_type(const std::string& node_type, const int desired_level) const
 {
   // Vector to return containing parents at desired level for edges
   NodeVec level_cons;
@@ -172,7 +172,7 @@ NodeVec Node::get_edges_of_type(const std::string& node_type, const int& desired
 // Collapse a nodes edge to a given level into a map of
 // connected block id->count
 // =============================================================================
-NodeEdgeMap Node::gather_edges_to_level(const int& level) const
+NodeEdgeMap Node::gather_edges_to_level(const int level) const
 {
   // Setup an edge count map for node
   NodeEdgeMap edges_counts;

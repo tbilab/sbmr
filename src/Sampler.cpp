@@ -12,7 +12,7 @@ double Sampler::draw_unif()
 // =============================================================================
 // Draw single sample from a discrete random uniform (0 - max_val] distribution
 // =============================================================================
-int Sampler::get_rand_int(const int& max_val)
+int Sampler::get_rand_int(const int max_val)
 {
   // Initialize a uniform random number generator with max at desired value
   std::uniform_int_distribution<int> dist(0, max_val);

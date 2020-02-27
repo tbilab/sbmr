@@ -39,7 +39,7 @@ class Sampler {
   // ==========================================
   // Methods
   double  draw_unif();                             // Return random uniform value between 0 and 1.
-  int     get_rand_int(const int& max_val);        // Sample from discrete random uniform from 0 to max
+  int     get_rand_int(const int max_val);        // Sample from discrete random uniform from 0 to max
   NodePtr sample(const NodeList& nodes_to_sample); // Sample random node from a list of nodes
   NodePtr sample(const NodeVec& nodes_to_sample);  // Sample random node from vector of nodes
 };
