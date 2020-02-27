@@ -115,6 +115,8 @@ class Node : public std::enable_shared_from_this<Node> {
   NodeVec     get_edges_of_type(const std::string& node_type, const int desired_level) const; // Get all nodes connected to Node at a given level
   NodeEdgeMap gather_edges_to_level(const int level) const;                                   // Get a map keyed by node with value of number of edges for all of a nodes edges to a level
   static void connect_nodes(NodePtr node_a, NodePtr node_b);                                  // Static method to connect two nodes to each other with edge
+  bool        operator==(const Node& other_node);
+  bool        operator==(const Node& other_node) const;
 };
 
 #endif

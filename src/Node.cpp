@@ -197,3 +197,14 @@ void Node::connect_nodes(NodePtr node_a, NodePtr node_b)
   node_a->add_edge(node_b);
   node_b->add_edge(node_a);
 }
+
+// Equality comparison
+bool Node::operator==(const Node& other_node)
+{
+  return id == other_node.id;
+}
+
+bool  Node::operator==(const Node& other_node) const
+{
+  return id == other_node.id;
+}
