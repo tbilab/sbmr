@@ -30,7 +30,6 @@ inline void Node::add_edge(NodePtr node)
   }
 }
 
-
 inline void remove_edge(NodeList& edge_list, const NodePtr& node_to_remove)
 {
   // Scan through this nodes edges untill we find the first instance
@@ -53,7 +52,7 @@ inline void remove_edge(NodeList& edge_list, const NodePtr& node_to_remove)
 void Node::update_edges(const NodeList& moved_node_edges, const Update_Type& update_type)
 {
   // PROFILE_FUNCTION();
- 
+
   // We will scan upward from the this node up through all its parents
   // First, we start with this node
   auto node_being_updated = this_ptr();
@@ -113,7 +112,7 @@ void Node::set_parent(NodePtr new_parent)
 
   // Add this node to new parent's children list
   new_parent->children.insert(this_ptr());
- 
+
   // Set this node's parent
   parent = new_parent;
 }
@@ -192,10 +191,9 @@ NodeEdgeMap Node::gather_edges_to_level(const int& level) const
 // =============================================================================
 // Static method to connect two nodes to each other with edge
 // =============================================================================
-void Node::connect_nodes(const NodePtr& node1_ptr, const NodePtr& node2_ptr)
+void Node::connect_nodes(NodePtr node_a, NodePtr node_b)
 {
   //PROFILE_FUNCTION();
-  node1_ptr->add_edge(node2_ptr);
-  node2_ptr->add_edge(node1_ptr);
+  node_a->add_edge(node_b);
+  node_b->add_edge(node_a);
 }
-

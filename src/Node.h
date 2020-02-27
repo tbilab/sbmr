@@ -109,12 +109,12 @@ class Node : public std::enable_shared_from_this<Node> {
   // =========================================================================
   NodePtr     this_ptr();                                                                      // Gets a shared pointer to object (replaces this)
   void        set_parent(NodePtr new_parent);                                                  // Set current node parent/cluster
-  void        add_edge(NodePtr node);                                                   // Add edge to another node
-  void        update_edges(const NodeList& moved_node_edges, const Update_Type& update_type);     // Add or remove edges from nodes edge list
+  void        add_edge(NodePtr node);                                                          // Add edge to another node
+  void        update_edges(const NodeList& moved_node_edges, const Update_Type& update_type);  // Add or remove edges from nodes edge list
   NodePtr     get_parent_at_level(const int& level);                                           // Get parent of node at a given level
   NodeVec     get_edges_of_type(const std::string& node_type, const int& desired_level) const; // Get all nodes connected to Node at a given level
   NodeEdgeMap gather_edges_to_level(const int& level) const;                                   // Get a map keyed by node with value of number of edges for all of a nodes edges to a level
-  static void connect_nodes(const NodePtr& node_a, const NodePtr& node_b);                     // Static method to connect two nodes to each other with edge
+  static void connect_nodes(NodePtr node_a, NodePtr node_b);                                   // Static method to connect two nodes to each other with edge
 };
 
 #endif
