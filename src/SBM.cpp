@@ -623,9 +623,9 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr& node,
 MCMC_Sweeps SBM::mcmc_sweep(const int    level,
                             const int    num_sweeps,
                             const double& eps,
-                            const bool&   variable_num_blocks,
-                            const bool&   track_pairs,
-                            const bool&   verbose)
+                            const bool   variable_num_blocks,
+                            const bool   track_pairs,
+                            const bool   verbose)
 {
   PROFILE_FUNCTION();
 
@@ -1054,7 +1054,7 @@ CollapseResults SBM::collapse_blocks(const int    node_level,
                                      const int    num_checks_per_block,
                                      const double& sigma,
                                      const double& eps,
-                                     const bool&   report_all_steps)
+                                     const bool   report_all_steps)
 {
   PROFILE_FUNCTION();
   const int block_level = node_level + 1;

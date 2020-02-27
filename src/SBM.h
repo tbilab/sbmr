@@ -90,7 +90,7 @@ using EdgeTypes       = std::map<std::string, std::set<std::string>>;
 class SBM {
 
   private:
-    // const version that wont append new level if it doesn't exist
+  // const version that wont append new level if it doesn't exist
   LevelPtr get_level(const int level) const;
 
   public:
@@ -99,7 +99,7 @@ class SBM {
   LevelMap        nodes;            // A kmap keyed by level integer of each level of nodes
   NodeTypeCounts  node_type_counts; // A map keyed by type to a map keyed by level of node counts
   std::list<Edge> edges;            // Each pair of edges in the network
-  int id_counter = 0;               // Iterates up everytime a node is created so we don't have naming collissions.
+  int             id_counter = 0;   // Iterates up everytime a node is created so we don't have naming collissions.
   // Map keyed by a node type. Value is the types of nodes the key type is allowed to connect to.
   EdgeTypes edge_type_pairs;
 
@@ -154,8 +154,8 @@ class SBM {
 
   // Get a node's block connections map to a desired level
   NodeEdgeMap get_node_to_block_edge_counts(const std::string& id,
-                                            const int         node_level        = 0,
-                                            const int         connections_level = 1) const;
+                                            const int          node_level        = 0,
+                                            const int          connections_level = 1) const;
 
   // Load a level blocking from a state dump
   void set_state(const std::vector<std::string>& id,
@@ -173,10 +173,10 @@ class SBM {
   double get_entropy(int level) const;
 
   // Use model state to propose a potential block move for a node.
-  NodePtr propose_move(const NodePtr& node, const double&  eps);
+  NodePtr propose_move(const NodePtr& node, const double& eps);
 
   NodeVec propose_moves(const NodePtr& node,
-                        const int     num_moves,
+                        const int      num_moves,
                         const double&  eps);
 
   // Make a decision on the proposed new block for node
@@ -185,36 +185,36 @@ class SBM {
                                       const double&  eps);
 
   // Runs efficient MCMC sweep algorithm on desired node level
-  MCMC_Sweeps mcmc_sweep(const int    level,
-                         const int    num_sweeps,
+  MCMC_Sweeps mcmc_sweep(const int     level,
+                         const int     num_sweeps,
                          const double& eps,
-                         const bool&   variable_num_blocks,
-                         const bool&   track_pairs,
-                         const bool&   verbose = false);
+                         const bool    variable_num_blocks,
+                         const bool    track_pairs,
+                         const bool    verbose = false);
 
   // Merge two blocks, placing all nodes that were under block_b under
   // block_a and deleting from model.
   void merge_blocks(const NodePtr& block_a, const NodePtr& block_b);
 
   // Merge two blocks at a given level based on the probability of doing so
-  Merge_Step agglomerative_merge(const int    level_of_blocks,
-                                 const int    n_merges,
-                                 const int    num_checks_per_block,
+  Merge_Step agglomerative_merge(const int     level_of_blocks,
+                                 const int     n_merges,
+                                 const int     num_checks_per_block,
                                  const double& eps);
 
   // Run mcmc chain initialization by finding best organization
   // of B' blocks for all B from B = N to B = 1.
-  CollapseResults collapse_blocks(const int    node_level,
-                                  const int    num_mcmc_steps,
-                                  const int    desired_num_blocks,
-                                  const int    num_checks_per_block,
+  CollapseResults collapse_blocks(const int     node_level,
+                                  const int     num_mcmc_steps,
+                                  const int     desired_num_blocks,
+                                  const int     num_checks_per_block,
                                   const double& sigma,
                                   const double& eps,
-                                  const bool&   report_all_steps);
+                                  const bool    report_all_steps);
 
-  CollapseResults collapse_run(const int              node_level,
-                               const int              num_mcmc_steps,
-                               const int              num_checks_per_block,
+  CollapseResults collapse_run(const int               node_level,
+                               const int               num_mcmc_steps,
+                               const int               num_checks_per_block,
                                const double&           sigma,
                                const double&           eps,
                                const std::vector<int>& block_nums);
