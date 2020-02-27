@@ -205,11 +205,11 @@ void SBM::initialize_blocks(const int level, const int num_blocks)
       int num_blocks_to_build = num_blocks;
 
       // Check to make sure there are enough nodes of this type at the desired level to fill them with this many blocks
-      if(type.second.at(level) < num_blocks){
+      if (type.second.at(level) < num_blocks) {
         num_blocks_to_build = type.second.at(level);
         WARN_ABOUT("Fewer nodes of type " + type.first + " at level " + std::to_string(level) + "(" + std::to_string(num_blocks_to_build) + ") than requested number of groups (" + std::to_string(num_blocks) + ")");
       }
-      
+
       // Reserve proper number of slots for new blocks
       type_to_blocks[type.first].reserve(num_blocks_to_build);
 
@@ -403,8 +403,8 @@ BlockEdgeCounts SBM::get_block_edge_counts(const int level) const
 }
 
 NodeEdgeMap SBM::get_node_to_block_edge_counts(const std::string& id,
-                                               const int         node_level,
-                                               const int         connections_level) const
+                                               const int          node_level,
+                                               const int          connections_level) const
 {
   // Get edges to desired level
   return get_node_by_id(id, node_level)->gather_edges_to_level(connections_level);
@@ -445,9 +445,9 @@ inline void print_node_info(const Node& node)
           << "Parent:" << node.parent->id << std::endl;
 }
 
-NodeVec SBM::propose_moves(const Node& node,
+NodeVec SBM::propose_moves(const Node&   node,
                            const int     num_moves,
-                           const double&  eps)
+                           const double& eps)
 {
   NodeVec proposed_moves;
   proposed_moves.reserve(num_moves);
@@ -487,9 +487,9 @@ NodeVec SBM::propose_moves(const Node& node,
 // =============================================================================
 // Make a decision on the proposed new block for node
 // =============================================================================
-Proposal_Res SBM::make_proposal_decision(const Node& node,
-                                         const Node& new_block,
-                                         const double&  eps)
+Proposal_Res SBM::make_proposal_decision(const Node&   node,
+                                         const Node&   new_block,
+                                         const double& eps)
 {
   PROFILE_FUNCTION();
 
@@ -557,7 +557,7 @@ Proposal_Res SBM::make_proposal_decision(const Node& node,
   double post_move_prob = 0;
 
   for (const auto& move_edges : move_edge_counts) {
-    const Node&        neighbor = *move_edges.first;
+    const Node&           neighbor = *move_edges.first;
     const Node_Move_Cons& pre      = move_edges.second;
 
     // Degree of neighbor group before move
@@ -620,12 +620,12 @@ Proposal_Res SBM::make_proposal_decision(const Node& node,
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-MCMC_Sweeps SBM::mcmc_sweep(const int    level,
-                            const int    num_sweeps,
+MCMC_Sweeps SBM::mcmc_sweep(const int     level,
+                            const int     num_sweeps,
                             const double& eps,
-                            const bool   variable_num_blocks,
-                            const bool   track_pairs,
-                            const bool   verbose)
+                            const bool    variable_num_blocks,
+                            const bool    track_pairs,
+                            const bool    verbose)
 {
   PROFILE_FUNCTION();
 
@@ -871,9 +871,9 @@ void SBM::merge_blocks(const NodePtr& absorbing_block, const NodePtr& absorbed_b
 // =============================================================================
 // Merge blocks at a given level based on the best probability of doing so
 // =============================================================================
-Merge_Step SBM::agglomerative_merge(const int    block_level,
-                                    const int    num_merges_to_make,
-                                    const int    num_checks_per_block,
+Merge_Step SBM::agglomerative_merge(const int     block_level,
+                                    const int     num_merges_to_make,
+                                    const int     num_checks_per_block,
                                     const double& eps)
 {
   PROFILE_FUNCTION();
@@ -1048,13 +1048,13 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
 // Run mcmc chain initialization by finding best organization
 // of B' blocks for all B from B = N to B = 1.
 // =============================================================================
-CollapseResults SBM::collapse_blocks(const int    node_level,
-                                     const int    num_mcmc_steps,
-                                     const int    desired_num_blocks,
-                                     const int    num_checks_per_block,
+CollapseResults SBM::collapse_blocks(const int     node_level,
+                                     const int     num_mcmc_steps,
+                                     const int     desired_num_blocks,
+                                     const int     num_checks_per_block,
                                      const double& sigma,
                                      const double& eps,
-                                     const bool   report_all_steps)
+                                     const bool    report_all_steps)
 {
   PROFILE_FUNCTION();
   const int block_level = node_level + 1;
@@ -1147,9 +1147,9 @@ CollapseResults SBM::collapse_blocks(const int    node_level,
 // Repeat the collapse_blocks method with a ranging number of desired blocks to
 // collapse to and report just the final result for all
 // =============================================================================
-CollapseResults SBM::collapse_run(const int              node_level,
-                                  const int              num_mcmc_steps,
-                                  const int              num_checks_per_block,
+CollapseResults SBM::collapse_run(const int               node_level,
+                                  const int               num_mcmc_steps,
+                                  const int               num_checks_per_block,
                                   const double&           sigma,
                                   const double&           eps,
                                   const std::vector<int>& block_nums)
