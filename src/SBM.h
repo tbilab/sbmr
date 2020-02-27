@@ -173,15 +173,15 @@ class SBM {
   double get_entropy(int level) const;
 
   // Use model state to propose a potential block move for a node.
-  NodePtr propose_move(const NodePtr& node, const double& eps);
+  NodePtr propose_move(const Node& node, const double& eps);
 
-  NodeVec propose_moves(const NodePtr& node,
-                        const int      num_moves,
-                        const double&  eps);
+  NodeVec propose_moves(const Node&   node,
+                        const int     num_moves,
+                        const double& eps);
 
   // Make a decision on the proposed new block for node
-  Proposal_Res make_proposal_decision(const NodePtr& node,
-                                      const NodePtr& new_block,
+  Proposal_Res make_proposal_decision(const Node& node,
+                                      const Node& new_block,
                                       const double&  eps);
 
   // Runs efficient MCMC sweep algorithm on desired node level

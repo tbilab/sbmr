@@ -413,17 +413,17 @@ NodeEdgeMap SBM::get_node_to_block_edge_counts(const std::string& id,
 // =============================================================================
 // Propose a potential block move for a node.
 // =============================================================================
-NodePtr SBM::propose_move(const NodePtr& node, const double& eps)
+NodePtr SBM::propose_move(const Node& node, const double& eps)
 {
   PROFILE_FUNCTION();
 
-  const int block_level = node->level + 1;
+  const int block_level = node.level + 1;
 
   // Grab a list of all the blocks that the node could join
-  const NodeVec potential_blocks = get_nodes_of_type_at_level(node->type, block_level);
+  const NodeVec potential_blocks = get_nodes_of_type_at_level(node.type, block_level);
 
   // Sample a random neighbor of node
-  const NodePtr rand_neighbor = sampler.sample(node->edges)->get_parent_at_level(node->level);
+  const NodePtr rand_neighbor = sampler.sample(node.edges)->get_parent_at_level(node.level);
 
   // Get number total number edges for neighbor's block
   const int neighbor_block_degree = rand_neighbor->parent->degree;
@@ -434,37 +434,37 @@ NodePtr SBM::propose_move(const NodePtr& node, const double& eps)
 
   // Decide where we will get new block from and draw from potential candidates
   return sampler.draw_unif() < prob_of_random_block ? sampler.sample(potential_blocks)
-                                                    : sampler.sample(rand_neighbor->get_edges_of_type(node->type, block_level));
+                                                    : sampler.sample(rand_neighbor->get_edges_of_type(node.type, block_level));
 }
 
-inline void print_node_info(const NodePtr& node)
+inline void print_node_info(const Node& node)
 {
-  OUT_MSG << "\nID:" << node->id << ", "
-          << "Level:" << node->level << ", "
-          << "N-Children:" << node->children.size() << ", "
-          << "Parent:" << node->parent->id << std::endl;
+  OUT_MSG << "\nID:" << node.id << ", "
+          << "Level:" << node.level << ", "
+          << "N-Children:" << node.children.size() << ", "
+          << "Parent:" << node.parent->id << std::endl;
 }
 
-NodeVec SBM::propose_moves(const NodePtr& node,
+NodeVec SBM::propose_moves(const Node& node,
                            const int     num_moves,
                            const double&  eps)
 {
   NodeVec proposed_moves;
   proposed_moves.reserve(num_moves);
 
-  const int block_level = node->level + 1;
+  const int block_level = node.level + 1;
 
   // Grab a list of all the blocks that the node could join
-  const NodeVec potential_blocks = get_nodes_of_type_at_level(node->type, block_level);
+  const NodeVec potential_blocks = get_nodes_of_type_at_level(node.type, block_level);
 
   for (int i = 0; i < num_moves; i++) {
     // Sample a random neighbor of node
 
-    if (node->edges.size() == 0) {
+    if (node.degree == 0) {
       print_node_info(node);
-      LOGIC_ERROR("Trying to sample edges from " + node->id + " but no edges were found");
+      LOGIC_ERROR("Trying to sample edges from " + node.id + " but no edges were found");
     }
-    const NodePtr rand_neighbor = sampler.sample(node->edges)->get_parent_at_level(node->level);
+    const NodePtr rand_neighbor = sampler.sample(node.edges)->get_parent_at_level(node.level);
 
     // Get number total number edges for neighbor's block
     const int neighbor_block_degree = rand_neighbor->parent->degree;
@@ -476,7 +476,7 @@ NodeVec SBM::propose_moves(const NodePtr& node,
     // Decide where we will get new block from and draw from potential candidates
     const NodePtr chosen_move = sampler.draw_unif() < prob_of_random_block
         ? sampler.sample(potential_blocks)
-        : sampler.sample(rand_neighbor->get_edges_of_type(node->type, block_level));
+        : sampler.sample(rand_neighbor->get_edges_of_type(node.type, block_level));
 
     proposed_moves.push_back(chosen_move);
   }
@@ -487,20 +487,20 @@ NodeVec SBM::propose_moves(const NodePtr& node,
 // =============================================================================
 // Make a decision on the proposed new block for node
 // =============================================================================
-Proposal_Res SBM::make_proposal_decision(const NodePtr& node,
-                                         const NodePtr& new_block,
+Proposal_Res SBM::make_proposal_decision(const Node& node,
+                                         const Node& new_block,
                                          const double&  eps)
 {
   PROFILE_FUNCTION();
 
-  const NodePtr old_block = node->parent; // Reference to old block that would be swapped for new_block
+  const Node old_block = *(node.parent); // Reference to old block that would be swapped for new_block
   // Make sure we're actually doing something
   if (old_block == new_block) {
     return Proposal_Res(0.0, 0.0);
   }
 
-  const double node_degree = node->degree;
-  const double block_level = new_block->level; // The level that this proposal is taking place on
+  const double node_degree = node.degree;
+  const double block_level = new_block.level; // The level that this proposal is taking place on
 
   // Setup a struct to hold all the info we need about a given pair
   struct Node_Move_Cons {
@@ -514,21 +514,21 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr& node,
   int node_to_old_block = 0;
   int node_to_new_block = 0;
 
-  for (const auto& edge : old_block->edges) {
+  for (const auto& edge : old_block.edges) {
     move_edge_counts[edge->get_parent_at_level(block_level)].old_to_neighbor++;
   }
 
-  for (const auto& edge : new_block->edges) {
+  for (const auto& edge : new_block.edges) {
     move_edge_counts[edge->get_parent_at_level(block_level)].new_to_neighbor++;
   }
 
-  for (const auto& edge : node->edges) {
+  for (const auto& edge : node.edges) {
     const NodePtr edge_block = edge->get_parent_at_level(block_level);
 
-    if (edge_block == old_block) {
+    if (old_block == *edge_block) {
       node_to_old_block++;
     }
-    else if (edge_block == new_block) {
+    else if (new_block == *edge_block) {
       node_to_new_block++;
     }
 
@@ -539,16 +539,16 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr& node,
   // Loop over all the possible neighbor node types for this node and add up.
   int n_possible_neighbors = 0;
 
-  const auto possible_neighbor_types = edge_type_pairs.at(node->type);
+  const auto possible_neighbor_types = edge_type_pairs.at(node.type);
   for (const auto& neighbor_type : possible_neighbor_types) {
     n_possible_neighbors += node_type_counts[neighbor_type][block_level];
   }
 
   // These are constants for edge connections that are used in entropy calc
   const int node_to_old_new_delta = node_to_old_block - node_to_new_block;
-  const int pre_old_degree        = old_block->degree;
+  const int pre_old_degree        = old_block.degree;
   const int post_old_degree       = pre_old_degree - node_degree;
-  const int pre_new_degree        = new_block->degree;
+  const int pre_new_degree        = new_block.degree;
   const int post_new_degree       = pre_new_degree + node_degree;
 
   // These will get summed into as we loop over all the neighbor blocks
@@ -557,11 +557,11 @@ Proposal_Res SBM::make_proposal_decision(const NodePtr& node,
   double post_move_prob = 0;
 
   for (const auto& move_edges : move_edge_counts) {
-    const NodePtr&        neighbor = move_edges.first;
+    const Node&        neighbor = *move_edges.first;
     const Node_Move_Cons& pre      = move_edges.second;
 
     // Degree of neighbor group before move
-    const int pre_neighbor_degree = neighbor->degree;
+    const int pre_neighbor_degree = neighbor.degree;
 
     // Initialize variables that will get changed depending on what the neighbor group is
     int    post_old_to_neighbor = pre.old_to_neighbor;
@@ -692,11 +692,11 @@ MCMC_Sweeps SBM::mcmc_sweep(const int    level,
       }
 
       // Get a move proposal
-      const NodePtr proposed_new_block = propose_move(curr_node, eps);
+      const NodePtr proposed_new_block = propose_move(*curr_node, eps);
 
       // If the proposed block is the nodes current block, we don't need to waste
       // time checking because decision will always result in same state.
-      if ((curr_node->parent)->id == proposed_new_block->id) {
+      if (curr_node->parent == proposed_new_block) {
         continue;
       }
 
@@ -708,7 +708,7 @@ MCMC_Sweeps SBM::mcmc_sweep(const int    level,
                 << ",";
       }
       // Calculate acceptance probability based on posterior changes
-      Proposal_Res proposal_results = make_proposal_decision(curr_node, proposed_new_block, eps);
+      Proposal_Res proposal_results = make_proposal_decision(*curr_node, *proposed_new_block, eps);
 
       // Make movement decision
       const bool move_accepted = proposal_results.prob_of_accept > sampler.draw_unif();
@@ -929,7 +929,7 @@ Merge_Step SBM::agglomerative_merge(const int    block_level,
     }
     else {
       // Otherwise, we should sample a given number of blocks to check
-      metablocks_to_search = propose_moves(block.second, num_checks_per_block, eps);
+      metablocks_to_search = propose_moves(*(block.second), num_checks_per_block, eps);
     }
 
     // Now that we have gathered all the merges to check, we can loop
