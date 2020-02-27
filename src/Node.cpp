@@ -50,7 +50,7 @@ inline void remove_edge(NodeList& edge_list, const NodePtr& node_to_remove)
 // =============================================================================
 // Add or remove edges from a nodes edge list
 // =============================================================================
-void Node::update_edges_from_node(const NodeList& moved_node_edges, const Update_Type& update_type)
+void Node::update_edges(const NodeList& moved_node_edges, const Update_Type& update_type)
 {
   // PROFILE_FUNCTION();
  
@@ -102,14 +102,14 @@ void Node::set_parent(NodePtr new_parent)
   // Remove self from previous parents children list (if it existed)
   if (old_parent) {
     // Remove this node's edges contribution from parent's
-    old_parent->update_edges_from_node(edges, Remove);
+    old_parent->update_edges(edges, Remove);
 
     // Remove self from previous children
     old_parent->children.erase(this_ptr());
   }
 
   // Add this node's edges to parent's degree count
-  new_parent->update_edges_from_node(edges, Add);
+  new_parent->update_edges(edges, Add);
 
   // Add this node to new parent's children list
   new_parent->children.insert(this_ptr());
