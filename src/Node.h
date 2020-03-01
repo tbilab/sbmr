@@ -95,6 +95,15 @@ class Node : public std::enable_shared_from_this<Node> {
   {
   }
 
+  // Disable costly copy and move methods for error protection
+  // Copy construction
+  Node(const Node&) = delete;
+  Node& operator=(const Node&) = delete;
+
+  // Move operations
+  Node(Node&&)  = delete;
+  Node& operator=(Node&&) = delete;
+
   // Attributes
   // =========================================================================
   std::string id;       // Unique integer id for node
