@@ -493,7 +493,7 @@ Proposal_Res SBM::make_proposal_decision(const Node&   node,
 {
   PROFILE_FUNCTION();
 
-  const Node old_block = *(node.parent); // Reference to old block that would be swapped for new_block
+  const Node& old_block = *(node.parent); // Reference to old block that would be swapped for new_block
   // Make sure we're actually doing something
   if (old_block == new_block) {
     return Proposal_Res(0.0, 0.0);
