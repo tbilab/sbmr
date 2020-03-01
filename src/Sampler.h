@@ -31,6 +31,17 @@ class Sampler {
   {
   }
 
+  // Copy construction. Just pick up the old generator in its current state
+  Sampler(const Sampler& old_sampler)
+      : generator(old_sampler.generator)
+  {
+  }
+  Sampler& operator=(const Sampler&) = delete;
+
+  // Move operations
+  Sampler(Sampler&&) = delete;
+  Sampler& operator=(Sampler&&) = delete;
+
   // Attributes
   // ===========================================================================
   std::mt19937                     generator; // Generates random unsigned ints
