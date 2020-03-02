@@ -51,7 +51,10 @@ visualize_propensity_network.sbm_network <- function(sbm, proportion_threshold =
     dplyr::distinct(id, avg_prop_connection) %>%
     dplyr::left_join(sbm$nodes, by = "id")
 
-  new_sbm_network(edges = edges, nodes = nodes, setup_model = FALSE) %>%
+  new_sbm_network(edges = edges,
+                  nodes = nodes,
+                  setup_model = FALSE,
+                  remove_isolated_nodes = FALSE) %>%
     visualize_network(node_color_col = "avg_prop_connection",
                       node_shape_col = "type")
 
