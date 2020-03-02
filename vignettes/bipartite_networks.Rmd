@@ -23,7 +23,7 @@ library(ggplot2)
 ```
 
 
-Start with the package included polinators network.
+Start with the package included pollinators network.
 
 ```{r load-data}
 clements_polinators %>% head()

@@ -5,11 +5,11 @@
 requireNamespace("usethis", quietly = TRUE)
 library(tidyverse)
 
-polinator_wide <- read_csv('data-raw/clements_polinators.csv')
+pollinator_wide <- read_csv('data-raw/clements_pollinators.csv')
 
-clements_polinators <- polinator_wide %>%
-  pivot_longer(-polinator, names_to = "flower") %>%
+clements_pollinators <- pollinator_wide %>%
+  pivot_longer(-pollinator, names_to = "flower") %>%
   filter(value == 1) %>%
   select(-value)
 
-usethis::use_data(clements_polinators)
+usethis::use_data(clements_pollinators,overwrite = TRUE)
