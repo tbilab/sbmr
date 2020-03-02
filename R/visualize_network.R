@@ -30,16 +30,16 @@
 #' visualize_network(net, node_shape_col = 'block', node_color_col = 'type')
 #'
 visualize_network <- function(sbm,
-                              node_color_col = 'block',
                               node_shape_col = 'type',
+                              node_color_col = "none",
                               width = "100%",
                               height = NULL){
   UseMethod("visualize_network")
 }
 
 visualize_network.default <- function(sbm,
-                                      node_color_col = 'block',
                                       node_shape_col = 'type',
+                                      node_color_col = "none",
                                       width = "100%",
                                       height = NULL){
   cat("visualize_network generic")
@@ -48,14 +48,28 @@ visualize_network.default <- function(sbm,
 
 #' @export
 visualize_network.sbm_network <- function(sbm,
-                                          node_color_col = 'block',
                                           node_shape_col = 'type',
+                                          node_color_col = "none",
                                           width = "100%",
                                           height = NULL){
+  nodes_for_plotting <- sbm$nodes
+
+  if(node_color_col == "block" | node_shape_col == "block"){
+    node_state <- attr(sbm, "state")
+
+    if(is.null(node_state)){
+      stop("Can't visualize block structure as model has not been initialized.")
+    }
+
+    nodes_for_plotting <- node_state %>%
+      dplyr::filter(level == 0) %>%
+      dplyr::rename(block = parent)
+  }
+
   r2d3::r2d3(
     data = list(
       edges = sbm$edges,
-      nodes = sbm$nodes
+      nodes = nodes_for_plotting
     ),
     options = list(
       color_col = node_color_col,
