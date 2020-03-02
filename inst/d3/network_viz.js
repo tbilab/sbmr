@@ -84,7 +84,8 @@ const simulation = d3.forceSimulation(nodes)
     .force("link", d3.forceLink(links).id(d => d.id))
     .force("charge", d3.forceManyBody())
     .force("x", d3.forceX(width / 2))
-    .force("y", d3.forceY(height / 2));
+    .force("y", d3.forceY(height / 2))
+    .force('collision', d3.forceCollide().radius(10));
 
 // Optimized for fully connected graphs.
 //const simulation = d3.forceSimulation(nodes)
