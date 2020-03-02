@@ -56,12 +56,15 @@
 #'   called?
 #' @param edge_types A dataframe in the same format of as `edges` that contains
 #'   allowed pairs (order does not matter) of possible node type combinations
-#'   across edges. For instance: nodes of type polinator are allowed to connect
+#'   across edges. For instance: nodes of type pollinator are allowed to connect
 #'   to flower nodes but not to other pollinator nodes. If this is left
 #'   undefined, it is inferred from edges.
 #' @param show_warnings Do you want to be warned when minor problems are
-#'   detected by function? Usefull to disable when not running in an interactive
+#'   detected by function? Useful to disable when not running in an interactive
 #'   mode etc.
+#' @param remove_isolated_nodes Should the network filter out nodes that have no
+#'   edges? This option should only be set to `FALSE` for visualization purposes
+#'   as the SBM model needs at least one edge for every node to work.
 #' @param random_seed Integer seed to be passed to model's internal random
 #'   sampling engine. Note that if the model is restored from a saved state this
 #'   seed will be initialized again to the start value which will harm
@@ -156,7 +159,8 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                             edge_types = NULL,
                             default_node_type = "node",
                             show_warnings = interactive(),
-                            random_seed = NULL){
+                            random_seed = NULL,
+                            remove_isolated_nodes = TRUE){
 
 
   # Setup some tidy eval stuff for the column names
@@ -275,7 +279,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                "from edges"))
   }
 
-  if(any(nodes_not_in_edges)){
+  if(any(nodes_not_in_edges) & remove_isolated_nodes){
     unconnected_nodes <- unique_node_ids[nodes_not_in_edges]
 
     # Let the user know what happened
