@@ -4,12 +4,18 @@
 \alias{visualize_propensity_network}
 \title{Plot network of nodes connected by pairwise block propensity}
 \usage{
-visualize_propensity_network(sbm, proportion_threshold = 0.2)
+visualize_propensity_network(
+  sbm,
+  proportion_threshold = 0.2,
+  isolate_type = NULL
+)
 }
 \arguments{
 \item{sbm}{Object of class \code{sbm_network}.}
 
 \item{proportion_threshold}{Threshold of pairwise propensity to consider two nodes linked. Choose carefully!}
+
+\item{isolate_type}{Node type to be isolated for visualization. If left empty all types are included.}
 }
 \value{
 An interactive network plot with force layout.

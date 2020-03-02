@@ -4,10 +4,12 @@
 \alias{get_sweep_pair_counts}
 \title{Get pairwise group sharing counts from model}
 \usage{
-get_sweep_pair_counts(sbm)
+get_sweep_pair_counts(sbm, isolate_type = NULL)
 }
 \arguments{
 \item{sbm}{Object of class \code{sbm_network}.}
+
+\item{isolate_type}{Node type to be isolated for visualization. If left empty all types are included.}
 }
 \value{
 pairwise connection propensity counts from latest MCMC sweep
