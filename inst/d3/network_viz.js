@@ -79,10 +79,18 @@ const Y = d3.scaleLinear()
 
 
 // Setup the simulation
+// Optimized for disjoint graphs...
 const simulation = d3.forceSimulation(nodes)
-      .force("link", d3.forceLink(links).id(d => d.id))
-      .force("charge", d3.forceManyBody())
-      .force("center", d3.forceCenter(width / 2, height / 2));
+    .force("link", d3.forceLink(links).id(d => d.id))
+    .force("charge", d3.forceManyBody())
+    .force("x", d3.forceX(width / 2))
+    .force("y", d3.forceY(height / 2));
+
+// Optimized for fully connected graphs.
+//const simulation = d3.forceSimulation(nodes)
+//      .force("link", d3.forceLink(links).id(d => d.id))
+//      .force("charge", d3.forceManyBody().strength(-5))
+//      .force("center", d3.forceCenter(width / 2, height / 2));
 
 let not_being_dragged = true;
 
