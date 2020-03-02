@@ -9,6 +9,7 @@
 #' @family visualizations
 #'
 #' @inheritParams verify_model
+#' @inheritParams get_sweep_pair_counts
 #'
 #' @return GGplot2 plot containing ECDF of the pairwise propensities of residing in same block for MCMC sweeps.
 #' @export
@@ -23,22 +24,19 @@
 #' # Plot results
 #' visualize_propensity_dist(net)
 #'
-visualize_propensity_dist <- function(sbm){
+visualize_propensity_dist <- function(sbm, isolate_type = NULL){
   UseMethod("visualize_propensity_dist")
 }
 
-visualize_propensity_dist.default <- function(sbm){
-  cat("visualize_propensity_dist generic")
-}
 
 #' @export
-visualize_propensity_dist.sbm_network <- function(sbm){
+visualize_propensity_dist.sbm_network <- function(sbm, isolate_type = NULL){
+  pair_counts <- get_sweep_pair_counts(sbm, isolate_type = isolate_type)
 
-  pair_counts <- get_sweep_pair_counts(sbm)
+  non_zero_pair <- which(pair_counts$times_connected != 0)[1]
+  n_sweeps <- round(pair_counts$times_connected[non_zero_pair]/pair_counts$proportion_connected[non_zero_pair])
 
-  n_sweeps <- round(pair_counts$times_connected[1]/pair_counts$proportion_connected[1])
-
-  ggplot2::ggplot(pair_counts, ggplot2::aes(x = proportion_connected)) +
+  ggplot2::ggplot(pair_counts, ggplot2::aes(x = proportion_connected, color = type)) +
     ggplot2::stat_ecdf() +
     ggplot2::labs(
       title = "Pairwise block concensus proportion distribution",
