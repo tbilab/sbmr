@@ -131,7 +131,9 @@ visualize_propensity_dist(pollinator_net)
 ```
 
 ```{r}
-visualize_propensity_network(pollinator_net, proportion_threshold = 0.5)
+pollinator_net %>% 
+  visualize_propensity_network(proportion_threshold = 0.01, 
+                               isolate_type = "flower")
 ```
 
 
