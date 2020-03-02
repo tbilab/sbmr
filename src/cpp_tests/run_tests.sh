@@ -8,7 +8,7 @@ OPTIMIZATION_LEVEL=""
 # OPTIMIZATION_LEVEL=-O2
 
 # Compile the main classes
-g++ -std=c++11 ${OPTIMIZATION_LEVEL} -c \
+g++ -std=c++17 ${OPTIMIZATION_LEVEL} -c \
   -DNO_RCPP=1 \
   Node.cpp Block_Consensus.cpp SBM.cpp Sampler.cpp 
 
@@ -19,12 +19,12 @@ echo "==========================================================================
 # Compile the entryway to the tests. This only needs to happen once
 if [ ! -f cpp_tests/tests-main.o ]; then
   echo "Building test entryway..."
-  g++ -std=c++11 ${OPTIMIZATION_LEVEL} cpp_tests/tests-main.cpp -c -o cpp_tests/tests-main.o
+  g++ -std=c++17 ${OPTIMIZATION_LEVEL} cpp_tests/tests-main.cpp -c -o cpp_tests/tests-main.o
 fi
 
 
 # Compile all the tests
-g++ -std=c++11 ${OPTIMIZATION_LEVEL} -DNO_RCPP=1\
+g++ -std=c++17 ${OPTIMIZATION_LEVEL} -DNO_RCPP=1\
   cpp_tests/tests-main.o \
   Node.o SBM.o Sampler.o Block_Consensus.o \
   cpp_tests/tests-node.cpp \

@@ -556,12 +556,12 @@ Proposal_Res SBM::make_proposal_decision(const Node&   node,
   double pre_move_prob  = 0;
   double post_move_prob = 0;
 
-  for (const auto& move_edges : move_edge_counts) {
-    const Node&           neighbor = *move_edges.first;
-    const Node_Move_Cons& pre      = move_edges.second;
+  for (const auto& [neighbor, pre] : move_edge_counts) {
+    // const Node&           neighbor = *move_edges.first;
+    // const Node_Move_Cons& pre      = move_edges.second;
 
     // Degree of neighbor group before move
-    const int pre_neighbor_degree = neighbor.degree;
+    const int pre_neighbor_degree = neighbor->degree;
 
     // Initialize variables that will get changed depending on what the neighbor group is
     int    post_old_to_neighbor = pre.old_to_neighbor;
@@ -571,8 +571,8 @@ Proposal_Res SBM::make_proposal_decision(const Node&   node,
     // This will stay the same unless the neighbor is one of the old or new blocks
     int post_neighbor_degree = pre_neighbor_degree;
 
-    const bool neighbor_is_old = neighbor == old_block;
-    const bool neighbor_is_new = neighbor == new_block;
+    const bool neighbor_is_old = *neighbor == old_block;
+    const bool neighbor_is_new = *neighbor == new_block;
 
     if (neighbor_is_old) {
       post_old_to_neighbor -= 2 * (node_to_old_block);
