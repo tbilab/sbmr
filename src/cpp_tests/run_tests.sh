@@ -30,13 +30,13 @@ g++ -std=c++11 ${OPTIMIZATION_LEVEL} -DNO_RCPP=1\
   cpp_tests/tests-main.o \
   cpp_tests/tests-node.cpp \
   cpp_tests/tests-edge.cpp \
+  cpp_tests/tests-sampler.cpp \
   -o cpp_tests/run_tests.o 
 
 # g++ -std=c++11 ${OPTIMIZATION_LEVEL} -DNO_RCPP=1\
 #   cpp_tests/tests-main.o \
 #   Node.o SBM.o Sampler.o Block_Consensus.o \
 #   cpp_tests/tests-node.cpp \
-#   cpp_tests/tests-sampler.cpp \
 #   cpp_tests/tests-network.cpp \
 #   cpp_tests/tests-sbm.cpp \
 #   -o cpp_tests/run_tests.o 
