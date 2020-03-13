@@ -1,6 +1,5 @@
 // [[Rcpp::plugins(cpp11)]]
-#ifndef __NODE_INCLUDED__
-#define __NODE_INCLUDED__
+#pragma once
 
 #include "error_and_message_macros.h"
 #include "profiling/Instrument.h"
@@ -22,7 +21,9 @@ class Node;
 
 // For a bit of clarity
 // using NodePtr     = std::shared_ptr<Node>;
-using NodePtr     = Node*;
+using NodePtr  = Node*;
+using NodeUPtr = std::unique_ptr<Node>;
+
 using NodeVec     = std::vector<NodePtr>;
 using NodeList    = std::list<NodePtr>;
 using NodeSet     = std::set<NodePtr>;
@@ -272,10 +273,8 @@ class Node {
 // =============================================================================
 // Static method to connect two nodes to each other with edge
 // =============================================================================
-void connect_nodes(NodePtr node_a, NodePtr node_b)
+inline void connect_nodes(NodePtr node_a, NodePtr node_b)
 {
   node_a->add_edge(node_b);
   node_b->add_edge(node_a);
 }
-
-#endif
