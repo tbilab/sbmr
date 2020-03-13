@@ -2,8 +2,6 @@
 #include "print_helpers.h"
 #include "catch.hpp"
 
-using NodeUPtr = std::unique_ptr<Node>;
-
 TEST_CASE("Basic Initialization", "[Node]")
 {
   NodeUPtr n1 = NodeUPtr( new Node{"n1", 0, "a"});
