@@ -21,7 +21,8 @@
 class Node;
 
 // For a bit of clarity
-using NodePtr     = std::shared_ptr<Node>;
+// using NodePtr     = std::shared_ptr<Node>;
+using NodePtr     = Node*;
 using NodeVec     = std::vector<NodePtr>;
 using NodeList    = std::list<NodePtr>;
 using NodeSet     = std::set<NodePtr>;
@@ -36,69 +37,240 @@ enum Update_Type { Add,
 //=================================
 // Main node class declaration
 //=================================
-class Node : public std::enable_shared_from_this<Node> {
-public:
-    // Constructors
-    // =========================================================================
+class Node {
+  public:
+  // Constructors
+  // =========================================================================
 
-    // Takes ID, node hiearchy level, and assumes default 'a' for type
-    Node(std::string node_id, int level)
-        : id(node_id)
-        , type("a")
-        , level(level)
-        , degree(0)
-    {
+  // Takes ID, node hiearchy level, and assumes default 'a' for type
+  Node(std::string node_id, int level)
+      : id(node_id)
+      , type("a")
+      , level(level)
+      , degree(0)
+  {
+  }
+
+  // Takes the node's id, level, and type.
+  Node(std::string node_id, int level, std::string type)
+      : id(node_id)
+      , type(type)
+      , level(level)
+      , degree(0)
+  {
+  }
+
+  // Takes the node's id, level, and type as integer (for legacy api compatability)
+  Node(std::string node_id, int level, int type)
+      : id(node_id)
+      , type(std::to_string(type))
+      , level(level)
+      , degree(0)
+  {
+  }
+
+  // Disable costly copy and move methods for error protection
+  // Copy construction
+  Node(const Node&) = delete;
+  Node& operator=(const Node&) = delete;
+
+  // Move operations
+  Node(Node&&)  = delete;
+  Node& operator=(Node&&) = delete;
+
+  // Attributes
+  // =========================================================================
+  std::string id;   // Unique integer id for node
+  std::string type; // What type of node is this?
+  int level;        // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
+  NodeList edges;   // Nodes that are connected to this node
+  NodePtr parent;   // What node contains this node (aka its cluster)
+  NodeSet children; // Nodes that are contained within node (if node is cluster)
+  int degree;       // How many edges/ edges does this node have?
+
+  // Methods
+  // =========================================================================
+  void set_parent(NodePtr new_parent)
+  {
+    if (level != new_parent->level - 1) {
+      LOGIC_ERROR("Parent node must be one level above child");
     }
 
-    // Takes the node's id, level, and type.
-    Node(std::string node_id, int level, std::string type)
-        : id(node_id)
-        , type(type)
-        , level(level)
-        , degree(0)
-    {
+    const NodePtr old_parent = parent;
+
+    // Remove self from previous parents children list (if it existed)
+    if (old_parent) {
+      // Remove this node's edges contribution from parent's
+      old_parent->update_edges(edges, Remove);
+
+      // Remove self from previous children
+      old_parent->children.erase(this);
     }
 
-    // Takes the node's id, level, and type as integer (for legacy api compatability)
-    Node(std::string node_id, int level, int type)
-        : id(node_id)
-        , type(std::to_string(type))
-        , level(level)
-        , degree(0)
+    // Add this node's edges to parent's degree count
+    new_parent->update_edges(edges, Add);
+
+    // Add this node to new parent's children list
+    new_parent->children.insert(this);
+
+    // Set this node's parent
+    parent = new_parent;
+  }
+
+  // Get parent of node at a given level
+  NodePtr get_parent_at_level(const int level_of_parent)
+  {
     {
+      // First we need to make sure that the requested level is not less than that
+      // of the current node.
+      if (level_of_parent < level) {
+        LOGIC_ERROR("Requested parent level (" + std::to_string(level_of_parent) + ") lower than current node level (" + std::to_string(level) + ").");
+      }
+
+      // Start with this node as current node
+      NodePtr current_node = this;
+
+      while (current_node->level != level_of_parent) {
+        if (!parent) {
+          RANGE_ERROR("No parent at level " + std::to_string(level_of_parent) + " for " + id);
+        }
+
+        // Traverse up parents until we've reached just below where we want to go
+        current_node = current_node->parent;
+      }
+
+      // Return the final node, aka the parent at desired level
+      return current_node;
+    }
+  }
+
+  // =============================================================================
+  // Get all nodes connected to Node at a given level with specified type
+  // We return a vector because we need random access to elements in this array
+  // and that isn't provided to us with the list format.
+  // =============================================================================
+  NodeVec get_edges_of_type(const std::string& node_type, const int desired_level) const
+  {
+    // Vector to return containing parents at desired level for edges
+    NodeVec level_cons;
+
+    // Conservatively assume all edges will be taken
+    level_cons.reserve(edges.size());
+
+    // Go through every child node's edges list, find parent at
+    // desired level and place in connected nodes vector
+    for (const auto& edge : edges) {
+      if (edge->type == node_type) {
+        level_cons.push_back(edge->get_parent_at_level(desired_level));
+      }
     }
 
-    // Disable costly copy and move methods for error protection
-    // Copy construction
-    Node(const Node&) = delete;
-    Node& operator=(const Node&) = delete;
+    return level_cons;
+  }
 
-    // Move operations
-    Node(Node&&)  = delete;
-    Node& operator=(Node&&) = delete;
+  // =============================================================================
+  // Collapse a nodes edge to a given level into a map of
+  // connected block id->count
+  // =============================================================================
+  NodeEdgeMap gather_edges_to_level(const int level) const
+  {
+    // Setup an edge count map for node
+    NodeEdgeMap edges_counts;
 
-    // Attributes
-    // =========================================================================
-    std::string id;   // Unique integer id for node
-    std::string type; // What type of node is this?
-    int level;        // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
-    NodeList edges;   // Nodes that are connected to this node
-    NodePtr parent;   // What node contains this node (aka its cluster)
-    NodeSet children; // Nodes that are contained within node (if node is cluster)
-    int degree;       // How many edges/ edges does this node have?
+    // Fill out edge count map by
+    // - looping over all edges
+    // - mapping them to the desired level
+    // - and adding to their counts
+    for (const NodePtr& curr_edge : edges) {
+      edges_counts[curr_edge->get_parent_at_level(level)]++;
+    }
 
-    // Methods
-    // =========================================================================
-    NodePtr this_ptr();                                                                     // Gets a shared pointer to object (replaces this)
-    void set_parent(NodePtr new_parent);                                                    // Set current node parent/cluster
-    void add_edge(NodePtr node);                                                            // Add edge to another node
-    void update_edges(const NodeList& moved_node_edges, const Update_Type& update_type);    // Add or remove edges from nodes edge list
-    NodePtr get_parent_at_level(const int level);                                           // Get parent of node at a given level
-    NodeVec get_edges_of_type(const std::string& node_type, const int desired_level) const; // Get all nodes connected to Node at a given level
-    NodeEdgeMap gather_edges_to_level(const int level) const;                               // Get a map keyed by node with value of number of edges for all of a nodes edges to a level
-    static void connect_nodes(NodePtr node_a, NodePtr node_b);                              // Static method to connect two nodes to each other with edge
-    bool operator==(const Node& other_node);
-    bool operator==(const Node& other_node) const;
+    return edges_counts;
+  }
+
+  // =============================================================================
+  // Add edge to another node
+  // =============================================================================
+  void add_edge(NodePtr node)
+  {
+    // propigate new edge upwards to all parents
+    NodePtr current_node = this;
+    int current_level    = level;
+
+    while (current_node) {
+      // Add node to base edges
+      (current_node->edges).push_back(node);
+      current_node->degree++;
+      current_node = current_node->parent;
+      current_level++;
+    }
+  }
+
+  // =============================================================================
+  // Add or remove edges from a nodes edge list
+  // =============================================================================
+  void update_edges(const NodeList& moved_node_edges, const Update_Type& update_type)
+  {
+    // We will scan upward from the this node up through all its parents
+    // First, we start with this node
+    auto node_being_updated = this;
+
+    // While we still have a node to continue to in the hierarchy...
+    while (node_being_updated) {
+      // Loop through all the edges that are being updated...
+      // Grab reference to the current nodes edges list
+      NodeList& updated_node_edges = node_being_updated->edges;
+
+      // Loop through all the edges from the node being moved
+      for (const auto& edge_to_update : moved_node_edges) {
+
+        switch (update_type) {
+        case Remove:
+          remove_edge(updated_node_edges, edge_to_update);
+          break;
+        case Add:
+          updated_node_edges.push_back(edge_to_update);
+          break;
+        default:
+          LOGIC_ERROR("Something went wrong in edge updating");
+          break;
+        }
+      }
+
+      // Update degree of current node
+      node_being_updated->degree = node_being_updated->edges.size();
+
+      // Update current node to nodes parent
+      node_being_updated = node_being_updated->parent;
+    }
+  }
+
+  bool operator==(const Node& other_node) { return id == other_node.id; }
+  bool operator==(const Node& other_node) const { return id == other_node.id; }
 };
+
+// =============================================================================
+// Static method to connect two nodes to each other with edge
+// =============================================================================
+void connect_nodes(NodePtr node_a, NodePtr node_b)
+{
+  node_a->add_edge(node_b);
+  node_b->add_edge(node_a);
+}
+
+void remove_edge(NodeList& edge_list, const NodePtr& node_to_remove)
+{
+  // Scan through edges untill we find the first instance
+  // of the connected node we want to remove
+  auto loc_of_edge = std::find(edge_list.begin(),
+                               edge_list.end(),
+                               node_to_remove);
+
+  if (loc_of_edge != edge_list.end()) {
+    edge_list.erase(loc_of_edge);
+  } else {
+    LOGIC_ERROR("Trying to erase non-existant edge from parent node.");
+  }
+}
 
 #endif
