@@ -5,7 +5,8 @@
 // We swap out some commonly used error and message funtions depending on if this
 // code is being compiled with RCPP available or not. When RCPP is being used ot
 // compile the code these functions make sure messages are properly passed to R.
-#if NO_RCPP
+// #if NO_RCPP
+#ifndef BEGIN_RCPP
 #define LOGIC_ERROR(msg) throw std::logic_error(msg)
 #define RANGE_ERROR(msg) throw std::range_error(msg)
 #define WARN_ABOUT(msg)          \
