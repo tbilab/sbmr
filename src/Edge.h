@@ -1,14 +1,18 @@
+#pragma once
+
 #include "Node.h"
 
 class Edge {
   public:
   // Encodes an edge between two nodes such that they will always have the same order
   // (alphabetical)
-  NodePtr     node_a;
-  NodePtr     node_b;
+  NodePtr node_a;
+  NodePtr node_b;
   std::string pair_id;
   Edge(const NodePtr a, const NodePtr b)
-      : node_a(a->id < b->id ? a : b), node_b(a->id < b->id ? b : a), pair_id(node_a->id + "--" + node_b->id)
+      : node_a(a->id < b->id ? a : b)
+      , node_b(a->id < b->id ? b : a)
+      , pair_id(node_a->id + "--" + node_b->id)
   {
   }
   inline Edge at_level(const int level) const
