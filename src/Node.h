@@ -38,6 +38,12 @@ enum Update_Type { Add,
 // Main node class declaration
 //=================================
 class Node {
+  private:
+  bool have_parent()
+  {
+    return parent != nullptr;
+  }
+
   public:
   // Constructors
   // =========================================================================
@@ -80,31 +86,30 @@ class Node {
 
   // Attributes
   // =========================================================================
-  std::string id;   // Unique integer id for node
-  std::string type; // What type of node is this?
-  int level;        // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
-  NodeList edges;   // Nodes that are connected to this node
-  NodePtr parent;   // What node contains this node (aka its cluster)
-  NodeSet children; // Nodes that are contained within node (if node is cluster)
-  int degree;       // How many edges/ edges does this node have?
+  std::string id;           // Unique integer id for node
+  std::string type;         // What type of node is this?
+  int level;                // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
+  NodeList edges;           // Nodes that are connected to this node
+  NodePtr parent = nullptr; // What node contains this node (aka its cluster)
+  NodeSet children;         // Nodes that are contained within node (if node is cluster)
+  int degree;               // How many edges/ edges does this node have?
 
   // Methods
   // =========================================================================
   void set_parent(NodePtr new_parent)
   {
+
     if (level != new_parent->level - 1) {
       LOGIC_ERROR("Parent node must be one level above child");
     }
 
-    const NodePtr old_parent = parent;
-
     // Remove self from previous parents children list (if it existed)
-    if (old_parent) {
+    if (have_parent()) {
       // Remove this node's edges contribution from parent's
-      old_parent->update_edges(edges, Remove);
+      parent->update_edges(edges, Remove);
 
       // Remove self from previous children
-      old_parent->children.erase(this);
+      parent->children.erase(this);
     }
 
     // Add this node's edges to parent's degree count
@@ -206,6 +211,21 @@ class Node {
     }
   }
 
+  void remove_edge(NodeList& edge_list, const NodePtr& node_to_remove)
+  {
+    // Scan through edges untill we find the first instance
+    // of the connected node we want to remove
+    auto loc_of_edge = std::find(edge_list.begin(),
+                                 edge_list.end(),
+                                 node_to_remove);
+
+    if (loc_of_edge != edge_list.end()) {
+      edge_list.erase(loc_of_edge);
+    } else {
+      LOGIC_ERROR("Trying to erase non-existant edge from parent node.");
+    }
+  }
+
   // =============================================================================
   // Add or remove edges from a nodes edge list
   // =============================================================================
@@ -256,21 +276,6 @@ void connect_nodes(NodePtr node_a, NodePtr node_b)
 {
   node_a->add_edge(node_b);
   node_b->add_edge(node_a);
-}
-
-void remove_edge(NodeList& edge_list, const NodePtr& node_to_remove)
-{
-  // Scan through edges untill we find the first instance
-  // of the connected node we want to remove
-  auto loc_of_edge = std::find(edge_list.begin(),
-                               edge_list.end(),
-                               node_to_remove);
-
-  if (loc_of_edge != edge_list.end()) {
-    edge_list.erase(loc_of_edge);
-  } else {
-    LOGIC_ERROR("Trying to erase non-existant edge from parent node.");
-  }
 }
 
 #endif
