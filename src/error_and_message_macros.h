@@ -7,6 +7,7 @@
 // compile the code these functions make sure messages are properly passed to R.
 // #if NO_RCPP
 #ifndef BEGIN_RCPP
+#include <iostream>
 #define LOGIC_ERROR(msg) throw std::logic_error(msg)
 #define RANGE_ERROR(msg) throw std::range_error(msg)
 #define WARN_ABOUT(msg)            \
