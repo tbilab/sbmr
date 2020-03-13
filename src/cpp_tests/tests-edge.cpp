@@ -3,16 +3,16 @@
 
 TEST_CASE("Edge attributes filled in properly", "[Edge]")
 {
-  NodePtr n1 = std::make_shared<Node>("n1", 0);
-  NodePtr n2 = std::make_shared<Node>("n2", 0);
-  NodePtr a1 = std::make_shared<Node>("a1", 1);
-  NodePtr b1 = std::make_shared<Node>("b1", 1);
+  NodeUPtr n1 = NodeUPtr( new Node{"n1", 0});
+  NodeUPtr n2 = NodeUPtr( new Node{"n2", 0});
+  NodeUPtr a1 = NodeUPtr( new Node{"a1", 1});
+  NodeUPtr b1 = NodeUPtr( new Node{"b1", 1});
  
-  n1->set_parent(b1);
-  n2->set_parent(a1);
+  n1->set_parent(b1.get());
+  n2->set_parent(a1.get());
 
   // Build basic edge between two nodes
-  const Edge n1_to_n2 = Edge(n1, n2);
+  const Edge n1_to_n2 = Edge(n1.get(), n2.get());
 
   // Make sure that n1 is chosen as node_a (aka the first in alphabetical order)
   REQUIRE(n1_to_n2.node_a->id == "n1");
