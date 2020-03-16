@@ -14,7 +14,7 @@ void swap_blocks(Node* child_node,
   child_node->set_parent(new_block);
 
   // If the old block is now empty and we're removing empty blocks, delete it
-  if (has_old_block && remove_empty && old_block->empty()) {
+  if (has_old_block && remove_empty && old_block->no_children()) {
 
     const bool delete_successful = delete_from_vector(block_holder, old_block);
 
