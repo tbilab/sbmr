@@ -1,4 +1,5 @@
 #include "../network.h"
+#include "../swap_blocks.h"
 #include "catch.hpp"
 
 TEST_CASE("Basic initialization of network", "[Network]")
@@ -173,6 +174,42 @@ TEST_CASE("Metablock initialization", "[Network]")
   // Cant remove blocks when no levels are left
   REQUIRE_THROWS(my_net.delete_blocks());
 }
+
+
+TEST_CASE("Swapping of blocks", "[Network]")
+{
+  SBM_Network my_net(42);
+
+  // Add some nodes to Network
+  my_net.add_node("n1", "n");
+  my_net.add_node("n2", "n");
+  my_net.add_node("n3", "n");
+  my_net.add_node("m1", "m");
+  my_net.add_node("m2", "m");
+  my_net.add_node("m3", "m");
+
+  my_net.initialize_blocks();
+
+  // Make sure network is how we desired it to be
+  REQUIRE(my_net.num_nodes_of_type("n", 1) == 3);
+  REQUIRE(my_net.num_nodes_of_type("m", 1) == 3);
+
+  // Merge second node into first nodes block
+  Node* node2 = my_net.get_nodes_of_type("n")[1].get();
+  Node* block1 = my_net.get_nodes_of_type("n")[0]->get_parent();
+
+  swap_blocks(node2,
+              block1,
+              my_net.get_nodes_of_type("n", 1),
+              true);
+
+  // There should now be one less block of type n
+  REQUIRE(my_net.num_nodes_of_type("n", 1) == 2);
+  REQUIRE(my_net.num_nodes_of_type("m", 1) == 3);
+}
+
+
+
 
 // TEST_CASE("Cleaning up empty blocks", "[Network]")
 // {
