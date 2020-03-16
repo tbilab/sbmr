@@ -3,7 +3,7 @@
 
 TEST_CASE("Basic initialization of network", "[Network]")
 {
-  SBM_Network my_net;
+  SBM_Network my_net(42);
 
   // Add some nodes to Network
   my_net.add_node("n1", "n");
@@ -15,6 +15,13 @@ TEST_CASE("Basic initialization of network", "[Network]")
   my_net.add_node("m4", "m");
   REQUIRE(my_net.num_nodes() == 7);
   REQUIRE(my_net.num_nodes_at_level(0) == 7);
+
+  my_net.initialize_blocks(2);
+
+  // We should now have added four new nodes at the block level (1)
+  REQUIRE(my_net.num_nodes() == 11);
+  REQUIRE(my_net.num_nodes_at_level(0) == 7);
+  REQUIRE(my_net.num_nodes_at_level(1) == 4);
 
 //   // Create a block node
 //   my_net.create_block_node("n", 1);

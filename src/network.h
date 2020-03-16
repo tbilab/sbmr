@@ -4,7 +4,8 @@
 #include "Sampler.h"
 #include "vector_helpers.h"
 
-using Type_Map = std::map<std::string, std::vector<NodeUPtr>>;
+using NodeUPtr_Vec = std::vector<NodeUPtr>;
+using Type_Map     = std::map<std::string, NodeUPtr_Vec>;
 // using Type_Map = std::vector<std::vector<NodeUPtr>>;
 
 class SBM_Network {
@@ -12,6 +13,7 @@ class SBM_Network {
   private:
   // Data
   std::vector<Type_Map> nodes;
+  Sampler random_sampler;
 
   Type_Map& get_nodes_at_level(const int level = 0)
   {
@@ -23,7 +25,7 @@ class SBM_Network {
     return nodes.at(level);
   }
 
-  std::vector<NodeUPtr>& get_nodes_of_type(const std::string& type, const int level = 0)
+  NodeUPtr_Vec& get_nodes_of_type(const std::string& type, const int level = 0)
   {
     Type_Map& node_holder = get_nodes_at_level(level);
 
@@ -41,6 +43,12 @@ class SBM_Network {
 
   SBM_Network()
       : nodes(1)
+  {
+  }
+
+  SBM_Network(const int random_seed)
+      : nodes(1)
+      , random_sampler(random_seed)
   {
   }
 
@@ -67,14 +75,58 @@ class SBM_Network {
     return node_ptr;
   }
 
+  void initialize_blocks(const int num_blocks)
+  {
+    const int block_level = nodes.size();
+    // Make a new level for the blocks
+    nodes.push_back(Type_Map());
+
+    Type_Map& child_nodes = get_nodes_at_level(block_level - 1);
+    Type_Map& block_nodes = get_nodes_at_level(block_level);
+
+    // Loop over all node types present in previous level
+    for (auto& child_type : child_nodes) {
+      const std::string& type     = child_type.first;
+      NodeUPtr_Vec& nodes_of_type = child_type.second;
+
+      if (num_blocks > nodes_of_type.size()) {
+        LOGIC_ERROR("Can't initialize more blocks than there are nodes of a given type");
+      }
+
+      // Setup a new empty vector for this nodes type and get a reference to it
+      NodeUPtr_Vec& blocks_for_type = block_nodes.emplace(type, NodeUPtr_Vec()).first->second;
+
+      // Reserve enough spaces for the blocks to be inserted
+      blocks_for_type.reserve(num_blocks);
+
+      for (int i = 0; i < num_blocks; i++) {
+        // Build a new block node wrapped in smart pointer in it's type vector
+        blocks_for_type.emplace_back(new Node("block", block_level, type));
+      }
+
+      // Shuffle child nodes
+      random_sampler.shuffle(nodes_of_type);
+
+      // Loop through now shuffled children nodes
+      for (int i = 0; i < nodes_of_type.size(); i++) {
+        Node* parent_block = blocks_for_type[i % num_blocks].get();
+        Node* child_node = nodes_of_type[i].get();
+
+        // Add blocks one at a time, looping back after end to each node
+        child_node->set_parent(parent_block);
+      }
+
+    }
+  }
+
   // Getters
-  int num_nodes() const 
+  int num_nodes() const
   {
     return total_num_elements(nodes);
   }
 
-  int num_nodes_at_level(const int level) 
+  int num_nodes_at_level(const int level)
   {
-      return total_num_elements(get_nodes_at_level(level));
+    return total_num_elements(get_nodes_at_level(level));
   }
 };
