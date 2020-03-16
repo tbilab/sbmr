@@ -159,6 +159,19 @@ TEST_CASE("Metablock initialization", "[Network]")
   // We should now have three levels with the third having 4 blocks
   REQUIRE(my_net.num_levels() == 3);
   REQUIRE(my_net.num_nodes_at_level(2) == 4);
+
+  // Now remove the metablocks
+  my_net.delete_blocks();
+
+  // Should be back to two levels
+  REQUIRE(my_net.num_levels() == 2);
+
+  // Remove the blocks
+  my_net.delete_blocks();
+  REQUIRE(my_net.num_levels() == 1);
+
+  // Cant remove blocks when no levels are left
+  REQUIRE_THROWS(my_net.delete_blocks());
 }
 
 // TEST_CASE("Cleaning up empty blocks", "[Network]")

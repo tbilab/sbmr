@@ -124,6 +124,15 @@ class SBM_Network {
     }
   }
 
+  void delete_blocks() {
+
+    if(nodes.size() == 1) {
+      LOGIC_ERROR("No block level to delete.");
+    }
+    // Remove the last layer of nodes. 
+    nodes.pop_back();
+  }
+
   // Getters
   int num_nodes() const
   {
