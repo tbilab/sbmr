@@ -31,46 +31,37 @@ TEST_CASE("Basic initialization of network", "[Network]")
 
   // We should have two levels
   REQUIRE(my_net.num_levels() == 2);
-
-  // Filter to a given node type
-  // Four nodes of the type "m" 
-
-//   // Get number of levels
-//   REQUIRE(my_net.nodes.size() == 2);
-
-//   // There should be two types of print_node_ids(*my_net.nodes.at(0))nodes
-//   REQUIRE(my_net.node_type_counts.size() == 2);
 }
 
-// TEST_CASE("Tracking node types", "[Network]")
-// {
-//   SBM my_net;
+TEST_CASE("Tracking node types", "[Network]")
+{
+  SBM_Network my_net;
 
-//   // Add some nodes to Network
-//   my_net.add_node("n1", "n");
-//   my_net.add_node("n2", "n");
+  // Add some nodes to Network
+  my_net.add_node("n1", "n");
+  my_net.add_node("n2", "n");
 
-//   // There should only be one type of node so far
-//   REQUIRE(1 == my_net.node_type_counts.size());
+  // There should only be one type of node so far
+  REQUIRE(my_net.num_types() == 1);
 
-//   my_net.add_node("m1", "m");
+  my_net.add_node("m1", "m");
 
-//   // There should now be two types of nodes
-//   REQUIRE(2 == my_net.node_type_counts.size());
+  // There should now be two types of nodes
+  REQUIRE(my_net.num_types() == 2);
 
-//   my_net.add_node("m2", "m");
-//   my_net.add_node("n3", "n");
+  my_net.add_node("m2", "m");
+  my_net.add_node("n3", "n");
 
-//   // There should still just be two types of nodes
-//   REQUIRE(2 == my_net.node_type_counts.size());
+  // There should still just be two types of nodes
+  REQUIRE(my_net.num_types() == 2);
 
-//   my_net.add_node("m3", "m");
-//   my_net.add_node("o1", "o");
-//   my_net.add_node("o2", "o");
+  my_net.add_node("m3", "m");
+  my_net.add_node("o1", "o");
+  my_net.add_node("o2", "o");
 
-//   // There should now be three types of nodes
-//   REQUIRE(3 == my_net.node_type_counts.size());
-// }
+  // There should now be three types of nodes
+  REQUIRE(my_net.num_types() == 3);
+}
 
 // TEST_CASE("Initializing a block for every node", "[Network]")
 // {

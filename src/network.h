@@ -142,4 +142,8 @@ class SBM_Network {
   int num_nodes_of_type(const std::string type, const int level = 0) {
     return get_nodes_of_type(type, level).size();
   }
+
+  int num_types() const {
+    return nodes.at(0).size();
+  }
 };
