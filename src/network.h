@@ -13,14 +13,19 @@ class SBM_Network {
   // Data
   std::vector<Type_Map> nodes;
 
-  std::vector<NodeUPtr>& get_nodes_of_type(const std::string& type, const int level = 0)
+  Type_Map& get_nodes_at_level(const int level = 0)
   {
     // Make sure we have the requested level
     if (level >= nodes.size()) {
       RANGE_ERROR("Node requested in level that does not exist");
     }
 
-    Type_Map& node_holder = nodes.at(level);
+    return nodes.at(level);
+  }
+
+  std::vector<NodeUPtr>& get_nodes_of_type(const std::string& type, const int level = 0)
+  {
+    Type_Map& node_holder = get_nodes_at_level(level);
 
     auto loc_for_type = node_holder.find(type);
     if (loc_for_type == node_holder.end()) {
@@ -35,7 +40,7 @@ class SBM_Network {
   // Setters
 
   SBM_Network()
-    : nodes(1)
+      : nodes(1)
   {
   }
 
@@ -63,9 +68,13 @@ class SBM_Network {
   }
 
   // Getters
-
-  int num_nodes()
+  int num_nodes() const 
   {
     return total_num_elements(nodes);
+  }
+
+  int num_nodes_at_level(const int level) 
+  {
+      return total_num_elements(get_nodes_at_level(level));
   }
 };
