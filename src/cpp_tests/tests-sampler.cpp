@@ -158,7 +158,7 @@ TEST_CASE("Node vector shuffling respects seeds", "[Sampler]")
   // Build nodes and add to vectors
   for (int i = 0; i < num_nodes; i++) {
     nodes_master.emplace_back(new Node { "n" + std::to_string(i), 0, 1 });
-    NodePtr new_node = nodes_master[i].get();
+    Node* new_node = nodes_master[i].get();
     nodes_vec1.push_back(new_node);
     nodes_vec2.push_back(new_node);
     nodes_vec3.push_back(new_node);

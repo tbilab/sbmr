@@ -6,10 +6,10 @@ class Edge {
   public:
   // Encodes an edge between two nodes such that they will always have the same order
   // (alphabetical)
-  NodePtr node_a;
-  NodePtr node_b;
+  Node* node_a;
+  Node* node_b;
   std::string pair_id;
-  Edge(const NodePtr a, const NodePtr b)
+  Edge(Node* a, Node* b)
       : node_a(a->id < b->id ? a : b)
       , node_b(a->id < b->id ? b : a)
       , pair_id(node_a->id + "--" + node_b->id)

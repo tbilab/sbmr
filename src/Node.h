@@ -20,15 +20,14 @@
 class Node;
 
 // For a bit of clarity
-// using NodePtr     = std::shared_ptr<Node>;
-using NodePtr  = Node*;
+// using Node*     = std::shared_ptr<Node>;
 using NodeUPtr = std::unique_ptr<Node>;
 
-using NodeVec     = std::vector<NodePtr>;
-using NodeList    = std::list<NodePtr>;
-using NodeSet     = std::set<NodePtr>;
-using NodeEdgeMap = std::map<NodePtr, int>;
-using NodeLevel   = std::map<std::string, NodePtr>;
+using NodeVec     = std::vector<Node*>;
+using NodeList    = std::list<Node*>;
+using NodeSet     = std::set<Node*>;
+using NodeEdgeMap = std::map<Node*, int>;
+using NodeLevel   = std::map<std::string, Node*>;
 using LevelPtr    = std::shared_ptr<NodeLevel>;
 using LevelMap    = std::map<int, LevelPtr>;
 
@@ -88,13 +87,13 @@ class Node {
   std::string type;         // What type of node is this?
   int level;                // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
   NodeList edges;           // Nodes that are connected to this node
-  NodePtr parent = nullptr; // What node contains this node (aka its cluster)
+  Node* parent = nullptr; // What node contains this node (aka its cluster)
   NodeSet children;         // Nodes that are contained within node (if node is cluster)
   int degree = 0;               // How many edges/ edges does this node have?
 
   // Methods
   // =========================================================================
-  void set_parent(NodePtr new_parent)
+  void set_parent(Node* new_parent)
   {
 
     if (level != new_parent->level - 1) {
@@ -121,7 +120,7 @@ class Node {
   }
 
   // Get parent of node at a given level
-  NodePtr get_parent_at_level(const int level_of_parent)
+  Node* get_parent_at_level(const int level_of_parent)
   {
     {
       // First we need to make sure that the requested level is not less than that
@@ -131,7 +130,7 @@ class Node {
       }
 
       // Start with this node as current node
-      NodePtr current_node = this;
+      Node* current_node = this;
 
       while (current_node->level != level_of_parent) {
         if (!parent) {
@@ -146,6 +145,8 @@ class Node {
       return current_node;
     }
   }
+
+  Node* get_parent() { return parent; }
 
   // =============================================================================
   // Get all nodes connected to Node at a given level with specified type
@@ -184,7 +185,7 @@ class Node {
     // - looping over all edges
     // - mapping them to the desired level
     // - and adding to their counts
-    for (const NodePtr& curr_edge : edges) {
+    for (const auto& curr_edge : edges) {
       edges_counts[curr_edge->get_parent_at_level(level)]++;
     }
 
@@ -194,10 +195,10 @@ class Node {
   // =============================================================================
   // Add edge to another node
   // =============================================================================
-  void add_edge(NodePtr node)
+  void add_edge(Node* node)
   {
     // propigate new edge upwards to all parents
-    NodePtr current_node = this;
+    Node* current_node = this;
     int current_level    = level;
 
     while (current_node) {
@@ -209,7 +210,7 @@ class Node {
     }
   }
 
-  void remove_edge(NodeList& edge_list, const NodePtr& node_to_remove)
+  void remove_edge(NodeList& edge_list, const Node* node_to_remove)
   {
     // Scan through edges untill we find the first instance
     // of the connected node we want to remove
@@ -270,7 +271,7 @@ class Node {
 // =============================================================================
 // Static method to connect two nodes to each other with edge
 // =============================================================================
-inline void connect_nodes(NodePtr node_a, NodePtr node_b)
+inline void connect_nodes(Node* node_a, Node* node_b)
 {
   node_a->add_edge(node_b);
   node_b->add_edge(node_a);
