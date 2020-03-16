@@ -225,7 +225,7 @@ class Node {
     }
   }
 
-  int empty() const {
+  int no_children() const {
     return children.size() == 0;
   }
 

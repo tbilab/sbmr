@@ -205,6 +205,14 @@ TEST_CASE("Swapping of blocks", "[Network]")
 
   // There should now be one less block of type n
   REQUIRE(my_net.num_nodes_of_type("n", 1) == 2);
+
+  // Now do the same for the m type nodes but don't delete the empty block
+  swap_blocks(my_net.get_nodes_of_type("m")[1].get(),
+              my_net.get_nodes_of_type("m")[0]->get_parent(),
+              my_net.get_nodes_of_type("m", 1),
+              false);
+
+  // There should be no change in the number of blocks
   REQUIRE(my_net.num_nodes_of_type("m", 1) == 3);
 }
 
