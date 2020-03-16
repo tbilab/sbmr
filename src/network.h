@@ -2,6 +2,7 @@
 
 #include "Node.h"
 #include "Sampler.h"
+#include "vector_helpers.h"
 
 using Type_Map = std::map<std::string, std::vector<NodeUPtr>>;
 // using Type_Map = std::vector<std::vector<NodeUPtr>>;
@@ -22,11 +23,11 @@ class SBM_Network {
     Type_Map& node_holder = nodes.at(level);
 
     auto loc_for_type = node_holder.find(type);
-    if(loc_for_type == node_holder.end()){
-        auto inserted_vec = node_holder.emplace(type, std::vector<NodeUPtr>());
-        return inserted_vec.first->second;
+    if (loc_for_type == node_holder.end()) {
+      auto inserted_vec = node_holder.emplace(type, std::vector<NodeUPtr>());
+      return inserted_vec.first->second;
     } else {
-        return loc_for_type->second;
+      return loc_for_type->second;
     }
   }
 
@@ -34,11 +35,11 @@ class SBM_Network {
   // Setters
 
   SBM_Network()
-  //   : nodes(1)
+    : nodes(1)
   {
   }
 
- Node* add_node(const std::string& id,
+  Node* add_node(const std::string& id,
                  const std::string& type = "a",
                  const int level         = 0)
   {
@@ -62,4 +63,9 @@ class SBM_Network {
   }
 
   // Getters
+
+  int num_nodes()
+  {
+    return total_num_elements(nodes);
+  }
 };
