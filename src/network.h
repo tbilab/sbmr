@@ -75,7 +75,7 @@ class SBM_Network {
     const int type_index = get_type_index(type);
 
     // Build new node pointer outside of vector first for ease of pointer retrieval
-    auto new_node = NodeUPtr(new Node(id, level, type_index));
+    auto new_node = NodeUPtr(new Node(id, level, type_index, num_types()));
 
     // Get raw pointer to node to return
     Node* node_ptr = new_node.get();
@@ -113,7 +113,7 @@ class SBM_Network {
 
       for (int i = 0; i < num_blocks; i++) {
         // Build a new block node wrapped in smart pointer in it's type vector
-        blocks_of_type.emplace_back(new Node("block", block_level, type_i));
+        blocks_of_type.emplace_back(new Node(type_i, block_level, num_types()));
       }
 
       // Shuffle child nodes if we're randomly assigning blocks
