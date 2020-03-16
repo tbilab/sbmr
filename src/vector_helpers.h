@@ -10,8 +10,6 @@
 template <typename T>
 using Vec_of_Vecs = std::vector<std::vector<T>>;
 
-template <typename K, typename T>
-using Vec_of_Maps = std::vector<std::map<K, T>>;
 
 template <typename T>
 using U_Ptr = std::unique_ptr<T>;
@@ -74,26 +72,6 @@ int total_num_elements(const std::vector<Vec_of_Vecs<T>>& vec_of_vec_of_vecs) {
   int total = 0;
   for (const auto& vec_of_vecs : vec_of_vec_of_vecs) {
     total += total_num_elements(vec_of_vecs);
-  }
-  return total;
-}
-
-template <typename K, typename T>
-int total_num_elements(const std::map<K, T>& map_of_els)
-{
-  int total = 0;
-  for (const auto& map_entry : map_of_els) {
-    total += map_entry.second.size();
-  }
-  return total;
-}
-
-// Total number of elements in a vector of vectors
-template <typename K, typename T>
-int total_num_elements(const Vec_of_Maps<K, T>& vec_of_maps) {
-  int total = 0;
-  for (const auto& sub_map : vec_of_maps) {
-    total += total_num_elements(sub_map);
   }
   return total;
 }
