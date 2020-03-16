@@ -4,16 +4,16 @@
 
 TEST_CASE("Basic Initialization", "[Node]")
 {
-  NodeUPtr n1 = NodeUPtr( new Node{"n1", 0, "a"});
-  NodeUPtr n2 = NodeUPtr( new Node{"n2", 0, "a"});
-  NodeUPtr n3 = NodeUPtr( new Node{"n3", 0, "a"});
-  NodeUPtr m1 = NodeUPtr( new Node{"m1", 0, "b"});
-  NodeUPtr m2 = NodeUPtr( new Node{"m2", 0, "b"});
-  NodeUPtr m3 = NodeUPtr( new Node{"m3", 0, "b"});
-  NodeUPtr c1 = NodeUPtr( new Node{"c1", 1, "a"});
-  NodeUPtr c2 = NodeUPtr( new Node{"c2", 1, "a"});
-  NodeUPtr d1 = NodeUPtr( new Node{"d1", 1, "b"});
-  NodeUPtr d2 = NodeUPtr( new Node{"d2", 1, "b"});
+  NodeUPtr n1 = NodeUPtr( new Node{"n1", 0, 0});
+  NodeUPtr n2 = NodeUPtr( new Node{"n2", 0, 0});
+  NodeUPtr n3 = NodeUPtr( new Node{"n3", 0, 0});
+  NodeUPtr m1 = NodeUPtr( new Node{"m1", 0, 1});
+  NodeUPtr m2 = NodeUPtr( new Node{"m2", 0, 1});
+  NodeUPtr m3 = NodeUPtr( new Node{"m3", 0, 1});
+  NodeUPtr c1 = NodeUPtr( new Node{"c1", 1, 1});
+  NodeUPtr c2 = NodeUPtr( new Node{"c2", 1, 1});
+  NodeUPtr d1 = NodeUPtr( new Node{"d1", 1, 1});
+  NodeUPtr d2 = NodeUPtr( new Node{"d2", 1, 1});
 
   n1->set_parent(c1.get());
   n2->set_parent(c1.get());
@@ -34,19 +34,19 @@ TEST_CASE("Basic Initialization", "[Node]")
   REQUIRE(n1->get_parent_at_level(1)->id == n1->parent->id);
 
   // Make sure the edge propigate properly.
-  REQUIRE("m1, m3" == print_node_ids(n1->get_edges_of_type("b",0)));
-  REQUIRE("d1, d2" == print_node_ids(n1->get_edges_of_type("b",1)));
-  REQUIRE("d1, d1, d2" == print_node_ids(c1->get_edges_of_type("b",1)));
-  REQUIRE("d2, d2" == print_node_ids(c2->get_edges_of_type("b",1)));
+  REQUIRE("m1, m3" == print_node_ids(n1->get_edges_of_type(1,0)));
+  REQUIRE("d1, d2" == print_node_ids(n1->get_edges_of_type(1,1)));
+  REQUIRE("d1, d1, d2" == print_node_ids(c1->get_edges_of_type(1,1)));
+  REQUIRE("d2, d2" == print_node_ids(c2->get_edges_of_type(1,1)));
 }
 
 TEST_CASE("Child addition and deletion", "[Node]")
 {
-  NodeUPtr n1  = NodeUPtr( new Node{"n1", 0, "a"});
-  NodeUPtr n2  = NodeUPtr( new Node{"n2", 0, "a"});
-  NodeUPtr n3  = NodeUPtr( new Node{"n3", 0, "a"});
-  NodeUPtr n11 = NodeUPtr( new Node{"n11", 1, "a"});
-  NodeUPtr n12 = NodeUPtr( new Node{"n12", 1, "a"});
+  NodeUPtr n1  = NodeUPtr( new Node{"n1", 0, 0});
+  NodeUPtr n2  = NodeUPtr( new Node{"n2", 0, 0});
+  NodeUPtr n3  = NodeUPtr( new Node{"n3", 0, 0});
+  NodeUPtr n11 = NodeUPtr( new Node{"n11", 1, 0});
+  NodeUPtr n12 = NodeUPtr( new Node{"n12", 1, 0});
 
   n1->set_parent(n11.get());
   n2->set_parent(n11.get());
@@ -75,22 +75,22 @@ TEST_CASE("Child addition and deletion", "[Node]")
 TEST_CASE("Gathering edge counts to a level", "[Node]")
 {
   // Node level
-  NodeUPtr a1 = NodeUPtr(new Node { "a1", 0, "a" });
-  NodeUPtr a2 = NodeUPtr(new Node { "a2", 0, "a" });
-  NodeUPtr a3 = NodeUPtr(new Node { "a3", 0, "a" });
-  NodeUPtr b1 = NodeUPtr(new Node { "b1", 0, "b" });
-  NodeUPtr b2 = NodeUPtr(new Node { "b2", 0, "b" });
-  NodeUPtr b3 = NodeUPtr(new Node { "b3", 0, "b" });
+  NodeUPtr a1 = NodeUPtr(new Node { "a1", 0, 0 });
+  NodeUPtr a2 = NodeUPtr(new Node { "a2", 0, 0 });
+  NodeUPtr a3 = NodeUPtr(new Node { "a3", 0, 0 });
+  NodeUPtr b1 = NodeUPtr(new Node { "b1", 0, 1 });
+  NodeUPtr b2 = NodeUPtr(new Node { "b2", 0, 1 });
+  NodeUPtr b3 = NodeUPtr(new Node { "b3", 0, 1 });
 
   // First level / blocks
-  NodeUPtr a11 = NodeUPtr(new Node { "a11", 1, "a" });
-  NodeUPtr a12 = NodeUPtr(new Node { "a12", 1, "a" });
-  NodeUPtr b11 = NodeUPtr(new Node { "b11", 1, "b" });
-  NodeUPtr b12 = NodeUPtr(new Node { "b12", 1, "b" });
+  NodeUPtr a11 = NodeUPtr(new Node { "a11", 1, 0 });
+  NodeUPtr a12 = NodeUPtr(new Node { "a12", 1, 0 });
+  NodeUPtr b11 = NodeUPtr(new Node { "b11", 1, 1 });
+  NodeUPtr b12 = NodeUPtr(new Node { "b12", 1, 1 });
 
   // Second level / super blocks
-  NodeUPtr a21 = NodeUPtr(new Node { "a21", 2, "a" });
-  NodeUPtr b21 = NodeUPtr(new Node { "b21", 2, "b" });
+  NodeUPtr a21 = NodeUPtr(new Node { "a21", 2, 0 });
+  NodeUPtr b21 = NodeUPtr(new Node { "b21", 2, 1 });
 
   a1->set_parent(a11.get());
   a2->set_parent(a12.get());
@@ -171,9 +171,9 @@ TEST_CASE("Edge count gathering (unipartite)", "[Node]")
   connect_nodes(n5.get(), n6.get());
 
   // Make 3 blocks
-  NodeUPtr a = NodeUPtr( new Node{"a", 1});
-  NodeUPtr b = NodeUPtr( new Node{"b", 1});
-  NodeUPtr c = NodeUPtr( new Node{"c", 1});
+  NodeUPtr a = NodeUPtr( new Node{0, 1});
+  NodeUPtr b = NodeUPtr( new Node{1, 1});
+  NodeUPtr c = NodeUPtr( new Node{2, 1});
 
   // Assign nodes to their blocks
   n1->set_parent(a.get());
@@ -227,9 +227,9 @@ TEST_CASE("Edge count gathering after moving (unipartite)", "[Node]")
   connect_nodes(n5.get(), n6.get());
 
   // Make 3 blocks
-  NodeUPtr a = NodeUPtr( new Node{"a", 1});
-  NodeUPtr b = NodeUPtr( new Node{"b", 1});
-  NodeUPtr c = NodeUPtr( new Node{"c", 1});
+  NodeUPtr a = NodeUPtr( new Node{0, 1});
+  NodeUPtr b = NodeUPtr( new Node{1, 1});
+  NodeUPtr c = NodeUPtr( new Node{2, 1});
 
   // Assign nodes to their blocks
   n1->set_parent(a.get());
@@ -260,22 +260,22 @@ TEST_CASE("Edge count gathering after moving (unipartite)", "[Node]")
 TEST_CASE("Tracking node degrees", "[Node]")
 {
   // Node level
-  NodeUPtr a1 = NodeUPtr( new Node{"a1", 0, "a"});
-  NodeUPtr a2 = NodeUPtr( new Node{"a2", 0, "a"});
-  NodeUPtr a3 = NodeUPtr( new Node{"a3", 0, "a"});
-  NodeUPtr b1 = NodeUPtr( new Node{"b1", 0, "b"});
-  NodeUPtr b2 = NodeUPtr( new Node{"b2", 0, "b"});
-  NodeUPtr b3 = NodeUPtr( new Node{"b3", 0, "b"});
+  NodeUPtr a1 = NodeUPtr( new Node{"a1", 0, 0});
+  NodeUPtr a2 = NodeUPtr( new Node{"a2", 0, 0});
+  NodeUPtr a3 = NodeUPtr( new Node{"a3", 0, 0});
+  NodeUPtr b1 = NodeUPtr( new Node{"b1", 0, 1});
+  NodeUPtr b2 = NodeUPtr( new Node{"b2", 0, 1});
+  NodeUPtr b3 = NodeUPtr( new Node{"b3", 0, 1});
 
   // First level / blocks
-  NodeUPtr a11 = NodeUPtr( new Node{"a11", 1, "a"});
-  NodeUPtr a12 = NodeUPtr( new Node{"a12", 1, "a"});
-  NodeUPtr b11 = NodeUPtr( new Node{"b11", 1, "b"});
-  NodeUPtr b12 = NodeUPtr( new Node{"b12", 1, "b"});
+  NodeUPtr a11 = NodeUPtr( new Node{"a11", 1, 0});
+  NodeUPtr a12 = NodeUPtr( new Node{"a12", 1, 0});
+  NodeUPtr b11 = NodeUPtr( new Node{"b11", 1, 1});
+  NodeUPtr b12 = NodeUPtr( new Node{"b12", 1, 1});
 
   // Second level / super blocks
-  NodeUPtr a21 = NodeUPtr( new Node{"a21", 2, "a"});
-  NodeUPtr b21 = NodeUPtr( new Node{"b21", 2, "b"});
+  NodeUPtr a21 = NodeUPtr( new Node{"a21", 2, 0});
+  NodeUPtr b21 = NodeUPtr( new Node{"b21", 2, 1});
 
   a1->set_parent(a11.get());
   a2->set_parent(a12.get());

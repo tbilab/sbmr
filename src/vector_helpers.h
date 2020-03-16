@@ -68,6 +68,16 @@ int total_num_elements(const Vec_of_Vecs<T>& vec_of_vecs) {
   return total;
 }
 
+// Total number of elements in a vector of vectors of vectors... all the way down
+template <typename T>
+int total_num_elements(const std::vector<Vec_of_Vecs<T>>& vec_of_vec_of_vecs) {
+  int total = 0;
+  for (const auto& vec_of_vecs : vec_of_vec_of_vecs) {
+    total += total_num_elements(vec_of_vecs);
+  }
+  return total;
+}
+
 template <typename K, typename T>
 int total_num_elements(const std::map<K, T>& map_of_els)
 {
