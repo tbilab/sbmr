@@ -75,7 +75,7 @@ class SBM_Network {
     return node_ptr;
   }
 
-  void initialize_blocks(int num_blocks)
+  void initialize_blocks(int num_blocks = -1)
   {
     const bool one_block_per_node = num_blocks == -1;
 

@@ -63,42 +63,42 @@ TEST_CASE("Tracking node types", "[Network]")
   REQUIRE(my_net.num_types() == 3);
 }
 
-// TEST_CASE("Initializing a block for every node", "[Network]")
-// {
-//   SBM my_net;
+TEST_CASE("Initializing a block for every node", "[Network]")
+{
+  SBM_Network my_net;
 
-//   my_net.add_node("a1", "a");
-//   my_net.add_node("a2", "a");
-//   my_net.add_node("a3", "a");
-//   my_net.add_node("a4", "a");
-//   my_net.add_node("a5", "a");
-//   my_net.add_node("a10", "a");
-//   my_net.add_node("a11", "a");
-//   my_net.add_node("a13", "a");
-//   my_net.add_node("a14", "a");
-//   my_net.add_node("a6", "a");
-//   my_net.add_node("a7", "a");
-//   my_net.add_node("a8", "a");
-//   my_net.add_node("a9", "a");
-//   my_net.add_node("a12", "a");
-//   my_net.add_node("b1", "b");
-//   my_net.add_node("b2", "b");
-//   my_net.add_node("b3", "b");
-//   my_net.add_node("b4", "b");
+  my_net.add_node("a1", "a");
+  my_net.add_node("a2", "a");
+  my_net.add_node("a3", "a");
+  my_net.add_node("a4", "a");
+  my_net.add_node("a5", "a");
+  my_net.add_node("a10", "a");
+  my_net.add_node("a11", "a");
+  my_net.add_node("a13", "a");
+  my_net.add_node("a14", "a");
+  my_net.add_node("a6", "a");
+  my_net.add_node("a7", "a");
+  my_net.add_node("a8", "a");
+  my_net.add_node("a9", "a");
+  my_net.add_node("a12", "a");
+  my_net.add_node("b1", "b");
+  my_net.add_node("b2", "b");
+  my_net.add_node("b3", "b");
+  my_net.add_node("b4", "b");
 
-//   // There should be a total of 18 nodes at base level
-//   REQUIRE(18 == my_net.get_level(0)->size());
+  // There should be a total of 18 nodes at base level
+  REQUIRE(my_net.num_nodes_at_level(0) == 18);
 
-//   // And zero nodes at the block level
-//   REQUIRE(0 == my_net.get_level(1)->size());
+  // And zero nodes at the block level
+  REQUIRE(my_net.num_levels() == 1);
 
-//   // Now assignin every node their own parent block
-//   my_net.initialize_blocks(0);
+  // Now assiging every node their own parent block
+  my_net.initialize_blocks();
 
-//   // There should now be a total of 18 nodes at level 1
-//   REQUIRE(18 == my_net.get_level(1)->size());
-
-// }
+  // There should now be a second level with 18 nodes
+  REQUIRE(my_net.num_levels() == 2);
+  REQUIRE(my_net.num_nodes_at_level(1) == 18);
+}
 
 // TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
 // {
