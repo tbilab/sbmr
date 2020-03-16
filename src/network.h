@@ -75,8 +75,10 @@ class SBM_Network {
     return node_ptr;
   }
 
-  void initialize_blocks(const int num_blocks)
+  void initialize_blocks(int num_blocks)
   {
+    const bool one_block_per_node = num_blocks == -1;
+
     const int block_level = nodes.size();
     // Make a new level for the blocks
     nodes.push_back(Type_Map());
@@ -88,6 +90,10 @@ class SBM_Network {
     for (auto& child_type : child_nodes) {
       const std::string& type     = child_type.first;
       NodeUPtr_Vec& nodes_of_type = child_type.second;
+
+      // If we're in the 1-block-per-node mode make sure we reflect that in reserved size
+      if (one_block_per_node)
+        num_blocks = nodes_of_type.size();
 
       if (num_blocks > nodes_of_type.size()) {
         LOGIC_ERROR("Can't initialize more blocks than there are nodes of a given type");
@@ -104,18 +110,17 @@ class SBM_Network {
         blocks_for_type.emplace_back(new Node("block", block_level, type));
       }
 
-      // Shuffle child nodes
-      random_sampler.shuffle(nodes_of_type);
+      // Shuffle child nodes if we're randomly assigning blocks
+      if (!one_block_per_node) random_sampler.shuffle(nodes_of_type);
 
       // Loop through now shuffled children nodes
       for (int i = 0; i < nodes_of_type.size(); i++) {
         Node* parent_block = blocks_for_type[i % num_blocks].get();
-        Node* child_node = nodes_of_type[i].get();
+        Node* child_node   = nodes_of_type[i].get();
 
         // Add blocks one at a time, looping back after end to each node
         child_node->set_parent(parent_block);
       }
-
     }
   }
 
@@ -125,8 +130,16 @@ class SBM_Network {
     return total_num_elements(nodes);
   }
 
-  int num_nodes_at_level(const int level)
+  int num_nodes_at_level(const int level) 
   {
     return total_num_elements(get_nodes_at_level(level));
+  }
+
+  int num_levels() const {
+    return nodes.size();
+  }
+
+  int num_nodes_of_type(const std::string type, const int level = 0) {
+    return get_nodes_of_type(type, level).size();
   }
 };

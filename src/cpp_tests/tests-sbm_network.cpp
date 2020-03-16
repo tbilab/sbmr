@@ -13,8 +13,12 @@ TEST_CASE("Basic initialization of network", "[Network]")
   my_net.add_node("m2", "m");
   my_net.add_node("m3", "m");
   my_net.add_node("m4", "m");
+
+
   REQUIRE(my_net.num_nodes() == 7);
   REQUIRE(my_net.num_nodes_at_level(0) == 7);
+  REQUIRE(my_net.num_nodes_of_type("m", 0) == 4);
+  REQUIRE(my_net.num_nodes_of_type("n", 0) == 3);
 
   my_net.initialize_blocks(2);
 
@@ -22,31 +26,14 @@ TEST_CASE("Basic initialization of network", "[Network]")
   REQUIRE(my_net.num_nodes() == 11);
   REQUIRE(my_net.num_nodes_at_level(0) == 7);
   REQUIRE(my_net.num_nodes_at_level(1) == 4);
+  REQUIRE(my_net.num_nodes_of_type("m", 1) == 2);
+  REQUIRE(my_net.num_nodes_of_type("n", 1) == 2);
 
-//   // Create a block node
-//   my_net.create_block_node("n", 1);
-//   my_net.create_block_node("m", 1);
+  // We should have two levels
+  REQUIRE(my_net.num_levels() == 2);
 
-//   // How many nodes at the 'data' level do we have?
-//   REQUIRE(my_net.nodes.at(0)->size() == 7);
-
-//   REQUIRE(
-//       print_node_ids(*my_net.nodes.at(0)) == "m1, m2, m3, m4, n1, n2, n3");
-
-//   // We should have two levels
-//   REQUIRE(my_net.nodes.size() == 2);
-
-//   // Group name convention <type>-<level>_<id>
-//   REQUIRE(
-//       print_node_ids(*my_net.nodes.at(1)) == "m-1_1, n-1_0");
-
-//   // Filter to a given node type
-//   REQUIRE(
-//       "n1, n2, n3" == print_node_ids(my_net.get_nodes_of_type_at_level("n", 0)));
-//   REQUIRE(
-//       "m1, m2, m3, m4" == print_node_ids(my_net.get_nodes_of_type_at_level("m", 0)));
-//   REQUIRE(
-//       "m-1_1" == print_node_ids(my_net.get_nodes_of_type_at_level("m", 1)));
+  // Filter to a given node type
+  // Four nodes of the type "m" 
 
 //   // Get number of levels
 //   REQUIRE(my_net.nodes.size() == 2);
