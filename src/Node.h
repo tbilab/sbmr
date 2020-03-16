@@ -3,7 +3,6 @@
 #include "error_and_message_macros.h"
 #include "profiling/Instrument.h"
 
-
 #include <exception>
 #include <iostream>
 #include <list>
@@ -18,6 +17,8 @@
 // What this file declares
 // =============================================================================
 class Node;
+
+using string = std::string;
 
 // For a bit of clarity
 // using Node*     = std::shared_ptr<Node>;
@@ -51,23 +52,22 @@ class Node {
   // Takes ID, node hiearchy level, and assumes default 'a' for type
   Node(const std::string& node_id, const int level)
       : id(node_id)
-      , type("a")
+      , type(0)
       , level(level)
   {
   }
 
   // Takes the node's id, level, and type.
-  Node(const std::string& node_id, const int level, const std::string& type)
+  Node(const std::string& node_id, const int level, const int type)
       : id(node_id)
       , type(type)
       , level(level)
   {
   }
 
-  // Takes the node's id, level, and type as integer (for legacy api compatability)
-  Node(const std::string& node_id, const int level, const int type)
-      : id(node_id)
-      , type(std::to_string(type))
+  // Takes a type int and a level and leaves id empty (useful for block nodes)
+  Node(const int type, const int level)
+      : type(0)
       , level(level)
   {
   }
@@ -83,13 +83,13 @@ class Node {
 
   // Attributes
   // =========================================================================
-  std::string id;           // Unique integer id for node
-  std::string type;         // What type of node is this?
-  int level;                // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
-  NodeList edges;           // Nodes that are connected to this node
+  std::string id;         // Unique integer id for node
+  int type;               // What type of node is this?
+  int level;              // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
+  NodeList edges;         // Nodes that are connected to this node
   Node* parent = nullptr; // What node contains this node (aka its cluster)
-  NodeSet children;         // Nodes that are contained within node (if node is cluster)
-  int degree = 0;               // How many edges/ edges does this node have?
+  NodeSet children;       // Nodes that are contained within node (if node is cluster)
+  int degree = 0;         // How many edges/ edges does this node have?
 
   // Methods
   // =========================================================================
@@ -153,7 +153,7 @@ class Node {
   // We return a vector because we need random access to elements in this array
   // and that isn't provided to us with the list format.
   // =============================================================================
-  NodeVec get_edges_of_type(const std::string& node_type, const int desired_level) const
+  NodeVec get_edges_of_type(const int node_type, const int desired_level) const
   {
     // Vector to return containing parents at desired level for edges
     NodeVec level_cons;
@@ -199,7 +199,7 @@ class Node {
   {
     // propigate new edge upwards to all parents
     Node* current_node = this;
-    int current_level    = level;
+    int current_level  = level;
 
     while (current_node) {
       // Add node to base edges
@@ -225,11 +225,10 @@ class Node {
     }
   }
 
-  int no_children() const {
+  int no_children() const
+  {
     return children.size() == 0;
   }
-
-
 
   // =============================================================================
   // Add or remove edges from a nodes edge list
