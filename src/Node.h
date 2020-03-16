@@ -1,8 +1,8 @@
 // [[Rcpp::plugins(cpp11)]]
 #pragma once
-
 #include "error_and_message_macros.h"
 #include "profiling/Instrument.h"
+
 
 #include <exception>
 #include <iostream>
@@ -50,29 +50,26 @@ class Node {
   // =========================================================================
 
   // Takes ID, node hiearchy level, and assumes default 'a' for type
-  Node(std::string node_id, int level)
+  Node(const std::string& node_id, const int level)
       : id(node_id)
       , type("a")
       , level(level)
-      , degree(0)
   {
   }
 
   // Takes the node's id, level, and type.
-  Node(std::string node_id, int level, std::string type)
+  Node(const std::string& node_id, const int level, const std::string& type)
       : id(node_id)
       , type(type)
       , level(level)
-      , degree(0)
   {
   }
 
   // Takes the node's id, level, and type as integer (for legacy api compatability)
-  Node(std::string node_id, int level, int type)
+  Node(const std::string& node_id, const int level, const int type)
       : id(node_id)
       , type(std::to_string(type))
       , level(level)
-      , degree(0)
   {
   }
 
@@ -93,7 +90,7 @@ class Node {
   NodeList edges;           // Nodes that are connected to this node
   NodePtr parent = nullptr; // What node contains this node (aka its cluster)
   NodeSet children;         // Nodes that are contained within node (if node is cluster)
-  int degree;               // How many edges/ edges does this node have?
+  int degree = 0;               // How many edges/ edges does this node have?
 
   // Methods
   // =========================================================================
