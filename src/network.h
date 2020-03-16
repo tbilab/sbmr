@@ -25,18 +25,7 @@ class SBM_Network {
     return nodes.at(level);
   }
 
-  NodeUPtr_Vec& get_nodes_of_type(const std::string& type, const int level = 0)
-  {
-    Type_Map& node_holder = get_nodes_at_level(level);
 
-    auto loc_for_type = node_holder.find(type);
-    if (loc_for_type == node_holder.end()) {
-      auto inserted_vec = node_holder.emplace(type, std::vector<NodeUPtr>());
-      return inserted_vec.first->second;
-    } else {
-      return loc_for_type->second;
-    }
-  }
 
   public:
   // Setters
@@ -134,6 +123,20 @@ class SBM_Network {
   }
 
   // Getters
+  NodeUPtr_Vec& get_nodes_of_type(const std::string& type, const int level = 0)
+  {
+    Type_Map& node_holder = get_nodes_at_level(level);
+
+    auto loc_for_type = node_holder.find(type);
+    if (loc_for_type == node_holder.end()) {
+      auto inserted_vec = node_holder.emplace(type, std::vector<NodeUPtr>());
+      return inserted_vec.first->second;
+    } else {
+      return loc_for_type->second;
+    }
+  }
+
+
   int num_nodes() const
   {
     return total_num_elements(nodes);
