@@ -30,191 +30,162 @@ TEST_CASE("Basic initialization of network", "[Network]")
   REQUIRE(my_net.num_nodes_of_type("m", 1) == 2);
   REQUIRE(my_net.num_nodes_of_type("n", 1) == 2);
 
-  // // We should have two levels
-  // REQUIRE(my_net.num_levels() == 2);
+  // We should have two levels
+  REQUIRE(my_net.num_levels() == 2);
 }
 
-// TEST_CASE("Tracking node types", "[Network]")
-// {
-//   SBM_Network my_net({"m", "n"}, 42);
 
-//   // Add some nodes to Network
-//   my_net.add_node("n1", "n");
-//   my_net.add_node("n2", "n");
+TEST_CASE("Initializing a block for every node", "[Network]")
+{
+  SBM_Network my_net({"a", "b"}, 42);
 
-//   // There should only be one type of node so far
-//   REQUIRE(my_net.num_types() == 1);
+  my_net.add_node("a1", "a");
+  my_net.add_node("a2", "a");
+  my_net.add_node("a3", "a");
+  my_net.add_node("a4", "a");
+  my_net.add_node("a5", "a");
+  my_net.add_node("a10", "a");
+  my_net.add_node("a11", "a");
+  my_net.add_node("a13", "a");
+  my_net.add_node("a14", "a");
+  my_net.add_node("a6", "a");
+  my_net.add_node("a7", "a");
+  my_net.add_node("a8", "a");
+  my_net.add_node("a9", "a");
+  my_net.add_node("a12", "a");
+  my_net.add_node("b1", "b");
+  my_net.add_node("b2", "b");
+  my_net.add_node("b3", "b");
+  my_net.add_node("b4", "b");
 
-//   my_net.add_node("m1", "m");
+  // There should be a total of 18 nodes at base level
+  REQUIRE(my_net.num_nodes_at_level(0) == 18);
 
-//   // There should now be two types of nodes
-//   REQUIRE(my_net.num_types() == 2);
+  // And zero nodes at the block level
+  REQUIRE(my_net.num_levels() == 1);
 
-//   my_net.add_node("m2", "m");
-//   my_net.add_node("n3", "n");
+  // Now assiging every node their own parent block
+  my_net.initialize_blocks();
 
-//   // There should still just be two types of nodes
-//   REQUIRE(my_net.num_types() == 2);
+  // There should now be a second level with 18 nodes
+  REQUIRE(my_net.num_levels() == 2);
+  REQUIRE(my_net.num_nodes_at_level(1) == 18);
+}
 
-//   my_net.add_node("m3", "m");
-//   my_net.add_node("o1", "o");
-//   my_net.add_node("o2", "o");
+TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
+{
+  SBM_Network my_net({"a", "b"}, 42);
 
-//   // There should now be three types of nodes
-//   REQUIRE(my_net.num_types() == 3);
-// }
+  my_net.add_node("a1", "a");
+  my_net.add_node("a2", "a");
+  my_net.add_node("a3", "a");
+  my_net.add_node("a4", "a");
+  my_net.add_node("a5", "a");
+  my_net.add_node("a6", "a");
+  my_net.add_node("a7", "a");
+  my_net.add_node("a8", "a");
+  my_net.add_node("a9", "a");
+  my_net.add_node("a10", "a");
 
-// TEST_CASE("Initializing a block for every node", "[Network]")
-// {
-//   SBM_Network my_net({"a", "b"}, 42);
+  my_net.add_node("b1", "b");
+  my_net.add_node("b2", "b");
+  my_net.add_node("b3", "b");
+  my_net.add_node("b4", "b");
+  my_net.add_node("b5", "b");
+  my_net.add_node("b6", "b");
+  my_net.add_node("b7", "b");
+  my_net.add_node("b8", "b");
+  my_net.add_node("b9", "b");
+  my_net.add_node("b10", "b");
 
-//   my_net.add_node("a1", "a");
-//   my_net.add_node("a2", "a");
-//   my_net.add_node("a3", "a");
-//   my_net.add_node("a4", "a");
-//   my_net.add_node("a5", "a");
-//   my_net.add_node("a10", "a");
-//   my_net.add_node("a11", "a");
-//   my_net.add_node("a13", "a");
-//   my_net.add_node("a14", "a");
-//   my_net.add_node("a6", "a");
-//   my_net.add_node("a7", "a");
-//   my_net.add_node("a8", "a");
-//   my_net.add_node("a9", "a");
-//   my_net.add_node("a12", "a");
-//   my_net.add_node("b1", "b");
-//   my_net.add_node("b2", "b");
-//   my_net.add_node("b3", "b");
-//   my_net.add_node("b4", "b");
+  // Distribute 3 total blocks for each type across nodes randomly
+  my_net.initialize_blocks(3);
 
-//   // There should be a total of 18 nodes at base level
-//   REQUIRE(my_net.num_nodes_at_level(0) == 18);
+  // There should now be three block nodes of each type
+  REQUIRE(my_net.num_nodes_of_type("a", 1) == 3);
+  REQUIRE(my_net.num_nodes_of_type("b", 1) == 3);
+}
 
-//   // And zero nodes at the block level
-//   REQUIRE(my_net.num_levels() == 1);
+TEST_CASE("Metablock initialization", "[Network]")
+{
+  SBM_Network my_net({"m", "n"}, 42);
 
-//   // Now assiging every node their own parent block
-//   my_net.initialize_blocks();
+  // Add some nodes to Network
+  my_net.add_node("n1", "n");
+  my_net.add_node("n2", "n");
+  my_net.add_node("n3", "n");
+  my_net.add_node("m1", "m");
+  my_net.add_node("m2", "m");
+  my_net.add_node("m3", "m");
+  my_net.add_node("m4", "m");
 
-//   // There should now be a second level with 18 nodes
-//   REQUIRE(my_net.num_levels() == 2);
-//   REQUIRE(my_net.num_nodes_at_level(1) == 18);
-// }
+  my_net.initialize_blocks(3);
 
-// TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
-// {
-//   SBM_Network my_net({"a", "b"}, 42);
+  // We should now have added six new blocks
+  REQUIRE(my_net.num_levels() == 2);
+  REQUIRE(my_net.num_nodes_at_level(1) == 6);
 
-//   my_net.add_node("a1", "a");
-//   my_net.add_node("a2", "a");
-//   my_net.add_node("a3", "a");
-//   my_net.add_node("a4", "a");
-//   my_net.add_node("a5", "a");
-//   my_net.add_node("a6", "a");
-//   my_net.add_node("a7", "a");
-//   my_net.add_node("a8", "a");
-//   my_net.add_node("a9", "a");
-//   my_net.add_node("a10", "a");
+  // Now we can initialize metablocks for those blocks
+  my_net.initialize_blocks(2);
 
-//   my_net.add_node("b1", "b");
-//   my_net.add_node("b2", "b");
-//   my_net.add_node("b3", "b");
-//   my_net.add_node("b4", "b");
-//   my_net.add_node("b5", "b");
-//   my_net.add_node("b6", "b");
-//   my_net.add_node("b7", "b");
-//   my_net.add_node("b8", "b");
-//   my_net.add_node("b9", "b");
-//   my_net.add_node("b10", "b");
+  // We should now have three levels with the third having 4 blocks
+  REQUIRE(my_net.num_levels() == 3);
+  REQUIRE(my_net.num_nodes_at_level(2) == 4);
 
-//   // Distribute 3 total blocks for each type across nodes randomly
-//   my_net.initialize_blocks(3);
+  // Now remove the metablocks
+  my_net.delete_blocks();
 
-//   // There should now be three block nodes of each type
-//   REQUIRE(my_net.num_nodes_of_type("a", 1) == 3);
-//   REQUIRE(my_net.num_nodes_of_type("b", 1) == 3);
-// }
+  // Should be back to two levels
+  REQUIRE(my_net.num_levels() == 2);
 
-// TEST_CASE("Metablock initialization", "[Network]")
-// {
-//   SBM_Network my_net({"m", "n"}, 42);
+  // Remove the blocks
+  my_net.delete_blocks();
+  REQUIRE(my_net.num_levels() == 1);
 
-//   // Add some nodes to Network
-//   my_net.add_node("n1", "n");
-//   my_net.add_node("n2", "n");
-//   my_net.add_node("n3", "n");
-//   my_net.add_node("m1", "m");
-//   my_net.add_node("m2", "m");
-//   my_net.add_node("m3", "m");
-//   my_net.add_node("m4", "m");
-
-//   my_net.initialize_blocks(3);
-
-//   // We should now have added six new blocks
-//   REQUIRE(my_net.num_levels() == 2);
-//   REQUIRE(my_net.num_nodes_at_level(1) == 6);
-
-//   // Now we can initialize metablocks for those blocks
-//   my_net.initialize_blocks(2);
-
-//   // We should now have three levels with the third having 4 blocks
-//   REQUIRE(my_net.num_levels() == 3);
-//   REQUIRE(my_net.num_nodes_at_level(2) == 4);
-
-//   // Now remove the metablocks
-//   my_net.delete_blocks();
-
-//   // Should be back to two levels
-//   REQUIRE(my_net.num_levels() == 2);
-
-//   // Remove the blocks
-//   my_net.delete_blocks();
-//   REQUIRE(my_net.num_levels() == 1);
-
-//   // Cant remove blocks when no levels are left
-//   REQUIRE_THROWS(my_net.delete_blocks());
-// }
+  // Cant remove blocks when no levels are left
+  REQUIRE_THROWS(my_net.delete_blocks());
+}
 
 
-// TEST_CASE("Swapping of blocks", "[Network]")
-// {
-//   SBM_Network my_net({"m", "n"}, 42);
+TEST_CASE("Swapping of blocks", "[Network]")
+{
+  SBM_Network my_net({"m", "n"}, 42);
 
-//   // Add some nodes to Network
-//   my_net.add_node("n1", "n");
-//   my_net.add_node("n2", "n");
-//   my_net.add_node("n3", "n");
-//   my_net.add_node("m1", "m");
-//   my_net.add_node("m2", "m");
-//   my_net.add_node("m3", "m");
+  // Add some nodes to Network
+  my_net.add_node("n1", "n");
+  my_net.add_node("n2", "n");
+  my_net.add_node("n3", "n");
+  my_net.add_node("m1", "m");
+  my_net.add_node("m2", "m");
+  my_net.add_node("m3", "m");
 
-//   my_net.initialize_blocks();
+  my_net.initialize_blocks();
 
-//   // Make sure network is how we desired it to be
-//   REQUIRE(my_net.num_nodes_of_type("n", 1) == 3);
-//   REQUIRE(my_net.num_nodes_of_type("m", 1) == 3);
+  // Make sure network is how we desired it to be
+  REQUIRE(my_net.num_nodes_of_type("n", 1) == 3);
+  REQUIRE(my_net.num_nodes_of_type("m", 1) == 3);
 
-//   // Merge second node into first nodes block
-//   Node* node2 = my_net.get_nodes_of_type("n")[1].get();
-//   Node* block1 = my_net.get_nodes_of_type("n")[0]->get_parent();
+  // Merge second node into first nodes block
+  Node* node2 = my_net.get_nodes_of_type("n")[1].get();
+  Node* block1 = my_net.get_nodes_of_type("n")[0]->get_parent();
 
-//   swap_blocks(node2,
-//               block1,
-//               my_net.get_nodes_of_type("n", 1),
-//               true);
+  swap_blocks(node2,
+              block1,
+              my_net.get_nodes_of_type("n", 1),
+              true);
 
-//   // There should now be one less block of type n
-//   REQUIRE(my_net.num_nodes_of_type("n", 1) == 2);
+  // There should now be one less block of type n
+  REQUIRE(my_net.num_nodes_of_type("n", 1) == 2);
 
-//   // Now do the same for the m type nodes but don't delete the empty block
-//   swap_blocks(my_net.get_nodes_of_type("m")[1].get(),
-//               my_net.get_nodes_of_type("m")[0]->get_parent(),
-//               my_net.get_nodes_of_type("m", 1),
-//               false);
+  // Now do the same for the m type nodes but don't delete the empty block
+  swap_blocks(my_net.get_nodes_of_type("m")[1].get(),
+              my_net.get_nodes_of_type("m")[0]->get_parent(),
+              my_net.get_nodes_of_type("m", 1),
+              false);
 
-//   // There should be no change in the number of blocks
-//   REQUIRE(my_net.num_nodes_of_type("m", 1) == 3);
-// }
+  // There should be no change in the number of blocks
+  REQUIRE(my_net.num_nodes_of_type("m", 1) == 3);
+}
 
 
 
