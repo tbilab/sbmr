@@ -35,8 +35,13 @@ enum Update_Type { Add,
 class Node {
   private:
   Node* parent = nullptr; // What node contains this node (aka its cluster)
-  Edges_By_Type typed_edges;
+  Edges_By_Type edges;
   Node_Vec children; // Nodes that are contained within node (if node is cluster)
+  int degree = 0; // How many edges/ edges does this node have?
+  std::string id; // Unique integer id for node
+  int type;       // What type of node is this?
+  int level;      // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
+
 
   bool have_parent() { return parent != nullptr; }
 
@@ -48,16 +53,23 @@ class Node {
       : id(node_id)
       , type(type)
       , level(level)
-      , typed_edges(num_types)
+      , edges(num_types)
   {
   }
 
   Node(const int type, const int level, const int num_types = 1)
       : type(type)
       , level(level)
-      , typed_edges(num_types)
+      , edges(num_types)
   {
   }
+
+  // =========================================================================
+  // Constant attribute getters - these are static after node creation 
+  // =========================================================================
+  std::string get_id() const { return id; }
+  int get_type() const { return type; }
+  int get_level() const { return level; }
 
   // Disable costly copy and move methods for error protection
   // Copy construction
@@ -68,12 +80,6 @@ class Node {
   Node(Node&&)  = delete;
   Node& operator=(Node&&) = delete;
 
-  // Attributes
-  // =========================================================================
-  std::string id; // Unique integer id for node
-  int type;       // What type of node is this?
-  int level;      // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
-  int degree = 0; // How many edges/ edges does this node have?
 
   // =========================================================================
   // Children-Related methods
@@ -164,7 +170,7 @@ class Node {
   // =========================================================================
   Node_Ptr_Vec& get_edges_of_type(const int node_type)
   {
-    return typed_edges.at(node_type);
+    return edges.at(node_type);
   }
 
   // Collapse edges to a given level into a map of connected block id->count
@@ -173,7 +179,7 @@ class Node {
     // Setup an edge count map for node
     Edge_Count_Map edges_counts;
 
-    for (const auto& edges_of_type : typed_edges) {
+    for (const auto& edges_of_type : edges) {
       for (const auto& edge : edges_of_type) {
         edges_counts[edge->get_parent_at_level(level)]++;
       }
@@ -190,7 +196,7 @@ class Node {
 
   Edges_By_Type& all_edges()
   {
-    return typed_edges;
+    return edges;
   }
 
   void update_edges(const Edges_By_Type& edges_to_update, const Update_Type& update_type)
