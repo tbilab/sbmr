@@ -2,6 +2,8 @@
 
 #include "../Node.h"
 
+
+
 // ============================================================================
 // Takes a vector of node ids and returns a string of them pasted together
 // ============================================================================
@@ -34,9 +36,11 @@ inline std::string print_ids_to_string(std::vector<std::string> node_ids)
 // Grab vector of node ids from a sequential container of nodes
 // ============================================================================
 
-// =======================================================
-// List Version
-inline std::string print_node_ids(NodeList nodes)
+
+
+
+template <typename Node_Container>
+inline std::string print_node_ids(Node_Container nodes)
 {
   // Vector of node ids to be filled in
   std::vector<std::string> node_ids;
@@ -49,37 +53,6 @@ inline std::string print_node_ids(NodeList nodes)
   return print_ids_to_string(node_ids);
 }
 
-// Set Version
-inline std::string print_node_ids(NodeSet nodes)
-{
-  // Vector of node ids to be filled in
-  std::vector<std::string> node_ids;
-
-  // Add node ids to containing vector
-  for (const auto& node : nodes) {
-    // Append node id to return string.
-    node_ids.push_back(node->id);
-  }
-
-  return print_ids_to_string(node_ids);
-}
-
-// Vector Version
-inline std::string print_node_ids(NodeVec nodes)
-{
-  // Vector of node ids to be filled in
-  std::vector<std::string> node_ids;
-
-  // Add node ids to containing vector
-  for (auto node_it = nodes.begin();
-       node_it != nodes.end();
-       ++node_it) {
-    // Append node id to return string.
-    node_ids.push_back((*node_it)->id);
-  }
-
-  return print_ids_to_string(node_ids);
-}
 
 // =======================================================
 // Map version
