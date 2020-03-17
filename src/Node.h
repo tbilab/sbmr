@@ -172,6 +172,10 @@ class Node {
     return parent;
   }
 
+  string get_parent_id() const {
+    return parent == nullptr ? "none" : parent->get_id();
+  }
+
   // =========================================================================
   // Edge-Related methods
   // =========================================================================
