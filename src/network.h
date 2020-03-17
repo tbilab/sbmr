@@ -6,71 +6,104 @@
 #include "vector_helpers.h"
 
 using Node_UPtr_Vec = std::vector<Node_UPtr>;
-using Type_Vec = std::vector<std::vector<Node_UPtr>>;
-
+using Type_Vec      = std::vector<std::vector<Node_UPtr>>;
 
 class SBM_Network {
 
   private:
   // Data
   std::vector<Type_Vec> nodes;
-  std::unordered_map<string, int> type_name_to_int;
+  Int_Map<string> type_name_to_int;
   Sampler random_sampler;
 
-  Type_Vec& get_nodes_at_level(const int level = 0)
-  {
-    // Make sure we have the requested level
-    if (level >= nodes.size()) {
-      RANGE_ERROR("Node requested in level that does not exist");
-    }
-
-    return nodes.at(level);
-  }
-
-  int get_type_index(const string name)
+  // =========================================================================
+  // Private helper methods
+  // =========================================================================
+  int get_type_index(const string name) const
   {
     const auto name_it = type_name_to_int.find(name);
 
     // If this is a previously unseen type, add new entry
-    if (name_it == type_name_to_int.end()) {
+    if (name_it == type_name_to_int.end())
       LOGIC_ERROR("Type " + name + " doesn't exist in network");
-    }
 
     return name_it->second;
   }
 
-  int build_level() {
-    // First we create a new vector with one vector per types
-    nodes.emplace_back(num_types());
+  void check_for_level(const int level) const
+  {
+    // Make sure we have the requested level
+    if (level >= nodes.size())
+      RANGE_ERROR("Node requested in level that does not exist");
+  }
 
-    // Return the index of the new level just inserted
-    return nodes.size() - 1;
+  void check_for_type(const int type_index) const
+  {
+    if (type_index >= type_name_to_int.size())
+      RANGE_ERROR("Type " + as_str(type_index) + " does not exist in network.");
   }
 
   public:
-  // Setters
-
+  // =========================================================================
+  // Constructor
+  // =========================================================================
   SBM_Network(const std::vector<std::string>& node_types = { "node" },
               const int random_seed                      = 42)
       : random_sampler(random_seed)
   {
     int c_index = 0;
     for (const auto& type_name : node_types) {
-      type_name_to_int[type_name] = c_index;
-      c_index++;
+      type_name_to_int[type_name] = c_index++;
     }
 
     build_level();
   }
 
+  // =========================================================================
+  // Information
+  // =========================================================================
+  int num_nodes() const
+  {
+    return total_num_elements(nodes);
+  }
+
+  int num_nodes_at_level(const int level) const
+  {
+    check_for_level(level);
+    return total_num_elements(nodes.at(level));
+  }
+
+  int num_levels() const
+  {
+    return nodes.size();
+  }
+
+  int num_nodes_of_type(const int type_i, const int level = 0) const
+  {
+    check_for_level(level);
+    check_for_type(type_i);
+    return nodes.at(level).at(type_i).size();
+  }
+
+  int num_nodes_of_type(const string& type, const int level = 0) const
+  {
+    check_for_level(level);
+    return nodes.at(level).at(get_type_index(type)).size();
+  }
+
+  int num_types() const
+  {
+    return type_name_to_int.size();
+  }
+
+  // =========================================================================
+  // Modification
+  // =========================================================================
   Node* add_node(const std::string& id,
                  const std::string& type = "a",
                  const int level         = 0)
   {
-    // Make sure we have the requested level
-    if (level >= nodes.size()) {
-      RANGE_ERROR("Node requested in level that does not exist");
-    }
+    check_for_level(level);
 
     const int type_index = get_type_index(type);
 
@@ -81,7 +114,7 @@ class SBM_Network {
     Node* node_ptr = new_node.get();
 
     // Move node unique pointer into its type in map
-    nodes.at(level).at(type_index).push_back(std::move(new_node));
+    get_nodes_of_type(type_index, level).push_back(std::move(new_node));
 
     return node_ptr;
   }
@@ -91,22 +124,20 @@ class SBM_Network {
     const bool one_block_per_node = num_blocks == -1;
 
     const int block_level = build_level();
+    const int child_level = block_level - 1;
 
-    Type_Vec& child_nodes = nodes.at(block_level-1);
-    Type_Vec& block_nodes = nodes.at(block_level);
+    // Loop over all node types
+    for (int type_i = 0; type_i < num_types(); type_i++) {
 
-    // Loop over all node types present in previous level
-    for (int type_i = 0; type_i < child_nodes.size(); type_i++) {
-      Node_UPtr_Vec& nodes_of_type  = child_nodes[type_i];
-      Node_UPtr_Vec& blocks_of_type = block_nodes[type_i];
+      Node_UPtr_Vec& nodes_of_type  = get_nodes_of_type(type_i, child_level);
+      Node_UPtr_Vec& blocks_of_type = get_nodes_of_type(type_i, block_level);
 
       // If we're in the 1-block-per-node mode make sure we reflect that in reserved size
       if (one_block_per_node)
         num_blocks = nodes_of_type.size();
 
-      if (num_blocks > nodes_of_type.size()) {
+      if (num_blocks > nodes_of_type.size())
         LOGIC_ERROR("Can't initialize more blocks than there are nodes of a given type");
-      }
 
       // Reserve enough spaces for the blocks to be inserted
       blocks_of_type.reserve(num_blocks);
@@ -121,7 +152,7 @@ class SBM_Network {
         random_sampler.shuffle(nodes_of_type);
 
       // Loop through now shuffled children nodes
-      for (int i = 0; i < nodes_of_type.size(); i++) {
+      for (int i = 0; i < num_types(); i++) {
         Node* parent_block = blocks_of_type[i % num_blocks].get();
         Node* child_node   = nodes_of_type[i].get();
 
@@ -131,52 +162,44 @@ class SBM_Network {
     }
   }
 
+  int build_level()
+  {
+    // First we create a new vector with one vector per types
+    nodes.emplace_back(num_types());
+
+    // Return the index of the new level just inserted
+    return nodes.size() - 1;
+  }
+
   void delete_blocks()
   {
-
-    if (nodes.size() == 1) {
+    if (nodes.size() == 1)
       LOGIC_ERROR("No block level to delete.");
-    }
+
     // Remove the last layer of nodes.
     nodes.pop_back();
   }
 
-  // Getters
-  Node_UPtr_Vec& get_nodes_of_type(const std::string& type, const int level = 0)
+  // =========================================================================
+  // Node Grabbers
+  // =========================================================================
+  Type_Vec& get_nodes_at_level(const int level = 0)
   {
-    return get_nodes_of_type(get_type_index(type), level);
+    // Make sure we have the requested level
+    check_for_level(level);
+
+    return nodes[level];
   }
 
   Node_UPtr_Vec& get_nodes_of_type(const int type_index, const int level = 0)
   {
-    Type_Vec& node_holder = get_nodes_at_level(level);
+    check_for_type(type_index);
 
-    return node_holder[type_index];
+    return get_nodes_at_level(level)[type_index];
   }
 
-  int num_nodes() const
+  Node_UPtr_Vec& get_nodes_of_type(const std::string& type, const int level = 0)
   {
-    return total_num_elements(nodes);
-  }
-
-  int num_nodes_at_level(const int level)
-  {
-    return total_num_elements(get_nodes_at_level(level));
-  }
-
-  int num_levels() const
-  {
-    return nodes.size();
-  }
-
-  template <typename T>
-  int num_nodes_of_type(const T type, const int level = 0)
-  {
-    return get_nodes_of_type(type, level).size();
-  }
-
-  int num_types() const
-  {
-    return type_name_to_int.size();
+    return get_nodes_of_type(get_type_index(type), level);
   }
 };
