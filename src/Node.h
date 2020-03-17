@@ -17,14 +17,13 @@ class Node;
 using string = std::string;
 
 template <typename T>
-inline string as_str(const T& val) {return std::to_string(val);}
+inline string as_str(const T& val) { return std::to_string(val); }
 
 // For a bit of clarity
 using Node_UPtr      = std::unique_ptr<Node>;
 using Node_Ptr_Vec   = std::vector<Node*>;
 using Edges_By_Type  = std::vector<Node_Ptr_Vec>;
 using Node_Vec       = std::vector<Node*>;
-using Node_Set       = std::set<Node*>;
 using Edge_Count_Map = std::map<Node*, int>;
 
 enum Update_Type { Add,
@@ -42,10 +41,9 @@ class Node {
   bool have_parent() { return parent != nullptr; }
 
   public:
+  // =========================================================================
   // Constructors
   // =========================================================================
-
-  // Takes the node's id, level, and type.
   Node(const std::string& node_id, const int level, const int type, const int num_types = 1)
       : id(node_id)
       , type(type)
@@ -54,7 +52,6 @@ class Node {
   {
   }
 
-  // Takes a type int and a level and leaves id empty (useful for block nodes)
   Node(const int type, const int level, const int num_types = 1)
       : type(type)
       , level(level)
@@ -102,6 +99,11 @@ class Node {
     return children.size();
   }
 
+  bool no_children() const
+  {
+    return num_children() == 0;
+  }
+
   bool is_child(Node* node) const
   {
     return std::find(children.begin(),
@@ -136,17 +138,16 @@ class Node {
   {
     // First we need to make sure that the requested level is not less than that
     // of the current node.
-    if (level_of_parent < level) 
-      LOGIC_ERROR("Requested parent level (" + as_str(level_of_parent) + ") lower than current node level (" + as_str(level) + ").");
-    
+    if (level_of_parent < level)
+      LOGIC_ERROR("Requested parent level (" + as_str(level_of_parent)
+                  + ") lower than current node level (" + as_str(level) + ").");
 
     // Start with this node as current node
     Node* current_node = this;
 
     while (current_node->level != level_of_parent) {
-      if (!parent) 
+      if (!parent)
         RANGE_ERROR("No parent at level " + as_str(level_of_parent) + " for " + id);
-      
 
       // Traverse up parents until we've reached just below where we want to go
       current_node = current_node->parent;
@@ -156,23 +157,17 @@ class Node {
     return current_node;
   }
 
-  Node* get_parent() { return parent; }
+  Node* get_parent() const { return parent; }
 
-  // =============================================================================
-  // Get all nodes connected to Node at a given level with specified type
-  // We return a vector because we need random access to elements in this array
-  // and that isn't provided to us with the list format.
-  // =============================================================================
+  // =========================================================================
+  // Edge-Related methods
+  // =========================================================================
   Node_Ptr_Vec& get_edges_of_type(const int node_type)
   {
-
     return typed_edges.at(node_type);
   }
 
-  // =============================================================================
-  // Collapse a nodes edge to a given level into a map of
-  // connected block id->count
-  // =============================================================================
+  // Collapse edges to a given level into a map of connected block id->count
   Edge_Count_Map gather_edges_to_level(const int level) const
   {
     // Setup an edge count map for node
@@ -187,32 +182,26 @@ class Node {
     return edges_counts;
   }
 
-  // =============================================================================
-  // Add edge to another node
-  // =============================================================================
   void add_edge(Node* node)
   {
     get_edges_of_type(node->type).push_back(node);
     degree++;
   }
 
-  void remove_edge(Node_Vec& edge_list, Node* node_to_remove)
+  Edges_By_Type& all_edges()
   {
-    delete_from_vector(get_edges_of_type(node_to_remove->type), node_to_remove);
+    return typed_edges;
   }
 
-  Edges_By_Type& all_edges() { return typed_edges; }
-
-  // =============================================================================
-  // Add or remove edges from a nodes edge list
-  // =============================================================================
   void update_edges(const Edges_By_Type& edges_to_update, const Update_Type& update_type)
   {
+    int type_i = 0;
 
-    for (int type_i = 0; type_i < edges_to_update.size(); type_i++) {
-      auto& node_edges_of_type = get_edges_of_type(type_i);
+    for (const auto& edges_of_type : edges_to_update) {
+      // Get references to this node's edges to type (update type for next go-round)
+      auto& node_edges_of_type = get_edges_of_type(type_i++);
 
-      for (const auto& edge : edges_to_update.at(type_i)) {
+      for (const auto& edge : edges_of_type) {
         switch (update_type) {
         case Remove:
           delete_from_vector(node_edges_of_type, edge);
@@ -224,13 +213,14 @@ class Node {
           break;
         default:
           LOGIC_ERROR("Something went wrong in edge updating");
-          break;
         }
       }
     }
   }
 
-  int no_children() const { return children.size() == 0; }
+  // =========================================================================
+  // Comparison operators
+  // =========================================================================
   bool operator==(const Node& other_node) { return id == other_node.id; }
   bool operator==(const Node& other_node) const { return id == other_node.id; }
 };
