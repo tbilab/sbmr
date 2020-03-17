@@ -16,6 +16,9 @@ class Node;
 
 using string = std::string;
 
+template <typename T>
+inline string as_str(const T& val) {return std::to_string(val);}
+
 // For a bit of clarity
 using Node_UPtr      = std::unique_ptr<Node>;
 using Node_Ptr_Vec   = std::vector<Node*>;
@@ -94,9 +97,18 @@ class Node {
     update_edges(child->all_edges(), Remove);
   }
 
-  int num_children() const { return children.size(); }
+  int num_children() const
+  {
+    return children.size();
+  }
 
-  bool is_child(Node* node) const { return std::find(children.begin(), children.end(), node) != children.end(); }
+  bool is_child(Node* node) const
+  {
+    return std::find(children.begin(),
+                     children.end(),
+                     node)
+        != children.end();
+  }
 
   // =========================================================================
   // Parent-Related methods
@@ -109,10 +121,8 @@ class Node {
     }
 
     // Remove self from previous parents children list (if it existed)
-    if (have_parent()) {
-      // Remove self from previous children
+    if (have_parent())
       parent->remove_child(this);
-    }
 
     // Add this node to new parent's children list
     new_parent->add_child(this);
@@ -126,17 +136,17 @@ class Node {
   {
     // First we need to make sure that the requested level is not less than that
     // of the current node.
-    if (level_of_parent < level) {
-      LOGIC_ERROR("Requested parent level (" + std::to_string(level_of_parent) + ") lower than current node level (" + std::to_string(level) + ").");
-    }
+    if (level_of_parent < level) 
+      LOGIC_ERROR("Requested parent level (" + as_str(level_of_parent) + ") lower than current node level (" + as_str(level) + ").");
+    
 
     // Start with this node as current node
     Node* current_node = this;
 
     while (current_node->level != level_of_parent) {
-      if (!parent) {
-        RANGE_ERROR("No parent at level " + std::to_string(level_of_parent) + " for " + id);
-      }
+      if (!parent) 
+        RANGE_ERROR("No parent at level " + as_str(level_of_parent) + " for " + id);
+      
 
       // Traverse up parents until we've reached just below where we want to go
       current_node = current_node->parent;
