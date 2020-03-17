@@ -256,6 +256,11 @@ int index_of_node(const State_Dump& state, const string& node_id)
   return -1;
 }
 
+string parent_from_state(const State_Dump& state, const string& node_id)
+{
+  return state.parents[index_of_node(state, node_id)];
+}
+
 TEST_CASE("State dumping and restoring", "[Network")
 {
   SBM_Network my_net({ "a", "b" }, 42);
@@ -286,58 +291,27 @@ TEST_CASE("State dumping and restoring", "[Network")
   Node* a1 = my_net.get_node_by_id("a1", "a");
   Node* a2 = my_net.get_node_by_id("a2", "a");
 
-  // Make note of node 1s parent in first state
-  OUT_MSG << "a1 parent = " << a1->get_parent()->get_id()
-          << " | a2 parent = " << a2->get_parent()->get_id() << std::endl;
-
-  REQUIRE(my_net.num_nodes_of_type("a", 1) == 3);
-  REQUIRE(my_net.num_nodes_of_type("b", 1) == 3);
-  REQUIRE(a1->get_parent() != a2->get_parent());
-
-  // print_state(state1);
+  // // Grab parent ids from first state
   // const string a1_parent = state1.parents[index_of_node(state1, "a1")];
   // const string a2_parent = state1.parents[index_of_node(state1, "a2")];
-  // REQUIRE(a1_parent != a2_parent);
 
-  // // Now give merge a1 and a2 to same parent and remove a1s old parent
-  // swap_blocks(a1,
-  //             a2->get_parent(),
-  //             my_net.get_nodes_of_type("n", 1),
-  //             true);
+  // Now give merge a1 and a2 to same parent and remove a1s old parent
+  swap_blocks(a1,
+              a2->get_parent(),
+              my_net.get_nodes_of_type("a", 1),
+              true);
 
-  //  // Dump model state again
-  // State_Dump state2 = my_net.get_state();
+  // Dump model state again
+  State_Dump state2 = my_net.get_state();
 
-  //  // Make note of node 1s parent in first state
-  // const string a1_parent_new = state1.parents[index_of_node(state2, "a1")];
-  // const string a2_parent_new = state1.parents[index_of_node(state2, "a2")];
-  // REQUIRE(a1_parent != a1_parent_new);
-  // REQUIRE(a1_parent_new == a2_parent_new);
+  // a1's parent changed
+  REQUIRE(parent_from_state(state1, "a1") != parent_from_state(state2, "a1"));
 
-  // NodePtr a14 = my_net.add_node("a14", "a", 1);
-  // a1->set_parent(a14);
-
-  // // Dump model state again
-  // State_Dump state2 = my_net.get_state();
-
-  // // Make sure new parent for a1 is reflected in new state dump
-  // REQUIRE(
-  //     print_ids_to_string(state2.id) == "a1, a11, a12, a13, a14, a2, a3, b1, b11, b12, b13, b2, b3");
-
-  // REQUIRE(
-  //     print_ids_to_string(state2.parent) == "a12, a13, a14, b11, b12, b13, none, none, none, none, none, none, none");
-
-  // // Now restore model to pre a1->a14 move state
-  // my_net.set_state(state1.id, state1.parent, state1.level, state1.type);
-
-  // State_Dump state3 = my_net.get_state();
-
-  // // Make sure state dumps 1 and 3 match state dump is in correct form
-  // REQUIRE(
-  //     print_ids_to_string(state1.id) == print_ids_to_string(state3.id));
-
-  // REQUIRE(
-  //     print_ids_to_string(state1.parent) == print_ids_to_string(state3.parent));
+  // a2's parent did not change
+  REQUIRE(parent_from_state(state1, "a2") == parent_from_state(state2, "a2"));
+  
+  // a1 and a2 now share a parent
+  REQUIRE(parent_from_state(state2, "a1") == parent_from_state(state2, "a2"));
 }
 
 // // TEST_CASE("Counting edges", "[Network]")
