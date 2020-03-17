@@ -165,9 +165,9 @@ TEST_CASE("Edge count gathering (unipartite)", "[Node]")
   connect_nodes(n5.get(), n6.get());
 
   // Make 3 blocks
-  Node_UPtr a = Node_UPtr(new Node { 0, 1 });
-  Node_UPtr b = Node_UPtr(new Node { 1, 1 });
-  Node_UPtr c = Node_UPtr(new Node { 2, 1 });
+  Node_UPtr a = Node_UPtr(new Node {0, 0, 1 });
+  Node_UPtr b = Node_UPtr(new Node {1, 1, 1 });
+  Node_UPtr c = Node_UPtr(new Node {2, 2, 1 });
 
   // Assign nodes to their blocks
   n1->set_parent(a.get());
