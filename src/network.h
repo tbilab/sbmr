@@ -118,10 +118,8 @@ class SBM_Network {
   // =============================================================================
   State_Dump get_state() const
   {
-    const int N = num_nodes();
-
     // Initialize the return struct
-    State_Dump state(N);
+    State_Dump state(num_nodes());
 
     // Loop through levels
     for (int level = 0; level < nodes.size(); level++) {
