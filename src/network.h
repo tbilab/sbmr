@@ -184,7 +184,7 @@ class SBM_Network {
 
       for (int i = 0; i < num_blocks; i++) {
         // Build a new block node wrapped in smart pointer in it's type vector
-        blocks_of_type.emplace_back(new Node(block_counter, type_i, block_level, num_types()));
+        blocks_of_type.emplace_back(new Node(block_counter++, type_i, block_level, num_types()));
       }
 
       // Shuffle child nodes if we're randomly assigning blocks
@@ -192,7 +192,7 @@ class SBM_Network {
         random_sampler.shuffle(nodes_of_type);
 
       // Loop through now shuffled children nodes
-      for (int i = 0; i < num_types(); i++) {
+      for (int i = 0; i < nodes_of_type.size(); i++) {
         Node* parent_block = blocks_of_type[i % num_blocks].get();
         Node* child_node   = nodes_of_type[i].get();
 
