@@ -2,14 +2,9 @@
 #pragma once
 #include "error_and_message_macros.h"
 #include "vector_helpers.h"
-#include "profiling/Instrument.h"
 
-#include <exception>
-#include <iostream>
-#include <list>
 #include <map>
 #include <memory>
-#include <queue>
 #include <set>
 #include <string>
 #include <vector>
@@ -21,20 +16,13 @@ class Node;
 
 using string = std::string;
 
-using Node_Ptr_Vec  = std::vector<Node*>;
-using Edges_By_Type = std::vector<Node_Ptr_Vec>;
-
 // For a bit of clarity
-// using Node*     = std::shared_ptr<Node>;
-using NodeUPtr = std::unique_ptr<Node>;
-
-using NodeVec     = std::vector<Node*>;
-using NodeList    = std::list<Node*>;
-using NodeSet     = std::set<Node*>;
-using NodeEdgeMap = std::map<Node*, int>;
-using NodeLevel   = std::map<std::string, Node*>;
-using LevelPtr    = std::shared_ptr<NodeLevel>;
-using LevelMap    = std::map<int, LevelPtr>;
+using Node_UPtr      = std::unique_ptr<Node>;
+using Node_Ptr_Vec   = std::vector<Node*>;
+using Edges_By_Type  = std::vector<Node_Ptr_Vec>;
+using Node_Vec       = std::vector<Node*>;
+using Node_Set       = std::set<Node*>;
+using Edge_Count_Map = std::map<Node*, int>;
 
 enum Update_Type { Add,
                    Remove };
@@ -86,7 +74,7 @@ class Node {
   int level;      // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
   Edges_By_Type typed_edges;
   Node* parent = nullptr; // What node contains this node (aka its cluster)
-  NodeSet children;       // Nodes that are contained within node (if node is cluster)
+  Node_Set children;      // Nodes that are contained within node (if node is cluster)
   int degree = 0;         // How many edges/ edges does this node have?
 
   // Methods
@@ -159,10 +147,10 @@ class Node {
   // Collapse a nodes edge to a given level into a map of
   // connected block id->count
   // =============================================================================
-  NodeEdgeMap gather_edges_to_level(const int level) const
+  Edge_Count_Map gather_edges_to_level(const int level) const
   {
     // Setup an edge count map for node
-    NodeEdgeMap edges_counts;
+    Edge_Count_Map edges_counts;
 
     for (const auto& edges_of_type : typed_edges) {
       for (const auto& edge : edges_of_type) {
@@ -182,7 +170,7 @@ class Node {
     degree++;
   }
 
-  void remove_edge(NodeList& edge_list, Node* node_to_remove)
+  void remove_edge(Node_Vec& edge_list, Node* node_to_remove)
   {
     delete_from_vector(get_edges_of_type(node_to_remove->type), node_to_remove);
   }
