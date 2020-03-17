@@ -131,20 +131,18 @@ class SBM_Network {
     State_Dump state(N);
 
     // Loop through levels
-    int level = 0;
-    for (const auto& node_level : nodes) {
-      int type_i = 0;
-      for (const auto& nodes_of_type : node_level) {
-        const string type_name = types[type_i++];
-        for (const auto& node : nodes_of_type) {
+    for (int level = 0; level < nodes.size(); level++) {
+      for (int type_i = 0; type_i < num_types(); type_i++) {
+        const string& type_name = types[type_i++];
+        for (const auto& node : nodes.at(level).at(type_i)) {
           state.add(node->get_id(),
                     type_name,
                     node->get_parent_id(),
                     level);
         }
       }
-      level++;
     }
+
     return state;
   }
 
