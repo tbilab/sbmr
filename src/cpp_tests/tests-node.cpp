@@ -30,8 +30,8 @@ TEST_CASE("Basic Initialization", "[Node]")
   connect_nodes(n3.get(), m3.get());
 
   // Get basic info out of the nodes
-  REQUIRE(n1->id == "n1");
-  REQUIRE(n1->get_parent_at_level(1)->id == n1->get_parent()->id);
+  REQUIRE(n1->get_id() == "n1");
+  REQUIRE(n1->get_parent_at_level(1)->get_id() == n1->get_parent()->get_id());
 
   // // Make sure the edge propigate properly.
   // REQUIRE("m1, m3" == print_node_ids(n1->get_edges_of_type(1,0)));
@@ -292,39 +292,39 @@ TEST_CASE("Edge count gathering (unipartite)", "[Node]")
 //   b12->set_parent(b21.get());
 
 //   // Get basic info out of the nodes
-//   REQUIRE(a1->degree == 2);
-//   REQUIRE(a2->degree == 2);
-//   REQUIRE(a3->degree == 2);
+//   REQUIRE(a1->get_degree() == 2);
+//   REQUIRE(a2->get_degree() == 2);
+//   REQUIRE(a3->get_degree() == 2);
 
 
-//   REQUIRE(b1->degree == 2);
-//   REQUIRE(b2->degree == 3);
-//   REQUIRE(b3->degree == 1);
+//   REQUIRE(b1->get_degree() == 2);
+//   REQUIRE(b2->get_degree() == 3);
+//   REQUIRE(b3->get_degree() == 1);
 
-//   REQUIRE(a11->degree == 2);
-//   REQUIRE(a12->degree == 4);
-//   REQUIRE(b11->degree == 5);
-//   REQUIRE(b12->degree == 1);
-//   REQUIRE(a21->degree == 6);
-//   REQUIRE(b21->degree == 6);
+//   REQUIRE(a11->get_degree() == 2);
+//   REQUIRE(a12->get_degree() == 4);
+//   REQUIRE(b11->get_degree() == 5);
+//   REQUIRE(b12->get_degree() == 1);
+//   REQUIRE(a21->get_degree() == 6);
+//   REQUIRE(b21->get_degree() == 6);
 
 //   // Swap parents of a2 and b2 nodes
 //   a2->set_parent(a11.get());
 //   b2->set_parent(b12.get());
 
 //   // Make sure that the degrees correctly reflect change
-//   REQUIRE(a1->degree == 2);
-//   REQUIRE(a2->degree == 2);
-//   REQUIRE(a3->degree == 2);
+//   REQUIRE(a1->get_degree() == 2);
+//   REQUIRE(a2->get_degree() == 2);
+//   REQUIRE(a3->get_degree() == 2);
 
-//   REQUIRE(b1->degree == 2);
-//   REQUIRE(b2->degree == 3);
-//   REQUIRE(b3->degree == 1);
+//   REQUIRE(b1->get_degree() == 2);
+//   REQUIRE(b2->get_degree() == 3);
+//   REQUIRE(b3->get_degree() == 1);
 
-//   REQUIRE(a11->degree == 4);
-//   REQUIRE(a12->degree == 2);
-//   REQUIRE(b11->degree == 2);
-//   REQUIRE(b12->degree == 4);
-//   REQUIRE(a21->degree == 6);
-//   REQUIRE(b21->degree == 6);
+//   REQUIRE(a11->get_degree() == 4);
+//   REQUIRE(a12->get_degree() == 2);
+//   REQUIRE(b11->get_degree() == 2);
+//   REQUIRE(b12->get_degree() == 4);
+//   REQUIRE(a21->get_degree() == 6);
+//   REQUIRE(b21->get_degree() == 6);
 // }

@@ -15,15 +15,15 @@ TEST_CASE("Edge attributes filled in properly", "[Edge]")
   const Edge n1_to_n2 = Edge(n1.get(), n2.get());
 
   // Make sure that n1 is chosen as node_a (aka the first in alphabetical order)
-  REQUIRE(n1_to_n2.node_a->id == "n1");
-  REQUIRE(n1_to_n2.node_b->id == "n2");
+  REQUIRE(n1_to_n2.node_a->get_id() == "n1");
+  REQUIRE(n1_to_n2.node_b->get_id() == "n2");
 
   // Make sure that the construction of the string for the edge id went okay
   REQUIRE(n1_to_n2.pair_id == "n1--n2");
 
   // Make sure that we can project the edge to the next level and it works properly
   const Edge edge_at_l1 = n1_to_n2.at_level(1);
-  REQUIRE(edge_at_l1.node_a->id == "a1");
-  REQUIRE(edge_at_l1.node_b->id == "b1");
+  REQUIRE(edge_at_l1.node_a->get_id() == "a1");
+  REQUIRE(edge_at_l1.node_b->get_id() == "b1");
   REQUIRE(edge_at_l1.pair_id == "a1--b1");
 }
