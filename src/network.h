@@ -264,10 +264,10 @@ class SBM_Network {
 
     // Build a map to get nodes by id
     String_Map<Node*> node_by_id;
-    for_all_nodes([&node_by_id](const Node_UPtr& node) {
+    auto add_node_to_map = [&node_by_id](const Node_UPtr& node) {
       node_by_id[node->get_id()] = node.get();
-    },
-                  false);
+    };
+    for_all_nodes(add_node_to_map, false);
 
     // Setup map to get blocks/parents by id
     String_Map<Node*> block_by_id;
@@ -299,7 +299,7 @@ class SBM_Network {
       if (parent_it == block_by_id.end()) {
         // If this block is newly seen, create it
         const int type_i = get_type_index(type);
-        get_nodes_of_type(type, level + 1).emplace_back(new Node(parent, type_i, level + 1, num_types()));
+        get_nodes_of_type(type_i, level + 1).emplace_back(new Node(parent, type_i, level + 1, num_types()));
         parent_it = block_by_id.find(parent); // refind block
       }
       Node* parent_node = parent_it->second;
