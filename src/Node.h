@@ -37,13 +37,10 @@ class Node {
   Node* parent = nullptr; // What node contains this node (aka its cluster)
   Edges_By_Type edges;
   Node_Vec children; // Nodes that are contained within node (if node is cluster)
-  int degree = 0; // How many edges/ edges does this node have?
-  std::string id; // Unique integer id for node
-  int type;       // What type of node is this?
-  int level;      // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
-
-
-  bool have_parent() { return parent != nullptr; }
+  int degree = 0;    // How many edges/ edges does this node have?
+  std::string id;    // Unique integer id for node
+  int type;          // What type of node is this?
+  int level;         // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
 
   public:
   // =========================================================================
@@ -65,7 +62,7 @@ class Node {
   }
 
   // =========================================================================
-  // Constant attribute getters - these are static after node creation 
+  // Constant attribute getters - these are static after node creation
   // =========================================================================
   std::string get_id() const { return id; }
   int get_type() const { return type; }
@@ -79,7 +76,6 @@ class Node {
   // Move operations
   Node(Node&&)  = delete;
   Node& operator=(Node&&) = delete;
-
 
   // =========================================================================
   // Children-Related methods
@@ -129,7 +125,7 @@ class Node {
     }
 
     // Remove self from previous parents children list (if it existed)
-    if (have_parent())
+    if (parent != nullptr)
       parent->remove_child(this);
 
     // Add this node to new parent's children list
@@ -163,7 +159,10 @@ class Node {
     return current_node;
   }
 
-  Node* get_parent() const { return parent; }
+  Node* get_parent() const
+  {
+    return parent;
+  }
 
   // =========================================================================
   // Edge-Related methods
