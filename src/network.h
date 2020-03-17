@@ -20,6 +20,7 @@ struct State_Dump {
     parents.reserve(size);
     levels.reserve(size);
   }
+  int size() const { return ids.size(); }
 };
 
 class SBM_Network {
@@ -113,9 +114,7 @@ class SBM_Network {
     return types.size();
   }
 
-  // =============================================================================
   // Export current state of nodes in model
-  // =============================================================================
   State_Dump get_state() const
   {
     // Initialize the return struct
@@ -124,7 +123,7 @@ class SBM_Network {
     // Loop through levels
     for (int level = 0; level < nodes.size(); level++) {
       for (int type_i = 0; type_i < num_types(); type_i++) {
-        const string& type_name = types[type_i++];
+        const string& type_name = types[type_i];
         for (const auto& node : nodes.at(level).at(type_i)) {
           state.ids.push_back(node->get_id());
           state.types.push_back(type_name);
