@@ -10,7 +10,7 @@ namespace Rcpp {
   template <> SEXP wrap(const BlockEdgeCounts&);
   template <> SEXP wrap(const MCMC_Sweeps&);
   template <> SEXP wrap(const CollapseResults&);
-  template <> SEXP wrap(const NodeEdgeMap&);
+  template <> SEXP wrap(const Edge_Count_Map&);
 }
 
 using namespace Rcpp;
@@ -131,7 +131,7 @@ SEXP wrap(const CollapseResults& collapse_results)
 }
 
 template <>
-SEXP wrap(const NodeEdgeMap& node_connections)
+SEXP wrap(const Edge_Count_Map& node_connections)
 {
   const int n_connections = node_connections.size();
 

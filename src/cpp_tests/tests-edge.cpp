@@ -3,10 +3,10 @@
 
 TEST_CASE("Edge attributes filled in properly", "[Edge]")
 {
-  NodeUPtr n1 = NodeUPtr( new Node{"n1", 0, 2});
-  NodeUPtr n2 = NodeUPtr( new Node{"n2", 0, 2});
-  NodeUPtr a1 = NodeUPtr( new Node{"a1", 1, 2});
-  NodeUPtr b1 = NodeUPtr( new Node{"b1", 1, 2});
+  Node_UPtr n1 = Node_UPtr( new Node{"n1", 0, 2});
+  Node_UPtr n2 = Node_UPtr( new Node{"n2", 0, 2});
+  Node_UPtr a1 = Node_UPtr( new Node{"a1", 1, 2});
+  Node_UPtr b1 = Node_UPtr( new Node{"b1", 1, 2});
  
   n1->set_parent(b1.get());
   n2->set_parent(a1.get());

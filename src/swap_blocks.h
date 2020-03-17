@@ -5,7 +5,7 @@
 
 void swap_blocks(Node* child_node,
                  Node* new_block,
-                 std::vector<NodeUPtr>& block_holder,
+                 std::vector<Node_UPtr>& block_holder,
                  const bool remove_empty = true)
 {
   Node* old_block          = child_node->get_parent();

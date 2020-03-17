@@ -5,8 +5,8 @@
 #include "unordered_map"
 #include "vector_helpers.h"
 
-using NodeUPtr_Vec = std::vector<NodeUPtr>;
-using Type_Vec = std::vector<std::vector<NodeUPtr>>;
+using Node_UPtr_Vec = std::vector<Node_UPtr>;
+using Type_Vec = std::vector<std::vector<Node_UPtr>>;
 
 
 class SBM_Network {
@@ -75,7 +75,7 @@ class SBM_Network {
     const int type_index = get_type_index(type);
 
     // Build new node pointer outside of vector first for ease of pointer retrieval
-    auto new_node = NodeUPtr(new Node(id, level, type_index, num_types()));
+    auto new_node = Node_UPtr(new Node(id, level, type_index, num_types()));
 
     // Get raw pointer to node to return
     Node* node_ptr = new_node.get();
@@ -97,8 +97,8 @@ class SBM_Network {
 
     // Loop over all node types present in previous level
     for (int type_i = 0; type_i < child_nodes.size(); type_i++) {
-      NodeUPtr_Vec& nodes_of_type  = child_nodes[type_i];
-      NodeUPtr_Vec& blocks_of_type = block_nodes[type_i];
+      Node_UPtr_Vec& nodes_of_type  = child_nodes[type_i];
+      Node_UPtr_Vec& blocks_of_type = block_nodes[type_i];
 
       // If we're in the 1-block-per-node mode make sure we reflect that in reserved size
       if (one_block_per_node)
@@ -142,12 +142,12 @@ class SBM_Network {
   }
 
   // Getters
-  NodeUPtr_Vec& get_nodes_of_type(const std::string& type, const int level = 0)
+  Node_UPtr_Vec& get_nodes_of_type(const std::string& type, const int level = 0)
   {
     return get_nodes_of_type(get_type_index(type), level);
   }
 
-  NodeUPtr_Vec& get_nodes_of_type(const int type_index, const int level = 0)
+  Node_UPtr_Vec& get_nodes_of_type(const int type_index, const int level = 0)
   {
     Type_Vec& node_holder = get_nodes_at_level(level);
 

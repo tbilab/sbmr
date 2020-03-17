@@ -54,20 +54,3 @@ inline std::string print_node_ids(Node_Container nodes)
 }
 
 
-// =======================================================
-// Map version
-inline std::string print_node_ids(NodeLevel nodes)
-{
-  // Vector of node ids to be filled in
-  std::vector<std::string> node_ids;
-
-  // Add node ids to containing vector
-  for (auto node_it = nodes.begin();
-       node_it != nodes.end();
-       ++node_it) {
-    // Append node id to return string.
-    node_ids.push_back(node_it->second->id);
-  }
-
-  return print_ids_to_string(node_ids);
-}

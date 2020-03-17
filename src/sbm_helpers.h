@@ -16,7 +16,7 @@ inline double partial_entropy(const double& a,
   return a * std::log(a / (b * c));
 }
 
-inline int get_edge_counts(const NodeEdgeMap& node_cons, const NodePtr& neighbor)
+inline int get_edge_counts(const Edge_Count_Map& node_cons, const NodePtr& neighbor)
 {
   // Search the node being moved to's connections for the current neighbor
   const auto count_to_neighbor_it = node_cons.find(neighbor);

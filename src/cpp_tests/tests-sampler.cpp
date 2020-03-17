@@ -81,18 +81,18 @@ TEST_CASE("Node list and vector sampling", "[Sampler]")
   Sampler sampler_2(42);
 
   // Build three nodes
-  NodeUPtr n1 = NodeUPtr(new Node { "n1", 0, 1 });
-  NodeUPtr n2 = NodeUPtr(new Node { "n2", 0, 1 });
-  NodeUPtr n3 = NodeUPtr(new Node { "n3", 0, 1 });
+  Node_UPtr n1 = Node_UPtr(new Node { "n1", 0, 1 });
+  Node_UPtr n2 = Node_UPtr(new Node { "n2", 0, 1 });
+  Node_UPtr n3 = Node_UPtr(new Node { "n3", 0, 1 });
 
   // Add three nodes to a list
-  NodeList nodes_list;
+  Node_Vec nodes_list;
   nodes_list.push_back(n1.get());
   nodes_list.push_back(n2.get());
   nodes_list.push_back(n3.get());
 
   // Add three nodes to vector
-  NodeVec nodes_vec;
+  Node_Vec nodes_vec;
   nodes_vec.push_back(n1.get());
   nodes_vec.push_back(n2.get());
   nodes_vec.push_back(n3.get());
@@ -146,10 +146,10 @@ TEST_CASE("Node vector shuffling respects seeds", "[Sampler]")
   Sampler sampler_2(42);
   Sampler sampler_3(312);
 
-  std::vector<NodeUPtr> nodes_master;
-  NodeVec nodes_vec1;
-  NodeVec nodes_vec2;
-  NodeVec nodes_vec3;
+  std::vector<Node_UPtr> nodes_master;
+  Node_Vec nodes_vec1;
+  Node_Vec nodes_vec2;
+  Node_Vec nodes_vec3;
   nodes_master.reserve(num_nodes);
   nodes_vec1.reserve(num_nodes);
   nodes_vec2.reserve(num_nodes);
