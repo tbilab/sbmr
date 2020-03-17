@@ -166,8 +166,8 @@ TEST_CASE("Swapping of blocks", "[Network]")
   REQUIRE(my_net.num_nodes_of_type("m", 1) == 3);
 
   // Merge second node into first nodes block
-  Node* node2 = my_net.get_nodes_of_type("n")[1].get();
-  Node* block1 = my_net.get_nodes_of_type("n")[0]->get_parent();
+  Node* node2 = my_net.get_node_by_id("n2", "n");
+  Node* block1 = my_net.get_node_by_id("n1", "n")->get_parent();
 
   swap_blocks(node2,
               block1,
@@ -186,6 +186,97 @@ TEST_CASE("Swapping of blocks", "[Network]")
   // There should be no change in the number of blocks
   REQUIRE(my_net.num_nodes_of_type("m", 1) == 3);
 }
+
+bool state_has_entry(const State_Dump& state,
+                     const string& id,
+                     const string& type)
+{
+  for (int i = 0; i < state.size(); i++) {
+    if (state.ids[i] == id && state.types[i] == type) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void print_state(const State_Dump& state)
+{
+  for (int i = 0; i < state.size(); i++) {
+    OUT_MSG << "id: " << state.ids[i]
+            << ", type: " << state.types[i]
+            << ", parent: " << state.parents[i]
+            << ", level: " << state.levels[i]
+            << std::endl;
+  }
+}
+
+int index_of_node(const State_Dump& state, const string& node_id){
+  for (int i = 0; i < state.size(); i++)
+  {
+    if (state.ids[i] == node_id) return i;
+  } 
+  RANGE_ERROR ("Could not find node.");
+  return -1;
+}
+
+TEST_CASE("State dumping and restoring", "[Network")
+{
+  SBM_Network my_net({"a", "b"}, 42);
+
+  // Start with a few nodes in the network
+  my_net.add_node("a1", "a");
+  my_net.add_node("a2", "a");
+  my_net.add_node("a3", "a");
+
+  my_net.add_node("b1", "b");
+  my_net.add_node("b2", "b");
+  my_net.add_node("b3", "b");
+
+  // Give every node its own block
+  my_net.initialize_blocks();
+
+  // Dump model state
+  State_Dump state1 = my_net.get_state();
+  
+  // Test state dump is in correct form
+  REQUIRE(state_has_entry(state1, "a1", "a"));
+  REQUIRE(state_has_entry(state1, "a2", "a"));
+  REQUIRE(state_has_entry(state1, "a3", "a"));
+  REQUIRE(state_has_entry(state1, "b1", "b"));
+  REQUIRE(state_has_entry(state1, "b2", "b"));
+  REQUIRE(state_has_entry(state1, "b3", "b"));
+
+  // Make note of node 1s parent in first state
+  const string a1_parent = state1.parents[index_of_node(state1, "a1")];
+
+
+  // // Now give node a1 a different parent
+  // NodePtr a14 = my_net.add_node("a14", "a", 1);
+  // a1->set_parent(a14);
+
+  // // Dump model state again
+  // State_Dump state2 = my_net.get_state();
+
+  // // Make sure new parent for a1 is reflected in new state dump
+  // REQUIRE(
+  //     print_ids_to_string(state2.id) == "a1, a11, a12, a13, a14, a2, a3, b1, b11, b12, b13, b2, b3");
+
+  // REQUIRE(
+  //     print_ids_to_string(state2.parent) == "a12, a13, a14, b11, b12, b13, none, none, none, none, none, none, none");
+
+  // // Now restore model to pre a1->a14 move state
+  // my_net.set_state(state1.id, state1.parent, state1.level, state1.type);
+ 
+  // State_Dump state3 = my_net.get_state();
+
+  // // Make sure state dumps 1 and 3 match state dump is in correct form
+  // REQUIRE(
+  //     print_ids_to_string(state1.id) == print_ids_to_string(state3.id));
+
+  // REQUIRE(
+  //     print_ids_to_string(state1.parent) == print_ids_to_string(state3.parent));
+}
+
 
 
 
@@ -373,69 +464,3 @@ TEST_CASE("Swapping of blocks", "[Network]")
 // //   REQUIRE(a22_edges_new[b22] == 2);
 // // }
 
-// // TEST_CASE("State dumping and restoring", "[Network")
-// // {
-// //   SBM my_net;
-
-// //   // Start with a few nodes in the network
-// //   NodePtr a1 = my_net.add_node("a1", "a");
-// //   NodePtr a2 = my_net.add_node("a2", "a");
-// //   NodePtr a3 = my_net.add_node("a3", "a");
-
-// //   NodePtr b1 = my_net.add_node("b1", "b");
-// //   NodePtr b2 = my_net.add_node("b2", "b");
-// //   NodePtr b3 = my_net.add_node("b3", "b");
-
-// //   NodePtr a11 = my_net.add_node("a11", "a", 1);
-// //   NodePtr a12 = my_net.add_node("a12", "a", 1);
-// //   NodePtr a13 = my_net.add_node("a13", "a", 1);
-
-// //   NodePtr b11 = my_net.add_node("b11", "b", 1);
-// //   NodePtr b12 = my_net.add_node("b12", "b", 1);
-// //   NodePtr b13 = my_net.add_node("b13", "b", 1);
-
-// //   // Assign simple block structure
-// //   a1->set_parent(a11);
-// //   a2->set_parent(a12);
-// //   a3->set_parent(a13);
-
-// //   b1->set_parent(b11);
-// //   b2->set_parent(b12);
-// //   b3->set_parent(b13);
-
-// //   // Dump model state
-// //   State_Dump state1 = my_net.get_state();
-
-// //   // Test state dump is in correct form
-// //   REQUIRE(
-// //       print_ids_to_string(state1.id) == "a1, a11, a12, a13, a2, a3, b1, b11, b12, b13, b2, b3");
-
-// //   REQUIRE(
-// //       print_ids_to_string(state1.parent) == "a11, a12, a13, b11, b12, b13, none, none, none, none, none, none");
-
-// //   // Now give node a1 a different parent
-// //   NodePtr a14 = my_net.add_node("a14", "a", 1);
-// //   a1->set_parent(a14);
-
-// //   // Dump model state again
-// //   State_Dump state2 = my_net.get_state();
-
-// //   // Make sure new parent for a1 is reflected in new state dump
-// //   REQUIRE(
-// //       print_ids_to_string(state2.id) == "a1, a11, a12, a13, a14, a2, a3, b1, b11, b12, b13, b2, b3");
-
-// //   REQUIRE(
-// //       print_ids_to_string(state2.parent) == "a12, a13, a14, b11, b12, b13, none, none, none, none, none, none, none");
-
-// //   // Now restore model to pre a1->a14 move state
-// //   my_net.set_state(state1.id, state1.parent, state1.level, state1.type);
- 
-// //   State_Dump state3 = my_net.get_state();
-
-// //   // Make sure state dumps 1 and 3 match state dump is in correct form
-// //   REQUIRE(
-// //       print_ids_to_string(state1.id) == print_ids_to_string(state3.id));
-
-// //   REQUIRE(
-// //       print_ids_to_string(state1.parent) == print_ids_to_string(state3.parent));
-// // }
