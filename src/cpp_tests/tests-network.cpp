@@ -18,185 +18,226 @@ TEST_CASE("Basic initialization of network", "[Network]")
   my_net.add_node("m4", "m");
   
 
-//   // Create a block node
-//   my_net.create_block_node("n", 1);
-//   my_net.create_block_node("m", 1);
+  // Create a block node
+  my_net.create_block_node("n", 1);
+  my_net.create_block_node("m", 1);
 
-//   // How many nodes at the 'data' level do we have?
-//   REQUIRE(my_net.nodes.at(0)->size() == 7);
+  // How many nodes at the 'data' level do we have?
+  REQUIRE(my_net.nodes.at(0)->size() == 7);
 
-//   REQUIRE(
-//       print_node_ids(*my_net.nodes.at(0)) == "m1, m2, m3, m4, n1, n2, n3");
+  REQUIRE(
+      print_node_ids(*my_net.nodes.at(0)) == "m1, m2, m3, m4, n1, n2, n3");
 
-//   // We should have two levels
-//   REQUIRE(my_net.nodes.size() == 2);
+  // We should have two levels
+  REQUIRE(my_net.nodes.size() == 2);
 
-//   // Group name convention <type>-<level>_<id>
-//   REQUIRE(
-//       print_node_ids(*my_net.nodes.at(1)) == "m-1_1, n-1_0");
+  // Group name convention <type>-<level>_<id>
+  REQUIRE(
+      print_node_ids(*my_net.nodes.at(1)) == "m-1_1, n-1_0");
 
-//   // Filter to a given node type
-//   REQUIRE(
-//       "n1, n2, n3" == print_node_ids(my_net.get_nodes_of_type_at_level("n", 0)));
-//   REQUIRE(
-//       "m1, m2, m3, m4" == print_node_ids(my_net.get_nodes_of_type_at_level("m", 0)));
-//   REQUIRE(
-//       "m-1_1" == print_node_ids(my_net.get_nodes_of_type_at_level("m", 1)));
+  // Filter to a given node type
+  REQUIRE(
+      "n1, n2, n3" == print_node_ids(my_net.get_nodes_of_type_at_level("n", 0)));
+  REQUIRE(
+      "m1, m2, m3, m4" == print_node_ids(my_net.get_nodes_of_type_at_level("m", 0)));
+  REQUIRE(
+      "m-1_1" == print_node_ids(my_net.get_nodes_of_type_at_level("m", 1)));
 
-//   // Get number of levels
-//   REQUIRE(my_net.nodes.size() == 2);
+  // Get number of levels
+  REQUIRE(my_net.nodes.size() == 2);
 
-//   // There should be two types of print_node_ids(*my_net.nodes.at(0))nodes
-//   REQUIRE(my_net.node_type_counts.size() == 2);
+  // There should be two types of print_node_ids(*my_net.nodes.at(0))nodes
+  REQUIRE(my_net.node_type_counts.size() == 2);
 }
 
-// TEST_CASE("Tracking node types", "[Network]")
-// {
-//   SBM my_net;
+TEST_CASE("Initializing a block for every node", "[Network]")
+{
+  SBM my_net;
 
-//   // Add some nodes to Network
-//   my_net.add_node("n1", "n");
-//   my_net.add_node("n2", "n");
+  my_net.add_node("a1", "a");
+  my_net.add_node("a2", "a");
+  my_net.add_node("a3", "a");
+  my_net.add_node("a4", "a");
+  my_net.add_node("a5", "a");
+  my_net.add_node("a10", "a");
+  my_net.add_node("a11", "a");
+  my_net.add_node("a13", "a");
+  my_net.add_node("a14", "a");
+  my_net.add_node("a6", "a");
+  my_net.add_node("a7", "a");
+  my_net.add_node("a8", "a");
+  my_net.add_node("a9", "a");
+  my_net.add_node("a12", "a");
+  my_net.add_node("b1", "b");
+  my_net.add_node("b2", "b");
+  my_net.add_node("b3", "b");
+  my_net.add_node("b4", "b");
 
-//   // There should only be one type of node so far
-//   REQUIRE(1 == my_net.node_type_counts.size());
+  // There should be a total of 18 nodes at base level
+  REQUIRE(18 == my_net.get_level(0)->size());
 
-//   my_net.add_node("m1", "m");
+  // And zero nodes at the block level
+  REQUIRE(0 == my_net.get_level(1)->size());
 
-//   // There should now be two types of nodes
-//   REQUIRE(2 == my_net.node_type_counts.size());
+  // Now assignin every node their own parent block
+  my_net.initialize_blocks(0);
 
-//   my_net.add_node("m2", "m");
-//   my_net.add_node("n3", "n");
+  // There should now be a total of 18 nodes at level 1
+  REQUIRE(18 == my_net.get_level(1)->size());
 
-//   // There should still just be two types of nodes
-//   REQUIRE(2 == my_net.node_type_counts.size());
+}
 
-//   my_net.add_node("m3", "m");
-//   my_net.add_node("o1", "o");
-//   my_net.add_node("o2", "o");
+TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
+{
+  SBM my_net;
 
-//   // There should now be three types of nodes
-//   REQUIRE(3 == my_net.node_type_counts.size());
-// }
+  my_net.add_node("a1", "a");
+  my_net.add_node("a2", "a");
+  my_net.add_node("a3", "a");
+  my_net.add_node("a4", "a");
+  my_net.add_node("a5", "a");
+  my_net.add_node("a6", "a");
+  my_net.add_node("a7", "a");
+  my_net.add_node("a8", "a");
+  my_net.add_node("a9", "a");
+  my_net.add_node("a10", "a");
 
-// TEST_CASE("Initializing a block for every node", "[Network]")
-// {
-//   SBM my_net;
+  my_net.add_node("b1", "b");
+  my_net.add_node("b2", "b");
+  my_net.add_node("b3", "b");
+  my_net.add_node("b4", "b");
+  my_net.add_node("b5", "b");
+  my_net.add_node("b6", "b");
+  my_net.add_node("b7", "b");
+  my_net.add_node("b8", "b");
+  my_net.add_node("b9", "b");
+  my_net.add_node("b10", "b");
 
-//   my_net.add_node("a1", "a");
-//   my_net.add_node("a2", "a");
-//   my_net.add_node("a3", "a");
-//   my_net.add_node("a4", "a");
-//   my_net.add_node("a5", "a");
-//   my_net.add_node("a10", "a");
-//   my_net.add_node("a11", "a");
-//   my_net.add_node("a13", "a");
-//   my_net.add_node("a14", "a");
-//   my_net.add_node("a6", "a");
-//   my_net.add_node("a7", "a");
-//   my_net.add_node("a8", "a");
-//   my_net.add_node("a9", "a");
-//   my_net.add_node("a12", "a");
-//   my_net.add_node("b1", "b");
-//   my_net.add_node("b2", "b");
-//   my_net.add_node("b3", "b");
-//   my_net.add_node("b4", "b");
+  // Distribute 3 total blocks for each type across nodes randomly
+  my_net.initialize_blocks(0, 3);
 
-//   // There should be a total of 18 nodes at base level
-//   REQUIRE(18 == my_net.get_level(0)->size());
+  // There should now be 6 or fewer nodes at level 1
+  REQUIRE(my_net.get_level(1)->size() <= 6);
+}
 
-//   // And zero nodes at the block level
-//   REQUIRE(0 == my_net.get_level(1)->size());
+TEST_CASE("Cleaning up empty blocks", "[Network]")
+{
+  SBM my_net;
 
-//   // Now assignin every node their own parent block
-//   my_net.initialize_blocks(0);
+  // Start with a few nodes in the network
+  NodePtr n1 = my_net.add_node("n1", "a");
+  NodePtr n2 = my_net.add_node("n2", "a");
+  NodePtr n3 = my_net.add_node("n3", "a");
+  NodePtr n4 = my_net.add_node("n4", "a");
 
-//   // There should now be a total of 18 nodes at level 1
-//   REQUIRE(18 == my_net.get_level(1)->size());
+  // Create a few block nodes at first level
+  NodePtr g1_1 = my_net.create_block_node("a", 1);
+  NodePtr g1_2 = my_net.create_block_node("a", 1);
+  NodePtr g1_3 = my_net.create_block_node("a", 1);
+  NodePtr g1_4 = my_net.create_block_node("a", 1);
 
-// }
+  // Create two blocks for second level
+  NodePtr g2_1 = my_net.create_block_node("a", 2);
+  NodePtr g2_2 = my_net.create_block_node("a", 2);
 
-// TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
-// {
-//   SBM my_net;
+  // Add children to blocks 1 and two at first level
+  n1->set_parent(g1_1);
+  n2->set_parent(g1_1);
+  n3->set_parent(g1_2);
+  n4->set_parent(g1_2);
 
-//   my_net.add_node("a1", "a");
-//   my_net.add_node("a2", "a");
-//   my_net.add_node("a3", "a");
-//   my_net.add_node("a4", "a");
-//   my_net.add_node("a5", "a");
-//   my_net.add_node("a6", "a");
-//   my_net.add_node("a7", "a");
-//   my_net.add_node("a8", "a");
-//   my_net.add_node("a9", "a");
-//   my_net.add_node("a10", "a");
+  // Add children to both level two blocks
+  g1_1->set_parent(g2_1);
+  g1_2->set_parent(g2_1);
+  g1_3->set_parent(g2_1);
+  g1_4->set_parent(g2_2);
 
-//   my_net.add_node("b1", "b");
-//   my_net.add_node("b2", "b");
-//   my_net.add_node("b3", "b");
-//   my_net.add_node("b4", "b");
-//   my_net.add_node("b5", "b");
-//   my_net.add_node("b6", "b");
-//   my_net.add_node("b7", "b");
-//   my_net.add_node("b8", "b");
-//   my_net.add_node("b9", "b");
-//   my_net.add_node("b10", "b");
+  // Make sure our SBM is the proper size
+  REQUIRE(3 == my_net.nodes.size());
+  REQUIRE(4 == my_net.nodes.at(0)->size());
+  REQUIRE(4 == my_net.nodes.at(1)->size());
+  REQUIRE(2 == my_net.nodes.at(2)->size());
 
-//   // Distribute 3 total blocks for each type across nodes randomly
-//   my_net.initialize_blocks(0, 3);
+  // Run block cleanup
+  my_net.clean_empty_blocks();
 
-//   // There should now be 6 or fewer nodes at level 1
-//   REQUIRE(my_net.get_level(1)->size() <= 6);
-// }
+  // Two should have been taken from the first block level
+  REQUIRE(2 == my_net.nodes.at(1)->size());
 
-// TEST_CASE("Cleaning up empty blocks", "[Network]")
+  // And 1 should have been taken from the second block level
+  REQUIRE(1 == my_net.nodes.at(2)->size());
+}
+
+
+
+// TEST_CASE("State dumping and restoring", "[Network")
 // {
 //   SBM my_net;
 
 //   // Start with a few nodes in the network
-//   NodePtr n1 = my_net.add_node("n1", "a");
-//   NodePtr n2 = my_net.add_node("n2", "a");
-//   NodePtr n3 = my_net.add_node("n3", "a");
-//   NodePtr n4 = my_net.add_node("n4", "a");
+//   NodePtr a1 = my_net.add_node("a1", "a");
+//   NodePtr a2 = my_net.add_node("a2", "a");
+//   NodePtr a3 = my_net.add_node("a3", "a");
 
-//   // Create a few block nodes at first level
-//   NodePtr g1_1 = my_net.create_block_node("a", 1);
-//   NodePtr g1_2 = my_net.create_block_node("a", 1);
-//   NodePtr g1_3 = my_net.create_block_node("a", 1);
-//   NodePtr g1_4 = my_net.create_block_node("a", 1);
+//   NodePtr b1 = my_net.add_node("b1", "b");
+//   NodePtr b2 = my_net.add_node("b2", "b");
+//   NodePtr b3 = my_net.add_node("b3", "b");
 
-//   // Create two blocks for second level
-//   NodePtr g2_1 = my_net.create_block_node("a", 2);
-//   NodePtr g2_2 = my_net.create_block_node("a", 2);
+//   NodePtr a11 = my_net.add_node("a11", "a", 1);
+//   NodePtr a12 = my_net.add_node("a12", "a", 1);
+//   NodePtr a13 = my_net.add_node("a13", "a", 1);
 
-//   // Add children to blocks 1 and two at first level
-//   n1->set_parent(g1_1);
-//   n2->set_parent(g1_1);
-//   n3->set_parent(g1_2);
-//   n4->set_parent(g1_2);
+//   NodePtr b11 = my_net.add_node("b11", "b", 1);
+//   NodePtr b12 = my_net.add_node("b12", "b", 1);
+//   NodePtr b13 = my_net.add_node("b13", "b", 1);
 
-//   // Add children to both level two blocks
-//   g1_1->set_parent(g2_1);
-//   g1_2->set_parent(g2_1);
-//   g1_3->set_parent(g2_1);
-//   g1_4->set_parent(g2_2);
+//   // Assign simple block structure
+//   a1->set_parent(a11);
+//   a2->set_parent(a12);
+//   a3->set_parent(a13);
 
-//   // Make sure our SBM is the proper size
-//   REQUIRE(3 == my_net.nodes.size());
-//   REQUIRE(4 == my_net.nodes.at(0)->size());
-//   REQUIRE(4 == my_net.nodes.at(1)->size());
-//   REQUIRE(2 == my_net.nodes.at(2)->size());
+//   b1->set_parent(b11);
+//   b2->set_parent(b12);
+//   b3->set_parent(b13);
 
-//   // Run block cleanup
-//   my_net.clean_empty_blocks();
+//   // Dump model state
+//   State_Dump state1 = my_net.get_state();
 
-//   // Two should have been taken from the first block level
-//   REQUIRE(2 == my_net.nodes.at(1)->size());
+//   // Test state dump is in correct form
+//   REQUIRE(
+//       print_ids_to_string(state1.id) == "a1, a11, a12, a13, a2, a3, b1, b11, b12, b13, b2, b3");
 
-//   // And 1 should have been taken from the second block level
-//   REQUIRE(1 == my_net.nodes.at(2)->size());
+//   REQUIRE(
+//       print_ids_to_string(state1.parent) == "a11, a12, a13, b11, b12, b13, none, none, none, none, none, none");
+
+//   // Now give node a1 a different parent
+//   NodePtr a14 = my_net.add_node("a14", "a", 1);
+//   a1->set_parent(a14);
+
+//   // Dump model state again
+//   State_Dump state2 = my_net.get_state();
+
+//   // Make sure new parent for a1 is reflected in new state dump
+//   REQUIRE(
+//       print_ids_to_string(state2.id) == "a1, a11, a12, a13, a14, a2, a3, b1, b11, b12, b13, b2, b3");
+
+//   REQUIRE(
+//       print_ids_to_string(state2.parent) == "a12, a13, a14, b11, b12, b13, none, none, none, none, none, none, none");
+
+//   // Now restore model to pre a1->a14 move state
+//   my_net.set_state(state1.id, state1.parent, state1.level, state1.type);
+ 
+//   State_Dump state3 = my_net.get_state();
+
+//   // Make sure state dumps 1 and 3 match state dump is in correct form
+//   REQUIRE(
+//       print_ids_to_string(state1.id) == print_ids_to_string(state3.id));
+
+//   REQUIRE(
+//       print_ids_to_string(state1.parent) == print_ids_to_string(state3.parent));
 // }
+
+
 
 // TEST_CASE("Counting edges", "[Network]")
 // {
@@ -380,71 +421,4 @@ TEST_CASE("Basic initialization of network", "[Network]")
 //   auto a22_edges_new = a22->gather_edges_to_level(2);
 //   REQUIRE(a22_edges_new[b21] == 2);
 //   REQUIRE(a22_edges_new[b22] == 2);
-// }
-
-// TEST_CASE("State dumping and restoring", "[Network")
-// {
-//   SBM my_net;
-
-//   // Start with a few nodes in the network
-//   NodePtr a1 = my_net.add_node("a1", "a");
-//   NodePtr a2 = my_net.add_node("a2", "a");
-//   NodePtr a3 = my_net.add_node("a3", "a");
-
-//   NodePtr b1 = my_net.add_node("b1", "b");
-//   NodePtr b2 = my_net.add_node("b2", "b");
-//   NodePtr b3 = my_net.add_node("b3", "b");
-
-//   NodePtr a11 = my_net.add_node("a11", "a", 1);
-//   NodePtr a12 = my_net.add_node("a12", "a", 1);
-//   NodePtr a13 = my_net.add_node("a13", "a", 1);
-
-//   NodePtr b11 = my_net.add_node("b11", "b", 1);
-//   NodePtr b12 = my_net.add_node("b12", "b", 1);
-//   NodePtr b13 = my_net.add_node("b13", "b", 1);
-
-//   // Assign simple block structure
-//   a1->set_parent(a11);
-//   a2->set_parent(a12);
-//   a3->set_parent(a13);
-
-//   b1->set_parent(b11);
-//   b2->set_parent(b12);
-//   b3->set_parent(b13);
-
-//   // Dump model state
-//   State_Dump state1 = my_net.get_state();
-
-//   // Test state dump is in correct form
-//   REQUIRE(
-//       print_ids_to_string(state1.id) == "a1, a11, a12, a13, a2, a3, b1, b11, b12, b13, b2, b3");
-
-//   REQUIRE(
-//       print_ids_to_string(state1.parent) == "a11, a12, a13, b11, b12, b13, none, none, none, none, none, none");
-
-//   // Now give node a1 a different parent
-//   NodePtr a14 = my_net.add_node("a14", "a", 1);
-//   a1->set_parent(a14);
-
-//   // Dump model state again
-//   State_Dump state2 = my_net.get_state();
-
-//   // Make sure new parent for a1 is reflected in new state dump
-//   REQUIRE(
-//       print_ids_to_string(state2.id) == "a1, a11, a12, a13, a14, a2, a3, b1, b11, b12, b13, b2, b3");
-
-//   REQUIRE(
-//       print_ids_to_string(state2.parent) == "a12, a13, a14, b11, b12, b13, none, none, none, none, none, none, none");
-
-//   // Now restore model to pre a1->a14 move state
-//   my_net.set_state(state1.id, state1.parent, state1.level, state1.type);
- 
-//   State_Dump state3 = my_net.get_state();
-
-//   // Make sure state dumps 1 and 3 match state dump is in correct form
-//   REQUIRE(
-//       print_ids_to_string(state1.id) == print_ids_to_string(state3.id));
-
-//   REQUIRE(
-//       print_ids_to_string(state1.parent) == print_ids_to_string(state3.parent));
 // }
