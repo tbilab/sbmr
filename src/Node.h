@@ -75,7 +75,31 @@ class Node {
   int level;      // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
   int degree = 0; // How many edges/ edges does this node have?
 
-  // Methods
+  // =========================================================================
+  // Children-Related methods
+  // =========================================================================
+  void add_child(Node* child)
+  {
+    children.push_back(child);
+
+    // Add new child's edges
+    update_edges(child->all_edges(), Add);
+  }
+
+  void remove_child(Node* child)
+  {
+    delete_from_vector(children, child);
+
+    // Remove child's edges
+    update_edges(child->all_edges(), Remove);
+  }
+
+  int num_children() const { return children.size(); }
+
+  bool is_child(Node* node) const { return std::find(children.begin(), children.end(), node) != children.end(); }
+
+  // =========================================================================
+  // Parent-Related methods
   // =========================================================================
   void set_parent(Node* new_parent)
   {
@@ -86,15 +110,9 @@ class Node {
 
     // Remove self from previous parents children list (if it existed)
     if (have_parent()) {
-      // Remove this node's edges contribution from parent's
-      parent->update_edges(typed_edges, Remove);
-
       // Remove self from previous children
       parent->remove_child(this);
     }
-
-    // Add this node's edges to parent's degree count
-    new_parent->update_edges(typed_edges, Add);
 
     // Add this node to new parent's children list
     new_parent->add_child(this);
@@ -102,20 +120,6 @@ class Node {
     // Set this node's parent
     parent = new_parent;
   }
-
-  void add_child(Node* child)
-  {
-    children.push_back(child);
-  }
-
-  void remove_child(Node* child)
-  {
-    delete_from_vector(children, child);
-  }
-
-  int num_children() const { return children.size(); }
-
-  bool is_child(Node* node) const { return std::find(children.begin(), children.end(), node) != children.end(); }
 
   // Get parent of node at a given level
   Node* get_parent_at_level(const int level_of_parent)
@@ -186,6 +190,8 @@ class Node {
   {
     delete_from_vector(get_edges_of_type(node_to_remove->type), node_to_remove);
   }
+
+  Edges_By_Type& all_edges() { return typed_edges; }
 
   // =============================================================================
   // Add or remove edges from a nodes edge list
