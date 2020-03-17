@@ -213,13 +213,20 @@ class SBM_Network {
     return nodes.size() - 1;
   }
 
-  void delete_blocks()
+  void delete_block_level()
   {
     if (nodes.size() == 1)
       LOGIC_ERROR("No block level to delete.");
 
     // Remove the last layer of nodes.
     nodes.pop_back();
+  }
+
+  void delete_all_blocks()
+  {
+    while (num_levels() > 1) {
+      delete_block_level();
+    }
   }
 
   // =============================================================================
@@ -241,9 +248,14 @@ class SBM_Network {
 
       // If the level of the current entry has gone up
 
-      // If the new parent is "none", then no need to go further
+        // Swap the maps as the blocks are now the child nodes
 
-      // 
+      // Find current entry's node 
+
+      // Grab parent block pointer
+        // If it isn't in block map, make it
+
+      // Connect node and parent to eachother 
 
 
     // const int n = id.size();
