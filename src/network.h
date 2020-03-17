@@ -20,13 +20,6 @@ struct State_Dump {
     parents.reserve(size);
     levels.reserve(size);
   }
-  void add(const string& i, const string& t, const string& p, const int l)
-  {
-    ids.push_back(i);
-    types.push_back(t);
-    parents.push_back(p);
-    levels.push_back(l);
-  }
 };
 
 class SBM_Network {
@@ -135,10 +128,10 @@ class SBM_Network {
       for (int type_i = 0; type_i < num_types(); type_i++) {
         const string& type_name = types[type_i++];
         for (const auto& node : nodes.at(level).at(type_i)) {
-          state.add(node->get_id(),
-                    type_name,
-                    node->get_parent_id(),
-                    level);
+          state.ids.push_back(node->get_id());
+          state.types.push_back(type_name);
+          state.parents.push_back(node->get_parent_id());
+          state.levels.push_back(level);
         }
       }
     }
