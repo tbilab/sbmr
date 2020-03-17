@@ -39,7 +39,6 @@ class Node {
   Node_Vec children; // Nodes that are contained within node (if node is cluster)
   int degree = 0;    // How many edges/ edges does this node have?
   std::string id;    // Unique integer id for node
-  int index = -1;    // Relative index of this nodes creation (if block node)
   int type;          // What type of node is this?
   int level;         // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
 
@@ -66,7 +65,7 @@ class Node {
       : type(type)
       , level(level)
       , edges(num_types)
-      , index(i)
+      , id("b_" + as_str(i))
   {
   }
 
