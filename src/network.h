@@ -4,9 +4,13 @@
 #include "Sampler.h"
 #include "unordered_map"
 #include "vector_helpers.h"
+#include <unordered_map>
 
 using Node_UPtr_Vec = std::vector<Node_UPtr>;
 using Type_Vec      = std::vector<std::vector<Node_UPtr>>;
+
+template <typename T>
+using String_Map = std::unordered_map<string, T>;
 
 struct State_Dump {
   std::vector<string> ids;
@@ -115,27 +119,44 @@ class SBM_Network {
   }
 
   // Export current state of nodes in model
-  State_Dump get_state() const
+  State_Dump get_state()
   {
     // Initialize the return struct
     State_Dump state(num_nodes());
 
-    if (num_levels() == 1) LOGIC_ERROR("No state to export - Try adding blocks");
+    auto& type_to_str = types;
+    if (num_levels() == 1)
+      LOGIC_ERROR("No state to export - Try adding blocks");
 
-    // Loop through all levels that have blocks/parents
-    for (int level = 0; level < nodes.size() - 1; level++) {
-      for (int type_i = 0; type_i < num_types(); type_i++) {
-        const string& type_name = types[type_i];
-        for (const auto& node : nodes.at(level).at(type_i)) {
-          state.ids.push_back(node->get_id());
-          state.types.push_back(type_name);
-          state.parents.push_back(node->get_parent_id());
-          state.levels.push_back(level);
-        }
-      }
-    }
+    for_all_nodes([&type_to_str, &state](const Node_UPtr& node) {
+      state.ids.push_back(node->get_id());
+      state.types.push_back(type_to_str[node->get_type()]);
+      state.parents.push_back(node->get_parent_id());
+      state.levels.push_back(node->get_level());
+    });
 
     return state;
+  }
+
+  // Apply a lambda function over all nodes in network
+  void for_all_nodes(std::function<void(const Node_UPtr& node)> fn,
+                     const bool include_blocks = true) const
+  {
+    if (include_blocks) {
+      for (const auto& node_level : nodes) {
+        for (const auto& nodes_of_type : node_level) {
+          std::for_each(nodes_of_type.begin(),
+                        nodes_of_type.end(),
+                        fn);
+        }
+      }
+    } else {
+      for (const auto& nodes_of_type : nodes.at(0)) {
+        std::for_each(nodes_of_type.begin(),
+                      nodes_of_type.end(),
+                      fn);
+      }
+    }
   }
 
   // =========================================================================
@@ -232,69 +253,60 @@ class SBM_Network {
   // =============================================================================
   // Load current state of nodes in model from state dump given SBM::get_state()
   // =============================================================================
-  void update_state(const std::vector<string>& id,
-                    const std::vector<string>& parent,
-                    const std::vector<int>& level,
-                    const std::vector<string>& type)
+  void update_state(const std::vector<string>& ids,
+                    const std::vector<string>& parents,
+                    const std::vector<int>& levels,
+                    const std::vector<string>& types)
   {
 
     // Remove all block levels
+    delete_all_blocks();
 
     // Build a map to get nodes by id
+    String_Map<Node*> node_by_id;
+    for_all_nodes([&node_by_id](const Node_UPtr& node) {
+      node_by_id[node->get_id()] = node.get();
+    },
+                  false);
 
     // Setup map to get blocks/parents by id
+    String_Map<Node*> block_by_id;
 
     // Loop through entries of the state dump
+    int last_level = 0;
+    for (int i = 0; i < ids.size(); i++) {
+      const string& id     = ids[i];
+      const string& parent = parents[i];
+      const string& type   = types[i];
+      const int level      = levels[i];
 
       // If the level of the current entry has gone up
+      // Swap the maps as the blocks are now the child nodes
+      if (last_level != level) {
+        node_by_id = std::move(block_by_id);
+        // block_by_id will be empty now
+        block_by_id = String_Map<Node*>();
+      }
 
-        // Swap the maps as the blocks are now the child nodes
-
-      // Find current entry's node 
+      // Find current entry's node
+      auto node_it = node_by_id.find(id);
+      if (node_it == node_by_id.end())
+        LOGIC_ERROR("Node in state (" + id + ") is not present in network");
+      Node* current_node = node_it->second;
 
       // Grab parent block pointer
-        // If it isn't in block map, make it
+      auto parent_it = block_by_id.find(parent);
+      if (parent_it == block_by_id.end()) {
+        // If this block is newly seen, create it
+        const int type_i = get_type_index(type);
+        get_nodes_of_type(type, level + 1).emplace_back(new Node(parent, type_i, level + 1, num_types()));
+        parent_it = block_by_id.find(parent); // refind block
+      }
+      Node* parent_node = parent_it->second;
 
-      // Connect node and parent to eachother 
-
-
-    // const int n = id.size();
-
-    // for (int i = 0; i < n; i++) {
-    //   const std::string node_type    = type[i];
-    //   const std::string child_id     = id[i];
-    //   const int         child_level  = level[i];
-    //   const std::string parent_id    = parent[i];
-    //   const int         parent_level = child_level + 1;
-
-    //   auto aquire_node = [node_type, this](const std::string& node_id, const int node_level) {
-    //     LevelPtr nodes_at_level = get_level(node_level);
-
-    //     // Attempt to find the node in the network
-    //     auto node_loc = nodes_at_level->find(node_id);
-
-    //     if (node_loc == nodes_at_level->end()) {
-    //       return add_node(node_id, node_type, node_level);
-    //     }
-    //     else {
-    //       return node_loc->second;
-    //     }
-    //   };
-
-    //   // "none" indicates the highest level has been reached
-    //   if (parent_id == "none") {
-    //     continue;
-    //   }
-
-    //   // Attempt to find the parent node in the network
-    //   // Next grab the child node (this one should exist...)
-    //   // Assign the parent node to the child node
-    //   aquire_node(child_id, child_level)->set_parent(aquire_node(parent_id, parent_level));
-    // }
-
-    // // Now clean up any potentially childless nodes that got kicked
-    // // out by this process
-    // clean_empty_blocks();
+      // Connect node and parent to eachother
+      current_node->set_parent(parent_node);
+    }
   }
 
   // =========================================================================
