@@ -8,6 +8,17 @@
 using Node_UPtr_Vec = std::vector<Node_UPtr>;
 using Type_Vec      = std::vector<std::vector<Node_UPtr>>;
 
+struct State_Dump {
+  std::vector<string> id;
+  std::vector<string> parent;
+  std::vector<int> level;
+  State_Dump(const int size) {
+    id.reserve(size);
+    parent.reserve(size);
+    level.reserve(size);
+  }
+};
+
 class SBM_Network {
 
   private:
@@ -15,6 +26,7 @@ class SBM_Network {
   std::vector<Type_Vec> nodes;
   Int_Map<string> type_name_to_int;
   Sampler random_sampler;
+  int block_counter = 0; // Keeps track of how many block we've had
 
   // =========================================================================
   // Private helper methods
@@ -96,6 +108,66 @@ class SBM_Network {
     return type_name_to_int.size();
   }
 
+// =============================================================================
+// Export current state of nodes in model
+// =============================================================================
+// State_Dump get_state() const
+// {
+//   const int N = num_nodes();
+
+//   // Initialize the return struct
+//   State_Dump state(N);
+
+//   // First add the data-level nodes
+//   for (const auto& type_nodes : nodes.at(0)) {
+//     for (const auto& node : type_nodes) {
+//       state.id.push_back(node->get_id());
+//       state.level.push_back(0);
+//       state.parent.push_back()
+//     }
+//   }
+
+//   // Loop through levels
+//   int level = 0;
+//   for (const auto& level_nodes : nodes) {
+//     int type = 0;
+//     for (const auto& type_nodes: level_nodes){
+//       state.id.push_back()
+//       type++;
+//     }
+
+//     level++;
+//   }
+
+
+//   for (const auto& level : nodes) {
+
+//     // Add level's nodes to current total
+//     n_nodes_seen += level.second->size();
+
+//     // Update sizes of the state vectors
+//     state.id.reserve(n_nodes_seen);
+//     state.level.reserve(n_nodes_seen);
+//     state.parent.reserve(n_nodes_seen);
+//     state.type.reserve(n_nodes_seen);
+
+//     // Loop through each node in level
+//     for (const auto& node : *level.second) {
+
+//       // Dump all its desired info into its element in the state vectors
+//       state.id.push_back(node.second->id);
+//       state.level.push_back(level.first);
+//       state.type.push_back(node.second->type);
+
+//       // Record parent if node has one
+//       state.parent.push_back(node.second->parent ? node.second->parent->id : "none");
+
+//     } // End node loop
+//   }   // End level loop
+
+//   return state;
+// }
+
   // =========================================================================
   // Modification
   // =========================================================================
@@ -144,7 +216,7 @@ class SBM_Network {
 
       for (int i = 0; i < num_blocks; i++) {
         // Build a new block node wrapped in smart pointer in it's type vector
-        blocks_of_type.emplace_back(new Node(type_i, block_level, num_types()));
+        blocks_of_type.emplace_back(new Node(block_counter, type_i, block_level, num_types()));
       }
 
       // Shuffle child nodes if we're randomly assigning blocks
