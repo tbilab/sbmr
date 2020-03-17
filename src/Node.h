@@ -33,11 +33,10 @@ enum Update_Type { Add,
 class Node {
   private:
   Node* parent = nullptr; // What node contains this node (aka its cluster)
+  Edges_By_Type typed_edges;
+  Node_Vec children; // Nodes that are contained within node (if node is cluster)
 
-  bool have_parent()
-  {
-    return parent != nullptr;
-  }
+  bool have_parent() { return parent != nullptr; }
 
   public:
   // Constructors
@@ -74,9 +73,7 @@ class Node {
   std::string id; // Unique integer id for node
   int type;       // What type of node is this?
   int level;      // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
-  Edges_By_Type typed_edges;
-  Node_Set children;      // Nodes that are contained within node (if node is cluster)
-  int degree = 0;         // How many edges/ edges does this node have?
+  int degree = 0; // How many edges/ edges does this node have?
 
   // Methods
   // =========================================================================
@@ -93,18 +90,32 @@ class Node {
       parent->update_edges(typed_edges, Remove);
 
       // Remove self from previous children
-      parent->children.erase(this);
+      parent->remove_child(this);
     }
 
     // Add this node's edges to parent's degree count
     new_parent->update_edges(typed_edges, Add);
 
     // Add this node to new parent's children list
-    new_parent->children.insert(this);
+    new_parent->add_child(this);
 
     // Set this node's parent
     parent = new_parent;
   }
+
+  void add_child(Node* child)
+  {
+    children.push_back(child);
+  }
+
+  void remove_child(Node* child)
+  {
+    delete_from_vector(children, child);
+  }
+
+  int num_children() const { return children.size(); }
+
+  bool is_child(Node* node) const { return std::find(children.begin(), children.end(), node) != children.end(); }
 
   // Get parent of node at a given level
   Node* get_parent_at_level(const int level_of_parent)

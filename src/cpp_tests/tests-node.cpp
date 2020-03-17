@@ -53,23 +53,23 @@ TEST_CASE("Child addition and deletion", "[Node]")
   n3->set_parent(n12.get());
 
   // n11 should have 2 children
-  REQUIRE(n11->children.size() == 2);
+  REQUIRE(n11->num_children() == 2);
   // One of those children should be n2
-  REQUIRE(n11->children.count(n2.get()) == 1);
+  REQUIRE(n11->is_child(n2.get()));
 
   // n12 should have 1 child
-  REQUIRE(n12->children.size() == 1);
+  REQUIRE(n12->num_children() == 1);
 
   // Set the parent of n2 to be n12 and results should flip
   n2->set_parent(n12.get());
 
   // n11 should have 1 child
-  REQUIRE(n11->children.size() == 1);
+  REQUIRE(n11->num_children() == 1);
 
   // n12 should have 2 children
-  REQUIRE(n12->children.size() == 2);
+  REQUIRE(n12->num_children() == 2);
   // One of those children should be n2
-  REQUIRE(n12->children.count(n2.get()) == 1);
+  REQUIRE(n12->is_child(n2.get()));
 }
 
 TEST_CASE("Gathering edge counts to a level", "[Node]")
