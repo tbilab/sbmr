@@ -133,7 +133,7 @@ class Node {
     }
 
     // Remove self from previous parents children list (if it existed)
-    if (parent != nullptr)
+    if (has_parent())
       parent->remove_child(this);
 
     // Add this node to new parent's children list
@@ -174,6 +174,10 @@ class Node {
 
   string get_parent_id() const {
     return parent == nullptr ? "none" : parent->get_id();
+  }
+
+  bool has_parent() const {
+    return parent != nullptr;
   }
 
   // =========================================================================
