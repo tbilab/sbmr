@@ -120,8 +120,10 @@ class SBM_Network {
     // Initialize the return struct
     State_Dump state(num_nodes());
 
-    // Loop through levels
-    for (int level = 0; level < nodes.size(); level++) {
+    if (num_levels() == 1) LOGIC_ERROR("No state to export - Try adding blocks");
+
+    // Loop through all levels that have blocks/parents
+    for (int level = 0; level < nodes.size() - 1; level++) {
       for (int type_i = 0; type_i < num_types(); type_i++) {
         const string& type_name = types[type_i];
         for (const auto& node : nodes.at(level).at(type_i)) {
@@ -218,6 +220,69 @@ class SBM_Network {
 
     // Remove the last layer of nodes.
     nodes.pop_back();
+  }
+
+  // =============================================================================
+  // Load current state of nodes in model from state dump given SBM::get_state()
+  // =============================================================================
+  void update_state(const std::vector<string>& id,
+                    const std::vector<string>& parent,
+                    const std::vector<int>& level,
+                    const std::vector<string>& type)
+  {
+
+    // Remove all block levels
+
+    // Build a map to get nodes by id
+
+    // Setup map to get blocks/parents by id
+
+    // Loop through entries of the state dump
+
+      // If the level of the current entry has gone up
+
+      // If the new parent is "none", then no need to go further
+
+      // 
+
+
+    // const int n = id.size();
+
+    // for (int i = 0; i < n; i++) {
+    //   const std::string node_type    = type[i];
+    //   const std::string child_id     = id[i];
+    //   const int         child_level  = level[i];
+    //   const std::string parent_id    = parent[i];
+    //   const int         parent_level = child_level + 1;
+
+    //   auto aquire_node = [node_type, this](const std::string& node_id, const int node_level) {
+    //     LevelPtr nodes_at_level = get_level(node_level);
+
+    //     // Attempt to find the node in the network
+    //     auto node_loc = nodes_at_level->find(node_id);
+
+    //     if (node_loc == nodes_at_level->end()) {
+    //       return add_node(node_id, node_type, node_level);
+    //     }
+    //     else {
+    //       return node_loc->second;
+    //     }
+    //   };
+
+    //   // "none" indicates the highest level has been reached
+    //   if (parent_id == "none") {
+    //     continue;
+    //   }
+
+    //   // Attempt to find the parent node in the network
+    //   // Next grab the child node (this one should exist...)
+    //   // Assign the parent node to the child node
+    //   aquire_node(child_id, child_level)->set_parent(aquire_node(parent_id, parent_level));
+    // }
+
+    // // Now clean up any potentially childless nodes that got kicked
+    // // out by this process
+    // clean_empty_blocks();
   }
 
   // =========================================================================
