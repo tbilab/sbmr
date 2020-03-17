@@ -9,13 +9,23 @@ using Node_UPtr_Vec = std::vector<Node_UPtr>;
 using Type_Vec      = std::vector<std::vector<Node_UPtr>>;
 
 struct State_Dump {
-  std::vector<string> id;
-  std::vector<string> parent;
-  std::vector<int> level;
-  State_Dump(const int size) {
-    id.reserve(size);
-    parent.reserve(size);
-    level.reserve(size);
+  std::vector<string> ids;
+  std::vector<string> types;
+  std::vector<string> parents;
+  std::vector<int> levels;
+  State_Dump(const int size)
+  {
+    ids.reserve(size);
+    types.reserve(size);
+    parents.reserve(size);
+    levels.reserve(size);
+  }
+  void add(const string& i, const string& t, const string& p, const int l)
+  {
+    ids.push_back(i);
+    types.push_back(t);
+    parents.push_back(p);
+    levels.push_back(l);
   }
 };
 
@@ -24,6 +34,7 @@ class SBM_Network {
   private:
   // Data
   std::vector<Type_Vec> nodes;
+  std::vector<string> types;
   Int_Map<string> type_name_to_int;
   Sampler random_sampler;
   int block_counter = 0; // Keeps track of how many block we've had
@@ -51,7 +62,7 @@ class SBM_Network {
 
   void check_for_type(const int type_index) const
   {
-    if (type_index >= type_name_to_int.size())
+    if (type_index >= num_types())
       RANGE_ERROR("Type " + as_str(type_index) + " does not exist in network.");
   }
 
@@ -62,6 +73,7 @@ class SBM_Network {
   SBM_Network(const std::vector<std::string>& node_types = { "node" },
               const int random_seed                      = 42)
       : random_sampler(random_seed)
+      , types(node_types)
   {
     int c_index = 0;
     for (const auto& type_name : node_types) {
@@ -105,68 +117,36 @@ class SBM_Network {
 
   int num_types() const
   {
-    return type_name_to_int.size();
+    return types.size();
   }
 
-// =============================================================================
-// Export current state of nodes in model
-// =============================================================================
-// State_Dump get_state() const
-// {
-//   const int N = num_nodes();
+  // =============================================================================
+  // Export current state of nodes in model
+  // =============================================================================
+  State_Dump get_state() const
+  {
+    const int N = num_nodes();
 
-//   // Initialize the return struct
-//   State_Dump state(N);
+    // Initialize the return struct
+    State_Dump state(N);
 
-//   // First add the data-level nodes
-//   for (const auto& type_nodes : nodes.at(0)) {
-//     for (const auto& node : type_nodes) {
-//       state.id.push_back(node->get_id());
-//       state.level.push_back(0);
-//       state.parent.push_back()
-//     }
-//   }
-
-//   // Loop through levels
-//   int level = 0;
-//   for (const auto& level_nodes : nodes) {
-//     int type = 0;
-//     for (const auto& type_nodes: level_nodes){
-//       state.id.push_back()
-//       type++;
-//     }
-
-//     level++;
-//   }
-
-
-//   for (const auto& level : nodes) {
-
-//     // Add level's nodes to current total
-//     n_nodes_seen += level.second->size();
-
-//     // Update sizes of the state vectors
-//     state.id.reserve(n_nodes_seen);
-//     state.level.reserve(n_nodes_seen);
-//     state.parent.reserve(n_nodes_seen);
-//     state.type.reserve(n_nodes_seen);
-
-//     // Loop through each node in level
-//     for (const auto& node : *level.second) {
-
-//       // Dump all its desired info into its element in the state vectors
-//       state.id.push_back(node.second->id);
-//       state.level.push_back(level.first);
-//       state.type.push_back(node.second->type);
-
-//       // Record parent if node has one
-//       state.parent.push_back(node.second->parent ? node.second->parent->id : "none");
-
-//     } // End node loop
-//   }   // End level loop
-
-//   return state;
-// }
+    // Loop through levels
+    int level = 0;
+    for (const auto& node_level : nodes) {
+      int type_i = 0;
+      for (const auto& nodes_of_type : node_level) {
+        const string type_name = types[type_i++];
+        for (const auto& node : nodes_of_type) {
+          state.add(node->get_id(),
+                    type_name,
+                    node->get_parent_id(),
+                    level);
+        }
+      }
+      level++;
+    }
+    return state;
+  }
 
   // =========================================================================
   // Modification
