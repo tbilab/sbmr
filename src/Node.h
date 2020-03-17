@@ -32,6 +32,8 @@ enum Update_Type { Add,
 //=================================
 class Node {
   private:
+  Node* parent = nullptr; // What node contains this node (aka its cluster)
+
   bool have_parent()
   {
     return parent != nullptr;
@@ -73,7 +75,6 @@ class Node {
   int type;       // What type of node is this?
   int level;      // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
   Edges_By_Type typed_edges;
-  Node* parent = nullptr; // What node contains this node (aka its cluster)
   Node_Set children;      // Nodes that are contained within node (if node is cluster)
   int degree = 0;         // How many edges/ edges does this node have?
 
