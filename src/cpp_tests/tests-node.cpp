@@ -40,6 +40,15 @@ TEST_CASE("Basic Initialization", "[Node]")
   // REQUIRE("d2, d2" == print_node_ids(c2->get_edges_of_type(1,1)));
 }
 
+TEST_CASE("Block id construction", "[Node]")
+{
+  Node_UPtr b1 = Node_UPtr(new Node {0, 0, 0, 2});
+  Node_UPtr b2 = Node_UPtr(new Node {1, 0, 0, 2});
+
+  REQUIRE(b1->get_id() == "b_0");
+  REQUIRE(b2->get_id() == "b_1");
+}
+
 TEST_CASE("Child addition and deletion", "[Node]")
 {
   Node_UPtr n1  = Node_UPtr(new Node { "n1", 0, 0 });
