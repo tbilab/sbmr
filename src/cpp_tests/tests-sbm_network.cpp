@@ -1,10 +1,11 @@
 #include "../network.h"
 #include "../swap_blocks.h"
 #include "catch.hpp"
+#include <set>
 
 TEST_CASE("Basic initialization of network", "[Network]")
 {
-  SBM_Network my_net({"m", "n"}, 42);
+  SBM_Network my_net({ "m", "n" }, 42);
 
   // Add some nodes to Network
   my_net.add_node("n1", "n");
@@ -14,7 +15,6 @@ TEST_CASE("Basic initialization of network", "[Network]")
   my_net.add_node("m2", "m");
   my_net.add_node("m3", "m");
   my_net.add_node("m4", "m");
-
 
   REQUIRE(my_net.num_nodes() == 7);
   REQUIRE(my_net.num_nodes_at_level(0) == 7);
@@ -34,10 +34,47 @@ TEST_CASE("Basic initialization of network", "[Network]")
   REQUIRE(my_net.num_levels() == 2);
 }
 
+TEST_CASE("Default block initialization", "[Network]")
+{
+  SBM_Network my_net({ "a", "b" }, 42);
+
+  // Start with a few nodes in the network
+  my_net.add_node("a1", "a");
+  my_net.add_node("a2", "a");
+  my_net.add_node("a3", "a");
+  my_net.add_node("b1", "b");
+  my_net.add_node("b2", "b");
+  my_net.add_node("b3", "b");
+
+  // Give every node its own block
+  my_net.initialize_blocks();
+
+  // There should be same number of nodes at block level as data level
+  REQUIRE(my_net.num_nodes_at_level(0) == my_net.num_nodes_at_level(1));
+
+  // Make sure every node has a parent node
+  REQUIRE(my_net.get_node_by_id("a1", "a")->has_parent());
+  REQUIRE(my_net.get_node_by_id("a2", "a")->has_parent());
+  REQUIRE(my_net.get_node_by_id("a3", "a")->has_parent());
+  REQUIRE(my_net.get_node_by_id("b1", "b")->has_parent());
+  REQUIRE(my_net.get_node_by_id("b2", "b")->has_parent());
+  REQUIRE(my_net.get_node_by_id("b3", "b")->has_parent());
+
+  // All parents should be unique
+  std::set<string> unique_blocks { my_net.get_node_by_id("a1", "a")->get_parent_id(),
+                                   my_net.get_node_by_id("a2", "a")->get_parent_id(),
+                                   my_net.get_node_by_id("a3", "a")->get_parent_id(),
+                                   my_net.get_node_by_id("b1", "b")->get_parent_id(),
+                                   my_net.get_node_by_id("b2", "b")->get_parent_id(),
+                                   my_net.get_node_by_id("b3", "b")->get_parent_id() };
+
+  REQUIRE(unique_blocks.size() == my_net.num_nodes_at_level(1));
+}
+
 
 TEST_CASE("Initializing a block for every node", "[Network]")
 {
-  SBM_Network my_net({"a", "b"}, 42);
+  SBM_Network my_net({ "a", "b" }, 42);
 
   my_net.add_node("a1", "a");
   my_net.add_node("a2", "a");
@@ -74,7 +111,7 @@ TEST_CASE("Initializing a block for every node", "[Network]")
 
 TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
 {
-  SBM_Network my_net({"a", "b"}, 42);
+  SBM_Network my_net({ "a", "b" }, 42);
 
   my_net.add_node("a1", "a");
   my_net.add_node("a2", "a");
@@ -108,7 +145,7 @@ TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
 
 TEST_CASE("Metablock initialization", "[Network]")
 {
-  SBM_Network my_net({"m", "n"}, 42);
+  SBM_Network my_net({ "m", "n" }, 42);
 
   // Add some nodes to Network
   my_net.add_node("n1", "n");
@@ -146,10 +183,9 @@ TEST_CASE("Metablock initialization", "[Network]")
   REQUIRE_THROWS(my_net.delete_blocks());
 }
 
-
 TEST_CASE("Swapping of blocks", "[Network]")
 {
-  SBM_Network my_net({"m", "n"}, 42);
+  SBM_Network my_net({ "m", "n" }, 42);
 
   // Add some nodes to Network
   my_net.add_node("n1", "n");
@@ -166,7 +202,7 @@ TEST_CASE("Swapping of blocks", "[Network]")
   REQUIRE(my_net.num_nodes_of_type("m", 1) == 3);
 
   // Merge second node into first nodes block
-  Node* node2 = my_net.get_node_by_id("n2", "n");
+  Node* node2  = my_net.get_node_by_id("n2", "n");
   Node* block1 = my_net.get_node_by_id("n1", "n")->get_parent();
 
   swap_blocks(node2,
@@ -210,18 +246,19 @@ void print_state(const State_Dump& state)
   }
 }
 
-int index_of_node(const State_Dump& state, const string& node_id){
-  for (int i = 0; i < state.size(); i++)
-  {
-    if (state.ids[i] == node_id) return i;
-  } 
-  RANGE_ERROR ("Could not find node.");
+int index_of_node(const State_Dump& state, const string& node_id)
+{
+  for (int i = 0; i < state.size(); i++) {
+    if (state.ids[i] == node_id)
+      return i;
+  }
+  RANGE_ERROR("Could not find node.");
   return -1;
 }
 
 TEST_CASE("State dumping and restoring", "[Network")
 {
-  SBM_Network my_net({"a", "b"}, 42);
+  SBM_Network my_net({ "a", "b" }, 42);
 
   // Start with a few nodes in the network
   my_net.add_node("a1", "a");
@@ -237,7 +274,7 @@ TEST_CASE("State dumping and restoring", "[Network")
 
   // Dump model state
   State_Dump state1 = my_net.get_state();
-  
+
   // Test state dump is in correct form
   REQUIRE(state_has_entry(state1, "a1", "a"));
   REQUIRE(state_has_entry(state1, "a2", "a"));
@@ -246,11 +283,37 @@ TEST_CASE("State dumping and restoring", "[Network")
   REQUIRE(state_has_entry(state1, "b2", "b"));
   REQUIRE(state_has_entry(state1, "b3", "b"));
 
+  Node* a1 = my_net.get_node_by_id("a1", "a");
+  Node* a2 = my_net.get_node_by_id("a2", "a");
+
   // Make note of node 1s parent in first state
-  const string a1_parent = state1.parents[index_of_node(state1, "a1")];
+  OUT_MSG << "a1 parent = " << a1->get_parent()->get_id()
+          << " | a2 parent = " << a2->get_parent()->get_id() << std::endl;
 
+  REQUIRE(my_net.num_nodes_of_type("a", 1) == 3);
+  REQUIRE(my_net.num_nodes_of_type("b", 1) == 3);
+  REQUIRE(a1->get_parent() != a2->get_parent());
 
-  // // Now give node a1 a different parent
+  // print_state(state1);
+  // const string a1_parent = state1.parents[index_of_node(state1, "a1")];
+  // const string a2_parent = state1.parents[index_of_node(state1, "a2")];
+  // REQUIRE(a1_parent != a2_parent);
+
+  // // Now give merge a1 and a2 to same parent and remove a1s old parent
+  // swap_blocks(a1,
+  //             a2->get_parent(),
+  //             my_net.get_nodes_of_type("n", 1),
+  //             true);
+
+  //  // Dump model state again
+  // State_Dump state2 = my_net.get_state();
+
+  //  // Make note of node 1s parent in first state
+  // const string a1_parent_new = state1.parents[index_of_node(state2, "a1")];
+  // const string a2_parent_new = state1.parents[index_of_node(state2, "a2")];
+  // REQUIRE(a1_parent != a1_parent_new);
+  // REQUIRE(a1_parent_new == a2_parent_new);
+
   // NodePtr a14 = my_net.add_node("a14", "a", 1);
   // a1->set_parent(a14);
 
@@ -266,7 +329,7 @@ TEST_CASE("State dumping and restoring", "[Network")
 
   // // Now restore model to pre a1->a14 move state
   // my_net.set_state(state1.id, state1.parent, state1.level, state1.type);
- 
+
   // State_Dump state3 = my_net.get_state();
 
   // // Make sure state dumps 1 and 3 match state dump is in correct form
@@ -276,9 +339,6 @@ TEST_CASE("State dumping and restoring", "[Network")
   // REQUIRE(
   //     print_ids_to_string(state1.parent) == print_ids_to_string(state3.parent));
 }
-
-
-
 
 // // TEST_CASE("Counting edges", "[Network]")
 // // {
@@ -463,4 +523,3 @@ TEST_CASE("State dumping and restoring", "[Network")
 // //   REQUIRE(a22_edges_new[b21] == 2);
 // //   REQUIRE(a22_edges_new[b22] == 2);
 // // }
-
