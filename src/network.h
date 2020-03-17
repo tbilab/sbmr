@@ -242,4 +242,14 @@ class SBM_Network {
   {
     return get_nodes_of_type(get_type_index(type), level);
   }
+
+  Node* get_node_by_id(const string& id, const string& type)
+  {
+    auto& nodes_of_type = get_nodes_of_type(type);
+
+    return std::find_if(nodes_of_type.begin(),
+                        nodes_of_type.end(),
+                        [&id](Node_UPtr& node) { return node->get_id() == id; })
+        ->get();
+  }
 };
