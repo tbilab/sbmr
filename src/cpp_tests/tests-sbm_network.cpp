@@ -53,20 +53,20 @@ TEST_CASE("Default block initialization", "[Network]")
   REQUIRE(my_net.num_nodes_at_level(0) == my_net.num_nodes_at_level(1));
 
   // Make sure every node has a parent node
-  REQUIRE(my_net.get_node_by_id("a1", "a")->has_parent());
-  REQUIRE(my_net.get_node_by_id("a2", "a")->has_parent());
-  REQUIRE(my_net.get_node_by_id("a3", "a")->has_parent());
-  REQUIRE(my_net.get_node_by_id("b1", "b")->has_parent());
-  REQUIRE(my_net.get_node_by_id("b2", "b")->has_parent());
-  REQUIRE(my_net.get_node_by_id("b3", "b")->has_parent());
+  REQUIRE(my_net.get_node_by_id("a1")->has_parent());
+  REQUIRE(my_net.get_node_by_id("a2")->has_parent());
+  REQUIRE(my_net.get_node_by_id("a3")->has_parent());
+  REQUIRE(my_net.get_node_by_id("b1")->has_parent());
+  REQUIRE(my_net.get_node_by_id("b2")->has_parent());
+  REQUIRE(my_net.get_node_by_id("b3")->has_parent());
 
   // All parents should be unique
-  std::set<string> unique_blocks { my_net.get_node_by_id("a1", "a")->get_parent_id(),
-                                   my_net.get_node_by_id("a2", "a")->get_parent_id(),
-                                   my_net.get_node_by_id("a3", "a")->get_parent_id(),
-                                   my_net.get_node_by_id("b1", "b")->get_parent_id(),
-                                   my_net.get_node_by_id("b2", "b")->get_parent_id(),
-                                   my_net.get_node_by_id("b3", "b")->get_parent_id() };
+  std::set<string> unique_blocks { my_net.get_node_by_id("a1")->get_parent_id(),
+                                   my_net.get_node_by_id("a2")->get_parent_id(),
+                                   my_net.get_node_by_id("a3")->get_parent_id(),
+                                   my_net.get_node_by_id("b1")->get_parent_id(),
+                                   my_net.get_node_by_id("b2")->get_parent_id(),
+                                   my_net.get_node_by_id("b3")->get_parent_id() };
 
   REQUIRE(unique_blocks.size() == my_net.num_nodes_at_level(1));
 }
@@ -201,8 +201,8 @@ TEST_CASE("Swapping of blocks", "[Network]")
   REQUIRE(my_net.num_nodes_of_type("m", 1) == 3);
 
   // Merge second node into first nodes block
-  Node* node2  = my_net.get_node_by_id("n2", "n");
-  Node* block1 = my_net.get_node_by_id("n1", "n")->get_parent();
+  Node* node2  = my_net.get_node_by_id("n2");
+  Node* block1 = my_net.get_node_by_id("n1")->get_parent();
 
   swap_blocks(node2,
               block1,
@@ -287,8 +287,8 @@ TEST_CASE("State dumping and restoring", "[Network")
   REQUIRE(state_has_entry(state1, "b2", "b"));
   REQUIRE(state_has_entry(state1, "b3", "b"));
 
-  Node* a1 = my_net.get_node_by_id("a1", "a");
-  Node* a2 = my_net.get_node_by_id("a2", "a");
+  Node* a1 = my_net.get_node_by_id("a1");
+  Node* a2 = my_net.get_node_by_id("a2");
 
   // Now give merge a1 and a2 to same parent and remove a1s old parent
   swap_blocks(a1,
@@ -342,8 +342,8 @@ TEST_CASE("State dumping and restoring", "[Network")
   REQUIRE(my_net2.num_levels() == 2);
   REQUIRE(my_net2.num_nodes_at_level(1) == 5);
 
-  REQUIRE(my_net2.get_node_by_id("a1", "a")->get_parent()
-          == my_net2.get_node_by_id("a2", "a")->get_parent());
+  REQUIRE(my_net2.get_node_by_id("a1")->get_parent()
+          == my_net2.get_node_by_id("a2")->get_parent());
 }
 
 TEST_CASE("State dumping and restoring: w/ metablocks", "[Network")
