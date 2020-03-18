@@ -70,8 +70,8 @@ class Block_Consensus {
 
   // Update the set of pairs that need to be updated for a given sweep.
   static void update_changed_pairs(const std::string& node_id,
-                                   const NodeSet& old_connections,
-                                   const NodeSet& new_connections,
+                                   const Node_Set& old_connections,
+                                   const Node_Set& new_connections,
                                    PairSet& pair_moves)
   {
     // Loop through all the nodes in the previous group node changes
