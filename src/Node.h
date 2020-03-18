@@ -69,6 +69,14 @@ class Node {
   {
   }
 
+  // Destructor
+  ~Node()
+  {
+    std::for_each(children.begin(),
+                  children.end(),
+                  [](Node* child) { child->remove_parent(); });
+  }
+
   // =========================================================================
   // Constant attribute getters - these are static after node creation
   // =========================================================================
@@ -127,14 +135,14 @@ class Node {
   // =========================================================================
   void set_parent(Node* new_parent)
   {
-
     if (level != new_parent->level - 1) {
       LOGIC_ERROR("Parent node must be one level above child");
     }
 
     // Remove self from previous parents children list (if it existed)
-    if (has_parent())
+    if (has_parent()) {
       parent->remove_child(this);
+    }
 
     // Add this node to new parent's children list
     new_parent->add_child(this);
@@ -178,6 +186,10 @@ class Node {
 
   bool has_parent() const {
     return parent != nullptr;
+  }
+
+  void remove_parent() {
+    parent = nullptr;
   }
 
   // =========================================================================
