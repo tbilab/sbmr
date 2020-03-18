@@ -16,7 +16,7 @@ struct State_Dump {
   std::vector<string> ids;
   std::vector<string> types;
   std::vector<string> parents;
-  std::vector<int> levels;
+  std::vector<int> levels;  
   State_Dump(const int size)
   {
     ids.reserve(size);
@@ -121,41 +121,37 @@ class SBM_Network {
   // Export current state of nodes in model
   State_Dump get_state()
   {
+    if (num_levels() == 1) LOGIC_ERROR("No state to export - Try adding blocks");
+    
     // Initialize the return struct
     State_Dump state(num_nodes());
 
+    // We need to declare this in local scope for lambda to see it
     auto& type_to_str = types;
-    if (num_levels() == 1)
-      LOGIC_ERROR("No state to export - Try adding blocks");
 
-    for_all_nodes([&type_to_str, &state](const Node_UPtr& node) {
-      state.ids.push_back(node->get_id());
-      state.types.push_back(type_to_str[node->get_type()]);
-      state.parents.push_back(node->get_parent_id());
-      state.levels.push_back(node->get_level());
-    });
+    // No need to record the last level's nodes as they are already included
+    // in the previous node's parent slot
+    for (int level = 0; level < num_levels() - 1; level++) {
+      for_all_nodes_at_level(level, [&](const Node_UPtr& node) {
+        state.ids.push_back(node->get_id());
+        state.types.push_back(type_to_str[node->get_type()]);
+        state.parents.push_back(node->get_parent_id());
+        state.levels.push_back(level);
+      });
+    }
 
     return state;
   }
 
   // Apply a lambda function over all nodes in network
-  void for_all_nodes(std::function<void(const Node_UPtr& node)> fn,
-                     const bool include_blocks = true) const
+  void for_all_nodes_at_level(const int level,
+                              std::function<void(const Node_UPtr& node)> fn) const
   {
-    if (include_blocks) {
-      for (const auto& node_level : nodes) {
-        for (const auto& nodes_of_type : node_level) {
-          std::for_each(nodes_of_type.begin(),
-                        nodes_of_type.end(),
-                        fn);
-        }
-      }
-    } else {
-      for (const auto& nodes_of_type : nodes.at(0)) {
-        std::for_each(nodes_of_type.begin(),
-                      nodes_of_type.end(),
-                      fn);
-      }
+    check_for_level(level);
+    for (const auto& nodes_of_type : nodes.at(level)) {
+      std::for_each(nodes_of_type.begin(),
+                    nodes_of_type.end(),
+                    fn);
     }
   }
 
@@ -269,7 +265,7 @@ class SBM_Network {
     auto add_node_to_map = [&node_by_id](const Node_UPtr& node) {
       node_by_id[node->get_id()] = node.get();
     };
-    for_all_nodes(add_node_to_map, false);
+    for_all_nodes_at_level(0, add_node_to_map);
 
     // Setup map to get blocks/parents by id
     String_Map<Node*> block_by_id;
