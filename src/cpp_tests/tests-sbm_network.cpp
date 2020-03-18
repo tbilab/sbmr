@@ -351,8 +351,61 @@ TEST_CASE("State dumping and restoring", "[Network")
 
   REQUIRE(my_net2.get_node_by_id("a1", "a")->get_parent()
           == my_net2.get_node_by_id("a2", "a")->get_parent());
+}
 
+TEST_CASE("State dumping and restoring: w/ metablocks", "[Network")
+{
+  SBM_Network my_net({ "a", "b" }, 42);
 
+  // Start with a few nodes in the network
+  my_net.add_node("a1", "a");
+  my_net.add_node("a2", "a");
+  my_net.add_node("a3", "a");
+  my_net.add_node("a4", "a");
+
+  my_net.add_node("b1", "b");
+  my_net.add_node("b2", "b");
+  my_net.add_node("b3", "b");
+  my_net.add_node("b4", "b");
+
+  // Give every node its own block
+  my_net.initialize_blocks();
+
+  // Distribute two metablocks per type accross the blocks
+  my_net.initialize_blocks(2);
+
+  REQUIRE(my_net.num_levels() == 3);
+  REQUIRE(my_net.num_nodes_at_level(0) == 8);
+  REQUIRE(my_net.num_nodes_at_level(1) == 8);
+  REQUIRE(my_net.num_nodes_at_level(2) == 4);
+
+  // Dump model state
+  State_Dump state1 = my_net.get_state();
+
+  // Build a new model that doesn't have any state
+  SBM_Network my_net2({ "a", "b" }, 42);
+
+  // Start with a few nodes in the network
+  my_net2.add_node("a1", "a");
+  my_net2.add_node("a2", "a");
+  my_net2.add_node("a3", "a");
+  my_net2.add_node("a4", "a");
+  my_net2.add_node("b1", "b");
+  my_net2.add_node("b2", "b");
+  my_net2.add_node("b3", "b");
+  my_net2.add_node("b4", "b");
+
+  REQUIRE(my_net2.num_levels() == 1);
+  REQUIRE(my_net2.num_nodes_at_level(0) == 8);
+
+  // Load dumped state from first model to this new model
+  my_net2.update_state(state1);
+
+  // Now check to make sure the size matches the previous model
+  REQUIRE(my_net2.num_levels() == 3);
+  REQUIRE(my_net2.num_nodes_at_level(0) == 8);
+  REQUIRE(my_net2.num_nodes_at_level(1) == 8);
+  REQUIRE(my_net2.num_nodes_at_level(2) == 4);
 }
 
 // // TEST_CASE("Counting edges", "[Network]")
