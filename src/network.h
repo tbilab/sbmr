@@ -236,7 +236,7 @@ class SBM_Network {
 
   void validate_edge(Node* node_a, Node* node_b)
   {
-    if (connection_types.at(node_a->get_type()).count(node_a->get_type()) == 0) {
+    if (connection_types.at(node_a->get_type()).count(node_b->get_type()) == 0) {
       LOGIC_ERROR("Connection between nodes "
                   + node_a->get_id() + " & " + node_b->get_id()
                   + " of types " + types[node_a->get_type()] + " & " + types[node_b->get_type()]
