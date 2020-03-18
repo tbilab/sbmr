@@ -235,8 +235,6 @@ class Node {
           node_edges_of_type.push_back(edge);
           degree++;
           break;
-        default:
-          LOGIC_ERROR("Something went wrong in edge updating");
         }
       }
     }
