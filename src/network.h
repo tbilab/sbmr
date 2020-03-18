@@ -16,7 +16,7 @@ struct State_Dump {
   std::vector<string> ids;
   std::vector<string> types;
   std::vector<string> parents;
-  std::vector<int> levels;  
+  std::vector<int> levels;
   State_Dump(const int size)
   {
     ids.reserve(size);
@@ -121,20 +121,18 @@ class SBM_Network {
   // Export current state of nodes in model
   State_Dump get_state()
   {
-    if (num_levels() == 1) LOGIC_ERROR("No state to export - Try adding blocks");
-    
+    if (num_levels() == 1)
+      LOGIC_ERROR("No state to export - Try adding blocks");
+
     // Initialize the return struct
     State_Dump state(num_nodes());
-
-    // We need to declare this in local scope for lambda to see it
-    auto& type_to_str = types;
 
     // No need to record the last level's nodes as they are already included
     // in the previous node's parent slot
     for (int level = 0; level < num_levels() - 1; level++) {
       for_all_nodes_at_level(level, [&](const Node_UPtr& node) {
         state.ids.push_back(node->get_id());
-        state.types.push_back(type_to_str[node->get_type()]);
+        state.types.push_back(types[node->get_type()]);
         state.parents.push_back(node->get_parent_id());
         state.levels.push_back(level);
       });
@@ -148,10 +146,8 @@ class SBM_Network {
                               std::function<void(const Node_UPtr& node)> fn) const
   {
     check_for_level(level);
-    for (const auto& nodes_of_type : nodes.at(level)) {
-      std::for_each(nodes_of_type.begin(),
-                    nodes_of_type.end(),
-                    fn);
+    for (const auto& nodes_vec : nodes.at(level)) {
+      std::for_each(nodes_vec.begin(), nodes_vec.end(), fn);
     }
   }
 
@@ -162,8 +158,6 @@ class SBM_Network {
                  const std::string& type = "a",
                  const int level         = 0)
   {
-    check_for_level(level);
-
     const int type_index = get_type_index(type);
 
     // Build new node pointer outside of vector first for ease of pointer retrieval
@@ -181,9 +175,11 @@ class SBM_Network {
   void initialize_blocks(int num_blocks = -1)
   {
     const bool one_block_per_node = num_blocks == -1;
+    const int block_level         = num_levels();
+    const int child_level         = block_level - 1;
 
-    const int block_level = build_level();
-    const int child_level = block_level - 1;
+    // Build empty level
+    build_level();
 
     // Loop over all node types
     for (int type_i = 0; type_i < num_types(); type_i++) {
@@ -212,38 +208,34 @@ class SBM_Network {
 
       // Loop through now shuffled children nodes
       for (int i = 0; i < nodes_of_type.size(); i++) {
-        Node* parent_block = blocks_of_type[i % num_blocks].get();
-        Node* child_node   = nodes_of_type[i].get();
-
         // Add blocks one at a time, looping back after end to each node
-        child_node->set_parent(parent_block);
+        nodes_of_type[i]->set_parent(blocks_of_type[i % num_blocks].get());
       }
     }
   }
 
-  int build_level()
+  void build_level()
   {
-    // First we create a new vector with one vector per types
     nodes.emplace_back(num_types());
-
-    // Return the index of the new level just inserted
-    return nodes.size() - 1;
   }
 
   void delete_block_level()
   {
-    if (nodes.size() == 1)
+    if (has_blocks()) {
+      // Remove the last layer of nodes.
+      nodes.pop_back();
+    } else {
       LOGIC_ERROR("No block level to delete.");
-
-    // Remove the last layer of nodes.
-    nodes.pop_back();
+    }
   }
 
   void delete_all_blocks()
   {
-    while (num_levels() > 1) {
-      delete_block_level();
-    }
+    while (has_blocks()) { delete_block_level();}
+  }
+
+  bool has_blocks() const {
+    return num_levels() > 1;
   }
 
   // =============================================================================
@@ -254,11 +246,8 @@ class SBM_Network {
                     const std::vector<int>& levels,
                     const std::vector<string>& types)
   {
-
-    // Remove all block levels
-    delete_all_blocks();
-    // Add an empty block level to fill in
-    build_level();
+    delete_all_blocks(); // Remove all block levels
+    build_level();       // Add an empty block level to fill in
 
     // Build a map to get nodes by id
     String_Map<Node*> node_by_id;
@@ -278,41 +267,31 @@ class SBM_Network {
       const string& type   = types[i];
       const int level      = levels[i];
 
-      OUT_MSG << "Node: " << id << "... " << std::endl;
-
       // If the level of the current entry has gone up
       // Swap the maps as the blocks are now the child nodes
       if (last_level != level) {
-        OUT_MSG << "New level!" << std::endl;
-        node_by_id = std::move(block_by_id);
-        // block_by_id will be empty now
-        block_by_id = String_Map<Node*>();
-        // Setup new level for blocks
-        build_level();
-        last_level = level;
+        node_by_id = std::move(block_by_id); // block_by_id will be empty now
+        build_level();                       // Setup new level for blocks
+        last_level = level;                  // Update the current level
       }
 
       // Find current entry's node
-      auto node_it = node_by_id.find(id);
-      if (node_it == node_by_id.end())
-        LOGIC_ERROR("Node in state (" + id + ") is not present in network");
-      Node* current_node = node_it->second;
+      Node* current_node = [&]() {
+        const auto node_it = node_by_id.find(id);
+        if (node_it == node_by_id.end())
+          LOGIC_ERROR("Node in state (" + id + ") is not present in network");
+        return node_it->second;
+      }();
 
-      OUT_MSG << "Parent: " << parent << "... ";
       // Grab parent block pointer
-      auto parent_it = block_by_id.find(parent);
-      if (parent_it == block_by_id.end()) {
-        OUT_MSG << "Doesn't exist. Making...";
+      Node* parent_node = [&]() {
+        const auto parent_it = block_by_id.find(parent);
         // If this block is newly seen, create it
-        block_by_id[parent] = add_node(parent, type, level + 1);
-        parent_it           = block_by_id.find(parent); // refind block
-        OUT_MSG << "Made!" << std::endl;
-      } else {
-        OUT_MSG << "Exists. Grabbing!" << std::endl;
-      }
-      Node* parent_node = parent_it->second;
+        if (parent_it == block_by_id.end())
+          return block_by_id.emplace(parent, add_node(parent, type, level + 1)).first->second;
+        return parent_it->second;
+      }();
 
-      OUT_MSG << "Connecting node to parent" << std::endl;
       // Connect node and parent to eachother
       current_node->set_parent(parent_node);
     }
@@ -328,16 +307,13 @@ class SBM_Network {
   // =========================================================================
   Type_Vec& get_nodes_at_level(const int level = 0)
   {
-    // Make sure we have the requested level
     check_for_level(level);
-
-    return nodes[level];
+    return nodes.at(level);
   }
 
   Node_UPtr_Vec& get_nodes_of_type(const int type_index, const int level = 0)
   {
     check_for_type(type_index);
-
     return get_nodes_at_level(level)[type_index];
   }
 
@@ -348,11 +324,13 @@ class SBM_Network {
 
   Node* get_node_by_id(const string& id, const string& type)
   {
+    // Slow. To be only used in testing/debugging
     auto& nodes_of_type = get_nodes_of_type(type);
 
-    return std::find_if(nodes_of_type.begin(),
-                        nodes_of_type.end(),
-                        [&id](Node_UPtr& node) { return node->get_id() == id; })
+    return std::find_if(
+               nodes_of_type.begin(),
+               nodes_of_type.end(),
+               [&id](Node_UPtr& node) { return node->get_id() == id; })
         ->get();
   }
 };
