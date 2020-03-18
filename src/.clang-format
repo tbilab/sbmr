@@ -1,6 +1,6 @@
 ---
-Language:        Cpp
-BasedOnStyle:  WebKit
+Language: Cpp
+BasedOnStyle: WebKit
 IndentWidth: 2
 AlignTrailingComments: true
 AlignConsecutiveAssignments: true

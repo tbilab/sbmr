@@ -135,14 +135,12 @@ class Node {
   // =========================================================================
   void set_parent(Node* new_parent)
   {
-    if (level != new_parent->level - 1) {
+    if (level != new_parent->level - 1)
       LOGIC_ERROR("Parent node must be one level above child");
-    }
 
     // Remove self from previous parents children list (if it existed)
-    if (has_parent()) {
+    if (has_parent())
       parent->remove_child(this);
-    }
 
     // Add this node to new parent's children list
     new_parent->add_child(this);
@@ -157,8 +155,10 @@ class Node {
     // First we need to make sure that the requested level is not less than that
     // of the current node.
     if (level_of_parent < level)
-      LOGIC_ERROR("Requested parent level (" + as_str(level_of_parent)
-                  + ") lower than current node level (" + as_str(level) + ").");
+      LOGIC_ERROR("Requested parent level ("
+                  + as_str(level_of_parent)
+                  + ") lower than current node level ("
+                  + as_str(level) + ").");
 
     // Start with this node as current node
     Node* current_node = this;
@@ -175,22 +175,13 @@ class Node {
     return current_node;
   }
 
-  Node* get_parent() const
-  {
-    return parent;
-  }
+  Node* get_parent() const { return parent; }
 
-  string get_parent_id() const {
-    return parent == nullptr ? "none" : parent->get_id();
-  }
+  string get_parent_id() const { return parent == nullptr ? "none" : parent->get_id(); }
 
-  bool has_parent() const {
-    return parent != nullptr;
-  }
+  bool has_parent() const { return parent != nullptr; }
 
-  void remove_parent() {
-    parent = nullptr;
-  }
+  void remove_parent() { parent = nullptr; }
 
   // =========================================================================
   // Edge-Related methods

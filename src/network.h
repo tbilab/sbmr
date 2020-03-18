@@ -261,6 +261,8 @@ class SBM_Network {
 
     // Remove all block levels
     delete_all_blocks();
+    // Add an empty block level to fill in
+    build_level();
 
     // Build a map to get nodes by id
     String_Map<Node*> node_by_id;
@@ -280,12 +282,18 @@ class SBM_Network {
       const string& type   = types[i];
       const int level      = levels[i];
 
+      OUT_MSG << "Node: " << id << "... " << std::endl;
+
       // If the level of the current entry has gone up
       // Swap the maps as the blocks are now the child nodes
       if (last_level != level) {
+        OUT_MSG << "New level!" << std::endl;
         node_by_id = std::move(block_by_id);
         // block_by_id will be empty now
         block_by_id = String_Map<Node*>();
+        // Setup new level for blocks
+        build_level();
+        last_level = level;
       }
 
       // Find current entry's node
@@ -294,19 +302,29 @@ class SBM_Network {
         LOGIC_ERROR("Node in state (" + id + ") is not present in network");
       Node* current_node = node_it->second;
 
+      OUT_MSG << "Parent: " << parent << "... ";
       // Grab parent block pointer
       auto parent_it = block_by_id.find(parent);
       if (parent_it == block_by_id.end()) {
+        OUT_MSG << "Doesn't exist. Making...";
         // If this block is newly seen, create it
-        const int type_i = get_type_index(type);
-        get_nodes_of_type(type_i, level + 1).emplace_back(new Node(parent, type_i, level + 1, num_types()));
-        parent_it = block_by_id.find(parent); // refind block
+        block_by_id[parent] = add_node(parent, type, level + 1);
+        parent_it           = block_by_id.find(parent); // refind block
+        OUT_MSG << "Made!" << std::endl;
+      } else {
+        OUT_MSG << "Exists. Grabbing!" << std::endl;
       }
       Node* parent_node = parent_it->second;
 
+      OUT_MSG << "Connecting node to parent" << std::endl;
       // Connect node and parent to eachother
       current_node->set_parent(parent_node);
     }
+  }
+
+  void update_state(const State_Dump& state)
+  {
+    update_state(state.ids, state.parents, state.levels, state.types);
   }
 
   // =========================================================================
