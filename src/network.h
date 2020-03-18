@@ -6,7 +6,11 @@
 #include "vector_helpers.h"
 #include <unordered_map>
 
-using String_Vec = std::vector<string>;
+// These are seperate and will change based on compiler environemnt and only apply to the 
+// constructor and externally callable methods. 
+using Input_String_Vec = std::vector<string>;
+using Input_Int_Vec    = std::vector<int>;
+
 using Node_UPtr_Vec = std::vector<Node_UPtr>;
 using Type_Vec      = std::vector<std::vector<Node_UPtr>>;
 
@@ -65,7 +69,8 @@ class SBM_Network {
       RANGE_ERROR("Type " + as_str(type_index) + " does not exist in network.");
   }
 
-  void build_type_to_int(const String_Vec& type_vec) {
+  template <typename String_Container>
+  void build_type_to_int(const String_Container& type_vec) {
     for (int i = 0; i < type_vec.size(); i++)
     {
       type_name_to_int[type_vec[i]] = i;
