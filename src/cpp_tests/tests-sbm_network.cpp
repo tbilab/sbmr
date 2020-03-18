@@ -71,7 +71,6 @@ TEST_CASE("Default block initialization", "[Network]")
   REQUIRE(unique_blocks.size() == my_net.num_nodes_at_level(1));
 }
 
-
 TEST_CASE("Initializing a block for every node", "[Network]")
 {
   SBM_Network my_net({ "a", "b" }, 42);
@@ -291,10 +290,6 @@ TEST_CASE("State dumping and restoring", "[Network")
   Node* a1 = my_net.get_node_by_id("a1", "a");
   Node* a2 = my_net.get_node_by_id("a2", "a");
 
-  // // Grab parent ids from first state
-  // const string a1_parent = state1.parents[index_of_node(state1, "a1")];
-  // const string a2_parent = state1.parents[index_of_node(state1, "a2")];
-
   // Now give merge a1 and a2 to same parent and remove a1s old parent
   swap_blocks(a1,
               a2->get_parent(),
@@ -309,7 +304,7 @@ TEST_CASE("State dumping and restoring", "[Network")
 
   // a2's parent did not change
   REQUIRE(parent_from_state(state1, "a2") == parent_from_state(state2, "a2"));
-  
+
   // a1 and a2 now share a parent
   REQUIRE(parent_from_state(state2, "a1") == parent_from_state(state2, "a2"));
 
@@ -342,8 +337,6 @@ TEST_CASE("State dumping and restoring", "[Network")
   my_net2.add_node("b2", "b");
 
   REQUIRE(my_net2.num_levels() == 1);
-
-  OUT_MSG << "---------- Loading state to fresh network -----------" << std::endl;
 
   my_net2.update_state(state2);
   REQUIRE(my_net2.num_levels() == 2);
