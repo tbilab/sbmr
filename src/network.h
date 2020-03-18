@@ -6,8 +6,8 @@
 #include "vector_helpers.h"
 #include <unordered_map>
 
-// These are seperate and will change based on compiler environemnt and only apply to the 
-// constructor and externally callable methods. 
+// These are seperate and will change based on compiler environemnt and only apply to the
+// constructor and externally callable methods.
 using Input_String_Vec = std::vector<string>;
 using Input_Int_Vec    = std::vector<int>;
 
@@ -69,14 +69,6 @@ class SBM_Network {
       RANGE_ERROR("Type " + as_str(type_index) + " does not exist in network.");
   }
 
-  template <typename String_Container>
-  void build_type_to_int(const String_Container& type_vec) {
-    for (int i = 0; i < type_vec.size(); i++)
-    {
-      type_name_to_int[type_vec[i]] = i;
-    }
-  }
-
   public:
   // =========================================================================
   // Constructor
@@ -85,46 +77,24 @@ class SBM_Network {
               const int random_seed                      = 42)
       : random_sampler(random_seed)
       , types(node_types)
+      , type_name_to_int(build_val_to_index_map(node_types))
   {
-    build_type_to_int(types);
-
-    build_level();
+    build_level(); // Setup empty first level of nodes
   }
 
-  // SBM_Network(const String_Vec& node_ids,
-  //             const String_Vec& node_types,
-  //             const String_Vec& edges_a,
-  //             const String_Vec& edges_b,
-  //             const String_Vec& types)
+  // SBM_Network(const Input_String_Vec& node_ids,
+  //             const Input_String_Vec& node_types,
+  //             const Input_String_Vec& edges_a,
+  //             const Input_String_Vec& edges_b,
+  //             const Input_String_Vec& all_types,
+  //             const int random_seed = 42)
+  //     : random_sampler(random_seed)
+  //     , types(all_types)
   // {
-  
-  //   // Reserve proper number of sub vectors for nodes based on number of types
-  //   nodes = Node_Type_Vec(n_types);
 
-  //   // Build a map to go from type name to index for faster look-up
-  //   for (int i = 0; i < n_types; i++) {
-  //     // Fill in type-to-index map entry for type
-  //     type_to_index.emplace(types_name[i], i);
+  //   build_type_to_int(all_types); // Make sure
 
-  //     // Reserve appropriate size for nodes vector for this type
-  //     nodes[i].reserve(types_count[i]);
-  //   }
-
-
-  //   for (int i = 0; i < nodes_id.size(); i++) {
-  //     // Find index for type
-  //     const auto type_index_it = type_to_index.find(std::string(nodes_type[i]));
-
-  //     // Make sure it fits what we were given
-  //     if (type_index_it == type_to_index.end())
-  //       Rcpp::stop("Node " + string(nodes_id[i]) + " has type (" +
-  //                  string(nodes_type[i]) +
-  //                  ") not found in provided node types");
-
-
-  //     // Build a new node wrapped in smart pointer in it's type vector
-  //     add_node(i, type_index_it->second, types_name.size());
-  //   }
+  //   build_level(); // Setup empty first level of nodes
   // }
 
   // =========================================================================
@@ -277,10 +247,13 @@ class SBM_Network {
 
   void delete_all_blocks()
   {
-    while (has_blocks()) { delete_block_level();}
+    while (has_blocks()) {
+      delete_block_level();
+    }
   }
 
-  bool has_blocks() const {
+  bool has_blocks() const
+  {
     return num_levels() > 1;
   }
 

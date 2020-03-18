@@ -138,4 +138,15 @@ T& get_random_element(std::vector<T>& vec, std::mt19937& random_generator)
   return vec[runif(random_generator)];
 }
 
+template <typename String_Container>
+Int_Map<std::string> build_val_to_index_map(const String_Container& type_vec)
+{
+  Int_Map<std::string> name_to_index;
+  for (int i = 0; i < type_vec.size(); i++) {
+    name_to_index[type_vec[i]] = i;
+  }
+
+  return name_to_index;
+}
+
 #endif
