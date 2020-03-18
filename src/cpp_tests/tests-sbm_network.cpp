@@ -312,6 +312,47 @@ TEST_CASE("State dumping and restoring", "[Network")
   
   // a1 and a2 now share a parent
   REQUIRE(parent_from_state(state2, "a1") == parent_from_state(state2, "a2"));
+
+  // Restore to original state
+  my_net.update_state(state1);
+  REQUIRE(my_net.num_levels() == 2);
+
+  State_Dump state3 = my_net.get_state();
+
+  // a1's parent is same as original state
+  REQUIRE(parent_from_state(state3, "a1") == parent_from_state(state1, "a1"));
+
+  // Which is not the same as a2's parent anymore
+  REQUIRE(parent_from_state(state3, "a1") != parent_from_state(state3, "a2"));
+
+  // The size of the network is correct...
+  REQUIRE(my_net.num_nodes_at_level(1) == 6);
+
+  // We can also build a brand new network without any previous groups and have it assume
+  // the state from before
+
+  SBM_Network my_net2({ "a", "b" }, 42);
+
+  // Start with a few nodes in the network
+  my_net2.add_node("a1", "a");
+  my_net2.add_node("a2", "a");
+  my_net2.add_node("a3", "a");
+  my_net2.add_node("b1", "b");
+  my_net2.add_node("b3", "b");
+  my_net2.add_node("b2", "b");
+
+  REQUIRE(my_net2.num_levels() == 1);
+
+  OUT_MSG << "---------- Loading state to fresh network -----------" << std::endl;
+
+  my_net2.update_state(state2);
+  REQUIRE(my_net2.num_levels() == 2);
+  REQUIRE(my_net2.num_nodes_at_level(1) == 5);
+
+  REQUIRE(my_net2.get_node_by_id("a1", "a")->get_parent()
+          == my_net2.get_node_by_id("a2", "a")->get_parent());
+
+
 }
 
 // // TEST_CASE("Counting edges", "[Network]")
