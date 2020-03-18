@@ -82,20 +82,21 @@ class SBM_Network {
     build_level(); // Setup empty first level of nodes
   }
 
-  // SBM_Network(const Input_String_Vec& node_ids,
-  //             const Input_String_Vec& node_types,
-  //             const Input_String_Vec& edges_a,
-  //             const Input_String_Vec& edges_b,
-  //             const Input_String_Vec& all_types,
-  //             const int random_seed = 42)
-  //     : random_sampler(random_seed)
-  //     , types(all_types)
-  // {
+  SBM_Network(const Input_String_Vec& node_ids,
+              const Input_String_Vec& node_types,
+              const Input_String_Vec& edges_a,
+              const Input_String_Vec& edges_b,
+              const Input_String_Vec& all_types,
+              const int random_seed = 42)
+      : random_sampler(random_seed)
+      , types(all_types)
+      , type_name_to_int(build_val_to_index_map(all_types))
+  {
+    build_level(node_ids.size()); // Setup empty first level of nodes with conservative space reserving
 
-  //   build_type_to_int(all_types); // Make sure
 
-  //   build_level(); // Setup empty first level of nodes
-  // }
+
+  }
 
   // =========================================================================
   // Information
@@ -195,7 +196,7 @@ class SBM_Network {
     const int child_level         = block_level - 1;
 
     // Build empty level
-    build_level();
+    build_level(one_block_per_node ? 0: num_blocks);
 
     // Loop over all node types
     for (int type_i = 0; type_i < num_types(); type_i++) {
@@ -230,9 +231,16 @@ class SBM_Network {
     }
   }
 
-  void build_level()
+  void build_level(const int reserve_size = 0)
   {
     nodes.emplace_back(num_types());
+
+    // If we were told to reserve a size for each type vec, do so.
+    if (reserve_size > 0) {
+      for (auto& type_vec : nodes.at(num_levels() - 1)) {
+        type_vec.reserve(reserve_size);
+      }
+    }
   }
 
   void delete_block_level()
