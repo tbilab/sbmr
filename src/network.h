@@ -39,7 +39,10 @@ class SBM_Network {
   std::vector<Type_Vec> nodes;
   std::vector<string> types;
   Int_Map<string> type_name_to_int;
+  std::map<int, std::set<int>> connection_types;
+  bool connection_limits = false;
   String_Map<Node*> id_to_node;
+
   Sampler random_sampler;
   int block_counter = 0; // Keeps track of how many block we've had
 
@@ -88,10 +91,13 @@ class SBM_Network {
               const Input_String_Vec& edges_a,
               const Input_String_Vec& edges_b,
               const Input_String_Vec& all_types,
-              const int random_seed = 42)
+              const int random_seed = 42,
+              const Input_String_Vec& allowed_edges_a = {},
+              const Input_String_Vec& allowed_edges_b = {})
       : random_sampler(random_seed)
       , types(all_types)
       , type_name_to_int(build_val_to_index_map(all_types))
+      , connection_limits(allowed_edges_a.size() != 0)
   {
     build_level(node_ids.size()); // Setup empty first level of nodes with conservative space reserving
 
@@ -100,6 +106,13 @@ class SBM_Network {
       add_node(node_ids[i], node_types[i]);
     }
 
+    // Fill in map to get allowed connection types for node type if they are provided
+    if (connection_limits) {
+      for (int i = 0; i < allowed_edges_a.size(); i++) {
+        add_allowed_connection(get_type_index(allowed_edges_a[i]),
+                               get_type_index(allowed_edges_b[i]));
+      }
+    }
   }
 
   // =========================================================================
@@ -195,6 +208,35 @@ class SBM_Network {
     get_nodes_of_type(type_index, level).push_back(std::move(new_node));
 
     return node_ptr;
+  }
+
+  void add_edge(const string& node_a, const string& node_b)
+  {
+    Node* a = get_node_by_id(node_a);
+    Node* b = get_node_by_id(node_b);
+    if (connection_limits) {
+      validate_edge(a, b); 
+    } else {
+      add_allowed_connection(a->get_type(), b->get_type());
+    }
+
+    a->add_edge(b);
+    b->add_edge(a);
+  }
+
+  void add_allowed_connection(const int type_a, const int type_b) {
+    connection_types[type_a].insert(type_b);
+    connection_types[type_b].insert(type_a);
+  }
+
+  void validate_edge(Node* node_a, Node* node_b)
+  {
+    if (connection_types.at(node_a->get_type()).count(node_a->get_type()) == 0) {
+      LOGIC_ERROR("Connection between nodes "
+                  + node_a->get_id() + " & " + node_b->get_id()
+                  + " of types " + types[node_a->get_type()] + " & " + types[node_b->get_type()]
+                  + " respectively not allowed.");
+    }
   }
 
   void initialize_blocks(int num_blocks = -1)
