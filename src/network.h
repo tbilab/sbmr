@@ -6,6 +6,7 @@
 #include "vector_helpers.h"
 #include <unordered_map>
 
+using String_Vec = std::vector<string>;
 using Node_UPtr_Vec = std::vector<Node_UPtr>;
 using Type_Vec      = std::vector<std::vector<Node_UPtr>>;
 
@@ -64,6 +65,13 @@ class SBM_Network {
       RANGE_ERROR("Type " + as_str(type_index) + " does not exist in network.");
   }
 
+  void build_type_to_int(const String_Vec& type_vec) {
+    for (int i = 0; i < type_vec.size(); i++)
+    {
+      type_name_to_int[type_vec[i]] = i;
+    }
+  }
+
   public:
   // =========================================================================
   // Constructor
@@ -73,13 +81,46 @@ class SBM_Network {
       : random_sampler(random_seed)
       , types(node_types)
   {
-    int c_index = 0;
-    for (const auto& type_name : node_types) {
-      type_name_to_int[type_name] = c_index++;
-    }
+    build_type_to_int(types);
 
     build_level();
   }
+
+  // SBM_Network(const String_Vec& node_ids,
+  //             const String_Vec& node_types,
+  //             const String_Vec& edges_a,
+  //             const String_Vec& edges_b,
+  //             const String_Vec& types)
+  // {
+  
+  //   // Reserve proper number of sub vectors for nodes based on number of types
+  //   nodes = Node_Type_Vec(n_types);
+
+  //   // Build a map to go from type name to index for faster look-up
+  //   for (int i = 0; i < n_types; i++) {
+  //     // Fill in type-to-index map entry for type
+  //     type_to_index.emplace(types_name[i], i);
+
+  //     // Reserve appropriate size for nodes vector for this type
+  //     nodes[i].reserve(types_count[i]);
+  //   }
+
+
+  //   for (int i = 0; i < nodes_id.size(); i++) {
+  //     // Find index for type
+  //     const auto type_index_it = type_to_index.find(std::string(nodes_type[i]));
+
+  //     // Make sure it fits what we were given
+  //     if (type_index_it == type_to_index.end())
+  //       Rcpp::stop("Node " + string(nodes_id[i]) + " has type (" +
+  //                  string(nodes_type[i]) +
+  //                  ") not found in provided node types");
+
+
+  //     // Build a new node wrapped in smart pointer in it's type vector
+  //     add_node(i, type_index_it->second, types_name.size());
+  //   }
+  // }
 
   // =========================================================================
   // Information
