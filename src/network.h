@@ -39,6 +39,7 @@ class SBM_Network {
   std::vector<Type_Vec> nodes;
   std::vector<string> types;
   Int_Map<string> type_name_to_int;
+  String_Map<Node*> id_to_node;
   Sampler random_sampler;
   int block_counter = 0; // Keeps track of how many block we've had
 
@@ -94,7 +95,10 @@ class SBM_Network {
   {
     build_level(node_ids.size()); // Setup empty first level of nodes with conservative space reserving
 
-
+    for (int i = 0; i < node_ids.size(); i++)
+    {
+      add_node(node_ids[i], node_types[i]);
+    }
 
   }
 
@@ -182,6 +186,10 @@ class SBM_Network {
 
     // Get raw pointer to node to return
     Node* node_ptr = new_node.get();
+
+    // Place this node in the id-to-node map if its a data-level node
+    if (level == 0)
+      id_to_node.emplace(id, node_ptr);
 
     // Move node unique pointer into its type in map
     get_nodes_of_type(type_index, level).push_back(std::move(new_node));
@@ -276,12 +284,8 @@ class SBM_Network {
     delete_all_blocks(); // Remove all block levels
     build_level();       // Add an empty block level to fill in
 
-    // Build a map to get nodes by id
-    String_Map<Node*> node_by_id;
-    auto add_node_to_map = [&node_by_id](const Node_UPtr& node) {
-      node_by_id[node->get_id()] = node.get();
-    };
-    for_all_nodes_at_level(0, add_node_to_map);
+    // Make a copy of the id_to_node map (We will later overwrite it)
+    String_Map<Node*> node_by_id = id_to_node;
 
     // Setup map to get blocks/parents by id
     String_Map<Node*> block_by_id;
@@ -349,15 +353,14 @@ class SBM_Network {
     return get_nodes_of_type(get_type_index(type), level);
   }
 
-  Node* get_node_by_id(const string& id, const string& type)
+  Node* get_node_by_id(const string& id)
   {
-    // Slow. To be only used in testing/debugging
-    auto& nodes_of_type = get_nodes_of_type(type);
+    const auto node_it = id_to_node.find(id);
 
-    return std::find_if(
-               nodes_of_type.begin(),
-               nodes_of_type.end(),
-               [&id](Node_UPtr& node) { return node->get_id() == id; })
-        ->get();
+    if(node_it == id_to_node.end()) {
+      LOGIC_ERROR("Node " + id + " not found in network");
+    }
+
+    return node_it->second;
   }
 };
