@@ -32,6 +32,12 @@ struct State_Dump {
   int size() const { return ids.size(); }
 };
 
+enum Partite_Structure {
+  unipartite,             // One node type
+  multipartite,           // Multiple node types, all possible edges between non_like types allowed
+  multipartite_restricted // Multiple node types, only specific type combos allowed for edges
+};
+
 class SBM_Network {
 
   private:
@@ -40,8 +46,8 @@ class SBM_Network {
   std::vector<string> types;
   Int_Map<string> type_name_to_int;
   std::map<int, std::set<int>> connection_types;
-  bool connection_limits = false;
   String_Map<Node*> id_to_node;
+  Partite_Structure edge_types;
 
   Sampler random_sampler;
   int block_counter = 0; // Keeps track of how many block we've had
@@ -97,12 +103,16 @@ class SBM_Network {
       : random_sampler(random_seed)
       , types(all_types)
       , type_name_to_int(build_val_to_index_map(all_types))
-      , connection_limits(allowed_edges_a.size() != 0)
+      , edge_types(all_types.size() == 1
+                       ? unipartite
+                       : allowed_edges_a.size() == 0
+                           ? multipartite
+                           : multipartite_restricted)
   {
     build_level(node_ids.size()); // Setup empty first level of nodes with conservative space reserving
 
     // Fill in map to get allowed connection types if they are provided
-    if (connection_limits) {
+    if (edge_types == multipartite_restricted) {
       for (int i = 0; i < allowed_edges_a.size(); i++) {
         add_allowed_connection(get_type_index(allowed_edges_a[i]),
                                get_type_index(allowed_edges_b[i]));
@@ -219,10 +229,16 @@ class SBM_Network {
   {
     Node* a = get_node_by_id(node_a);
     Node* b = get_node_by_id(node_b);
-    if (connection_limits) {
-      validate_edge(a, b); 
-    } else {
+    switch (edge_types) {
+    case unipartite: 
+      // Do nothing
+      break;
+    case multipartite_restricted:
+      validate_edge(a, b);
+      break;
+    case multipartite:
       add_allowed_connection(a->get_type(), b->get_type());
+      break;
     }
 
     a->add_edge(b);
