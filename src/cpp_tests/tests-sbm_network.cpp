@@ -440,6 +440,29 @@ TEST_CASE("Building with vectors -- Bipartite", "[Network]")
   REQUIRE(my_net.num_nodes_of_type("b") == 2);
 }
 
+TEST_CASE("Building with vectors -- Tripartite", "[Network]")
+{
+  const std::vector<string> nodes_id{"a1", "a2", "b1", "c1", "c2"};
+  const std::vector<string> nodes_type{"a", "a", "b", "c", "c"};
+  const std::vector<string> types_name{"a", "b", "c"};
+
+  // Only has connections from a-b and a-c
+  const std::vector<string> edges_from{"a1", "a1", "a2", "a2"};
+  const std::vector<string>   edges_to{"b1", "c1", "b1", "c2"};
+
+  SBM_Network my_net { nodes_id, nodes_type,
+                       edges_from, edges_to,
+                       types_name };
+
+  REQUIRE(my_net.num_nodes() == 5);
+  REQUIRE(my_net.num_types() == 3);
+  REQUIRE(my_net.num_nodes_of_type("a") == 2);
+  REQUIRE(my_net.num_nodes_of_type("b") == 1);
+  REQUIRE(my_net.num_nodes_of_type("c") == 2);
+}
+
+
+
 // // TEST_CASE("Counting edges", "[Network]")
 // // {
 // //   SBM my_net;
