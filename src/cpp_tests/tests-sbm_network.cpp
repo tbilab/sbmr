@@ -401,7 +401,7 @@ TEST_CASE("State dumping and restoring: w/ metablocks", "[Network")
   REQUIRE(my_net2.num_nodes_at_level(2) == 4);
 }
 
-TEST_CASE("Building with vectors", "[Network]")
+TEST_CASE("Building with vectors -- Unipartite", "[Network]")
 {
   const std::vector<string> nodes_id{"a1", "a2", "a3"};
   const std::vector<string> nodes_type{"a", "a", "a"};
@@ -411,15 +411,33 @@ TEST_CASE("Building with vectors", "[Network]")
   const std::vector<string> edges_from{"a1", "a1", "a1", "a2", "a2"};
   const std::vector<string>   edges_to{"a1", "a2", "a3", "a2", "a3"};
 
-  SBM_Network my_net{
-    nodes_id, nodes_type,
-    edges_from, edges_to,
-    types_name
-  };
+  SBM_Network my_net { nodes_id, nodes_type,
+                       edges_from, edges_to,
+                       types_name };
 
   REQUIRE(my_net.num_nodes() == 3);
   REQUIRE(my_net.num_types() == 1);
   REQUIRE(my_net.num_nodes_of_type("a") == 3);
+}
+
+TEST_CASE("Building with vectors -- Bipartite", "[Network]")
+{
+  const std::vector<string> nodes_id{"a1", "a2", "b1", "b2"};
+  const std::vector<string> nodes_type{"a", "a", "b", "b"};
+  const std::vector<string> types_name{"a", "b"};
+
+  // Fully connected bipartite network
+  const std::vector<string> edges_from{"a1", "a1", "a2", "a2"};
+  const std::vector<string>   edges_to{"b1", "b2", "b1", "b2"};
+
+  SBM_Network my_net { nodes_id, nodes_type,
+                       edges_from, edges_to,
+                       types_name };
+
+  REQUIRE(my_net.num_nodes() == 4);
+  REQUIRE(my_net.num_types() == 2);
+  REQUIRE(my_net.num_nodes_of_type("a") == 2);
+  REQUIRE(my_net.num_nodes_of_type("b") == 2);
 }
 
 // // TEST_CASE("Counting edges", "[Network]")
