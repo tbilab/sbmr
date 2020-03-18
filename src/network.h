@@ -91,7 +91,7 @@ class SBM_Network {
               const Input_String_Vec& edges_a,
               const Input_String_Vec& edges_b,
               const Input_String_Vec& all_types,
-              const int random_seed = 42,
+              const int random_seed                   = 42,
               const Input_String_Vec& allowed_edges_a = {},
               const Input_String_Vec& allowed_edges_b = {})
       : random_sampler(random_seed)
@@ -101,17 +101,22 @@ class SBM_Network {
   {
     build_level(node_ids.size()); // Setup empty first level of nodes with conservative space reserving
 
-    for (int i = 0; i < node_ids.size(); i++)
-    {
-      add_node(node_ids[i], node_types[i]);
-    }
-
-    // Fill in map to get allowed connection types for node type if they are provided
+    // Fill in map to get allowed connection types if they are provided
     if (connection_limits) {
       for (int i = 0; i < allowed_edges_a.size(); i++) {
         add_allowed_connection(get_type_index(allowed_edges_a[i]),
                                get_type_index(allowed_edges_b[i]));
       }
+    }
+
+    // Add nodes to network
+    for (int i = 0; i < node_ids.size(); i++) {
+      add_node(node_ids[i], node_types[i]);
+    }
+
+    // Connect nodes with edges
+    for (int i = 0; i < edges_a.size(); i++) {
+      add_edge(edges_a[i], edges_b[i]);
     }
   }
 
