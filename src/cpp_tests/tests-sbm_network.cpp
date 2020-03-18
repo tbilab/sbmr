@@ -401,6 +401,27 @@ TEST_CASE("State dumping and restoring: w/ metablocks", "[Network")
   REQUIRE(my_net2.num_nodes_at_level(2) == 4);
 }
 
+TEST_CASE("Building with vectors", "[Network]")
+{
+  const std::vector<string> nodes_id{"a1", "a2", "a3"};
+  const std::vector<string> nodes_type{"a", "a", "a"};
+  const std::vector<string> types_name{"a"};
+
+  // Fully connected network (Except a3, which is not connected to itself)
+  const std::vector<string> edges_from{"a1", "a1", "a1", "a2", "a2"};
+  const std::vector<string>   edges_to{"a1", "a2", "a3", "a2", "a3"};
+
+  SBM_Network my_net{
+    nodes_id, nodes_type,
+    edges_from, edges_to,
+    types_name
+  };
+
+  REQUIRE(my_net.num_nodes() == 3);
+  REQUIRE(my_net.num_types() == 1);
+  REQUIRE(my_net.num_nodes_of_type("a") == 3);
+}
+
 // // TEST_CASE("Counting edges", "[Network]")
 // // {
 // //   SBM my_net;
