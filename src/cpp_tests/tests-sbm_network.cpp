@@ -461,7 +461,43 @@ TEST_CASE("Building with vectors -- Tripartite", "[Network]")
   REQUIRE(my_net.num_nodes_of_type("c") == 2);
 }
 
+TEST_CASE("Building with vectors -- Restricted tripartite", "[Network]")
+{
+  const std::vector<string> nodes_id{"a1", "a2", "b1", "b2", "c1", "c2"};
+  const std::vector<string> nodes_type{"a", "a", "b", "b", "c", "c"};
+  const std::vector<string> types_name{"a", "b", "c"};
 
+  const std::vector<string> edges_from{"a1", "a1", "a2", "b1", "b1", "b2"};
+  const std::vector<string>   edges_to{"b1", "b2", "b1", "c1", "c2", "c1"};
+
+  // Has connections from a-b and b-c
+  const std::vector<string> type_from{"a", "b"};
+  const std::vector<string>   type_to{"b", "c"};
+
+  SBM_Network my_net { nodes_id, nodes_type,
+                       edges_from, edges_to,
+                       types_name,
+                       42,
+                       type_from, type_to };
+
+  REQUIRE(my_net.num_nodes() == 6);
+  REQUIRE(my_net.num_types() == 3);
+  REQUIRE(my_net.num_nodes_of_type("a") == 2);
+  REQUIRE(my_net.num_nodes_of_type("b") == 2);
+  REQUIRE(my_net.num_nodes_of_type("c") == 2);
+
+  // Try adding an edges with unallowed types
+  const std::vector<string> bad_edges_from { "b1", "a1", "a1", "a2", "a2", "b1", "b1" };
+  const std::vector<string> bad_edges_to { "b2", "b1", "c1", "b1", "c2", "c2", "c1" };
+  
+  // Will complain
+  REQUIRE_THROWS(
+      SBM_Network { nodes_id, nodes_type,
+                    bad_edges_from, bad_edges_to,
+                    types_name,
+                    42,
+                    type_from, type_to});
+}
 
 // // TEST_CASE("Counting edges", "[Network]")
 // // {
