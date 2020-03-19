@@ -405,16 +405,11 @@ class SBM_Network {
   // =========================================================================
   // Node Grabbers
   // =========================================================================
-  Type_Vec& get_nodes_at_level(const int level = 0)
-  {
-    check_for_level(level);
-    return nodes.at(level);
-  }
-
   Node_UPtr_Vec& get_nodes_of_type(const int type_index, const int level = 0)
   {
+    check_for_level(level);
     check_for_type(type_index);
-    return get_nodes_at_level(level)[type_index];
+    return nodes[level][type_index];
   }
 
   Node_UPtr_Vec& get_nodes_of_type(const std::string& type, const int level = 0)
