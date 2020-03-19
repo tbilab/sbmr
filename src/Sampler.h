@@ -6,8 +6,8 @@
 
 #include "error_and_message_macros.h"
 #include <list>
-#include <vector>
 #include <random>
+#include <vector>
 
 using Random_Engine = std::mt19937;
 using C_Unif        = std::uniform_real_distribution<>;
@@ -100,6 +100,31 @@ class Sampler {
   {
     // Select a random index to return element at that index
     return node_vec.at(get_rand_int(node_vec.size() - 1));
+  }
+
+  template <typename T>
+  T& sample(std::vector<std::vector<T>>& vec_of_vecs, int n = -1)
+  {
+    // If size was not provided, get it
+    if (n == -1) {
+      n = total_num_elements(vec_of_vecs);
+    }
+   
+    int random_index = get_rand_int(n-1);
+
+    // Loop through subvectors and see if we can index into sub vector with random index
+    // If we can't then subtract the current subvector size from random index and keep going
+    for (auto& sub_vec : vec_of_vecs) {
+      const int current_size = sub_vec.size();
+      if (current_size <= random_index) {
+        random_index -= current_size;
+      } else {
+        return sub_vec[random_index];
+      }
+    }
+    LOGIC_ERROR("Random element could not be selected. Check formation of vectors");
+    // Default return is just the first element... potentially dangerous
+    return vec_of_vecs.at(0).at(0);
   }
 
   // =============================================================================
