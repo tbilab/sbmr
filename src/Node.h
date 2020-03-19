@@ -120,8 +120,8 @@ class Node {
     if (level != new_parent->level - 1) 
       LOGIC_ERROR("Parent node must be one level above child");
 
-    // Remove self from previous parents children list (if it existed)
-    if (has_parent())
+    // Remove self from previous parent's children list (if it existed)
+    if (has_parent()) 
       parent_node->remove_child(this);
 
     // Add this node to new parent's children list
@@ -199,6 +199,7 @@ class Node {
 
   void update_neighbors(const Edges_By_Type& neighbors_to_update, const Update_Type& update_type)
   {
+
     int type_i = 0;
 
     for (const auto& nodes_of_type : neighbors_to_update) {
@@ -218,6 +219,10 @@ class Node {
         }
       }
     }
+
+    // Propagate edge changes up hierarchy
+    if (has_parent()) 
+      parent_node->update_neighbors(neighbors_to_update, update_type);
   }
 
   // =========================================================================
