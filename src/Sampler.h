@@ -45,12 +45,15 @@ class Sampler {
   {
   }
 
-  Sampler& operator=(const Sampler&) = delete;
-
   // Move operations
-  Sampler(Sampler&&) = delete;
-  Sampler& operator=(Sampler&&) = delete;
+  Sampler& operator  =(Sampler&& moved_sampler)
+  {
+    generator = std::move(moved_sampler.generator);
+    return *this;
+  };
 
+  Sampler& operator=(const Sampler&) = delete;
+  Sampler(Sampler&&) = delete;
   // ==========================================
   // Methods
   // =============================================================================
@@ -109,8 +112,8 @@ class Sampler {
     if (n == -1) {
       n = total_num_elements(vec_of_vecs);
     }
-   
-    int random_index = get_rand_int(n-1);
+
+    int random_index = get_rand_int(n - 1);
 
     // Loop through subvectors and see if we can index into sub vector with random index
     // If we can't then subtract the current subvector size from random index and keep going
