@@ -93,15 +93,6 @@ class SBM_Network {
   // =========================================================================
   // Constructors
   // =========================================================================
-  SBM_Network(const std::vector<std::string>& node_types = { "node" },
-              const int random_seed                      = 42)
-      : random_sampler(random_seed)
-      , types(node_types)
-      , type_name_to_int(build_val_to_index_map(node_types))
-  {
-    build_level(); // Setup empty first level of nodes
-  }
-
   SBM_Network(const Input_String_Vec& node_ids,
               const Input_String_Vec& node_types,
               const Input_String_Vec& edges_a,
@@ -138,6 +129,23 @@ class SBM_Network {
     for (int i = 0; i < edges_a.size(); i++) {
       add_edge(edges_a[i], edges_b[i]);
     }
+  }
+
+  // Builds a network without any nodes or edges
+  // Calls the main constructor with empty node and edge vectors
+  SBM_Network(const Input_String_Vec& all_types       = { "node" },
+              const int random_seed                   = 42,
+              const Input_String_Vec& allowed_edges_a = {},
+              const Input_String_Vec& allowed_edges_b = {})
+      : SBM_Network(Input_String_Vec {},
+                    Input_String_Vec {},
+                    Input_String_Vec {},
+                    Input_String_Vec {},
+                    all_types,
+                    random_seed,
+                    allowed_edges_a,
+                    allowed_edges_b)
+  {
   }
 
   // =========================================================================
