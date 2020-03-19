@@ -634,6 +634,10 @@ TEST_CASE("Counting edges", "[Network]")
   REQUIRE(b12->degree() == 2);
   REQUIRE(b13->degree() == 3);
 
+  REQUIRE(a21->degree() == 5);
+  REQUIRE(a22->degree() == 4);
+  REQUIRE(b21->degree() == 6);
+  REQUIRE(b22->degree() == 3);
 
   // Check num edges between blocks
   auto a11_edges_new = a11->gather_neighbors_at_level(1);
@@ -650,4 +654,13 @@ TEST_CASE("Counting edges", "[Network]")
   REQUIRE(a13_edges_new[b11] == 1);
   REQUIRE(a13_edges_new[b12] == 1);
   REQUIRE(a13_edges_new[b13] == 2);
+
+  // Repeat for level 2
+  auto a21_edges_new = a21->gather_neighbors_at_level(2);
+  REQUIRE(a21_edges_new[b21] == 4);
+  REQUIRE(a21_edges_new[b22] == 1);
+
+  auto a22_edges_new = a22->gather_neighbors_at_level(2);
+  REQUIRE(a22_edges_new[b21] == 2);
+  REQUIRE(a22_edges_new[b22] == 2);
 }
