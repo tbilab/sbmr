@@ -34,10 +34,10 @@ TEST_CASE("Basic Initialization", "[Node]")
   REQUIRE(n1->parent_at_level(1)->id() == n1->parent()->id());
 
   // // Make sure the edge propigate properly.
-  // REQUIRE("m1, m3" == print_node_ids(n1->get_edges_of_type(1,0)));
-  // REQUIRE("d1, d2" == print_node_ids(n1->get_edges_of_type(1,1)));
-  // REQUIRE("d1, d1, d2" == print_node_ids(c1->get_edges_of_type(1,1)));
-  // REQUIRE("d2, d2" == print_node_ids(c2->get_edges_of_type(1,1)));
+  // REQUIRE("m1, m3" == print_node_ids(n1->edges_of_type(1,0)));
+  // REQUIRE("d1, d2" == print_node_ids(n1->edges_of_type(1,1)));
+  // REQUIRE("d1, d1, d2" == print_node_ids(c1->edges_of_type(1,1)));
+  // REQUIRE("d2, d2" == print_node_ids(c2->edges_of_type(1,1)));
 }
 
 TEST_CASE("Block id construction", "[Node]")

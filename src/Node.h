@@ -175,7 +175,7 @@ class Node {
   // =========================================================================
   // Edge-Related methods
   // =========================================================================
-  Node_Ptr_Vec& get_edges_of_type(const int node_type)
+  Node_Ptr_Vec& edges_of_type(const int node_type)
   {
     return _edges.at(node_type);
   }
@@ -186,9 +186,9 @@ class Node {
     // Setup an edge count map for node
     Edge_Count_Map edges_counts;
 
-    for (const auto& edges_of_type : _edges) {
-      for (const auto& edge : edges_of_type) {
-        edges_counts[edge->parent_at_level(level)]++;
+    for (const auto& nodes_of_type : _edges) {
+      for (const auto& node : nodes_of_type) {
+        edges_counts[node->parent_at_level(level)]++;
       }
     }
 
@@ -197,11 +197,11 @@ class Node {
 
   void add_edge(Node* node)
   {
-    get_edges_of_type(node->type()).push_back(node);
+    edges_of_type(node->type()).push_back(node);
     degree++;
   }
 
-  Edges_By_Type& edges()
+  Edges_By_Type& edges() 
   {
     return _edges;
   }
@@ -210,18 +210,18 @@ class Node {
   {
     int type_i = 0;
 
-    for (const auto& edges_of_type : edges_to_update) {
+    for (const auto& nodes_of_type : edges_to_update) {
       // Get references to this node's edges to type (update type for next go-round)
-      auto& node_edges_of_type = get_edges_of_type(type_i++);
+      auto& node_edges_of_type = edges_of_type(type_i++);
 
-      for (const auto& edge : edges_of_type) {
+      for (const auto& node : nodes_of_type) {
         switch (update_type) {
         case Remove:
-          delete_from_vector(node_edges_of_type, edge);
+          delete_from_vector(node_edges_of_type, node);
           degree--;
           break;
         case Add:
-          node_edges_of_type.push_back(edge);
+          node_edges_of_type.push_back(node);
           degree++;
           break;
         }
