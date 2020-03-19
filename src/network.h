@@ -154,7 +154,7 @@ class SBM_Network {
 
     // Connect nodes with edges
     for (int i = 0; i < edges_a.size(); i++) {
-      add_neighbor(edges_a[i], edges_b[i]);
+      add_edge(edges_a[i], edges_b[i]);
     }
   }
 
@@ -242,7 +242,7 @@ class SBM_Network {
     return node_ptr;
   }
 
-  void add_neighbor(const string& node_a, const string& node_b)
+  void add_edge(const string& node_a, const string& node_b)
   {
     Node* a = get_node_by_id(node_a);
     Node* b = get_node_by_id(node_b);
@@ -278,10 +278,7 @@ class SBM_Network {
       get_nodes_of_type(type_i, block_level).reserve(num_blocks);
 
       for (int i = 0; i < num_blocks; i++) {
-        // Build a new block node wrapped in smart pointer in it's type vector
-        add_node("b_" + as_str(block_counter++),
-                 type_i,
-                 block_level);
+        add_node("b_" + as_str(block_counter++), type_i, block_level);
       }
 
       Node_UPtr_Vec& blocks_of_type = get_nodes_of_type(type_i, block_level);

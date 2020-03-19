@@ -499,186 +499,168 @@ TEST_CASE("Building with vectors -- Restricted tripartite", "[Network]")
                     type_from, type_to});
 }
 
-// // TEST_CASE("Counting edges", "[Network]")
-// // {
-// //   SBM my_net;
+TEST_CASE("Counting edges", "[Network]")
+{
+  SBM_Network my_net{{ "a", "b" }, 42};
 
-// //   // Base-level nodes
-// //   NodePtr a1 = my_net.add_node("a1", "a");
-// //   NodePtr a2 = my_net.add_node("a2", "a");
-// //   NodePtr a3 = my_net.add_node("a3", "a");
-// //   NodePtr a4 = my_net.add_node("a4", "a");
-// //   NodePtr a5 = my_net.add_node("a5", "a");
+  // Base-level nodes
+  Node* a1 = my_net.add_node("a1", "a");
+  Node* a2 = my_net.add_node("a2", "a");
+  Node* a3 = my_net.add_node("a3", "a");
+  Node* a4 = my_net.add_node("a4", "a");
+  Node* a5 = my_net.add_node("a5", "a");
 
-// //   NodePtr b1 = my_net.add_node("b1", "b");
-// //   NodePtr b2 = my_net.add_node("b2", "b");
-// //   NodePtr b3 = my_net.add_node("b3", "b");
-// //   NodePtr b4 = my_net.add_node("b4", "b");
-// //   NodePtr b5 = my_net.add_node("b5", "b");
+  Node* b1 = my_net.add_node("b1", "b");
+  Node* b2 = my_net.add_node("b2", "b");
+  Node* b3 = my_net.add_node("b3", "b");
+  Node* b4 = my_net.add_node("b4", "b");
+  Node* b5 = my_net.add_node("b5", "b");
 
-// //   // level one blocks
-// //   NodePtr a11 = my_net.add_node("a11", "a", 1);
-// //   NodePtr a12 = my_net.add_node("a12", "a", 1);
-// //   NodePtr a13 = my_net.add_node("a13", "a", 1);
-// //   NodePtr b11 = my_net.add_node("b11", "b", 1);
-// //   NodePtr b12 = my_net.add_node("b12", "b", 1);
-// //   NodePtr b13 = my_net.add_node("b13", "b", 1);
+  // level one blocks
+  my_net.build_level();
+  Node* a11 = my_net.add_node("a11", "a", 1);
+  Node* a12 = my_net.add_node("a12", "a", 1);
+  Node* a13 = my_net.add_node("a13", "a", 1);
+  Node* b11 = my_net.add_node("b11", "b", 1);
+  Node* b12 = my_net.add_node("b12", "b", 1);
+  Node* b13 = my_net.add_node("b13", "b", 1);
 
-// //   // level two blocks
-// //   NodePtr a21 = my_net.add_node("a21", "a", 2);
-// //   NodePtr a22 = my_net.add_node("a22", "a", 2);
-// //   NodePtr b21 = my_net.add_node("b21", "b", 2);
-// //   NodePtr b22 = my_net.add_node("b22", "b", 2);
+  // level two blocks
+  my_net.build_level();
+  Node* a21 = my_net.add_node("a21", "a", 2);
+  Node* a22 = my_net.add_node("a22", "a", 2);
+  Node* b21 = my_net.add_node("b21", "b", 2);
+  Node* b22 = my_net.add_node("b22", "b", 2);
 
-// //   // Add edges
-// //   my_net.add_neighbor("a1", "b1");
-// //   my_net.add_neighbor("a1", "b2");
-// //   my_net.add_neighbor("a2", "b1");
-// //   my_net.add_neighbor("a2", "b3");
-// //   my_net.add_neighbor("a2", "b5");
-// //   my_net.add_neighbor("a3", "b2");
-// //   my_net.add_neighbor("a4", "b4");
-// //   my_net.add_neighbor("a4", "b5");
-// //   my_net.add_neighbor("a5", "b3");
+  // Add edges
+  my_net.add_edge("a1", "b1");
+  my_net.add_edge("a1", "b2");
+  my_net.add_edge("a2", "b1");
+  my_net.add_edge("a2", "b3");
+  my_net.add_edge("a2", "b5");
+  my_net.add_edge("a3", "b2");
+  my_net.add_edge("a4", "b4");
+  my_net.add_edge("a4", "b5");
+  my_net.add_edge("a5", "b3");
 
-// //   // Set hierarchy
+  // Set hierarchy
 
-// //   // Nodes -> level 1
-// //   a1->set_parent(a11);
+  // Nodes -> level 1
+  a1->set_parent(a11);
 
-// //   a2->set_parent(a12);
-// //   a3->set_parent(a12);
+  a2->set_parent(a12);
+  a3->set_parent(a12);
 
-// //   a4->set_parent(a13);
-// //   a5->set_parent(a13);
+  a4->set_parent(a13);
+  a5->set_parent(a13);
 
-// //   b1->set_parent(b11);
-// //   b2->set_parent(b11);
+  b1->set_parent(b11);
+  b2->set_parent(b11);
 
-// //   b3->set_parent(b12);
+  b3->set_parent(b12);
 
-// //   b4->set_parent(b13);
-// //   b5->set_parent(b13);
+  b4->set_parent(b13);
+  b5->set_parent(b13);
 
-// //   // level 1 -> level 2
-// //   a11->set_parent(a21);
-// //   a12->set_parent(a21);
-// //   a13->set_parent(a22);
+  // level 1 -> level 2
+  a11->set_parent(a21);
+  a12->set_parent(a21);
+  a13->set_parent(a22);
 
-// //   b11->set_parent(b21);
-// //   b12->set_parent(b21);
-// //   b13->set_parent(b22);
+  b11->set_parent(b21);
+  b12->set_parent(b21);
+  b13->set_parent(b22);
 
-// //   // Make sure our SBM is the proper size
+  // Make sure our SBM is the proper size
 
-// //   // There should be three total layers...
-// //   REQUIRE(3 == my_net.nodes.size());
-// //   REQUIRE(3 == my_net.node_type_counts.at("a").size());
+  // Make sure node degrees are correct
+  REQUIRE(a11->degree() == 2);
+  REQUIRE(a12->degree() == 4);
+  REQUIRE(a13->degree() == 3);
+  REQUIRE(b11->degree() == 4);
+  REQUIRE(b12->degree() == 2);
+  REQUIRE(b13->degree() == 3);
 
-// //   // 10 nodes at first level...
-// //   REQUIRE(10 == my_net.nodes.at(0)->size());
-// //   REQUIRE(6 == my_net.nodes.at(1)->size());
-// //   REQUIRE(4 == my_net.nodes.at(2)->size());
+  REQUIRE(a21->degree() == 6);
+  REQUIRE(a22->degree() == 3);
+  REQUIRE(b21->degree() == 6);
+  REQUIRE(b22->degree() == 3);
 
-// //   // Make sure node degrees are correct
-// //   REQUIRE(a11->degree == 2);
-// //   REQUIRE(a12->degree == 4);
-// //   REQUIRE(a13->degree == 3);
-// //   REQUIRE(b11->degree == 4);
-// //   REQUIRE(b12->degree == 2);
-// //   REQUIRE(b13->degree == 3);
+  // Gather edges between all blocks at level one
+  // Check num edges between blocks
+  auto a11_edges = a11->gather_neighbors_at_level(1);
+  REQUIRE(a11_edges[b11] == 2);
+  REQUIRE(a11_edges[b12] == 0);
+  REQUIRE(a11_edges[b13] == 0);
 
-// //   REQUIRE(a21->degree == 6);
-// //   REQUIRE(a22->degree == 3);
-// //   REQUIRE(b21->degree == 6);
-// //   REQUIRE(b22->degree == 3);
+  auto a12_edges = a12->gather_neighbors_at_level(1);
+  REQUIRE(a12_edges[b11] == 2);
 
-// //   // Gather edges between all blocks at level one
-// //   const auto level_1_counts = my_net.get_block_edge_counts(1);
+  REQUIRE(a12_edges[b12] == 1);
 
-// //   REQUIRE(level_1_counts.size() > 1);
+  REQUIRE(a12_edges[b13] == 1);
 
-// //   // Check num edges between blocks
-// //   auto a11_edges = a11->gather_neighbors_at_level(1);
-// //   REQUIRE(a11_edges[b11] == 2);
-// //   REQUIRE(level_1_counts.at(Edge(a11, b11)) == 2);
-// //   REQUIRE(a11_edges[b12] == 0);
-// //   REQUIRE(a11_edges[b13] == 0);
+  auto a13_edges = a13->gather_neighbors_at_level(1);
+  REQUIRE(a13_edges[b11] == 0);
+  REQUIRE(a13_edges[b12] == 1);
+  REQUIRE(a13_edges[b13] == 2);
 
-// //   auto a12_edges = a12->gather_neighbors_at_level(1);
-// //   REQUIRE(a12_edges[b11] == 2);
-// //   REQUIRE(level_1_counts.at(Edge(a12, b11)) == 2);
+  // Direction shouldn't matter
+  REQUIRE(a11->gather_neighbors_at_level(1)[b11] == b11->gather_neighbors_at_level(1)[a11]);
 
-// //   REQUIRE(a12_edges[b12] == 1);
-// //   REQUIRE(level_1_counts.at(Edge(a12, b12)) == 1);
+  // Direction shouldn't matter
+  REQUIRE(a11->gather_neighbors_at_level(1)[b12] == b12->gather_neighbors_at_level(1)[a11]);
 
-// //   REQUIRE(a12_edges[b13] == 1);
-// //   REQUIRE(level_1_counts.at(Edge(a12, b13)) == 1);
+  // Repeat for level 2
+  auto a21_edges = a21->gather_neighbors_at_level(2);
+  REQUIRE(a21_edges[b21] == 5);
+  REQUIRE(a21_edges[b22] == 1);
 
-// //   auto a13_edges = a13->gather_neighbors_at_level(1);
-// //   REQUIRE(a13_edges[b11] == 0);
-// //   REQUIRE(a13_edges[b12] == 1);
-// //   REQUIRE(level_1_counts.at(Edge(a13, b12)) == 1);
+  auto a22_edges = a22->gather_neighbors_at_level(2);
+  REQUIRE(a22_edges[b21] == 1);
+  REQUIRE(a22_edges[b22] == 2);
 
-// //   REQUIRE(a13_edges[b13] == 2);
-// //   REQUIRE(level_1_counts.at(Edge(a13, b13)) == 2);
+  // Now we will change the block for a node and make sure the changes are properly reflected
 
-// //   // Direction shouldn't matter
-// //   REQUIRE(a11->gather_neighbors_at_level(1)[b11] == b11->gather_neighbors_at_level(1)[a11]);
-// //   REQUIRE(level_1_counts.at(Edge(a13, b13)) == level_1_counts.at(Edge(b13, a13)));
+  // Update the level 1 edge counts
+  a3->set_parent(a13);
 
-// //   // Direction shouldn't matter
-// //   REQUIRE(a11->gather_neighbors_at_level(1)[b12] == b12->gather_neighbors_at_level(1)[a11]);
+  // // Make sure node degrees are correct
+  // REQUIRE(a11->degree() == 2);
+  // REQUIRE(a12->degree() == 3);
+  // REQUIRE(a13->degree() == 4);
 
-// //   // Repeat for level 2
-// //   auto a21_edges = a21->gather_neighbors_at_level(2);
-// //   REQUIRE(a21_edges[b21] == 5);
-// //   REQUIRE(a21_edges[b22] == 1);
+  // REQUIRE(b11->degree() == 4);
+  // REQUIRE(b12->degree() == 2);
+  // REQUIRE(b13->degree() == 3);
 
-// //   auto a22_edges = a22->gather_neighbors_at_level(2);
-// //   REQUIRE(a22_edges[b21] == 1);
-// //   REQUIRE(a22_edges[b22] == 2);
+  // REQUIRE(a21->degree() == 5);
+  // REQUIRE(a22->degree() == 4);
+  // REQUIRE(b21->degree() == 6);
+  // REQUIRE(b22->degree() == 3);
 
-// //   // Now we will change the block for a node and make sure the changes are properly detected
+  // // Check num edges between blocks
+  // auto a11_edges_new = a11->gather_neighbors_at_level(1);
+  // REQUIRE(a11_edges_new[b11] == 2);
+  // REQUIRE(a11_edges_new[b12] == 0);
+  // REQUIRE(a11_edges_new[b13] == 0);
 
-// //   // Update the level 1 edge counts
-// //   a3->set_parent(a13);
+  // auto a12_edges_new = a12->gather_neighbors_at_level(1);
+  // REQUIRE(a12_edges_new[b11] == 1);
+  // REQUIRE(a12_edges_new[b12] == 1);
+  // REQUIRE(a12_edges_new[b13] == 1);
 
-// //   // Make sure node degrees are correct
-// //   REQUIRE(a11->degree == 2);
-// //   REQUIRE(a12->degree == 3);
-// //   REQUIRE(a13->degree == 4);
-// //   REQUIRE(b11->degree == 4);
-// //   REQUIRE(b12->degree == 2);
-// //   REQUIRE(b13->degree == 3);
+  // auto a13_edges_new = a13->gather_neighbors_at_level(1);
+  // REQUIRE(a13_edges_new[b11] == 1);
+  // REQUIRE(a13_edges_new[b12] == 1);
+  // REQUIRE(a13_edges_new[b13] == 2);
 
-// //   REQUIRE(a21->degree == 5);
-// //   REQUIRE(a22->degree == 4);
-// //   REQUIRE(b21->degree == 6);
-// //   REQUIRE(b22->degree == 3);
+  // // Repeat for level 2
+  // auto a21_edges_new = a21->gather_neighbors_at_level(2);
+  // REQUIRE(a21_edges_new[b21] == 4);
+  // REQUIRE(a21_edges_new[b22] == 1);
 
-// //   // Check num edges between blocks
-// //   auto a11_edges_new = a11->gather_neighbors_at_level(1);
-// //   REQUIRE(a11_edges_new[b11] == 2);
-// //   REQUIRE(a11_edges_new[b12] == 0);
-// //   REQUIRE(a11_edges_new[b13] == 0);
-
-// //   auto a12_edges_new = a12->gather_neighbors_at_level(1);
-// //   REQUIRE(a12_edges_new[b11] == 1);
-// //   REQUIRE(a12_edges_new[b12] == 1);
-// //   REQUIRE(a12_edges_new[b13] == 1);
-
-// //   auto a13_edges_new = a13->gather_neighbors_at_level(1);
-// //   REQUIRE(a13_edges_new[b11] == 1);
-// //   REQUIRE(a13_edges_new[b12] == 1);
-// //   REQUIRE(a13_edges_new[b13] == 2);
-
-// //   // Repeat for level 2
-// //   auto a21_edges_new = a21->gather_neighbors_at_level(2);
-// //   REQUIRE(a21_edges_new[b21] == 4);
-// //   REQUIRE(a21_edges_new[b22] == 1);
-
-// //   auto a22_edges_new = a22->gather_neighbors_at_level(2);
-// //   REQUIRE(a22_edges_new[b21] == 2);
-// //   REQUIRE(a22_edges_new[b22] == 2);
-// // }
+  // auto a22_edges_new = a22->gather_neighbors_at_level(2);
+  // REQUIRE(a22_edges_new[b21] == 2);
+  // REQUIRE(a22_edges_new[b22] == 2);
+}
