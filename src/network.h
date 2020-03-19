@@ -79,6 +79,16 @@ class SBM_Network {
       RANGE_ERROR("Type " + as_str(type_index) + " does not exist in network.");
   }
 
+  // Apply a lambda function over all nodes in network
+  void for_all_nodes_at_level(const int level,
+                              std::function<void(const Node_UPtr& node)> fn) const
+  {
+    check_for_level(level);
+    for (const auto& nodes_vec : nodes.at(level)) {
+      std::for_each(nodes_vec.begin(), nodes_vec.end(), fn);
+    }
+  }
+
   public:
   // =========================================================================
   // Constructors
@@ -168,7 +178,7 @@ class SBM_Network {
   }
 
   // Export current state of nodes in model
-  State_Dump state()
+  State_Dump state() const
   {
     if (num_levels() == 1)
       LOGIC_ERROR("No state to export - Try adding blocks");
@@ -190,15 +200,6 @@ class SBM_Network {
     return state;
   }
 
-  // Apply a lambda function over all nodes in network
-  void for_all_nodes_at_level(const int level,
-                              std::function<void(const Node_UPtr& node)> fn) const
-  {
-    check_for_level(level);
-    for (const auto& nodes_vec : nodes.at(level)) {
-      std::for_each(nodes_vec.begin(), nodes_vec.end(), fn);
-    }
-  }
 
   // =========================================================================
   // Modification
