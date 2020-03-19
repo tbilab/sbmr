@@ -35,9 +35,9 @@ enum Update_Type { Add,
 class Node {
   private:
   Node* parent_node = nullptr; // What node contains this node (aka its cluster)
-  Edges_By_Type _edges;
+  Edges_By_Type _neighbors;
   Node_Vec children; // Nodes that are contained within node (if node is cluster)
-  int degree = 0;    // How many edges/ edges does this node have?
+  int degree = 0;    // How many neighbors/ neighbors does this node have?
   string _id;        // Unique integer id for node
   int _type;         // What type of node is this?
   int level;         // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
@@ -53,7 +53,7 @@ class Node {
       : _id(node_id)
       , _type(type)
       , level(level)
-      , _edges(num_types)
+      , _neighbors(num_types)
   {
   }
 
@@ -95,16 +95,16 @@ class Node {
   {
     children.push_back(child);
 
-    // Add new child's edges
-    update_edges(child->edges(), Add);
+    // Add new child's neighbors
+    update_neighbors(child->neighbors(), Add);
   }
 
   void remove_child(Node* child)
   {
     delete_from_vector(children, child);
 
-    // Remove child's edges
-    update_edges(child->edges(), Remove);
+    // Remove child's neighbors
+    update_neighbors(child->neighbors(), Remove);
   }
 
   int num_children() const
@@ -172,55 +172,55 @@ class Node {
   void remove_parent() { parent_node = nullptr; }
 
   // =========================================================================
-  // Edge-Related methods
+  // Neighbor-Related methods
   // =========================================================================
-  Edges_By_Type& edges()
+  Edges_By_Type& neighbors()
   {
-    return _edges;
+    return _neighbors;
   }
 
-  Node_Ptr_Vec& edges_to_type(const int node_type)
+  Node_Ptr_Vec& neighbors_of_type(const int node_type)
   {
-    return _edges.at(node_type);
+    return _neighbors.at(node_type);
   }
 
-  // Collapse edges to a given level into a map of connected block id->count
-  Edge_Count_Map gather_edges_to_level(const int level) const
+  // Collapse neighbors to a given level into a map of connected block id->count
+  Edge_Count_Map gather_neighbors_at_level(const int level) const
   {
-    // Setup an edge count map for node
-    Edge_Count_Map edges_counts;
+    // Setup an neighbor count map for node
+    Edge_Count_Map neighbors_counts;
 
-    for (const auto& nodes_of_type : _edges) {
+    for (const auto& nodes_of_type : _neighbors) {
       for (const auto& node : nodes_of_type) {
-        edges_counts[node->parent_at_level(level)]++;
+        neighbors_counts[node->parent_at_level(level)]++;
       }
     }
 
-    return edges_counts;
+    return neighbors_counts;
   }
 
-  void add_edge(Node* node)
+  void add_neighbor(Node* node)
   {
-    edges_to_type(node->type()).push_back(node);
+    neighbors_of_type(node->type()).push_back(node);
     degree++;
   }
 
-  void update_edges(const Edges_By_Type& edges_to_update, const Update_Type& update_type)
+  void update_neighbors(const Edges_By_Type& neighbors_to_update, const Update_Type& update_type)
   {
     int type_i = 0;
 
-    for (const auto& nodes_of_type : edges_to_update) {
-      // Get references to this node's edges to type (update type for next go-round)
-      auto& node_edges_to_type = edges_to_type(type_i++);
+    for (const auto& nodes_of_type : neighbors_to_update) {
+      // Get references to this node's neighbors to type (update type for next go-round)
+      auto& node_neighbors_of_type = neighbors_of_type(type_i++);
 
       for (const auto& node : nodes_of_type) {
         switch (update_type) {
         case Remove:
-          delete_from_vector(node_edges_to_type, node);
+          delete_from_vector(node_neighbors_of_type, node);
           degree--;
           break;
         case Add:
-          node_edges_to_type.push_back(node);
+          node_neighbors_of_type.push_back(node);
           degree++;
           break;
         }
@@ -236,10 +236,10 @@ class Node {
 };
 
 // =============================================================================
-// Static method to connect two nodes to each other with edge
+// Static method to connect two nodes to each other with an edge
 // =============================================================================
 inline void connect_nodes(Node* node_a, Node* node_b)
 {
-  node_a->add_edge(node_b);
-  node_b->add_edge(node_a);
+  node_a->add_neighbor(node_b);
+  node_b->add_neighbor(node_a);
 }
