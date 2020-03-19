@@ -10,9 +10,9 @@ class Edge {
   Node* node_b;
   std::string pair_id;
   Edge(Node* a, Node* b)
-      : node_a(a->get_id() < b->get_id() ? a : b)
-      , node_b(a->get_id() < b->get_id() ? b : a)
-      , pair_id(node_a->get_id() + "--" + node_b->get_id())
+      : node_a(a->id() < b->id() ? a : b)
+      , node_b(a->id() < b->id() ? b : a)
+      , pair_id(node_a->id() + "--" + node_b->id())
   {
   }
   inline Edge at_level(const int level) const

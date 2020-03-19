@@ -105,13 +105,13 @@ TEST_CASE("Node list and vector sampling", "[Sampler]")
   int times_vec_agreed      = 0;
 
   for (int i = 0; i < num_samples; ++i) {
-    std::string list_sample_id = sampler_1.sample(nodes_list)->get_id();
-    std::string vec_sample_id  = sampler_1.sample(nodes_vec)->get_id();
+    std::string list_sample_id = sampler_1.sample(nodes_list)->id();
+    std::string vec_sample_id  = sampler_1.sample(nodes_vec)->id();
 
-    if (sampler_2.sample(nodes_list)->get_id() == list_sample_id) {
+    if (sampler_2.sample(nodes_list)->id() == list_sample_id) {
       times_list_agreed++;
     }
-    if (sampler_2.sample(nodes_vec)->get_id() == vec_sample_id) {
+    if (sampler_2.sample(nodes_vec)->id() == vec_sample_id) {
       times_vec_agreed++;
     }
 

@@ -61,12 +61,12 @@ TEST_CASE("Default block initialization", "[Network]")
   REQUIRE(my_net.get_node_by_id("b3")->has_parent());
 
   // All parents should be unique
-  std::set<string> unique_blocks { my_net.get_node_by_id("a1")->get_parent_id(),
-                                   my_net.get_node_by_id("a2")->get_parent_id(),
-                                   my_net.get_node_by_id("a3")->get_parent_id(),
-                                   my_net.get_node_by_id("b1")->get_parent_id(),
-                                   my_net.get_node_by_id("b2")->get_parent_id(),
-                                   my_net.get_node_by_id("b3")->get_parent_id() };
+  std::set<string> unique_blocks { my_net.get_node_by_id("a1")->get_parent()->id(),
+                                   my_net.get_node_by_id("a2")->get_parent()->id(),
+                                   my_net.get_node_by_id("a3")->get_parent()->id(),
+                                   my_net.get_node_by_id("b1")->get_parent()->id(),
+                                   my_net.get_node_by_id("b2")->get_parent()->id(),
+                                   my_net.get_node_by_id("b3")->get_parent()->id() };
 
   REQUIRE(unique_blocks.size() == my_net.num_nodes_at_level(1));
 }

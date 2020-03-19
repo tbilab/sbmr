@@ -338,9 +338,9 @@ class SBM_Network {
     // in the previous node's parent slot
     for (int level = 0; level < num_levels() - 1; level++) {
       for_all_nodes_at_level(level, [&](const Node_UPtr& node) {
-        state.ids.push_back(node->get_id());
+        state.ids.push_back(node->id());
         state.types.push_back(types[node->get_type()]);
-        state.parents.push_back(node->get_parent_id());
+        state.parents.push_back(node->get_parent()->id());
         state.levels.push_back(level);
       });
     }

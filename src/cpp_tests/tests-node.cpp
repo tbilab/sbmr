@@ -30,8 +30,8 @@ TEST_CASE("Basic Initialization", "[Node]")
   connect_nodes(n3.get(), m3.get());
 
   // Get basic info out of the nodes
-  REQUIRE(n1->get_id() == "n1");
-  REQUIRE(n1->get_parent_at_level(1)->get_id() == n1->get_parent()->get_id());
+  REQUIRE(n1->id() == "n1");
+  REQUIRE(n1->get_parent_at_level(1)->id() == n1->get_parent()->id());
 
   // // Make sure the edge propigate properly.
   // REQUIRE("m1, m3" == print_node_ids(n1->get_edges_of_type(1,0)));
@@ -45,8 +45,8 @@ TEST_CASE("Block id construction", "[Node]")
   Node_UPtr b1 = Node_UPtr(new Node {0, 0, 0, 2});
   Node_UPtr b2 = Node_UPtr(new Node {1, 0, 0, 2});
 
-  REQUIRE(b1->get_id() == "b_0");
-  REQUIRE(b2->get_id() == "b_1");
+  REQUIRE(b1->id() == "b_0");
+  REQUIRE(b2->id() == "b_1");
 }
 
 TEST_CASE("Child addition and deletion", "[Node]")
@@ -64,7 +64,7 @@ TEST_CASE("Child addition and deletion", "[Node]")
   // n11 should have 2 children
   REQUIRE(n11->num_children() == 2);
   // One of those children should be n2
-  REQUIRE(n11->is_child(n2.get()));
+  REQUIRE(n11->has_child(n2.get()));
 
   // n12 should have 1 child
   REQUIRE(n12->num_children() == 1);
@@ -78,7 +78,7 @@ TEST_CASE("Child addition and deletion", "[Node]")
   // n12 should have 2 children
   REQUIRE(n12->num_children() == 2);
   // One of those children should be n2
-  REQUIRE(n12->is_child(n2.get()));
+  REQUIRE(n12->has_child(n2.get()));
 }
 
 TEST_CASE("Gathering edge counts to a level", "[Node]")
