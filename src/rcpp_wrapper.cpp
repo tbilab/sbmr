@@ -178,11 +178,11 @@ RCPP_MODULE(SBM)
       .method("add_node",
               &SBM ::add_node,
               "Add a node to the network. Takes the node id (string), the node type (string), and the node level (int). Use level = 0 for data-level nodes.")
-      .method("add_edge",
-              &SBM ::add_edge,
+      .method("add_neighbor",
+              &SBM ::add_neighbor,
               "Connects two nodes in network (at level 0) by their ids (string).")
-      .method("add_edge_types",
-              &SBM ::add_edge_types,
+      .method("add_neighbor_types",
+              &SBM ::add_neighbor_types,
               "Add list of allowed pairs of node types for edges.")
       .method("initialize_blocks",
               &SBM ::initialize_blocks,

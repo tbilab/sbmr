@@ -531,15 +531,15 @@ TEST_CASE("Building with vectors -- Restricted tripartite", "[Network]")
 // //   NodePtr b22 = my_net.add_node("b22", "b", 2);
 
 // //   // Add edges
-// //   my_net.add_edge("a1", "b1");
-// //   my_net.add_edge("a1", "b2");
-// //   my_net.add_edge("a2", "b1");
-// //   my_net.add_edge("a2", "b3");
-// //   my_net.add_edge("a2", "b5");
-// //   my_net.add_edge("a3", "b2");
-// //   my_net.add_edge("a4", "b4");
-// //   my_net.add_edge("a4", "b5");
-// //   my_net.add_edge("a5", "b3");
+// //   my_net.add_neighbor("a1", "b1");
+// //   my_net.add_neighbor("a1", "b2");
+// //   my_net.add_neighbor("a2", "b1");
+// //   my_net.add_neighbor("a2", "b3");
+// //   my_net.add_neighbor("a2", "b5");
+// //   my_net.add_neighbor("a3", "b2");
+// //   my_net.add_neighbor("a4", "b4");
+// //   my_net.add_neighbor("a4", "b5");
+// //   my_net.add_neighbor("a5", "b3");
 
 // //   // Set hierarchy
 
@@ -599,13 +599,13 @@ TEST_CASE("Building with vectors -- Restricted tripartite", "[Network]")
 // //   REQUIRE(level_1_counts.size() > 1);
 
 // //   // Check num edges between blocks
-// //   auto a11_edges = a11->gather_edges_to_level(1);
+// //   auto a11_edges = a11->gather_neighbors_at_level(1);
 // //   REQUIRE(a11_edges[b11] == 2);
 // //   REQUIRE(level_1_counts.at(Edge(a11, b11)) == 2);
 // //   REQUIRE(a11_edges[b12] == 0);
 // //   REQUIRE(a11_edges[b13] == 0);
 
-// //   auto a12_edges = a12->gather_edges_to_level(1);
+// //   auto a12_edges = a12->gather_neighbors_at_level(1);
 // //   REQUIRE(a12_edges[b11] == 2);
 // //   REQUIRE(level_1_counts.at(Edge(a12, b11)) == 2);
 
@@ -615,7 +615,7 @@ TEST_CASE("Building with vectors -- Restricted tripartite", "[Network]")
 // //   REQUIRE(a12_edges[b13] == 1);
 // //   REQUIRE(level_1_counts.at(Edge(a12, b13)) == 1);
 
-// //   auto a13_edges = a13->gather_edges_to_level(1);
+// //   auto a13_edges = a13->gather_neighbors_at_level(1);
 // //   REQUIRE(a13_edges[b11] == 0);
 // //   REQUIRE(a13_edges[b12] == 1);
 // //   REQUIRE(level_1_counts.at(Edge(a13, b12)) == 1);
@@ -624,18 +624,18 @@ TEST_CASE("Building with vectors -- Restricted tripartite", "[Network]")
 // //   REQUIRE(level_1_counts.at(Edge(a13, b13)) == 2);
 
 // //   // Direction shouldn't matter
-// //   REQUIRE(a11->gather_edges_to_level(1)[b11] == b11->gather_edges_to_level(1)[a11]);
+// //   REQUIRE(a11->gather_neighbors_at_level(1)[b11] == b11->gather_neighbors_at_level(1)[a11]);
 // //   REQUIRE(level_1_counts.at(Edge(a13, b13)) == level_1_counts.at(Edge(b13, a13)));
 
 // //   // Direction shouldn't matter
-// //   REQUIRE(a11->gather_edges_to_level(1)[b12] == b12->gather_edges_to_level(1)[a11]);
+// //   REQUIRE(a11->gather_neighbors_at_level(1)[b12] == b12->gather_neighbors_at_level(1)[a11]);
 
 // //   // Repeat for level 2
-// //   auto a21_edges = a21->gather_edges_to_level(2);
+// //   auto a21_edges = a21->gather_neighbors_at_level(2);
 // //   REQUIRE(a21_edges[b21] == 5);
 // //   REQUIRE(a21_edges[b22] == 1);
 
-// //   auto a22_edges = a22->gather_edges_to_level(2);
+// //   auto a22_edges = a22->gather_neighbors_at_level(2);
 // //   REQUIRE(a22_edges[b21] == 1);
 // //   REQUIRE(a22_edges[b22] == 2);
 
@@ -658,27 +658,27 @@ TEST_CASE("Building with vectors -- Restricted tripartite", "[Network]")
 // //   REQUIRE(b22->degree == 3);
 
 // //   // Check num edges between blocks
-// //   auto a11_edges_new = a11->gather_edges_to_level(1);
+// //   auto a11_edges_new = a11->gather_neighbors_at_level(1);
 // //   REQUIRE(a11_edges_new[b11] == 2);
 // //   REQUIRE(a11_edges_new[b12] == 0);
 // //   REQUIRE(a11_edges_new[b13] == 0);
 
-// //   auto a12_edges_new = a12->gather_edges_to_level(1);
+// //   auto a12_edges_new = a12->gather_neighbors_at_level(1);
 // //   REQUIRE(a12_edges_new[b11] == 1);
 // //   REQUIRE(a12_edges_new[b12] == 1);
 // //   REQUIRE(a12_edges_new[b13] == 1);
 
-// //   auto a13_edges_new = a13->gather_edges_to_level(1);
+// //   auto a13_edges_new = a13->gather_neighbors_at_level(1);
 // //   REQUIRE(a13_edges_new[b11] == 1);
 // //   REQUIRE(a13_edges_new[b12] == 1);
 // //   REQUIRE(a13_edges_new[b13] == 2);
 
 // //   // Repeat for level 2
-// //   auto a21_edges_new = a21->gather_edges_to_level(2);
+// //   auto a21_edges_new = a21->gather_neighbors_at_level(2);
 // //   REQUIRE(a21_edges_new[b21] == 4);
 // //   REQUIRE(a21_edges_new[b22] == 1);
 
-// //   auto a22_edges_new = a22->gather_edges_to_level(2);
+// //   auto a22_edges_new = a22->gather_neighbors_at_level(2);
 // //   REQUIRE(a22_edges_new[b21] == 2);
 // //   REQUIRE(a22_edges_new[b22] == 2);
 // // }

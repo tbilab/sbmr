@@ -34,10 +34,10 @@ TEST_CASE("Basic Initialization", "[Node]")
   REQUIRE(n1->parent_at_level(1)->id() == n1->parent()->id());
 
   // // Make sure the edge propigate properly.
-  // REQUIRE("m1, m3" == print_node_ids(n1->edges_to_type(1,0)));
-  // REQUIRE("d1, d2" == print_node_ids(n1->edges_to_type(1,1)));
-  // REQUIRE("d1, d1, d2" == print_node_ids(c1->edges_to_type(1,1)));
-  // REQUIRE("d2, d2" == print_node_ids(c2->edges_to_type(1,1)));
+  // REQUIRE("m1, m3" == print_node_ids(n1->neighbors_of_type(1,0)));
+  // REQUIRE("d1, d2" == print_node_ids(n1->neighbors_of_type(1,1)));
+  // REQUIRE("d1, d1, d2" == print_node_ids(c1->neighbors_of_type(1,1)));
+  // REQUIRE("d2, d2" == print_node_ids(c2->neighbors_of_type(1,1)));
 }
 
 TEST_CASE("Block id construction", "[Node]")
@@ -123,28 +123,28 @@ TEST_CASE("Gathering edge counts to a level", "[Node]")
   b12->set_parent(b21.get());
 
   // Gather all the edges from node a1 to level 1
-  Edge_Count_Map a1_to_l1 = a1->gather_edges_to_level(1);
+  Edge_Count_Map a1_to_l1 = a1->gather_neighbors_at_level(1);
 
   REQUIRE(a1_to_l1[b11.get()] == 2);
 
   REQUIRE(a1_to_l1[b12.get()] == 0);
 
   // now a3 to l1
-  Edge_Count_Map a3_to_l1 = a3->gather_edges_to_level(1);
+  Edge_Count_Map a3_to_l1 = a3->gather_neighbors_at_level(1);
 
   REQUIRE(a3_to_l1[b11.get()] == 1);
 
   REQUIRE(a3_to_l1[b12.get()] == 1);
 
   // now b2 to l1
-  Edge_Count_Map b2_to_l1 = b2->gather_edges_to_level(1);
+  Edge_Count_Map b2_to_l1 = b2->gather_neighbors_at_level(1);
 
   REQUIRE(b2_to_l1[a11.get()] == 1);
 
   REQUIRE(b2_to_l1[a12.get()] == 2);
 
   // // Last b11 to a21
-  // Edge_Count_Map b11_to_l2 = b11->gather_edges_to_level(2);
+  // Edge_Count_Map b11_to_l2 = b11->gather_neighbors_at_level(2);
 
   // REQUIRE(b11_to_l2[a21.get()] == 5);
 }
@@ -189,18 +189,18 @@ TEST_CASE("Edge count gathering (unipartite)", "[Node]")
   // Move node 4 to c block
   n4->set_parent(c.get());
 
-  const auto a_edges = a->gather_edges_to_level(1);
+  const auto a_edges = a->gather_neighbors_at_level(1);
   REQUIRE(a_edges.size() == 3);
   REQUIRE(a_edges.at(a.get()) == 2 * 1); // self edges will be double
   REQUIRE(a_edges.at(b.get()) == 2);
   REQUIRE(a_edges.at(c.get()) == 4);
 
-  const auto b_edges = b->gather_edges_to_level(1);
+  const auto b_edges = b->gather_neighbors_at_level(1);
   REQUIRE(b_edges.size() == 2);
   REQUIRE(b_edges.at(a.get()) == 2);
   REQUIRE(b_edges.at(c.get()) == 2);
 
-  const auto c_edges = c->gather_edges_to_level(1);
+  const auto c_edges = c->gather_neighbors_at_level(1);
   REQUIRE(c_edges.at(a.get()) == 4);
   REQUIRE(c_edges.at(b.get()) == 2);
   REQUIRE(c_edges.at(c.get()) == 2 * 3);
@@ -242,19 +242,19 @@ TEST_CASE("Edge count gathering (unipartite)", "[Node]")
 //   n5->set_parent(c.get());
 //   n6->set_parent(c.get());
 
-//   const auto a_edges = a->gather_edges_to_level(1);
+//   const auto a_edges = a->gather_neighbors_at_level(1);
 //   REQUIRE(a_edges.size() == 3);
 //   REQUIRE(a_edges.at(a.get()) == 2 * 1); // self edges will be double
 //   REQUIRE(a_edges.at(b.get()) == 4);
 //   REQUIRE(a_edges.at(c.get()) == 2);
 
-//   const auto b_edges = b->gather_edges_to_level(1);
+//   const auto b_edges = b->gather_neighbors_at_level(1);
 //   REQUIRE(b_edges.size() == 3);
 //   REQUIRE(b_edges.at(a.get()) == 4);
 //   REQUIRE(b_edges.at(b.get()) == 1 * 2);
 //   REQUIRE(b_edges.at(c.get()) == 3);
 
-//   const auto c_edges = c->gather_edges_to_level(1);
+//   const auto c_edges = c->gather_neighbors_at_level(1);
 //   REQUIRE(c_edges.at(a.get()) == 2);
 //   REQUIRE(c_edges.at(b.get()) == 3);
 //   REQUIRE(c_edges.at(c.get()) == 2 * 1);

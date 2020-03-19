@@ -155,7 +155,7 @@ class SBM_Network {
 
     // Connect nodes with edges
     for (int i = 0; i < edges_a.size(); i++) {
-      add_edge(edges_a[i], edges_b[i]);
+      add_neighbor(edges_a[i], edges_b[i]);
     }
   }
 
@@ -238,15 +238,15 @@ class SBM_Network {
     return node_ptr;
   }
 
-  void add_edge(const string& node_a, const string& node_b)
+  void add_neighbor(const string& node_a, const string& node_b)
   {
     Node* a = get_node_by_id(node_a);
     Node* b = get_node_by_id(node_b);
 
     validate_edge(a->type(), b->type());
 
-    a->add_edge(b);
-    b->add_edge(a);
+    a->add_neighbor(b);
+    b->add_neighbor(a);
   }
 
   void initialize_blocks(int num_blocks = -1)
