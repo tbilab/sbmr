@@ -175,7 +175,7 @@ class Node {
   // =========================================================================
   // Edge-Related methods
   // =========================================================================
-  Node_Ptr_Vec& edges_of_type(const int node_type)
+  Node_Ptr_Vec& edges_to_type(const int node_type)
   {
     return _edges.at(node_type);
   }
@@ -197,7 +197,7 @@ class Node {
 
   void add_edge(Node* node)
   {
-    edges_of_type(node->type()).push_back(node);
+    edges_to_type(node->type()).push_back(node);
     degree++;
   }
 
@@ -212,16 +212,16 @@ class Node {
 
     for (const auto& nodes_of_type : edges_to_update) {
       // Get references to this node's edges to type (update type for next go-round)
-      auto& node_edges_of_type = edges_of_type(type_i++);
+      auto& node_edges_to_type = edges_to_type(type_i++);
 
       for (const auto& node : nodes_of_type) {
         switch (update_type) {
         case Remove:
-          delete_from_vector(node_edges_of_type, node);
+          delete_from_vector(node_edges_to_type, node);
           degree--;
           break;
         case Add:
-          node_edges_of_type.push_back(node);
+          node_edges_to_type.push_back(node);
           degree++;
           break;
         }
