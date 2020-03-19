@@ -46,14 +46,14 @@ class Sampler {
   }
 
   // Move operations
-  Sampler& operator  =(Sampler&& moved_sampler)
+  Sampler& operator=(Sampler&& moved_sampler)
   {
     generator = std::move(moved_sampler.generator);
     return *this;
   };
 
   Sampler& operator=(const Sampler&) = delete;
-  Sampler(Sampler&&) = delete;
+  Sampler(Sampler&&)                 = delete;
   // ==========================================
   // Methods
   // =============================================================================

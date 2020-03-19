@@ -176,7 +176,8 @@ class SBM_Network {
   }
 
   // Move constructor
-  SBM_Network(SBM_Network&& moved_net) {
+  SBM_Network(SBM_Network&& moved_net)
+  {
     nodes            = std::move(moved_net.nodes);
     types            = std::move(moved_net.types);
     type_name_to_int = std::move(moved_net.type_name_to_int);
