@@ -96,7 +96,7 @@ class Sampler {
   // Easier than list because we can just index to a spot
   // =============================================================================
   template <typename T>
-  T sample(const std::vector<T>& node_vec)
+  T& sample(std::vector<T>& node_vec)
   {
     // Select a random index to return element at that index
     return node_vec.at(get_rand_int(node_vec.size() - 1));
