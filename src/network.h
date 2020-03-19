@@ -124,8 +124,8 @@ class SBM_Network {
     // Fill in map to get allowed connection types if they are provided
     if (edge_types == multipartite_restricted) {
       for (int i = 0; i < allowed_edges_a.size(); i++) {
-        add_allowed_connection(get_type_index(allowed_edges_a[i]),
-                               get_type_index(allowed_edges_b[i]));
+        validate_edge(get_type_index(allowed_edges_a[i]),
+                      get_type_index(allowed_edges_b[i]), true);
       }
     }
 
@@ -200,7 +200,6 @@ class SBM_Network {
     return state;
   }
 
-
   // =========================================================================
   // Modification
   // =========================================================================
@@ -230,34 +229,32 @@ class SBM_Network {
   {
     Node* a = get_node_by_id(node_a);
     Node* b = get_node_by_id(node_b);
-    switch (edge_types) {
-    case unipartite: 
-      // Do nothing
-      break;
-    case multipartite_restricted:
-      validate_edge(a, b);
-      break;
-    case multipartite:
-      add_allowed_connection(a->get_type(), b->get_type());
-      break;
-    }
+
+    validate_edge(a->get_type(), b->get_type());
 
     a->add_edge(b);
     b->add_edge(a);
   }
 
-  void add_allowed_connection(const int type_a, const int type_b) {
-    connection_types[type_a].insert(type_b);
-    connection_types[type_b].insert(type_a);
-  }
-
-  void validate_edge(Node* node_a, Node* node_b)
+  void validate_edge(const int type_a, const int type_b, const bool loading = false)
   {
-    if (connection_types.at(node_a->get_type()).count(node_b->get_type()) == 0) {
-      LOGIC_ERROR("Connection between nodes "
-                  + node_a->get_id() + " & " + node_b->get_id()
-                  + " of types " + types[node_a->get_type()] + " & " + types[node_b->get_type()]
-                  + " respectively not allowed.");
+    if (edge_types == unipartite) {
+      return; // Do nothing
+    }
+
+    if (loading || edge_types == multipartite) {
+      // Load the type into connection types for later use
+      connection_types[type_a].insert(type_b);
+      connection_types[type_b].insert(type_a);
+    } else {
+      // If we're in a restricted multipartite network
+      // make sure that this is an acceptable edgetype combo
+      const bool edge_not_allowed = connection_types.at(type_a).count(type_b) == 0;
+
+      if (edge_not_allowed)
+        LOGIC_ERROR("Connection provided between nodes of types "
+                    + types[type_a] + " & " + types[type_b]
+                    + " which was not a specified combination in allowed edge types");
     }
   }
 
@@ -268,7 +265,7 @@ class SBM_Network {
     const int child_level         = block_level - 1;
 
     // Build empty level
-    build_level(one_block_per_node ? 0: num_blocks);
+    build_level(one_block_per_node ? 0 : num_blocks);
 
     // Loop over all node types
     for (int type_i = 0; type_i < num_types(); type_i++) {
@@ -421,7 +418,7 @@ class SBM_Network {
   {
     const auto node_it = id_to_node.find(id);
 
-    if(node_it == id_to_node.end()) {
+    if (node_it == id_to_node.end()) {
       LOGIC_ERROR("Node " + id + " not found in network");
     }
 
