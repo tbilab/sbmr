@@ -39,7 +39,7 @@ class Node {
   Node_Vec children; // Nodes that are contained within node (if node is cluster)
   int degree = 0;    // How many edges/ edges does this node have?
   string _id;    // Unique integer id for node
-  int type;          // What type of node is this?
+  int _type;          // What type of node is this?
   int level;         // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
 
   public:
@@ -51,7 +51,7 @@ class Node {
        const int type,
        const int num_types = 1)
       : _id(node_id)
-      , type(type)
+      , _type(type)
       , level(level)
       , edges(num_types)
   {
@@ -85,7 +85,7 @@ class Node {
   // Constant attribute getters - these are static after node creation
   // =========================================================================
   string id() const { return _id; }
-  int get_type() const { return type; }
+  int type() const { return _type; }
   int get_level() const { return level; }
   Node* get_parent() const { return parent; }
 
@@ -196,7 +196,7 @@ class Node {
 
   void add_edge(Node* node)
   {
-    get_edges_of_type(node->type).push_back(node);
+    get_edges_of_type(node->type()).push_back(node);
     degree++;
   }
 

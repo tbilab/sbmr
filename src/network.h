@@ -243,7 +243,7 @@ class SBM_Network {
     Node* a = get_node_by_id(node_a);
     Node* b = get_node_by_id(node_b);
 
-    validate_edge(a->get_type(), b->get_type());
+    validate_edge(a->type(), b->type());
 
     a->add_edge(b);
     b->add_edge(a);
@@ -339,7 +339,7 @@ class SBM_Network {
     for (int level = 0; level < num_levels() - 1; level++) {
       for_all_nodes_at_level(level, [&](const Node_UPtr& node) {
         state.ids.push_back(node->id());
-        state.types.push_back(types[node->get_type()]);
+        state.types.push_back(types[node->type()]);
         state.parents.push_back(node->get_parent()->id());
         state.levels.push_back(level);
       });
