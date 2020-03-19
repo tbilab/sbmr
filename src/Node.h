@@ -38,7 +38,7 @@ class Node {
   Edges_By_Type edges;
   Node_Vec children; // Nodes that are contained within node (if node is cluster)
   int degree = 0;    // How many edges/ edges does this node have?
-  string id;    // Unique integer id for node
+  string _id;    // Unique integer id for node
   int type;          // What type of node is this?
   int level;         // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
 
@@ -50,7 +50,7 @@ class Node {
        const int level,
        const int type,
        const int num_types = 1)
-      : id(node_id)
+      : _id(node_id)
       , type(type)
       , level(level)
       , edges(num_types)
@@ -74,21 +74,21 @@ class Node {
                   [](Node* child) { child->remove_parent(); });
   }
 
-  // =========================================================================
-  // Constant attribute getters - these are static after node creation
-  // =========================================================================
-  string get_id() const { return id; }
-  int get_type() const { return type; }
-  int get_level() const { return level; }
-
   // Disable costly copy and move methods for error protection
   // Copy construction
   Node(const Node&) = delete;
   Node& operator=(const Node&) = delete;
-
-  // Move operations
   Node(Node&&)  = delete;
   Node& operator=(Node&&) = delete;
+
+  // =========================================================================
+  // Constant attribute getters - these are static after node creation
+  // =========================================================================
+  string id() const { return _id; }
+  int get_type() const { return type; }
+  int get_level() const { return level; }
+  Node* get_parent() const { return parent; }
+
 
   // =========================================================================
   // Children-Related methods
@@ -114,12 +114,7 @@ class Node {
     return children.size();
   }
 
-  bool no_children() const
-  {
-    return num_children() == 0;
-  }
-
-  bool is_child(Node* node) const
+  bool has_child(Node* node) const
   {
     return std::find(children.begin(),
                      children.end(),
@@ -162,7 +157,7 @@ class Node {
 
     while (current_node->level != level_of_parent) {
       if (!parent)
-        RANGE_ERROR("No parent at level " + as_str(level_of_parent) + " for " + id);
+        RANGE_ERROR("No parent at level " + as_str(level_of_parent) + " for " + id());
 
       // Traverse up parents until we've reached just below where we want to go
       current_node = current_node->parent;
@@ -171,10 +166,6 @@ class Node {
     // Return the final node, aka the parent at desired level
     return current_node;
   }
-
-  Node* get_parent() const { return parent; }
-
-  string get_parent_id() const { return parent == nullptr ? "none" : parent->get_id(); }
 
   bool has_parent() const { return parent != nullptr; }
 
@@ -240,8 +231,8 @@ class Node {
   // =========================================================================
   // Comparison operators
   // =========================================================================
-  bool operator==(const Node& other_node) { return id == other_node.id; }
-  bool operator==(const Node& other_node) const { return id == other_node.id; }
+  bool operator==(const Node& other_node) { return id() == other_node.id(); }
+  bool operator==(const Node& other_node) const { return id() == other_node.id(); }
 };
 
 // =============================================================================
