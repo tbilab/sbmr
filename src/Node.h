@@ -62,10 +62,7 @@ class Node {
        const int type,
        const int level,
        const int num_types = 1)
-      : type(type)
-      , level(level)
-      , edges(num_types)
-      , id("b_" + as_str(i))
+      : Node("b_" + as_str(i), level, type, num_types)
   {
   }
 
