@@ -141,7 +141,7 @@ class Node {
   }
 
   // Get parent of node at a given level
-  Node* get_parent_at_level(const int level_of_parent)
+  Node* parent_at_level(const int level_of_parent) 
   {
     // First we need to make sure that the requested level is not less than that
     // of the current node.
@@ -188,7 +188,7 @@ class Node {
 
     for (const auto& edges_of_type : edges) {
       for (const auto& edge : edges_of_type) {
-        edges_counts[edge->get_parent_at_level(level)]++;
+        edges_counts[edge->parent_at_level(level)]++;
       }
     }
 

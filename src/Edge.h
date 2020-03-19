@@ -18,8 +18,8 @@ class Edge {
   inline Edge at_level(const int level) const
   {
     // Project edge to desired level
-    return Edge(node_a->get_parent_at_level(level),
-                node_b->get_parent_at_level(level));
+    return Edge(node_a->parent_at_level(level),
+                node_b->parent_at_level(level));
   }
   bool operator==(const Edge& edge_2) const
   {
