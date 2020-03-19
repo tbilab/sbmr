@@ -81,7 +81,7 @@ class SBM_Network {
 
   public:
   // =========================================================================
-  // Constructor
+  // Constructors
   // =========================================================================
   SBM_Network(const std::vector<std::string>& node_types = { "node" },
               const int random_seed                      = 42)
@@ -168,7 +168,7 @@ class SBM_Network {
   }
 
   // Export current state of nodes in model
-  State_Dump get_state()
+  State_Dump state()
   {
     if (num_levels() == 1)
       LOGIC_ERROR("No state to export - Try adding blocks");
@@ -337,7 +337,7 @@ class SBM_Network {
   }
 
   // =============================================================================
-  // Load current state of nodes in model from state dump given SBM::get_state()
+  // Load current state of nodes in model from state dump given SBM::state()
   // =============================================================================
   void update_state(const std::vector<string>& ids,
                     const std::vector<string>& parents,

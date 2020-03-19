@@ -277,7 +277,7 @@ TEST_CASE("State dumping and restoring", "[Network")
   my_net.initialize_blocks();
 
   // Dump model state
-  State_Dump state1 = my_net.get_state();
+  State_Dump state1 = my_net.state();
 
   // Test state dump is in correct form
   REQUIRE(state_has_entry(state1, "a1", "a"));
@@ -297,7 +297,7 @@ TEST_CASE("State dumping and restoring", "[Network")
               true);
 
   // Dump model state again
-  State_Dump state2 = my_net.get_state();
+  State_Dump state2 = my_net.state();
 
   // a1's parent changed
   REQUIRE(parent_from_state(state1, "a1") != parent_from_state(state2, "a1"));
@@ -312,7 +312,7 @@ TEST_CASE("State dumping and restoring", "[Network")
   my_net.update_state(state1);
   REQUIRE(my_net.num_levels() == 2);
 
-  State_Dump state3 = my_net.get_state();
+  State_Dump state3 = my_net.state();
 
   // a1's parent is same as original state
   REQUIRE(parent_from_state(state3, "a1") == parent_from_state(state1, "a1"));
@@ -373,7 +373,7 @@ TEST_CASE("State dumping and restoring: w/ metablocks", "[Network")
   REQUIRE(my_net.num_nodes_at_level(2) == 4);
 
   // Dump model state
-  State_Dump state1 = my_net.get_state();
+  State_Dump state1 = my_net.state();
 
   // Build a new model that doesn't have any state
   SBM_Network my_net2({ "a", "b" }, 42);
