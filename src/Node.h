@@ -37,7 +37,7 @@ class Node {
   Node* parent_node = nullptr; // What node contains this node (aka its cluster)
   Edges_By_Type _neighbors;
   Node_Vec children; // Nodes that are contained within node (if node is cluster)
-  int degree = 0;    // How many neighbors/ neighbors does this node have?
+  int _degree = 0;    // How many neighbors does this node have?
   string _id;        // Unique integer id for node
   int _type;         // What type of node is this?
   int level;         // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
@@ -78,6 +78,7 @@ class Node {
   string id() const { return _id; }
   int type() const { return _type; }
   Node* parent() const { return parent_node; }
+  int degree() const { return _degree; }
 
   // =========================================================================
   // Children-Related methods
@@ -193,7 +194,7 @@ class Node {
   void add_neighbor(Node* node)
   {
     neighbors_of_type(node->type()).push_back(node);
-    degree++;
+    _degree++;
   }
 
   void update_neighbors(const Edges_By_Type& neighbors_to_update, const Update_Type& update_type)
@@ -208,11 +209,11 @@ class Node {
         switch (update_type) {
         case Remove:
           delete_from_vector(node_neighbors_of_type, node);
-          degree--;
+          _degree--;
           break;
         case Add:
           node_neighbors_of_type.push_back(node);
-          degree++;
+          _degree++;
           break;
         }
       }
