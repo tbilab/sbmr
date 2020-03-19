@@ -40,15 +40,6 @@ TEST_CASE("Basic Initialization", "[Node]")
   // REQUIRE("d2, d2" == print_node_ids(c2->neighbors_of_type(1,1)));
 }
 
-TEST_CASE("Block id construction", "[Node]")
-{
-  Node_UPtr b1 = Node_UPtr(new Node {0, 0, 0, 2});
-  Node_UPtr b2 = Node_UPtr(new Node {1, 0, 0, 2});
-
-  REQUIRE(b1->id() == "b_0");
-  REQUIRE(b2->id() == "b_1");
-}
-
 TEST_CASE("Child addition and deletion", "[Node]")
 {
   Node_UPtr n1  = Node_UPtr(new Node { "n1", 0, 0 });
@@ -174,9 +165,9 @@ TEST_CASE("Edge count gathering (unipartite)", "[Node]")
   connect_nodes(n5.get(), n6.get());
 
   // Make 3 blocks
-  Node_UPtr a = Node_UPtr(new Node {0, 0, 1 });
-  Node_UPtr b = Node_UPtr(new Node {1, 1, 1 });
-  Node_UPtr c = Node_UPtr(new Node {2, 2, 1 });
+  Node_UPtr a = Node_UPtr(new Node {"a", 1, 0});
+  Node_UPtr b = Node_UPtr(new Node {"b", 1, 0});
+  Node_UPtr c = Node_UPtr(new Node {"c", 1, 0});
 
   // Assign nodes to their blocks
   n1->set_parent(a.get());
@@ -206,59 +197,59 @@ TEST_CASE("Edge count gathering (unipartite)", "[Node]")
   REQUIRE(c_edges.at(c.get()) == 2 * 3);
 }
 
-// TEST_CASE("Edge count gathering after moving (unipartite)", "[Node]")
-// {
-//   Node_UPtr n1 = Node_UPtr(new Node { "n1", 0, 0 });
-//   Node_UPtr n2 = Node_UPtr(new Node { "n2", 0, 0 });
-//   Node_UPtr n3 = Node_UPtr(new Node { "n3", 0, 0 });
-//   Node_UPtr n4 = Node_UPtr(new Node { "n4", 0, 0 });
-//   Node_UPtr n5 = Node_UPtr(new Node { "n5", 0, 0 });
-//   Node_UPtr n6 = Node_UPtr(new Node { "n6", 0, 0 });
+TEST_CASE("Edge count gathering after moving (unipartite)", "[Node]")
+{
+  // Node_UPtr n1 = Node_UPtr(new Node { "n1", 0, 0, 1});
+  // Node_UPtr n2 = Node_UPtr(new Node { "n2", 0, 0, 1});
+  // Node_UPtr n3 = Node_UPtr(new Node { "n3", 0, 0, 1});
+  // Node_UPtr n4 = Node_UPtr(new Node { "n4", 0, 0, 1});
+  // Node_UPtr n5 = Node_UPtr(new Node { "n5", 0, 0, 1});
+  // Node_UPtr n6 = Node_UPtr(new Node { "n6", 0, 0, 1});
 
-//   // Add edges
-//   connect_nodes(n1.get(), n2.get());
-//   connect_nodes(n1.get(), n3.get());
-//   connect_nodes(n1.get(), n4.get());
-//   connect_nodes(n1.get(), n5.get());
-//   connect_nodes(n2.get(), n3.get());
-//   connect_nodes(n2.get(), n4.get());
-//   connect_nodes(n2.get(), n5.get());
-//   connect_nodes(n3.get(), n4.get());
-//   connect_nodes(n3.get(), n6.get());
-//   connect_nodes(n4.get(), n5.get());
-//   connect_nodes(n4.get(), n6.get());
-//   connect_nodes(n5.get(), n6.get());
+  // // Add edges
+  // connect_nodes(n1.get(), n2.get());
+  // connect_nodes(n1.get(), n3.get());
+  // connect_nodes(n1.get(), n4.get());
+  // connect_nodes(n1.get(), n5.get());
+  // connect_nodes(n2.get(), n3.get());
+  // connect_nodes(n2.get(), n4.get());
+  // connect_nodes(n2.get(), n5.get());
+  // connect_nodes(n3.get(), n4.get());
+  // connect_nodes(n3.get(), n6.get());
+  // connect_nodes(n4.get(), n5.get());
+  // connect_nodes(n4.get(), n6.get());
+  // connect_nodes(n5.get(), n6.get());
 
-//   // Make 3 blocks
-//   Node_UPtr a = Node_UPtr(new Node { 0, 1 });
-//   Node_UPtr b = Node_UPtr(new Node { 1, 1 });
-//   Node_UPtr c = Node_UPtr(new Node { 2, 1 });
+  // // Make 3 blocks
+  // Node_UPtr a = Node_UPtr(new Node { "b", 0, 1});
+  // Node_UPtr b = Node_UPtr(new Node { "b", 0, 1});
+  // Node_UPtr c = Node_UPtr(new Node { "b", 0, 1});
 
-//   // Assign nodes to their blocks
-//   n1->set_parent(a.get());
-//   n2->set_parent(a.get());
-//   n3->set_parent(b.get());
-//   n4->set_parent(b.get());
-//   n5->set_parent(c.get());
-//   n6->set_parent(c.get());
+  // // Assign nodes to their blocks
+  // n1->set_parent(a.get());
+  // n2->set_parent(a.get());
+  // n3->set_parent(b.get());
+  // n4->set_parent(b.get());
+  // n5->set_parent(c.get());
+  // n6->set_parent(c.get());
 
-//   const auto a_edges = a->gather_neighbors_at_level(1);
-//   REQUIRE(a_edges.size() == 3);
-//   REQUIRE(a_edges.at(a.get()) == 2 * 1); // self edges will be double
-//   REQUIRE(a_edges.at(b.get()) == 4);
-//   REQUIRE(a_edges.at(c.get()) == 2);
+  // const auto a_edges = a->gather_neighbors_at_level(1);
+  // REQUIRE(a_edges.size() == 3);
+  // REQUIRE(a_edges.at(a.get()) == 2 * 1); // self edges will be double
+  // REQUIRE(a_edges.at(b.get()) == 4);
+  // REQUIRE(a_edges.at(c.get()) == 2);
 
-//   const auto b_edges = b->gather_neighbors_at_level(1);
-//   REQUIRE(b_edges.size() == 3);
-//   REQUIRE(b_edges.at(a.get()) == 4);
-//   REQUIRE(b_edges.at(b.get()) == 1 * 2);
-//   REQUIRE(b_edges.at(c.get()) == 3);
+  // const auto b_edges = b->gather_neighbors_at_level(1);
+  // REQUIRE(b_edges.size() == 3);
+  // REQUIRE(b_edges.at(a.get()) == 4);
+  // REQUIRE(b_edges.at(b.get()) == 1 * 2);
+  // REQUIRE(b_edges.at(c.get()) == 3);
 
-//   const auto c_edges = c->gather_neighbors_at_level(1);
-//   REQUIRE(c_edges.at(a.get()) == 2);
-//   REQUIRE(c_edges.at(b.get()) == 3);
-//   REQUIRE(c_edges.at(c.get()) == 2 * 1);
-// }
+  // const auto c_edges = c->gather_neighbors_at_level(1);
+  // REQUIRE(c_edges.at(a.get()) == 2);
+  // REQUIRE(c_edges.at(b.get()) == 3);
+  // REQUIRE(c_edges.at(c.get()) == 2 * 1);
+}
 
 // TEST_CASE("Tracking node degrees", "[Node]")
 // {

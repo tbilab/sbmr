@@ -57,15 +57,6 @@ class Node {
   {
   }
 
-  // Constructor used for building block nodes
-  Node(const int i,
-       const int type,
-       const int level,
-       const int num_types = 1)
-      : Node("b_" + as_str(i), level, type, num_types)
-  {
-  }
-
   // Destructor
   ~Node()
   {
@@ -125,7 +116,7 @@ class Node {
   // =========================================================================
   void set_parent(Node* new_parent)
   {
-    if (level != new_parent->level - 1)
+    if (level != new_parent->level - 1) 
       LOGIC_ERROR("Parent node must be one level above child");
 
     // Remove self from previous parents children list (if it existed)
