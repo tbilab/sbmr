@@ -175,6 +175,18 @@ class SBM_Network {
   {
   }
 
+  // Move constructor
+  SBM_Network(SBM_Network&& moved_net) {
+    nodes            = std::move(moved_net.nodes);
+    types            = std::move(moved_net.types);
+    type_name_to_int = std::move(moved_net.type_name_to_int);
+    connection_types = std::move(moved_net.connection_types);
+    id_to_node       = std::move(moved_net.id_to_node);
+    edge_types       = std::move(moved_net.edge_types);
+    random_sampler   = std::move(moved_net.random_sampler);
+    block_counter    = moved_net.block_counter;
+  }
+
   // =========================================================================
   // Information
   // =========================================================================
