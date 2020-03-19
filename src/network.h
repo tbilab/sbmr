@@ -38,6 +38,7 @@ enum Partite_Structure {
   multipartite_restricted // Multiple node types, only specific type combos allowed for edges
 };
 
+
 class SBM_Network {
 
   private:
@@ -86,6 +87,33 @@ class SBM_Network {
     check_for_level(level);
     for (const auto& nodes_vec : nodes.at(level)) {
       std::for_each(nodes_vec.begin(), nodes_vec.end(), fn);
+    }
+  }
+
+  bool no_blocks() const
+  {
+    return num_levels() == 1;
+  }
+
+  void validate_edge(const int type_a, const int type_b, const bool loading = false)
+  {
+    if (edge_types == unipartite) {
+      return; // Do nothing
+    }
+
+    if (loading || edge_types == multipartite) {
+      // Load the type into connection types for later use
+      connection_types[type_a].insert(type_b);
+      connection_types[type_b].insert(type_a);
+    } else {
+      // If we're in a restricted multipartite network
+      // make sure that this is an acceptable edgetype combo
+      const bool edge_not_allowed = connection_types.at(type_a).count(type_b) == 0;
+
+      if (edge_not_allowed)
+        LOGIC_ERROR("Connection provided between nodes of types "
+                    + types[type_a] + " & " + types[type_b]
+                    + " which was not a specified combination in allowed edge types");
     }
   }
 
@@ -185,29 +213,6 @@ class SBM_Network {
     return types.size();
   }
 
-  // Export current state of nodes in model
-  State_Dump state() const
-  {
-    if (num_levels() == 1)
-      LOGIC_ERROR("No state to export - Try adding blocks");
-
-    // Initialize the return struct
-    State_Dump state(num_nodes());
-
-    // No need to record the last level's nodes as they are already included
-    // in the previous node's parent slot
-    for (int level = 0; level < num_levels() - 1; level++) {
-      for_all_nodes_at_level(level, [&](const Node_UPtr& node) {
-        state.ids.push_back(node->get_id());
-        state.types.push_back(types[node->get_type()]);
-        state.parents.push_back(node->get_parent_id());
-        state.levels.push_back(level);
-      });
-    }
-
-    return state;
-  }
-
   // =========================================================================
   // Modification
   // =========================================================================
@@ -242,28 +247,6 @@ class SBM_Network {
 
     a->add_edge(b);
     b->add_edge(a);
-  }
-
-  void validate_edge(const int type_a, const int type_b, const bool loading = false)
-  {
-    if (edge_types == unipartite) {
-      return; // Do nothing
-    }
-
-    if (loading || edge_types == multipartite) {
-      // Load the type into connection types for later use
-      connection_types[type_a].insert(type_b);
-      connection_types[type_b].insert(type_a);
-    } else {
-      // If we're in a restricted multipartite network
-      // make sure that this is an acceptable edgetype combo
-      const bool edge_not_allowed = connection_types.at(type_a).count(type_b) == 0;
-
-      if (edge_not_allowed)
-        LOGIC_ERROR("Connection provided between nodes of types "
-                    + types[type_a] + " & " + types[type_b]
-                    + " which was not a specified combination in allowed edge types");
-    }
   }
 
   void initialize_blocks(int num_blocks = -1)
@@ -320,37 +303,57 @@ class SBM_Network {
     }
   }
 
-  void delete_block_level()
+  void remove_blocks()
   {
-    if (has_blocks()) {
+    const int num_levels_to_remove = num_levels() - 1;
+
+    for (int i = 0; i < num_levels_to_remove; i++) {
       // Remove the last layer of nodes.
       nodes.pop_back();
-    } else {
+    }
+  }
+
+  void delete_block_level()
+  {
+    // Only show error if trying to delete a single block.
+    if (no_blocks())
       LOGIC_ERROR("No block level to delete.");
-    }
-  }
 
-  void delete_all_blocks()
-  {
-    while (has_blocks()) {
-      delete_block_level();
-    }
-  }
-
-  bool has_blocks() const
-  {
-    return num_levels() > 1;
+    // Remove the last layer of nodes.
+    nodes.pop_back();
   }
 
   // =============================================================================
-  // Load current state of nodes in model from state dump given SBM::state()
+  // Model State
   // =============================================================================
+  State_Dump state() const
+  {
+    if (num_levels() == 1)
+      LOGIC_ERROR("No state to export - Try adding blocks");
+
+    // Initialize the return struct
+    State_Dump state(num_nodes());
+
+    // No need to record the last level's nodes as they are already included
+    // in the previous node's parent slot
+    for (int level = 0; level < num_levels() - 1; level++) {
+      for_all_nodes_at_level(level, [&](const Node_UPtr& node) {
+        state.ids.push_back(node->get_id());
+        state.types.push_back(types[node->get_type()]);
+        state.parents.push_back(node->get_parent_id());
+        state.levels.push_back(level);
+      });
+    }
+
+    return state;
+  }
+
   void update_state(const std::vector<string>& ids,
                     const std::vector<string>& parents,
                     const std::vector<int>& levels,
                     const std::vector<string>& types)
   {
-    delete_all_blocks(); // Remove all block levels
+    remove_blocks();      // Remove all block levels
     build_level();       // Add an empty block level to fill in
 
     // Make a copy of the id_to_node map (We will later overwrite it)
