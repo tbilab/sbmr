@@ -40,7 +40,7 @@ class Node {
   int _degree = 0;    // How many neighbors does this node have?
   string _id;        // Unique integer id for node
   int _type;         // What type of node is this?
-  int level;         // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
+  int _level;         // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
 
   public:
   // =========================================================================
@@ -52,7 +52,7 @@ class Node {
        const int num_types = 1)
       : _id(node_id)
       , _type(type)
-      , level(level)
+      , _level(level)
       , _neighbors(num_types)
   {
   }
@@ -79,6 +79,7 @@ class Node {
   int type() const { return _type; }
   Node* parent() const { return parent_node; }
   int degree() const { return _degree; }
+  int level() const { return _level; }
 
   // =========================================================================
   // Children-Related methods
@@ -117,7 +118,7 @@ class Node {
   // =========================================================================
   void set_parent(Node* new_parent)
   {
-    if (level != new_parent->level - 1) 
+    if (_level != new_parent->level() - 1) 
       LOGIC_ERROR("Parent node must be one level above child");
 
     // Remove self from previous parent's children list (if it existed)
@@ -136,15 +137,15 @@ class Node {
   {
     // First we need to make sure that the requested level is not less than that
     // of the current node.
-    if (level_of_parent < level)
+    if (level_of_parent < _level)
       LOGIC_ERROR("Requested parent level ("
                   + as_str(level_of_parent)
                   + ") lower than current node level ("
-                  + as_str(level) + ").");
+                  + as_str(_level) + ").");
 
     // Start with this node as current node
     Node* current_node     = this;
-    int current_node_level = level;
+    int current_node_level = _level;
 
     while (current_node_level != level_of_parent) {
       if (!has_parent())
@@ -175,6 +176,7 @@ class Node {
   {
     return _neighbors.at(node_type);
   }
+  
 
   // Collapse neighbors to a given level into a map of connected block id->count
   Edge_Count_Map gather_neighbors_at_level(const int level) const
