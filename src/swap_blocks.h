@@ -3,10 +3,10 @@
 #include "Node.h"
 #include "vector_helpers.h"
 
-void swap_blocks(Node* child_node,
-                 Node* new_block,
-                 std::vector<Node_UPtr>& block_holder,
-                 const bool remove_empty = true)
+inline void swap_blocks(Node* child_node,
+                        Node* new_block,
+                        std::vector<Node_UPtr>& block_holder,
+                        const bool remove_empty = true)
 {
   Node* old_block          = child_node->parent();
   const bool has_old_block = old_block != nullptr;
