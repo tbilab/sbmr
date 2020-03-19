@@ -34,7 +34,7 @@ enum Update_Type { Add,
 //=================================
 class Node {
   private:
-  Node* parent = nullptr; // What node contains this node (aka its cluster)
+  Node* parent_node = nullptr; // What node contains this node (aka its cluster)
   Edges_By_Type edges;
   Node_Vec children; // Nodes that are contained within node (if node is cluster)
   int degree = 0;    // How many edges/ edges does this node have?
@@ -86,8 +86,7 @@ class Node {
   // =========================================================================
   string id() const { return _id; }
   int type() const { return _type; }
-  int get_level() const { return level; }
-  Node* get_parent() const { return parent; }
+  Node* parent() const { return parent_node; }
 
 
   // =========================================================================
@@ -132,13 +131,13 @@ class Node {
 
     // Remove self from previous parents children list (if it existed)
     if (has_parent())
-      parent->remove_child(this);
+      parent_node->remove_child(this);
 
     // Add this node to new parent's children list
     new_parent->add_child(this);
 
     // Set this node's parent
-    parent = new_parent;
+    parent_node = new_parent;
   }
 
   // Get parent of node at a given level
@@ -154,22 +153,24 @@ class Node {
 
     // Start with this node as current node
     Node* current_node = this;
+    int current_node_level = level;
 
-    while (current_node->level != level_of_parent) {
-      if (!parent)
+    while (current_node_level != level_of_parent) {
+      if (!has_parent())
         RANGE_ERROR("No parent at level " + as_str(level_of_parent) + " for " + id());
 
       // Traverse up parents until we've reached just below where we want to go
-      current_node = current_node->parent;
+      current_node = current_node->parent();
+      current_node_level++;
     }
 
     // Return the final node, aka the parent at desired level
     return current_node;
   }
 
-  bool has_parent() const { return parent != nullptr; }
+  bool has_parent() const { return parent_node != nullptr; }
 
-  void remove_parent() { parent = nullptr; }
+  void remove_parent() { parent_node = nullptr; }
 
   // =========================================================================
   // Edge-Related methods
