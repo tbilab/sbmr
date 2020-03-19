@@ -31,7 +31,7 @@ TEST_CASE("Basic Initialization", "[Node]")
 
   // Get basic info out of the nodes
   REQUIRE(n1->id() == "n1");
-  REQUIRE(n1->get_parent_at_level(1)->id() == n1->get_parent()->id());
+  REQUIRE(n1->get_parent_at_level(1)->id() == n1->parent()->id());
 
   // // Make sure the edge propigate properly.
   // REQUIRE("m1, m3" == print_node_ids(n1->get_edges_of_type(1,0)));

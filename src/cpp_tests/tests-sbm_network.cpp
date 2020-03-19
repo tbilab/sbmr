@@ -61,12 +61,12 @@ TEST_CASE("Default block initialization", "[Network]")
   REQUIRE(my_net.get_node_by_id("b3")->has_parent());
 
   // All parents should be unique
-  std::set<string> unique_blocks { my_net.get_node_by_id("a1")->get_parent()->id(),
-                                   my_net.get_node_by_id("a2")->get_parent()->id(),
-                                   my_net.get_node_by_id("a3")->get_parent()->id(),
-                                   my_net.get_node_by_id("b1")->get_parent()->id(),
-                                   my_net.get_node_by_id("b2")->get_parent()->id(),
-                                   my_net.get_node_by_id("b3")->get_parent()->id() };
+  std::set<string> unique_blocks { my_net.get_node_by_id("a1")->parent()->id(),
+                                   my_net.get_node_by_id("a2")->parent()->id(),
+                                   my_net.get_node_by_id("a3")->parent()->id(),
+                                   my_net.get_node_by_id("b1")->parent()->id(),
+                                   my_net.get_node_by_id("b2")->parent()->id(),
+                                   my_net.get_node_by_id("b3")->parent()->id() };
 
   REQUIRE(unique_blocks.size() == my_net.num_nodes_at_level(1));
 }
@@ -202,7 +202,7 @@ TEST_CASE("Swapping of blocks", "[Network]")
 
   // Merge second node into first nodes block
   Node* node2  = my_net.get_node_by_id("n2");
-  Node* block1 = my_net.get_node_by_id("n1")->get_parent();
+  Node* block1 = my_net.get_node_by_id("n1")->parent();
 
   swap_blocks(node2,
               block1,
@@ -214,7 +214,7 @@ TEST_CASE("Swapping of blocks", "[Network]")
 
   // Now do the same for the m type nodes but don't delete the empty block
   swap_blocks(my_net.get_nodes_of_type("m")[1].get(),
-              my_net.get_nodes_of_type("m")[0]->get_parent(),
+              my_net.get_nodes_of_type("m")[0]->parent(),
               my_net.get_nodes_of_type("m", 1),
               false);
 
@@ -292,7 +292,7 @@ TEST_CASE("State dumping and restoring", "[Network")
 
   // Now give merge a1 and a2 to same parent and remove a1s old parent
   swap_blocks(a1,
-              a2->get_parent(),
+              a2->parent(),
               my_net.get_nodes_of_type("a", 1),
               true);
 
@@ -342,8 +342,8 @@ TEST_CASE("State dumping and restoring", "[Network")
   REQUIRE(my_net2.num_levels() == 2);
   REQUIRE(my_net2.num_nodes_at_level(1) == 5);
 
-  REQUIRE(my_net2.get_node_by_id("a1")->get_parent()
-          == my_net2.get_node_by_id("a2")->get_parent());
+  REQUIRE(my_net2.get_node_by_id("a1")->parent()
+          == my_net2.get_node_by_id("a2")->parent());
 }
 
 TEST_CASE("State dumping and restoring: w/ metablocks", "[Network")

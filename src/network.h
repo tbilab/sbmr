@@ -340,7 +340,7 @@ class SBM_Network {
       for_all_nodes_at_level(level, [&](const Node_UPtr& node) {
         state.ids.push_back(node->id());
         state.types.push_back(types[node->type()]);
-        state.parents.push_back(node->get_parent()->id());
+        state.parents.push_back(node->parent()->id());
         state.levels.push_back(level);
       });
     }

@@ -8,7 +8,7 @@ void swap_blocks(Node* child_node,
                  std::vector<Node_UPtr>& block_holder,
                  const bool remove_empty = true)
 {
-  Node* old_block          = child_node->get_parent();
+  Node* old_block          = child_node->parent();
   const bool has_old_block = old_block != nullptr;
 
   child_node->set_parent(new_block);
