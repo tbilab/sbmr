@@ -38,8 +38,8 @@ class Node {
   Edges_By_Type _edges;
   Node_Vec children; // Nodes that are contained within node (if node is cluster)
   int degree = 0;    // How many edges/ edges does this node have?
-  string _id;    // Unique integer id for node
-  int _type;          // What type of node is this?
+  string _id;        // Unique integer id for node
+  int _type;         // What type of node is this?
   int level;         // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
 
   public:
@@ -78,7 +78,7 @@ class Node {
   // Copy construction
   Node(const Node&) = delete;
   Node& operator=(const Node&) = delete;
-  Node(Node&&)  = delete;
+  Node(Node&&)                 = delete;
   Node& operator=(Node&&) = delete;
 
   // =========================================================================
@@ -87,7 +87,6 @@ class Node {
   string id() const { return _id; }
   int type() const { return _type; }
   Node* parent() const { return parent_node; }
-
 
   // =========================================================================
   // Children-Related methods
@@ -141,7 +140,7 @@ class Node {
   }
 
   // Get parent of node at a given level
-  Node* parent_at_level(const int level_of_parent) 
+  Node* parent_at_level(const int level_of_parent)
   {
     // First we need to make sure that the requested level is not less than that
     // of the current node.
@@ -152,7 +151,7 @@ class Node {
                   + as_str(level) + ").");
 
     // Start with this node as current node
-    Node* current_node = this;
+    Node* current_node     = this;
     int current_node_level = level;
 
     while (current_node_level != level_of_parent) {
@@ -175,6 +174,11 @@ class Node {
   // =========================================================================
   // Edge-Related methods
   // =========================================================================
+  Edges_By_Type& edges()
+  {
+    return _edges;
+  }
+
   Node_Ptr_Vec& edges_to_type(const int node_type)
   {
     return _edges.at(node_type);
@@ -199,11 +203,6 @@ class Node {
   {
     edges_to_type(node->type()).push_back(node);
     degree++;
-  }
-
-  Edges_By_Type& edges() 
-  {
-    return _edges;
   }
 
   void update_edges(const Edges_By_Type& edges_to_update, const Update_Type& update_type)
