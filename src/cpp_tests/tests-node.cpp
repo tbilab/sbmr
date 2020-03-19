@@ -199,132 +199,131 @@ TEST_CASE("Edge count gathering (unipartite)", "[Node]")
 
 TEST_CASE("Edge count gathering after moving (unipartite)", "[Node]")
 {
-  // Node_UPtr n1 = Node_UPtr(new Node { "n1", 0, 0, 1});
-  // Node_UPtr n2 = Node_UPtr(new Node { "n2", 0, 0, 1});
-  // Node_UPtr n3 = Node_UPtr(new Node { "n3", 0, 0, 1});
-  // Node_UPtr n4 = Node_UPtr(new Node { "n4", 0, 0, 1});
-  // Node_UPtr n5 = Node_UPtr(new Node { "n5", 0, 0, 1});
-  // Node_UPtr n6 = Node_UPtr(new Node { "n6", 0, 0, 1});
+  Node_UPtr n1 = Node_UPtr(new Node { "n1", 0, 0, 1});
+  Node_UPtr n2 = Node_UPtr(new Node { "n2", 0, 0, 1});
+  Node_UPtr n3 = Node_UPtr(new Node { "n3", 0, 0, 1});
+  Node_UPtr n4 = Node_UPtr(new Node { "n4", 0, 0, 1});
+  Node_UPtr n5 = Node_UPtr(new Node { "n5", 0, 0, 1});
+  Node_UPtr n6 = Node_UPtr(new Node { "n6", 0, 0, 1});
 
-  // // Add edges
-  // connect_nodes(n1.get(), n2.get());
-  // connect_nodes(n1.get(), n3.get());
-  // connect_nodes(n1.get(), n4.get());
-  // connect_nodes(n1.get(), n5.get());
-  // connect_nodes(n2.get(), n3.get());
-  // connect_nodes(n2.get(), n4.get());
-  // connect_nodes(n2.get(), n5.get());
-  // connect_nodes(n3.get(), n4.get());
-  // connect_nodes(n3.get(), n6.get());
-  // connect_nodes(n4.get(), n5.get());
-  // connect_nodes(n4.get(), n6.get());
-  // connect_nodes(n5.get(), n6.get());
+  // Add edges
+  connect_nodes(n1.get(), n2.get());
+  connect_nodes(n1.get(), n3.get());
+  connect_nodes(n1.get(), n4.get());
+  connect_nodes(n1.get(), n5.get());
+  connect_nodes(n2.get(), n3.get());
+  connect_nodes(n2.get(), n4.get());
+  connect_nodes(n2.get(), n5.get());
+  connect_nodes(n3.get(), n4.get());
+  connect_nodes(n3.get(), n6.get());
+  connect_nodes(n4.get(), n5.get());
+  connect_nodes(n4.get(), n6.get());
+  connect_nodes(n5.get(), n6.get());
 
-  // // Make 3 blocks
-  // Node_UPtr a = Node_UPtr(new Node { "b", 0, 1});
-  // Node_UPtr b = Node_UPtr(new Node { "b", 0, 1});
-  // Node_UPtr c = Node_UPtr(new Node { "b", 0, 1});
+  // Make 3 blocks
+  Node_UPtr a = Node_UPtr(new Node { "a", 1, 0});
+  Node_UPtr b = Node_UPtr(new Node { "b", 1, 0});
+  Node_UPtr c = Node_UPtr(new Node { "c", 1, 0});
 
-  // // Assign nodes to their blocks
-  // n1->set_parent(a.get());
-  // n2->set_parent(a.get());
-  // n3->set_parent(b.get());
-  // n4->set_parent(b.get());
-  // n5->set_parent(c.get());
-  // n6->set_parent(c.get());
+  // Assign nodes to their blocks
+  n1->set_parent(a.get());
+  n2->set_parent(a.get());
+  n3->set_parent(b.get());
+  n4->set_parent(b.get());
+  n5->set_parent(c.get());
+  n6->set_parent(c.get());
 
-  // const auto a_edges = a->gather_neighbors_at_level(1);
-  // REQUIRE(a_edges.size() == 3);
-  // REQUIRE(a_edges.at(a.get()) == 2 * 1); // self edges will be double
-  // REQUIRE(a_edges.at(b.get()) == 4);
-  // REQUIRE(a_edges.at(c.get()) == 2);
+  const auto a_edges = a->gather_neighbors_at_level(1);
+  REQUIRE(a_edges.size() == 3);
+  REQUIRE(a_edges.at(a.get()) == 2 * 1); // self edges will be double
+  REQUIRE(a_edges.at(b.get()) == 4);
+  REQUIRE(a_edges.at(c.get()) == 2);
 
-  // const auto b_edges = b->gather_neighbors_at_level(1);
-  // REQUIRE(b_edges.size() == 3);
-  // REQUIRE(b_edges.at(a.get()) == 4);
-  // REQUIRE(b_edges.at(b.get()) == 1 * 2);
-  // REQUIRE(b_edges.at(c.get()) == 3);
+  const auto b_edges = b->gather_neighbors_at_level(1);
+  REQUIRE(b_edges.size() == 3);
+  REQUIRE(b_edges.at(a.get()) == 4);
+  REQUIRE(b_edges.at(b.get()) == 1 * 2);
+  REQUIRE(b_edges.at(c.get()) == 3);
 
-  // const auto c_edges = c->gather_neighbors_at_level(1);
-  // REQUIRE(c_edges.at(a.get()) == 2);
-  // REQUIRE(c_edges.at(b.get()) == 3);
-  // REQUIRE(c_edges.at(c.get()) == 2 * 1);
+  const auto c_edges = c->gather_neighbors_at_level(1);
+  REQUIRE(c_edges.at(a.get()) == 2);
+  REQUIRE(c_edges.at(b.get()) == 3);
+  REQUIRE(c_edges.at(c.get()) == 2 * 1);
 }
 
-// TEST_CASE("Tracking node degrees", "[Node]")
-// {
-//   // Node level
-//   Node_UPtr a1 = Node_UPtr(new Node { "a1", 0, 0, 2 });
-//   Node_UPtr a2 = Node_UPtr(new Node { "a2", 0, 0, 2 });
-//   Node_UPtr a3 = Node_UPtr(new Node { "a3", 0, 0, 2 });
-//   Node_UPtr b1 = Node_UPtr(new Node { "b1", 0, 1, 2 });
-//   Node_UPtr b2 = Node_UPtr(new Node { "b2", 0, 1, 2 });
-//   Node_UPtr b3 = Node_UPtr(new Node { "b3", 0, 1, 2 });
+TEST_CASE("Tracking node degrees", "[Node]")
+{
+  // Node level
+  Node_UPtr a1 = Node_UPtr(new Node { "a1", 0, 0, 2 });
+  Node_UPtr a2 = Node_UPtr(new Node { "a2", 0, 0, 2 });
+  Node_UPtr a3 = Node_UPtr(new Node { "a3", 0, 0, 2 });
+  Node_UPtr b1 = Node_UPtr(new Node { "b1", 0, 1, 2 });
+  Node_UPtr b2 = Node_UPtr(new Node { "b2", 0, 1, 2 });
+  Node_UPtr b3 = Node_UPtr(new Node { "b3", 0, 1, 2 });
 
-//   // First level / blocks
-//   Node_UPtr a11 = Node_UPtr(new Node { "a11", 1, 0, 2 });
-//   Node_UPtr a12 = Node_UPtr(new Node { "a12", 1, 0, 2 });
-//   Node_UPtr b11 = Node_UPtr(new Node { "b11", 1, 1, 2 });
-//   Node_UPtr b12 = Node_UPtr(new Node { "b12", 1, 1, 2 });
+  // First level / blocks
+  Node_UPtr a11 = Node_UPtr(new Node { "a11", 1, 0, 2 });
+  Node_UPtr a12 = Node_UPtr(new Node { "a12", 1, 0, 2 });
+  Node_UPtr b11 = Node_UPtr(new Node { "b11", 1, 1, 2 });
+  Node_UPtr b12 = Node_UPtr(new Node { "b12", 1, 1, 2 });
 
-//   // Second level / super blocks
-//   Node_UPtr a21 = Node_UPtr(new Node { "a21", 2, 0, 2 });
-//   Node_UPtr b21 = Node_UPtr(new Node { "b21", 2, 1, 2 });
+  // Second level / super blocks
+  Node_UPtr a21 = Node_UPtr(new Node { "a21", 2, 0, 2 });
+  Node_UPtr b21 = Node_UPtr(new Node { "b21", 2, 1, 2 });
 
-//   connect_nodes(a1.get(), b1.get());
-//   connect_nodes(a1.get(), b2.get());
-//   connect_nodes(a2.get(), b1.get());
-//   connect_nodes(a2.get(), b2.get());
-//   connect_nodes(a3.get(), b2.get());
-//   connect_nodes(a3.get(), b3.get());
+  connect_nodes(a1.get(), b1.get());
+  connect_nodes(a1.get(), b2.get());
+  connect_nodes(a2.get(), b1.get());
+  connect_nodes(a2.get(), b2.get());
+  connect_nodes(a3.get(), b2.get());
+  connect_nodes(a3.get(), b3.get());
 
-//   a1->set_parent(a11.get());
-//   a2->set_parent(a12.get());
-//   a3->set_parent(a12.get());
+  a1->set_parent(a11.get());
+  a2->set_parent(a12.get());
+  a3->set_parent(a12.get());
 
-//   b1->set_parent(b11.get());
-//   b2->set_parent(b11.get());
-//   b3->set_parent(b12.get());
+  b1->set_parent(b11.get());
+  b2->set_parent(b11.get());
+  b3->set_parent(b12.get());
 
-//   a11->set_parent(a21.get());
-//   a12->set_parent(a21.get());
-//   b11->set_parent(b21.get());
-//   b12->set_parent(b21.get());
+  a11->set_parent(a21.get());
+  a12->set_parent(a21.get());
+  b11->set_parent(b21.get());
+  b12->set_parent(b21.get());
 
-//   // Get basic info out of the nodes
-//   REQUIRE(a1->get_degree() == 2);
-//   REQUIRE(a2->get_degree() == 2);
-//   REQUIRE(a3->get_degree() == 2);
+  // Get basic info out of the nodes
+  REQUIRE(a1->degree() == 2);
+  REQUIRE(a2->degree() == 2);
+  REQUIRE(a3->degree() == 2);
 
+  REQUIRE(b1->degree() == 2);
+  REQUIRE(b2->degree() == 3);
+  REQUIRE(b3->degree() == 1);
 
-//   REQUIRE(b1->get_degree() == 2);
-//   REQUIRE(b2->get_degree() == 3);
-//   REQUIRE(b3->get_degree() == 1);
+  REQUIRE(a11->degree() == 2);
+  REQUIRE(a12->degree() == 4);
+  REQUIRE(b11->degree() == 5);
+  REQUIRE(b12->degree() == 1);
+  REQUIRE(a21->degree() == 6);
+  REQUIRE(b21->degree() == 6);
 
-//   REQUIRE(a11->get_degree() == 2);
-//   REQUIRE(a12->get_degree() == 4);
-//   REQUIRE(b11->get_degree() == 5);
-//   REQUIRE(b12->get_degree() == 1);
-//   REQUIRE(a21->get_degree() == 6);
-//   REQUIRE(b21->get_degree() == 6);
+  // Swap parents of a2 and b2 nodes
+  a2->set_parent(a11.get());
+  b2->set_parent(b12.get());
 
-//   // Swap parents of a2 and b2 nodes
-//   a2->set_parent(a11.get());
-//   b2->set_parent(b12.get());
+  // Make sure that the degrees correctly reflect change
+  REQUIRE(a1->degree() == 2);
+  REQUIRE(a2->degree() == 2);
+  REQUIRE(a3->degree() == 2);
 
-//   // Make sure that the degrees correctly reflect change
-//   REQUIRE(a1->get_degree() == 2);
-//   REQUIRE(a2->get_degree() == 2);
-//   REQUIRE(a3->get_degree() == 2);
+  REQUIRE(b1->degree() == 2);
+  REQUIRE(b2->degree() == 3);
+  REQUIRE(b3->degree() == 1);
 
-//   REQUIRE(b1->get_degree() == 2);
-//   REQUIRE(b2->get_degree() == 3);
-//   REQUIRE(b3->get_degree() == 1);
-
-//   REQUIRE(a11->get_degree() == 4);
-//   REQUIRE(a12->get_degree() == 2);
-//   REQUIRE(b11->get_degree() == 2);
-//   REQUIRE(b12->get_degree() == 4);
-//   REQUIRE(a21->get_degree() == 6);
-//   REQUIRE(b21->get_degree() == 6);
-// }
+  REQUIRE(a11->degree() == 4);
+  REQUIRE(a12->degree() == 2);
+  REQUIRE(b11->degree() == 2);
+  REQUIRE(b12->degree() == 4);
+  REQUIRE(a21->degree() == 6);
+  REQUIRE(b21->degree() == 6);
+}
