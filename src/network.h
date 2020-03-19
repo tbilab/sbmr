@@ -38,7 +38,6 @@ enum Partite_Structure {
   multipartite_restricted // Multiple node types, only specific type combos allowed for edges
 };
 
-
 class SBM_Network {
 
   private:
@@ -220,8 +219,13 @@ class SBM_Network {
                  const std::string& type = "a",
                  const int level         = 0)
   {
-    const int type_index = get_type_index(type);
+    return add_node(id, get_type_index(type), level);
+  }
 
+  Node* add_node(const std::string& id,
+                 const int type_index = 0,
+                 const int level      = 0)
+  {
     // Build new node pointer outside of vector first for ease of pointer retrieval
     auto new_node = Node_UPtr(new Node(id, level, type_index, num_types()));
 
@@ -261,8 +265,7 @@ class SBM_Network {
     // Loop over all node types
     for (int type_i = 0; type_i < num_types(); type_i++) {
 
-      Node_UPtr_Vec& nodes_of_type  = get_nodes_of_type(type_i, child_level);
-      Node_UPtr_Vec& blocks_of_type = get_nodes_of_type(type_i, block_level);
+      Node_UPtr_Vec& nodes_of_type = get_nodes_of_type(type_i, child_level);
 
       // If we're in the 1-block-per-node mode make sure we reflect that in reserved size
       if (one_block_per_node)
@@ -272,12 +275,16 @@ class SBM_Network {
         LOGIC_ERROR("Can't initialize more blocks than there are nodes of a given type");
 
       // Reserve enough spaces for the blocks to be inserted
-      blocks_of_type.reserve(num_blocks);
+      get_nodes_of_type(type_i, block_level).reserve(num_blocks);
 
       for (int i = 0; i < num_blocks; i++) {
         // Build a new block node wrapped in smart pointer in it's type vector
-        blocks_of_type.emplace_back(new Node(block_counter++, type_i, block_level, num_types()));
+        add_node("b_" + as_str(block_counter++),
+                 type_i,
+                 block_level);
       }
+
+      Node_UPtr_Vec& blocks_of_type = get_nodes_of_type(type_i, block_level);
 
       // Shuffle child nodes if we're randomly assigning blocks
       if (!one_block_per_node)
@@ -353,8 +360,8 @@ class SBM_Network {
                     const std::vector<int>& levels,
                     const std::vector<string>& types)
   {
-    remove_blocks();      // Remove all block levels
-    build_level();       // Add an empty block level to fill in
+    remove_blocks(); // Remove all block levels
+    build_level();   // Add an empty block level to fill in
 
     // Make a copy of the id_to_node map (We will later overwrite it)
     String_Map<Node*> node_by_id = id_to_node;
