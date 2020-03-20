@@ -346,7 +346,7 @@ class SBM_Network {
   Node* propose_move(Node* node, const double eps = 0.1)
   {
     // Sample a random neighbor block
-    Node* neighbor_block = random_sampler.sample(node->neighbors(), node->degree());
+    Node* neighbor_block = random_sampler.sample(node->neighbors(), node->degree())->parent();
 
     // Get all the nodes connected to neighbor block of the node-to-move's type
     Node_Ptr_Vec& neighbor_edges_to_t = neighbor_block->neighbors_of_type(node->type());
@@ -355,13 +355,17 @@ class SBM_Network {
     Node_UPtr_Vec& all_potential_blocks = get_nodes_of_type(node->type(), node->level() + 1);
 
     // Decide if we are going to choose a random block for our node
-    const double ergo_amnt            = eps * all_potential_blocks.size();
-    const double prob_of_random_block = ergo_amnt / (double(neighbor_edges_to_t.size()) + ergo_amnt);
+    const double ergo_amnt = eps * all_potential_blocks.size();
+
+    const bool draw_from_neighbor = random_sampler.draw_unif()
+        > ergo_amnt / (double(neighbor_edges_to_t.size()) + ergo_amnt);
 
     // Decide where we will get new block from and draw from potential candidates
-    return random_sampler.draw_unif() < prob_of_random_block
-        ? random_sampler.sample(all_potential_blocks).get()
-        : random_sampler.sample(neighbor_edges_to_t);
+    if (draw_from_neighbor) {
+      return random_sampler.sample(neighbor_edges_to_t)->parent();
+    } else {
+      return random_sampler.sample(all_potential_blocks).get();
+    }
   }
 
   // =============================================================================
