@@ -225,6 +225,22 @@ class SBM_Network {
     return types.size();
   }
 
+  int num_possible_neighbors_for_node(Node* node) const
+  {
+    const int type  = node->type();
+    const int level = node->level();
+
+    const std::set<int>& node_neighbor_types = connection_types.at(type);
+
+    return std::accumulate(
+        node_neighbor_types.begin(),
+        node_neighbor_types.end(),
+        0,
+        [&](int n, const int type) {
+          return n + num_nodes_of_type(type, level + 1);
+        });
+  }
+
   // =========================================================================
   // Modification
   // =========================================================================
