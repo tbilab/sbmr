@@ -1,10 +1,9 @@
 #include "../network.h"
 #include "catch.hpp"
 
-
-SBM_Network simple_bipartite() 
+SBM_Network simple_bipartite()
 {
-  SBM_Network my_sbm{{ "a", "b" }, 42};
+  SBM_Network my_sbm { { "a", "b" }, 42 };
 
   // Add nodes to graph first
   Node* a1 = my_sbm.add_node("a1", "a");
@@ -32,11 +31,11 @@ SBM_Network simple_bipartite()
 
   my_sbm.add_edge("a2", "b1");
   my_sbm.add_edge("a2", "b2");
-  
+
   my_sbm.add_edge("a3", "b1");
   my_sbm.add_edge("a3", "b2");
   my_sbm.add_edge("a3", "b4");
-  
+
   my_sbm.add_edge("a4", "b3");
 
   // Assign nodes to their blocks
@@ -52,10 +51,9 @@ SBM_Network simple_bipartite()
   return my_sbm;
 }
 
-
-SBM_Network simple_unipartite() 
+SBM_Network simple_unipartite()
 {
-  SBM_Network my_SBM{{ "a" }, 42};
+  SBM_Network my_SBM { { "a" }, 42 };
 
   // Add nodes to graph first
   Node* n1 = my_SBM.add_node("n1", "a");
@@ -122,14 +120,12 @@ TEST_CASE("Generate Node move proposals - Simple Bipartite", "[SBM]")
   double frac_of_time_no_change = double(num_times_no_move) / double(num_trials);
   // Prob of a1 staying in a1_1 should be approximately (2 + eps)/(6 + 4*eps)
   // Make sure model's decisions to move a1 reflects this.
-  double two  = 2;
-  double six  = 6;
+  double two   = 2;
+  double six   = 6;
   double three = 3;
 
-  REQUIRE( Approx((two + eps) / (six + (three * eps))).epsilon(tol) == frac_of_time_no_change);
+  REQUIRE(Approx((two + eps) / (six + (three * eps))).epsilon(tol) == frac_of_time_no_change);
 }
-
-
 
 TEST_CASE("Generate Node move proposals - Simple Unipartite", "[SBM]")
 {
@@ -171,18 +167,18 @@ TEST_CASE("Generate Node move proposals - Simple Unipartite", "[SBM]")
   // # To a
   // p_to_t(2, 2, 8) +
   // p_to_t(1, 4, 9) +
-  // p_to_t(2, 2, 7) 
+  // p_to_t(2, 2, 7)
   // # 0.3033066
 
   // # To b
   // p_to_t(2, 4, 8) +
   // p_to_t(1, 2, 9) +
-  // p_to_t(2, 3, 7) 
+  // p_to_t(2, 3, 7)
   // # 0.4155352
 
   // # To c
   // p_to_t(2, 2, 8) +
   // p_to_t(1, 3, 9) +
-  // p_to_t(2, 2, 7) 
+  // p_to_t(2, 2, 7)
   // # 0.2811582
 }
