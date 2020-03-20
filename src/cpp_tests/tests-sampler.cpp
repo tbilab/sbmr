@@ -51,6 +51,43 @@ TEST_CASE("Lots of Samples", "[Sampler]")
   REQUIRE(max_draw < 1.0);
 }
 
+TEST_CASE("Sampling from nested vectors", "[Sampler]")
+{
+
+  std::vector<std::vector<int>> vec_of_vecs;
+
+  // Make a vector of three different vectors each with three integers
+  vec_of_vecs.push_back({0,1,2});
+  vec_of_vecs.push_back({3,4,5});
+  vec_of_vecs.push_back({6,7,8});
+
+  // Initialize a random sampler and seed
+  Sampler my_sampler(42);
+  const int num_samples = 1000;
+
+  int num_times_4 = 0;
+  int num_times_3 = 0;
+
+  for (int i = 0; i < num_samples; i++) {
+    const int sampled_int = my_sampler.sample(vec_of_vecs, 9);
+
+    if(sampled_int == 4) num_times_4++;
+
+    if(sampled_int == 3) num_times_3++;
+  }
+
+  const double proportion_4 = double(num_times_4)/double(num_samples);
+  const double proportion_3 = double(num_times_4)/double(num_samples);
+  const double thresh = 0.01;
+  const double true_prop = 1.0/9.0;
+  // Hope that four is chosen 1/9th of the time
+  REQUIRE(proportion_4 > true_prop - thresh);
+  REQUIRE(proportion_4 < true_prop + thresh);
+
+  REQUIRE(proportion_3 > true_prop - thresh);
+  REQUIRE(proportion_3 < true_prop + thresh);
+}
+
 TEST_CASE("Uniform integer sampling", "[Sampler]")
 {
   Sampler my_sampler;
