@@ -106,13 +106,8 @@ class Sampler {
   }
 
   template <typename T>
-  T& sample(std::vector<std::vector<T>>& vec_of_vecs, int n = -1)
+  T& sample(std::vector<std::vector<T>>& vec_of_vecs, const int n)
   {
-    // If size was not provided, get it
-    if (n == -1) {
-      n = total_num_elements(vec_of_vecs);
-    }
-
     int random_index = get_rand_int(n - 1);
 
     // Loop through subvectors and see if we can index into sub vector with random index
