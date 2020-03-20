@@ -133,40 +133,56 @@ TEST_CASE("Generate Node move proposals - Simple Bipartite", "[SBM]")
 
 TEST_CASE("Generate Node move proposals - Simple Unipartite", "[SBM]")
 {
-  double tol = 0.05;
+  double tol = 0.1;
   double eps = 0.01;
 
   auto my_sbm = simple_unipartite();
 
-  int num_trials = 700;
+  int num_trials = 2000;
   Node* n5       = my_sbm.get_node_by_id("n5");
   Node* b        = my_sbm.get_node_by_id("n4")->parent();
 
   // Sanity check to make sure we've got the right block
   REQUIRE(n5->parent() != b);
 
-  double num_times_to_b = 0;
+  std::map<string, int> times_to_block;
 
   // Run multiple trials and of move and see how often a given node is moved
   for (int i = 0; i < num_trials; ++i) {
     // Do move attempt (dry run)
-    Node* new_block = my_sbm.propose_move(n5, eps);
-
-    if (new_block == b)
-      num_times_to_b++;
+    times_to_block[my_sbm.propose_move(n5, eps)->id()]++;
   }
 
-  double frac_of_time_to_b = num_times_to_b / double(num_trials);
+  REQUIRE(double(times_to_block.at("a")) / double(num_trials)
+          == Approx(0.3033066).epsilon(tol));
 
-  REQUIRE(Approx(0.4155352).epsilon(tol) == frac_of_time_to_b);
+  REQUIRE(double(times_to_block.at("b")) / double(num_trials)
+          == Approx(0.4155352).epsilon(tol));
+
+  REQUIRE(double(times_to_block.at("c")) / double(num_trials)
+          == Approx(0.2811582).epsilon(tol));
+
   // Value calculated in R using the following:
   // eps <- 0.01
   // B <- 3
   // e_i <- 5
   // p_to_t <- function(e_it, e_tb, e_t){ (e_it/e_i) * ( (e_tb + eps) / (e_t + eps*B) ) }
 
+  // # To a
+  // p_to_t(2, 2, 8) +
+  // p_to_t(1, 4, 9) +
+  // p_to_t(2, 2, 7) 
+  // # 0.3033066
+
+  // # To b
   // p_to_t(2, 4, 8) +
   // p_to_t(1, 2, 9) +
-  // p_to_t(2, 3, 7)
+  // p_to_t(2, 3, 7) 
   // # 0.4155352
+
+  // # To c
+  // p_to_t(2, 2, 8) +
+  // p_to_t(1, 3, 9) +
+  // p_to_t(2, 2, 7) 
+  // # 0.2811582
 }
