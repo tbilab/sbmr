@@ -230,6 +230,10 @@ class SBM_Network {
     const int type  = node->type();
     const int level = node->level();
 
+    if (edge_types == unipartite) {
+      return num_nodes_of_type(type, level + 1);
+    }
+
     const std::set<int>& node_neighbor_types = connection_types.at(type);
 
     return std::accumulate(
