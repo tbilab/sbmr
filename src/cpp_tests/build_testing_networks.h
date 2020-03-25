@@ -3,7 +3,7 @@
 #include "../network.h"
 
 
-SBM_Network simple_bipartite()
+inline SBM_Network simple_bipartite()
 {
   SBM_Network my_sbm { { "a", "b" }, 42 };
 
@@ -53,7 +53,7 @@ SBM_Network simple_bipartite()
   return my_sbm;
 }
 
-SBM_Network simple_unipartite()
+inline SBM_Network simple_unipartite()
 {
   SBM_Network my_SBM { { "a" }, 42 };
 
