@@ -45,8 +45,6 @@ get_move_results(Node* node,
   // These will change before and after move
   double new_block_degree = new_block->degree();
   double old_block_degree = old_block->degree();
-  Node* curr_block        = old_block;
-  int curr_degree         = old_block_degree;
 
   // Gather up all the edges for both the node being moved and its old and new blocks
   Edge_Count_Map node_neighbor_counts      = node->gather_neighbors_at_level(block_level);
@@ -61,43 +59,34 @@ get_move_results(Node* node,
             : block_t->degree();
   };
 
-  auto add_ent = [&](double ent_sum, const Edge_Count& neighbor_count) {
-    const Node* block_t = neighbor_count.first;
-
-    const double scalar  = block_t == curr_block ? 2 : 1;
-    const int edges_to_t = neighbor_count.second;
+  // Get pre move entropy partials from new and old blocks
+  double pre_move_ent = 0.0;
+  for (const auto& old_neighbor_count : old_block_neighbor_counts) {
+    const Node* block_t  = old_neighbor_count.first;
+    const int edges_to_t = old_neighbor_count.second;
     const int t_degree   = get_block_degree(block_t);
+    const double scalar  = block_t == old_block ? 2 : 1;
 
-    return ent_sum + ent(neighbor_count.second, curr_degree, t_degree) / scalar;
-  };
+    pre_move_ent += ent(edges_to_t, old_block_degree, t_degree) / scalar;
+  }
 
-  const double old_block_ent = std::accumulate(old_block_neighbor_counts.begin(),
-                                               old_block_neighbor_counts.end(),
-                                               0.0,
-                                               add_ent);
+  for (const auto& new_neighbor_count : new_block_neighbor_counts) {
+    const Node* block_t  = new_neighbor_count.first;
+    const int edges_to_t = new_neighbor_count.second;
+    const int t_degree   = get_block_degree(block_t);
+    const double scalar  = block_t == new_block ? 2 : 1;
 
-  curr_block  = new_block;
-  curr_degree = new_block_degree;
+    pre_move_ent += ent(edges_to_t, new_block_degree, t_degree) / scalar;
+  }
 
-  const double new_block_ent = std::accumulate(new_block_neighbor_counts.begin(),
-                                               new_block_neighbor_counts.end(),
-                                               0.0,
-                                               add_ent);
+  // Get probability of node moving to new block
+  double prob_move_to_new = 0.0;
+  for (const auto& node_neighbor_count : node_neighbor_counts) {
+    const double t_degree   = get_block_degree(node_neighbor_count.first);
+    const double edges_to_t = new_block_neighbor_counts[node_neighbor_count.first];
 
-  auto calc_p_move_to_new = [&](double sum, const Edge_Count& edge_count) {
-    const double t_degree   = get_block_degree(edge_count.first);
-    const double edges_to_t = new_block_neighbor_counts[edge_count.first];
-
-    return sum + edge_count.second / node_degree * (edges_to_t + eps) / (t_degree + epsB);
-  };
-
-  const double prob_move_to_new = std::accumulate(node_neighbor_counts.begin(),
-                                                  node_neighbor_counts.end(),
-                                                  0.0,
-                                                  calc_p_move_to_new);
-
-  // Keeps track of the entropy sum for the pre-move portion
-  const double pre_move_ent = new_block_ent + old_block_ent;
+    prob_move_to_new += node_neighbor_count.second / node_degree * (edges_to_t + eps) / (t_degree + epsB);
+  }
 
   // Update edge count maps for post move
   for (const auto& node_block_count : node_neighbor_counts) {
@@ -122,35 +111,35 @@ get_move_results(Node* node,
 
   new_block_degree += node_degree;
   old_block_degree -= node_degree;
-  curr_block  = new_block;
-  curr_degree = new_block_degree;
 
-  const double new_block_ent_post = std::accumulate(new_block_neighbor_counts.begin(),
-                                                    new_block_neighbor_counts.end(),
-                                                    0.0,
-                                                    add_ent);
+  // Get post move entropy partials from new and old blocks
+  double post_move_ent = 0.0;
+  for (const auto& new_neighbor_count : new_block_neighbor_counts) {
+    const Node* block_t  = new_neighbor_count.first;
+    const int edges_to_t = new_neighbor_count.second;
+    const int t_degree   = get_block_degree(block_t);
+    const double scalar  = block_t == new_block ? 2 : 1;
 
-  curr_block  = old_block;
-  curr_degree = old_block_degree;
+    post_move_ent += ent(edges_to_t, new_block_degree, t_degree) / scalar;
+  }
 
-  const double old_block_ent_post = std::accumulate(old_block_neighbor_counts.begin(),
-                                                    old_block_neighbor_counts.end(),
-                                                    0.0,
-                                                    add_ent);
+  for (const auto& old_neighbor_count : old_block_neighbor_counts) {
+    const Node* block_t  = old_neighbor_count.first;
+    const int edges_to_t = old_neighbor_count.second;
+    const int t_degree   = get_block_degree(block_t);
+    const double scalar  = block_t == old_block ? 2 : 1;
 
-  double post_move_ent = new_block_ent_post + old_block_ent_post;
+    post_move_ent += ent(edges_to_t, new_block_degree, t_degree) / scalar;
+  }
 
-  auto calc_p_return_to_old = [&](double sum, const Edge_Count& edge_count) {
-    const double t_degree   = get_block_degree(edge_count.first);
-    const double edges_to_t = old_block_neighbor_counts[edge_count.first];
+  // Get probability of node moving back to original block
+  double prob_return_to_old = 0.0;
+  for (const auto& node_neighbor_count : node_neighbor_counts) {
+    const double t_degree   = get_block_degree(node_neighbor_count.first);
+    const double edges_to_t = old_block_neighbor_counts[node_neighbor_count.first];
 
-    return sum + edge_count.second / node_degree * (edges_to_t + eps) / (t_degree + epsB);
-  };
-
-  const double prob_return_to_old = std::accumulate(node_neighbor_counts.begin(),
-                                                    node_neighbor_counts.end(),
-                                                    0.0,
-                                                    calc_p_return_to_old);
+    prob_return_to_old += node_neighbor_count.second / node_degree * (edges_to_t + eps) / (t_degree + epsB);
+  }
 
   return Move_Results(pre_move_ent - post_move_ent,
                       prob_return_to_old / prob_move_to_new);
