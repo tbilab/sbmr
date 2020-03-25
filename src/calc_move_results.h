@@ -20,8 +20,30 @@ struct Move_Results {
   }
 };
 
+inline void reduce_edge_count(Node_Edge_Counts& count_map, Node* block, const int dec_amt)
+{
+  const int new_value = count_map[block] - dec_amt;
+  // If we've reduced the value to zero, then remove from map
+  if (new_value == 0) {
+    count_map.erase(block);
+  } else {
+    count_map[block] = new_value;
+  }
+}
+
+inline void increase_edge_count(Node_Edge_Counts& count_map, Node* block, const int inc_amt)
+{
+  count_map[block] += inc_amt;
+}
+
+
 double ent(const double e_rs, const double e_r, const double e_s)
 {
+  // OUT_MSG << "e_rs: " << e_rs
+  //         << ", e_r: " << e_r
+  //         << ", e_s: " << e_s
+  //         << " -> " << e_rs * std::log(e_rs / (e_r * e_s)) 
+  //         << std::endl;
   return e_rs * std::log(e_rs / (e_r * e_s));
 }
 
@@ -94,18 +116,18 @@ get_move_results(Node* node,
     const int e_to_block = node_block_count.second;
 
     if (block == new_block) {
-      new_block_neighbor_counts[old_block] -= e_to_block;
-      new_block_neighbor_counts[new_block] += 2 * e_to_block;
-
-      old_block_neighbor_counts[new_block] -= e_to_block;
+      reduce_edge_count(new_block_neighbor_counts, old_block, e_to_block);
+      increase_edge_count(new_block_neighbor_counts, new_block, 2 * e_to_block);
+      
+      reduce_edge_count(old_block_neighbor_counts, new_block, e_to_block);
     } else if (block == old_block) {
-      new_block_neighbor_counts[old_block] += e_to_block;
-
-      old_block_neighbor_counts[new_block] += e_to_block;
-      old_block_neighbor_counts[old_block] -= 2 * e_to_block;
+      increase_edge_count(new_block_neighbor_counts, old_block, e_to_block);
+      increase_edge_count(old_block_neighbor_counts, new_block, e_to_block);
+    
+      reduce_edge_count(old_block_neighbor_counts, old_block, 2 * e_to_block);
     } else {
-      new_block_neighbor_counts[block] += e_to_block;
-      old_block_neighbor_counts[block] -= e_to_block;
+      increase_edge_count(new_block_neighbor_counts, block, e_to_block);
+      reduce_edge_count(old_block_neighbor_counts, block, e_to_block);
     }
   }
 
