@@ -1,4 +1,6 @@
 #include "../network.h"
+#include "../swap_blocks.h"
+#include "../calc_move_results.h"
 #include "catch.hpp"
 
 SBM_Network simple_bipartite()
@@ -181,4 +183,43 @@ TEST_CASE("Generate Node move proposals - Simple Unipartite", "[SBM]")
   // p_to_t(1, 3, 9) +
   // p_to_t(2, 2, 7)
   // # 0.2811582
+}
+
+
+TEST_CASE("Move results information - Simple Unipartite", "[SBM]")
+{
+
+  auto my_sbm = SBM_Network{
+    {"a1", "a2", "a3", "a4", "b1", "b2", "b3", "b4"},
+    { "a",  "a",  "a",  "a",  "b",  "b",  "b",  "b"},
+    {"a1", "a2", "a2", "a3", "a3", "a3", "a4"},
+    {"b2", "b1", "b2", "b1", "b2", "b4", "b3"},
+    {"a", "b"}
+  };
+
+  my_sbm.initialize_blocks();
+
+  // a2 and a3 share a block
+  swap_blocks(my_sbm.get_node_by_id("a3"),
+              my_sbm.get_node_by_id("a2")->parent(), 
+              my_sbm.get_nodes_of_type("a", 1));
+
+  // b1 and b2 share a block
+  swap_blocks(my_sbm.get_node_by_id("b1"),
+              my_sbm.get_node_by_id("b2")->parent(), 
+              my_sbm.get_nodes_of_type("b", 1));
+
+  // Make sure we have correct number of blocks
+  REQUIRE(my_sbm.num_nodes_at_level(1) == 6);
+
+  auto a2 = my_sbm.get_node_by_id("a2");
+  // propose moving a2 into block with a1
+  const double move_delta = get_move_results(a2,
+                                             my_sbm.get_node_by_id("a1")->parent(),
+                                             my_sbm.num_possible_neighbors_for_node(a2),
+                                             0.1)
+                                .entropy_delta;
+
+  REQUIRE(move_delta == Approx(-0.5924696).epsilon(0.1));
+
 }
