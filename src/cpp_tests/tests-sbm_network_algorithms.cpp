@@ -194,13 +194,16 @@ TEST_CASE("Move results information - Simple Bipartite", "[SBM]")
 
   auto a2 = my_sbm.get_node_by_id("a2");
   // propose moving a2 into block with a1
-  const double move_delta = get_move_results(a2,
+  const auto move_results = get_move_results(a2,
                                              my_sbm.get_node_by_id("a1")->parent(),
                                              my_sbm.num_possible_neighbors_for_node(a2),
-                                             0.1)
-                                .entropy_delta;
+                                             0.1);
 
-  REQUIRE(move_delta == Approx(-0.5924696).epsilon(0.1));
+  REQUIRE(move_results.entropy_delta == Approx(-0.5924696).epsilon(0.1));
+
+  // This was a coincidence
+  // Value is (2 + eps)/(6 + eps*3) for both pre and post move probs
+  REQUIRE(move_results.prob_ratio == 1);
 }
 
 TEST_CASE("Move results information - Simple Unipartite", "[SBM]")
@@ -216,7 +219,5 @@ TEST_CASE("Move results information - Simple Unipartite", "[SBM]")
   const auto move_results = get_move_results(n4, group_c, B, 0.5);
 
   REQUIRE(move_results.entropy_delta == Approx(-0.1117765).epsilon(0.1));
-
-  // // Delta from hand calculation
-  // expect_approx_equal(move_results.entropy_delta,  -0.1117765);
+  REQUIRE(move_results.prob_ratio == Approx(0.6820954).epsilon(0.1));
 }
