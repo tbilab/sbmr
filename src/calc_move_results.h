@@ -11,6 +11,16 @@
 using Node_Edge_Counts = std::map<Node*, int>;
 using Edge_Count       = std::pair<Node*, int>;
 
+enum Which_Step {
+  pre_move,
+  post_move
+};
+
+enum Which_Block {
+  current,
+  proposed
+};
+
 struct Move_Results {
   double entropy_delta = 0.0;
   double prob_ratio    = 1.0;
@@ -66,7 +76,7 @@ struct Entropy_Adder {
   {
     return e_rs * std::log(e_rs / (e_r * e_s));
   }
-  double operator()(double ent_sum, const Edge_Count& neighbor_count)
+  double adder(double ent_sum, const Edge_Count& neighbor_count)
   {
     const Node* block_t = neighbor_count.first;
 
@@ -79,7 +89,29 @@ struct Entropy_Adder {
             : block_t->degree();
 
     return ent_sum + ent(neighbor_count.second, curr_degree, t_degree) / scalar;
-  };
+  }
+
+  double accumulate_ent(Edge_Count_Map& edge_counts, Which_Step step, Which_Block block)
+  {
+
+    if (step == Which_Step::pre_move) {
+      pre_move();
+    } else {
+      post_move();
+    }
+
+    if (block == Which_Block::current) {
+      old_block();
+    } else {
+      new_block();
+    }
+
+    auto ent_sum = [&](double sum, const Edge_Count& neighbor_count) {
+      return adder(sum, neighbor_count);
+    };
+
+    return std::accumulate(edge_counts.begin(), edge_counts.end(), 0.0, ent_sum);
+  }
 };
 
 Move_Results
@@ -113,17 +145,13 @@ get_move_results(Node* node,
   ent_adder.pre_move();
   ent_adder.new_block();
 
-  const double new_block_ent = std::accumulate(new_block_neighbor_counts.begin(),
-                                               new_block_neighbor_counts.end(),
-                                               0.0,
-                                               ent_adder);
+  const double new_block_ent = ent_adder.accumulate_ent(new_block_neighbor_counts,
+                                                        Which_Step::pre_move,
+                                                        Which_Block::proposed);
 
-  ent_adder.old_block();
-
-  const double old_block_ent = std::accumulate(old_block_neighbor_counts.begin(),
-                                               old_block_neighbor_counts.end(),
-                                               0.0,
-                                               ent_adder);
+  const double old_block_ent = ent_adder.accumulate_ent(old_block_neighbor_counts,
+                                                        Which_Step::pre_move,
+                                                        Which_Block::current);
 
   // Keeps track of the entropy sum for the pre-move portion
   const double pre_move_ent = new_block_ent + old_block_ent;
@@ -149,45 +177,17 @@ get_move_results(Node* node,
     }
   }
 
-  // Update entropy adding functor for post move calculations
-  ent_adder.post_move();
-  ent_adder.new_block();
+  const double new_block_ent_post = ent_adder.accumulate_ent(new_block_neighbor_counts,
+                                                        Which_Step::post_move,
+                                                        Which_Block::proposed);
 
-  const double new_block_ent_post = std::accumulate(new_block_neighbor_counts.begin(),
-                                                    new_block_neighbor_counts.end(),
-                                                    0.0,
-                                                    ent_adder);
+  const double old_block_ent_post = ent_adder.accumulate_ent(old_block_neighbor_counts,
+                                                        Which_Step::post_move,
+                                                        Which_Block::current);
 
-  ent_adder.old_block();
-
-  const double old_block_ent_post = std::accumulate(old_block_neighbor_counts.begin(),
-                                                    old_block_neighbor_counts.end(),
-                                                    0.0,
-                                                    ent_adder);
 
   double post_move_ent = new_block_ent_post + old_block_ent_post;
 
-  // for (const auto& new_block_count : new_block_neighbor_counts) {
-  //   const Node* block           = new_block_count.first;
-  //   const bool is_old           = block == old_block;
-  //   const bool is_new           = block == new_block;
-  //   const double scalar         = is_new ? 2 : 1;
-  //   const double e_new_to_block = new_block_count.second;
-  //   const double e_block        = is_old ? old_degree : is_new ? new_degree : block->degree();
-
-  //   post_move_ent += e_new_to_block * std::log(e_new_to_block / (new_degree * e_block));
-  // }
-
-  // for (const auto& old_block_count : old_block_neighbor_counts) {
-  //   const Node* block           = old_block_count.first;
-  //   const bool is_old           = block == old_block;
-  //   const bool is_new           = block == new_block;
-  //   const double scalar         = is_old ? 2 : 1;
-  //   const double e_old_to_block = old_block_count.second;
-  //   const double e_block        = is_old ? old_degree : is_new ? new_degree : block->degree();
-
-  //   post_move_ent += e_old_to_block * std::log(e_old_to_block / (new_degree * e_block));
-  // }
 
   // Edge_Map block_pair_counts;
   // sum_edge_counts(block_pair_counts, old_block, new_block);
