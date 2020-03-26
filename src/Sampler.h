@@ -72,52 +72,30 @@ class Sampler {
     return dist(generator);
   }
 
-  // =============================================================================
-  // Sample a random element from a list
-  // =============================================================================
-  template <typename T>
-  T sample(const std::list<T>& node_list)
-  {
-    const int size_of_list = node_list.size();
-
-    if (size_of_list == 0) {
-      LOGIC_ERROR("List to sample has no elements.");
-    }
-
-    // Start an iterator at begining of list
-    auto block_it = node_list.begin();
-
-    // Select a random index to grab and advance list iterator till we've walked
-    // the desired number of steps
-    std::advance(block_it, get_rand_int(node_list.size() - 1));
-
-    return *block_it;
-  }
-
-  // =============================================================================
+   // =============================================================================
   // Sample random node from vector
   // Easier than list because we can just index to a spot
   // =============================================================================
   template <typename T>
-  T& sample(std::vector<T>& node_vec)
+  const T& sample(const std::vector<T>& node_vec)
   {
     // Select a random index to return element at that index
     return node_vec.at(get_rand_int(node_vec.size() - 1));
   }
 
   template <typename T>
-  T& sample(std::vector<std::vector<T>>& vec_of_vecs, const int n)
+  const T& sample(const std::vector<std::vector<T>>& vec_of_vecs, const int n)
   {
     int random_index = get_rand_int(n - 1);
 
     // Loop through subvectors and see if we can index into sub vector with random index
     // If we can't then subtract the current subvector size from random index and keep going
-    for (auto& sub_vec : vec_of_vecs) {
+    for (const auto& sub_vec : vec_of_vecs) {
       const int current_size = sub_vec.size();
       if (current_size <= random_index) {
         random_index -= current_size;
       } else {
-        return sub_vec[random_index];
+        return sub_vec.at(random_index);
       }
     }
     LOGIC_ERROR("Random element could not be selected. Check formation of vectors");
