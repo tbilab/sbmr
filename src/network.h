@@ -49,7 +49,6 @@ class SBM_Network {
   String_Map<Node*> id_to_node;
   Partite_Structure edge_types;
 
-  Sampler random_sampler;
   int block_counter = 0; // Keeps track of how many block we've had
 
   // =========================================================================
@@ -117,6 +116,9 @@ class SBM_Network {
   }
 
   public:
+  // Have sampler object be public for use by other functions
+  Sampler sampler;
+
   // =========================================================================
   // Constructors
   // =========================================================================
@@ -128,7 +130,7 @@ class SBM_Network {
               const int random_seed                   = 42,
               const Input_String_Vec& allowed_edges_a = {},
               const Input_String_Vec& allowed_edges_b = {})
-      : random_sampler(random_seed)
+      : sampler(random_seed)
       , types(all_types)
       , type_name_to_int(build_val_to_index_map(all_types))
       , edge_types(all_types.size() == 1
@@ -184,7 +186,7 @@ class SBM_Network {
     connection_types = std::move(moved_net.connection_types);
     id_to_node       = std::move(moved_net.id_to_node);
     edge_types       = std::move(moved_net.edge_types);
-    random_sampler   = std::move(moved_net.random_sampler);
+    sampler   = std::move(moved_net.sampler);
     block_counter    = moved_net.block_counter;
   }
 
@@ -318,7 +320,7 @@ class SBM_Network {
 
       // Shuffle child nodes if we're randomly assigning blocks
       if (!one_block_per_node)
-        random_sampler.shuffle(nodes_of_type);
+        sampler.shuffle(nodes_of_type);
 
       // Loop through now shuffled children nodes
       for (int i = 0; i < nodes_of_type.size(); i++) {
@@ -366,7 +368,7 @@ class SBM_Network {
   Node* propose_move(Node* node, const double eps = 0.1)
   {
     // Sample a random neighbor block
-    Node* neighbor_block = random_sampler.sample(node->neighbors(), node->degree())->parent();
+    Node* neighbor_block = sampler.sample(node->neighbors(), node->degree())->parent();
 
     // Get all the nodes connected to neighbor block of the node-to-move's type
     Node_Ptr_Vec& neighbor_edges_to_t = neighbor_block->neighbors_of_type(node->type());
@@ -377,14 +379,14 @@ class SBM_Network {
     // Decide if we are going to choose a random block for our node
     const double ergo_amnt = eps * all_potential_blocks.size();
 
-    const bool draw_from_neighbor = random_sampler.draw_unif()
+    const bool draw_from_neighbor = sampler.draw_unif()
         > ergo_amnt / (double(neighbor_edges_to_t.size()) + ergo_amnt);
 
     // Decide where we will get new block from and draw from potential candidates
     if (draw_from_neighbor) {
-      return random_sampler.sample(neighbor_edges_to_t)->parent();
+      return sampler.sample(neighbor_edges_to_t)->parent();
     } else {
-      return random_sampler.sample(all_potential_blocks).get();
+      return sampler.sample(all_potential_blocks).get();
     }
   }
 
