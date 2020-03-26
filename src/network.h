@@ -186,7 +186,7 @@ class SBM_Network {
     connection_types = std::move(moved_net.connection_types);
     id_to_node       = std::move(moved_net.id_to_node);
     edge_types       = std::move(moved_net.edge_types);
-    sampler   = std::move(moved_net.sampler);
+    sampler          = std::move(moved_net.sampler);
     block_counter    = moved_net.block_counter;
   }
 
@@ -272,7 +272,7 @@ class SBM_Network {
       id_to_node.emplace(id, node_ptr);
 
     // Move node unique pointer into its type in map
-    get_nodes_of_type(type_index, level).push_back(std::move(new_node));
+    nodes[level][type_index].push_back(std::move(new_node));
 
     return node_ptr;
   }
@@ -300,7 +300,8 @@ class SBM_Network {
     // Loop over all node types
     for (int type_i = 0; type_i < num_types(); type_i++) {
 
-      Node_UPtr_Vec& nodes_of_type = get_nodes_of_type(type_i, child_level);
+      Node_UPtr_Vec& nodes_of_type  = nodes[child_level][type_i];
+      Node_UPtr_Vec& blocks_of_type = nodes[child_level + 1][type_i];
 
       // If we're in the 1-block-per-node mode make sure we reflect that in reserved size
       if (one_block_per_node)
@@ -310,13 +311,11 @@ class SBM_Network {
         LOGIC_ERROR("Can't initialize more blocks than there are nodes of a given type");
 
       // Reserve enough spaces for the blocks to be inserted
-      get_nodes_of_type(type_i, block_level).reserve(num_blocks);
+      blocks_of_type.reserve(num_blocks);
 
       for (int i = 0; i < num_blocks; i++) {
         add_node("b_" + as_str(block_counter++), type_i, block_level);
       }
-
-      Node_UPtr_Vec& blocks_of_type = get_nodes_of_type(type_i, block_level);
 
       // Shuffle child nodes if we're randomly assigning blocks
       if (!one_block_per_node)
@@ -365,16 +364,36 @@ class SBM_Network {
   // =============================================================================
   // Model Fitting
   // =============================================================================
+  void swap_blocks(Node* child_node,
+                   Node* new_block,
+                   const bool remove_empty = true)
+  {
+    Node* old_block          = child_node->parent();
+    const bool has_old_block = old_block != nullptr;
+
+    child_node->set_parent(new_block);
+
+    // If the old block is now empty and we're removing empty blocks, delete it
+    if (has_old_block && remove_empty && old_block->num_children() == 0) {
+
+      auto& block_vector           = nodes[new_block->level()][new_block->type()];
+      const bool delete_successful = delete_from_vector(block_vector, old_block);
+
+      if (!delete_successful)
+        LOGIC_ERROR("Tried to delete a node that doesn't exist");
+    }
+  }
+
   Node* propose_move(Node* node, const double eps = 0.1)
   {
     // Sample a random neighbor block
     Node* neighbor_block = sampler.sample(node->neighbors(), node->degree())->parent();
 
     // Get all the nodes connected to neighbor block of the node-to-move's type
-    Node_Ptr_Vec& neighbor_edges_to_t = neighbor_block->neighbors_of_type(node->type());
+    const Node_Ptr_Vec& neighbor_edges_to_t = neighbor_block->neighbors_of_type(node->type());
 
     // Get a reference to all the blocks that the node-to-move _could_ join
-    Node_UPtr_Vec& all_potential_blocks = get_nodes_of_type(node->type(), node->level() + 1);
+    const Node_UPtr_Vec& all_potential_blocks = get_nodes_of_type(node->type(), node->level() + 1);
 
     // Decide if we are going to choose a random block for our node
     const double ergo_amnt = eps * all_potential_blocks.size();
@@ -475,14 +494,14 @@ class SBM_Network {
   // =========================================================================
   // Node Grabbers
   // =========================================================================
-  Type_Vec& get_nodes_at_level(const int level)
+  const Type_Vec& get_nodes_at_level(const int level) const
   {
     check_for_level(level);
     return nodes[level];
   }
 
   // Get a vector of raw pointers to all nodes in a given level with no type separation
-  Node_Vec get_flat_level(const int level)
+  Node_Vec get_flat_level(const int level) const
   {
     Node_Vec all_nodes;
     all_nodes.reserve(num_nodes_at_level(level));
@@ -494,19 +513,19 @@ class SBM_Network {
     return all_nodes;
   }
 
-  Node_UPtr_Vec& get_nodes_of_type(const int type_index, const int level = 0)
+  const Node_UPtr_Vec& get_nodes_of_type(const int type_index, const int level = 0) const
   {
     check_for_level(level);
     check_for_type(type_index);
     return nodes[level][type_index];
   }
 
-  Node_UPtr_Vec& get_nodes_of_type(const std::string& type, const int level = 0)
+  const Node_UPtr_Vec& get_nodes_of_type(const std::string& type, const int level = 0) const
   {
     return get_nodes_of_type(get_type_index(type), level);
   }
 
-  Node* get_node_by_id(const string& id)
+  Node* get_node_by_id(const string& id) const
   {
     const auto node_it = id_to_node.find(id);
 
