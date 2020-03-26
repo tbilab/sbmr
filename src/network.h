@@ -278,7 +278,7 @@ class SBM_Network {
   }
 
   Node* add_block_node(const int type_index, const int level = 1){
-    return add_node("b_" + as_str(block_counter++), type_index, level);
+    return add_node("bl_" + types[type_index] + "_" + as_str(block_counter++), type_index, level);
   }
 
 
