@@ -115,25 +115,26 @@ MCMC_Sweeps mcmc_sweep(SBM_Network& net,
                 << move_accepted << std::endl;
       }
 
-      // // Is the move accepted?
-      // if (move_accepted) {
-      //   const NodePtr old_block = curr_node->parent;
+      // Is the move accepted?
+      if (move_accepted) {
+        Node* old_block = curr_node->parent();
 
-      //   // Move the node
-      //   curr_node->set_parent(proposed_new_block);
+        net.swap_blocks(curr_node,
+                        proposed_new_block,
+                        variable_num_blocks);
 
-      //   // Update results
-      //   results.nodes_moved.push_back(curr_node->id);
-      //   num_nodes_moved++;
-      //   entropy_delta += proposal_results.entropy_delta;
+        // Update results
+        results.nodes_moved.push_back(curr_node->id());
+        num_nodes_moved++;
+        entropy_delta += proposal_results.entropy_delta;
 
-      //   if (track_pairs) {
-      //     Block_Consensus::update_changed_pairs(curr_node->id,
-      //                                           old_block->children,
-      //                                           proposed_new_block->children,
-      //                                           pair_moves);
-      //   }
-      // } // End accepted if statement
+        if (track_pairs) {
+          Block_Consensus::update_changed_pairs(curr_node->id(),
+                                                old_block->children(),
+                                                proposed_new_block->children(),
+                                                pair_moves);
+        }
+      } // End accepted if statement
 
       // // Check for user breakout every 100 iterations.
       // steps_taken = (steps_taken + 1) % 100;
