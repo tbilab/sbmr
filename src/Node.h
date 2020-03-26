@@ -36,11 +36,11 @@ class Node {
   private:
   Node* parent_node = nullptr; // What node contains this node (aka its cluster)
   Edges_By_Type _neighbors;
-  Node_Vec children; // Nodes that are contained within node (if node is cluster)
-  int _degree = 0;    // How many neighbors does this node have?
+  Node_Vec _children; // Nodes that are contained within node (if node is cluster)
+  int _degree = 0;   // How many neighbors does this node have?
   string _id;        // Unique integer id for node
   int _type;         // What type of node is this?
-  int _level;         // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
+  int _level;        // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
 
   public:
   // =========================================================================
@@ -60,8 +60,8 @@ class Node {
   // Destructor
   ~Node()
   {
-    std::for_each(children.begin(),
-                  children.end(),
+    std::for_each(_children.begin(),
+                  _children.end(),
                   [](Node* child) { child->remove_parent(); });
   }
 
@@ -84,9 +84,13 @@ class Node {
   // =========================================================================
   // Children-Related methods
   // =========================================================================
+  Node_Vec children() const {
+    return _children;
+  }
+
   void add_child(Node* child)
   {
-    children.push_back(child);
+    _children.push_back(child);
 
     // Add new child's neighbors
     update_neighbors(child->neighbors(), Add);
@@ -94,7 +98,7 @@ class Node {
 
   void remove_child(Node* child)
   {
-    delete_from_vector(children, child);
+    delete_from_vector(_children, child);
 
     // Remove child's neighbors
     update_neighbors(child->neighbors(), Remove);
@@ -102,15 +106,15 @@ class Node {
 
   int num_children() const
   {
-    return children.size();
+    return _children.size();
   }
 
   bool has_child(Node* node) const
   {
-    return std::find(children.begin(),
-                     children.end(),
+    return std::find(_children.begin(),
+                     _children.end(),
                      node)
-        != children.end();
+        != _children.end();
   }
 
   // =========================================================================
@@ -118,11 +122,11 @@ class Node {
   // =========================================================================
   void set_parent(Node* new_parent)
   {
-    if (_level != new_parent->level() - 1) 
+    if (_level != new_parent->level() - 1)
       LOGIC_ERROR("Parent node must be one level above child");
 
     // Remove self from previous parent's children list (if it existed)
-    if (has_parent()) 
+    if (has_parent())
       parent_node->remove_child(this);
 
     // Add this node to new parent's children list
@@ -176,7 +180,6 @@ class Node {
   {
     return _neighbors.at(node_type);
   }
-  
 
   // Collapse neighbors to a given level into a map of connected block id->count
   Edge_Count_Map gather_neighbors_at_level(const int level) const
@@ -223,7 +226,7 @@ class Node {
     }
 
     // Propagate edge changes up hierarchy
-    if (has_parent()) 
+    if (has_parent())
       parent_node->update_neighbors(neighbors_to_update, update_type);
   }
 
