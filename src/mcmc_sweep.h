@@ -154,11 +154,11 @@ MCMC_Sweeps mcmc_sweep(SBM_Network& net,
 
       } // End accepted if statement
 
-      // // Check for user breakout every 100 iterations.
-      // steps_taken = (steps_taken + 1) % 100;
-      // if (steps_taken == 0) {
-      //   ALLOW_USER_BREAKOUT;
-      // }
+      // Check for user breakout every 100 iterations.
+      steps_taken = (steps_taken + 1) % 100;
+      if (steps_taken == 0) {
+        ALLOW_USER_BREAKOUT;
+      }
     } // End current sweep
 
     // // Update results for this sweep
@@ -172,5 +172,18 @@ MCMC_Sweeps mcmc_sweep(SBM_Network& net,
     // ALLOW_USER_BREAKOUT; // Let R used break out of loop if need be
   }                      // End multi-sweep loop
 
+  if (variable_num_blocks) {
+    OUT_MSG << "Cleaning up after end of MCMC sweep..." << std::endl;
+    // Cleanup the single empty block for each type
+    for (const auto& blocks_of_type : net.get_nodes_at_level(block_level)) {
+      for (const auto& block : blocks_of_type) {
+        if (block->num_children() == 0) {
+          OUT_MSG << "  Removed block from type " << block->type() << std::endl;
+          net.delete_node(block);
+          break;
+        }
+      }
+    }
+  }
   return results;
 }
