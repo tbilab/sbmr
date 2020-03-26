@@ -11,11 +11,13 @@ using Node_Edge_Counts = std::map<Node*, int>;
 using Edge_Count       = std::pair<Node*, int>;
 
 struct Move_Results {
-  double entropy_delta = 0.0;
-  double prob_ratio    = 1.0;
+  double entropy_delta  = 0.0;
+  double prob_ratio     = 1.0;
+  double prob_of_accept = 0.0;
   Move_Results(const double& e, const double& p)
       : entropy_delta(e)
       , prob_ratio(p)
+      , prob_of_accept(exp(-e) * p)
   {
   }
 };
@@ -36,7 +38,7 @@ inline void increase_edge_count(Node_Edge_Counts& count_map, Node* block, const 
   count_map[block] += inc_amt;
 }
 
-double ent(const double e_rs, const double e_r, const double e_s)
+inline double ent(const double e_rs, const double e_r, const double e_s)
 {
   // OUT_MSG << "e_rs: " << e_rs
   //         << ", e_r: " << e_r
@@ -46,11 +48,10 @@ double ent(const double e_rs, const double e_r, const double e_s)
   return e_rs * std::log(e_rs / (e_r * e_s));
 }
 
-Move_Results
-get_move_results(Node* node,
-                 Node* new_block,
-                 const int n_possible_neighbors,
-                 const double eps = 0.1)
+inline Move_Results get_move_results(Node* node,
+                                     Node* new_block,
+                                     const int n_possible_neighbors,
+                                     const double eps = 0.1)
 {
   Node* old_block = node->parent();
 
