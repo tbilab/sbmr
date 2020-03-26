@@ -1,6 +1,7 @@
 #pragma once
 
 #include "network.h"
+#include "calc_move_results.h"
 #include "Block_Consensus.h"
 
 struct MCMC_Sweeps {
@@ -32,127 +33,125 @@ MCMC_Sweeps mcmc_sweep(SBM_Network& net,
   // Initialize structure that contains the returned values for this/these sweeps
   MCMC_Sweeps results(num_sweeps);
 
-  // // Initialize pair tracking map if needed
-  // if (track_pairs) {
-  //   results.block_consensus.initialize(get_level(level));
-  // }
+  // Initialize pair tracking map if needed
+  if (track_pairs) {
+    results.block_consensus.initialize(net.get_nodes_at_level(level));
+  }
+  
+  // Check if we have any blocks ready in the network...
+  const bool no_blocks_present = net.num_levels() > block_level + 1;
 
-  // // Check if we have any blocks ready in the network...
-  // const bool no_blocks_present = get_level(block_level)->size() == 0;
+  if (no_blocks_present) {
+    net.initialize_blocks();
 
-  // if (no_blocks_present) {
-  //   initialize_blocks(level);
+    if (verbose) {
+      WARN_ABOUT("No blocks present. Initializing one block per node.");
+    }
+  } 
 
-  //   if (verbose) {
-  //     WARN_ABOUT("No blocks present. Initializing one block per node.");
-  //   }
-  // }
+  if (verbose) {
+    OUT_MSG << "sweep_num,"
+            << "node,"
+            << "current_block,"
+            << "proposed_block,"
+            << "entropy_delta,"
+            << "prob_of_accept,"
+            << "move_accepted" << std::endl;
+  }
 
-  // if (verbose) {
-  //   OUT_MSG << "sweep_num,"
-  //           << "node,"
-  //           << "current_block,"
-  //           << "proposed_block,"
-  //           << "entropy_delta,"
-  //           << "prob_of_accept,"
-  //           << "move_accepted" << std::endl;
-  // }
+  // Initialize a vector of nodes that will be passed through for a sweep.
+  auto nodes = net.get_flat_level(level);
 
-  // // Initialize a vector of nodes that will be passed through for a sweep.
-  // // Grab level map
-  // const LevelPtr node_map = get_level(level);
-  // NodeVec        nodes_to_sweep;
-  // nodes_to_sweep.reserve(node_map->size());
-  // for (const auto& node : *node_map) {
-  //   nodes_to_sweep.push_back(node.second);
-  // }
+  for (int i = 0; i < num_sweeps; i++) {
+    OUT_MSG << "Sweep " << i << std::endl;
+    // Book keeper variables for this sweeps stats
+    int    num_nodes_moved = 0;
+    double entropy_delta   = 0;
 
-  // for (int i = 0; i < num_sweeps; i++) {
-  //   // Book keeper variables for this sweeps stats
-  //   int    num_nodes_moved = 0;
-  //   double entropy_delta   = 0;
+    // Shuffle order of nodes to be run through for sweep
+    net.sampler.shuffle(nodes);
 
-  //   // Shuffle order order of nodes to be run through for sweep
-  //   std::shuffle(nodes_to_sweep.begin(), nodes_to_sweep.end(), sampler.generator);
+    // Setup container to track what pairs of nodes need to have their consensus membership updated for this sweep
+    Pair_Set pair_moves;
 
-  //   // Setup container to track what pairs need to be updated for sweep
-  //   std::set<std::string> pair_moves;
+    int steps_taken = 0;
+    // Loop through each node
+    for (const auto& curr_node : nodes) {
+      // Check if we're running sweep with variable block numbers. If we are, we
+      // need to make sure we don't have any extra unoccupied blocks floating around,
+      // then we need to add a new block as a potential for the node to enter
+      // if (variable_num_blocks) {
+      //   clean_empty_blocks();
+      //   create_block_node(curr_node->type, block_level);
+      // }
 
-  //   int steps_taken = 0;
-  //   // Loop through each node
-  //   for (const NodePtr& curr_node : nodes_to_sweep) {
-  //     // Check if we're running sweep with variable block numbers. If we are, we
-  //     // need to make sure we don't have any extra unoccupied blocks floating around,
-  //     // then we need to add a new block as a potential for the node to enter
-  //     if (variable_num_blocks) {
-  //       clean_empty_blocks();
-  //       create_block_node(curr_node->type, block_level);
-  //     }
+      // Get a move proposal
+      Node* proposed_new_block = net.propose_move(curr_node, eps);
 
-  //     // Get a move proposal
-  //     const NodePtr proposed_new_block = propose_move(*curr_node, eps);
+      // // If the proposed block is the nodes current block, we don't need to waste
+      // // time checking because decision will always result in same state.
+      // if (curr_node->parent == proposed_new_block) {
+      //   continue;
+      // }
 
-  //     // If the proposed block is the nodes current block, we don't need to waste
-  //     // time checking because decision will always result in same state.
-  //     if (curr_node->parent == proposed_new_block) {
-  //       continue;
-  //     }
+      if (verbose) {
+        OUT_MSG << i
+                << "," << curr_node->id()
+                << "," << curr_node->parent()->id()
+                << "," << proposed_new_block->id()
+                << ",";
+      }
+      // Calculate acceptance probability based on posterior changes
+      auto proposal_results = get_move_results(curr_node,
+                                               proposed_new_block,
+                                               net.num_possible_neighbors_for_node(curr_node),
+                                               eps);
 
-  //     if (verbose) {
-  //       OUT_MSG << i
-  //               << "," << curr_node->id
-  //               << "," << (curr_node->parent)->id
-  //               << "," << proposed_new_block->id
-  //               << ",";
-  //     }
-  //     // Calculate acceptance probability based on posterior changes
-  //     Proposal_Res proposal_results = make_proposal_decision(*curr_node, *proposed_new_block, eps);
+      // Make movement decision
+      const bool move_accepted = proposal_results.prob_of_accept > net.sampler.draw_unif();
 
-  //     // Make movement decision
-  //     const bool move_accepted = proposal_results.prob_of_accept > sampler.draw_unif();
+      if (verbose) {
+        OUT_MSG << proposal_results.entropy_delta << "," << proposal_results.prob_of_accept << ","
+                << move_accepted << std::endl;
+      }
 
-  //     if (verbose) {
-  //       OUT_MSG << proposal_results.entropy_delta << "," << proposal_results.prob_of_accept << ","
-  //               << move_accepted << std::endl;
-  //     }
+      // // Is the move accepted?
+      // if (move_accepted) {
+      //   const NodePtr old_block = curr_node->parent;
 
-  //     // Is the move accepted?
-  //     if (move_accepted) {
-  //       const NodePtr old_block = curr_node->parent;
+      //   // Move the node
+      //   curr_node->set_parent(proposed_new_block);
 
-  //       // Move the node
-  //       curr_node->set_parent(proposed_new_block);
+      //   // Update results
+      //   results.nodes_moved.push_back(curr_node->id);
+      //   num_nodes_moved++;
+      //   entropy_delta += proposal_results.entropy_delta;
 
-  //       // Update results
-  //       results.nodes_moved.push_back(curr_node->id);
-  //       num_nodes_moved++;
-  //       entropy_delta += proposal_results.entropy_delta;
+      //   if (track_pairs) {
+      //     Block_Consensus::update_changed_pairs(curr_node->id,
+      //                                           old_block->children,
+      //                                           proposed_new_block->children,
+      //                                           pair_moves);
+      //   }
+      // } // End accepted if statement
 
-  //       if (track_pairs) {
-  //         Block_Consensus::update_changed_pairs(curr_node->id,
-  //                                               old_block->children,
-  //                                               proposed_new_block->children,
-  //                                               pair_moves);
-  //       }
-  //     } // End accepted if statement
+      // // Check for user breakout every 100 iterations.
+      // steps_taken = (steps_taken + 1) % 100;
+      // if (steps_taken == 0) {
+      //   ALLOW_USER_BREAKOUT;
+      // }
+    } // End current sweep
 
-  //     // Check for user breakout every 100 iterations.
-  //     steps_taken = (steps_taken + 1) % 100;
-  //     if (steps_taken == 0) {
-  //       ALLOW_USER_BREAKOUT;
-  //     }
-  //   } // End current sweep
+    // // Update results for this sweep
+    // results.sweep_num_nodes_moved.push_back(num_nodes_moved);
+    // results.sweep_entropy_delta.push_back(entropy_delta);
 
-  //   // Update results for this sweep
-  //   results.sweep_num_nodes_moved.push_back(num_nodes_moved);
-  //   results.sweep_entropy_delta.push_back(entropy_delta);
-
-  //   // Update the concensus pairs map with results if needed.
-  //   if (track_pairs) {
-  //     results.block_consensus.update_pair_tracking_map(pair_moves);
-  //   }
-  //   ALLOW_USER_BREAKOUT; // Let R used break out of loop if need be
-  // }                      // End multi-sweep loop
+    // // Update the concensus pairs map with results if needed.
+    // if (track_pairs) {
+    //   results.block_consensus.update_pair_tracking_map(pair_moves);
+    // }
+    // ALLOW_USER_BREAKOUT; // Let R used break out of loop if need be
+  }                      // End multi-sweep loop
 
   return results;
 }
