@@ -47,7 +47,14 @@ MCMC_Sweeps mcmc_sweep(SBM_Network& net,
     if (verbose) {
       WARN_ABOUT("No blocks present. Initializing one block per node.");
     }
-  } 
+  }
+
+  // If we are allowing a variable number of blocks, initialize an empty block for each node type
+  if (variable_num_blocks) {
+    for (int type = 0; type < net.num_types(); type++) {
+      net.add_block_node(type, block_level);
+    }
+  }
 
   if (verbose) {
     OUT_MSG << "sweep_num,"
@@ -119,9 +126,19 @@ MCMC_Sweeps mcmc_sweep(SBM_Network& net,
       if (move_accepted) {
         Node* old_block = curr_node->parent();
 
-        net.swap_blocks(curr_node,
-                        proposed_new_block,
-                        variable_num_blocks);
+        if (variable_num_blocks) {
+          // If the old block will still have children after the move and
+          // the new block is empty block, this move will cause there to be no
+          // empty blocks for this type
+          const bool old_wont_be_empty = old_block->num_children() > 1;
+          const bool new_is_empty      = proposed_new_block->num_children() == 0;
+
+          if (new_is_empty & old_wont_be_empty) {
+            net.add_block_node(curr_node->type(), block_level);
+          }
+        }
+
+        net.swap_blocks(curr_node, proposed_new_block, variable_num_blocks);
 
         // Update results
         results.nodes_moved.push_back(curr_node->id());
@@ -134,6 +151,7 @@ MCMC_Sweeps mcmc_sweep(SBM_Network& net,
                                                 proposed_new_block->children(),
                                                 pair_moves);
         }
+
       } // End accepted if statement
 
       // // Check for user breakout every 100 iterations.
