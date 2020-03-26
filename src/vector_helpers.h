@@ -20,7 +20,7 @@ template <typename T>
 using Int_Map = std::map<T, int>;
 
 template <typename T>
-bool delete_from_vector(std::vector<T>& vec, const T to_remove)
+bool delete_from_vector(std::vector<T>& vec, const T& to_remove)
 {
   // Get iterator to the element we're deleting
   auto it = std::find(vec.begin(), vec.end(), to_remove);
