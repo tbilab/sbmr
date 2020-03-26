@@ -29,6 +29,8 @@ g++ -std=c++11 ${OPTIMIZATION_LEVEL} -DNO_RCPP=1\
   cpp_tests/tests-edge.cpp \
   cpp_tests/tests-sampler.cpp \
   cpp_tests/tests-sbm_network.cpp \
+  cpp_tests/tests-Block_Concensus.cpp \
+  cpp_tests/tests-mcmc_sweep.cpp \
   cpp_tests/tests-sbm_network_algorithms.cpp \
   -o cpp_tests/run_tests.o 
 
