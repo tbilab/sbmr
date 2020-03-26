@@ -84,7 +84,7 @@ class Node {
   // =========================================================================
   // Children-Related methods
   // =========================================================================
-  Node_Vec children() const {
+  const Node_Vec& children() const {
     return _children;
   }
 
