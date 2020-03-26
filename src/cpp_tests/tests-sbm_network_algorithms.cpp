@@ -1,7 +1,6 @@
 #include "../calc_move_results.h"
 #include "../network.h"
 #include "build_testing_networks.h"
-#include "../swap_blocks.h"
 // #include "../mcmc_sweep.h"
 #include "catch.hpp"
 

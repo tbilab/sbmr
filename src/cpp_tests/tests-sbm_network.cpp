@@ -1,5 +1,4 @@
 #include "../network.h"
-#include "../swap_blocks.h"
 #include "catch.hpp"
 #include <set>
 
@@ -204,18 +203,16 @@ TEST_CASE("Swapping of blocks", "[Network]")
   Node* node2  = my_net.get_node_by_id("n2");
   Node* block1 = my_net.get_node_by_id("n1")->parent();
 
-  swap_blocks(node2,
+  my_net.swap_blocks(node2,
               block1,
-              my_net.get_nodes_of_type("n", 1),
               true);
 
   // There should now be one less block of type n
   REQUIRE(my_net.num_nodes_of_type("n", 1) == 2);
 
   // Now do the same for the m type nodes but don't delete the empty block
-  swap_blocks(my_net.get_nodes_of_type("m")[1].get(),
+  my_net.swap_blocks(my_net.get_nodes_of_type("m")[1].get(),
               my_net.get_nodes_of_type("m")[0]->parent(),
-              my_net.get_nodes_of_type("m", 1),
               false);
 
   // There should be no change in the number of blocks
@@ -291,9 +288,8 @@ TEST_CASE("State dumping and restoring", "[Network")
   Node* a2 = my_net.get_node_by_id("a2");
 
   // Now give merge a1 and a2 to same parent and remove a1s old parent
-  swap_blocks(a1,
+  my_net.swap_blocks(a1,
               a2->parent(),
-              my_net.get_nodes_of_type("a", 1),
               true);
 
   // Dump model state again

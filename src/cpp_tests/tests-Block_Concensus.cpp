@@ -1,6 +1,5 @@
 #include "build_testing_networks.h"
 #include "../Block_Consensus.h"
-#include "../swap_blocks.h"
 #include "catch.hpp"
 
 
