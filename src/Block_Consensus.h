@@ -32,7 +32,7 @@ class Block_Consensus {
   public:
   int size() const { return consensus_pairs.size(); }
   // Initialies containers when needed
-  void initialize(Type_Vec& node_level)
+  void initialize(const Type_Vec& node_level)
   {
     // Loop through each type of node and insert unique pairs of members into
     // consensus pairs map. This avoids making pairs of nodes that can't ever
