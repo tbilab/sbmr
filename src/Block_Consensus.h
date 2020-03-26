@@ -25,17 +25,20 @@ inline string make_pair_key(const string& id_a,
 }
 
 class Block_Consensus {
-  public:
+  private:
   // Holds the pairs of nodes to connection status and counts
-  Pair_Map concensus_pairs;
+  Pair_Map consensus_pairs;
 
+  public:
+  int size() const { return consensus_pairs.size(); }
   // Initialies containers when needed
   void initialize(Type_Vec& node_level)
   {
     // Loop through each type of node and insert unique pairs of members into
-    // concensus pairs map. This avoids making pairs of nodes that can't ever
+    // consensus pairs map. This avoids making pairs of nodes that can't ever
     // be in the same blocks together
     for (const auto& nodes_of_type : node_level) {
+
       for (auto node_a_it = nodes_of_type.begin();
            node_a_it != nodes_of_type.end();
            node_a_it++) {
@@ -43,11 +46,10 @@ class Block_Consensus {
         for (auto node_b_it = std::next(node_a_it);
              node_b_it != nodes_of_type.end();
              node_b_it++) {
-
           // Initialize pair info for group
-          concensus_pairs.emplace(
-              make_pair_key(node_a_it->id(), node_b_it->id()),
-              Pair_Status(node_a_it->parent() == node_b_it->parent())); // Checks if in same group
+          consensus_pairs.emplace(
+              make_pair_key((*node_a_it)->id(), (*node_b_it)->id()),
+              Pair_Status((*node_a_it)->parent() == (*node_b_it)->parent())); // Checks if in same group
         }
       }
     }
@@ -56,7 +58,7 @@ class Block_Consensus {
   // Updates the pair statuses and iterates based on a set of changed pairs
   void update_pair_tracking_map(const Pair_Set& updated_pairs)
   {
-    for (auto& pair : concensus_pairs) {
+    for (auto& pair : consensus_pairs) {
 
       // Check if this pair was updated on last sweep
       auto sweep_change_loc   = updated_pairs.find(pair.first);
