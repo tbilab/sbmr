@@ -37,10 +37,10 @@ class Node {
   Node* parent_node = nullptr; // What node contains this node (aka its cluster)
   Edges_By_Type _neighbors;
   Node_Vec _children; // Nodes that are contained within node (if node is cluster)
-  int _degree = 0;   // How many neighbors does this node have?
-  string _id;        // Unique integer id for node
-  int _type;         // What type of node is this?
-  int _level;        // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
+  int _degree = 0;    // How many neighbors does this node have?
+  string _id;         // Unique integer id for node
+  int _type;          // What type of node is this?
+  int _level;         // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
 
   public:
   // =========================================================================
@@ -84,7 +84,8 @@ class Node {
   // =========================================================================
   // Children-Related methods
   // =========================================================================
-  const Node_Vec& children() const {
+  const Node_Vec& children() const
+  {
     return _children;
   }
 
@@ -171,12 +172,12 @@ class Node {
   // =========================================================================
   // Neighbor-Related methods
   // =========================================================================
-  Edges_By_Type& neighbors()
+  const Edges_By_Type& neighbors() const
   {
     return _neighbors;
   }
 
-  Node_Ptr_Vec& neighbors_of_type(const int node_type)
+  const Node_Ptr_Vec& neighbors_of_type(const int node_type) const
   {
     return _neighbors.at(node_type);
   }
@@ -198,7 +199,7 @@ class Node {
 
   void add_neighbor(Node* node)
   {
-    neighbors_of_type(node->type()).push_back(node);
+    _neighbors.at(node->type()).push_back(node);
     _degree++;
   }
 
@@ -209,7 +210,7 @@ class Node {
 
     for (const auto& nodes_of_type : neighbors_to_update) {
       // Get references to this node's neighbors to type (update type for next go-round)
-      auto& node_neighbors_of_type = neighbors_of_type(type_i++);
+      auto& node_neighbors_of_type = _neighbors.at(type_i++);
 
       for (const auto& node : nodes_of_type) {
         switch (update_type) {
