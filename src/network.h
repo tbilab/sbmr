@@ -277,6 +277,10 @@ class SBM_Network {
     return node_ptr;
   }
 
+  Node* add_block_node(const int type_index, const int level = 1){
+    return add_node("b_" + as_str(block_counter++), type_index, level);
+  }
+
   void add_edge(const string& node_a, const string& node_b)
   {
     Node* a = get_node_by_id(node_a);
@@ -314,7 +318,8 @@ class SBM_Network {
       blocks_of_type.reserve(num_blocks);
 
       for (int i = 0; i < num_blocks; i++) {
-        add_node("b_" + as_str(block_counter++), type_i, block_level);
+        add_block_node(type_i, block_level);
+        // add_node("b_" + as_str(block_counter++), type_i, block_level);
       }
 
       // Shuffle child nodes if we're randomly assigning blocks
