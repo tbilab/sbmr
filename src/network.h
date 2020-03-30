@@ -283,10 +283,13 @@ class SBM_Network {
       LOGIC_ERROR("Tried to delete a node that doesn't exist");
   }
 
-  void merge_blocks(Node* absorbing_block, Node* absorbed_block)
+  void merge_blocks(Node* absorbed_block, Node* absorbing_block)
   {
+    // Make a vector copy of all the children for absorbed block
+    const auto children_to_move = Node_Vec(absorbed_block->children());
+
     // Place all children of absorbed block into absorbing block
-    for (const auto& child_node : absorbed_block->children()) {
+    for (const auto& child_node : children_to_move) {
       child_node->set_parent(absorbing_block);
     }
 
