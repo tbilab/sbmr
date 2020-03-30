@@ -1,16 +1,16 @@
 #pragma once
 
+#include <queue>
+
 #include "Ordered_Pair.h"
+#include "get_move_results.h"
 #include "mcmc_sweep.h"
-
-#include "../get_move_results.h"
-
 #include "network.h"
 
 struct Merge_Step {
   double entropy_delta;
   double entropy;
-  State_Dump state;
+  // State_Dump state;
   int num_blocks;
   Merge_Step()
       : entropy_delta(0)
@@ -18,7 +18,7 @@ struct Merge_Step {
   }
   Merge_Step(const double e, const State_Dump s, const int n)
       : entropy_delta(e)
-      , state(s)
+      // , state(s)
       , num_blocks(n)
   {
   }
@@ -31,11 +31,11 @@ using Best_Move_Queue = std::priority_queue<std::pair<double, Node_Pair>>;
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-Merge_Step agglomerative_merge(SBM_Network& net,
-                               const int block_level,
-                               const int num_merges_to_make,
-                               const int num_checks_per_block,
-                               const double& eps)
+inline Merge_Step agglomerative_merge(SBM_Network& net,
+                                      const int block_level,
+                                      const int num_merges_to_make,
+                                      const int num_checks_per_block,
+                                      const double& eps)
 {
 
   // Strip away any previous meta-block level if it existed
@@ -56,7 +56,7 @@ Merge_Step agglomerative_merge(SBM_Network& net,
 
     // I think that there should be an easy way to calculate the minimum number of checks
     // needed to fully capture all pairs and it will be less than n_t
-    const int m = std::min(num_checks_per_block, blocks_of_type.size());
+    const int m = num_checks_per_block < blocks_of_type.size() ? num_checks_per_block : blocks_of_type.size();
     if (m < 2)
       LOGIC_ERROR("To few blocks to perform merge.");
 
@@ -66,7 +66,7 @@ Merge_Step agglomerative_merge(SBM_Network& net,
 
       for (int i = 0; i < m; i++) {
         const Node* proposed_metablock = net.propose_move(block.get(), eps);
-        const auto merge_pair          = Node_Pair(block, proposed_metablock->get_only_child());
+        const auto merge_pair          = Node_Pair(block.get(), proposed_metablock->get_only_child());
 
         // Ignore if proposed metablock is just current metablock
         if (metablock == proposed_metablock)
@@ -77,7 +77,7 @@ Merge_Step agglomerative_merge(SBM_Network& net,
         if (pair_already_checked)
           continue;
 
-        const auto move_delta = get_move_results(block, proposed_metablock, n_neighbors_for_type, eps).entropy_delta;
+        const auto move_delta = get_move_results(block.get(), proposed_metablock, n_neighbors_for_type, eps).entropy_delta;
 
         // Calculate entropy delta for merge and place into results queue.
         best_merges.push(std::make_pair(-move_delta, merge_pair));
@@ -96,7 +96,7 @@ Merge_Step agglomerative_merge(SBM_Network& net,
       LOGIC_ERROR("Ran out of merges to run after " + as_str(i));
 
     // Extract best remaining merge
-    const auto best_merge = best_moves_q.top();
+    const auto best_merge = best_merges.top();
     const auto block_pair = best_merge.second;
 
     // Make sure we haven't already merged the culled block
@@ -105,7 +105,7 @@ Merge_Step agglomerative_merge(SBM_Network& net,
     const bool second_block_unmerged = merged_blocks.insert(block_pair.second()).second;
 
     if (first_block_unmerged && second_block_unmerged)
-      net.merge_blocks(block_pair.second, block_pair.first);
+      net.merge_blocks(block_pair.second(), block_pair.first());
 
     // Update the results with entropy delta caused by this merge
     results.entropy_delta += best_merge.first;
