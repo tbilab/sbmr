@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Block_Consensus.h"
-#include "calc_move_results.h"
+#include "get_move_results.h"
 #include "network.h"
 
 struct MCMC_Sweeps {
