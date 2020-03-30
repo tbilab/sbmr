@@ -24,7 +24,7 @@ using Node_UPtr      = std::unique_ptr<Node>;
 using Node_Ptr_Vec   = std::vector<Node*>;
 using Edges_By_Type  = std::vector<Node_Ptr_Vec>;
 using Node_Vec       = std::vector<Node*>;
-using Edge_Count_Map = std::map<Node*, int>;
+using Edge_Count_Map = std::map<const Node*, int>;
 
 enum Update_Type { Add,
                    Remove };
