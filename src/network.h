@@ -347,14 +347,19 @@ class SBM_Network {
     }
   }
 
-  void remove_blocks()
+   void trim_levels(const int end_size)
   {
-    const int num_levels_to_remove = num_levels() - 1;
+    const int num_levels_to_remove = num_levels() - end_size;
 
     for (int i = 0; i < num_levels_to_remove; i++) {
       // Remove the last layer of nodes.
       nodes.pop_back();
     }
+  }
+
+  void remove_blocks()
+  {
+    trim_levels(1);
   }
 
   void delete_block_level()
