@@ -20,13 +20,13 @@ struct MCMC_Sweeps {
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-MCMC_Sweeps mcmc_sweep(SBM_Network& net,
-                       const int num_sweeps,
-                       const double& eps,
-                       const bool variable_num_blocks,
-                       const bool track_pairs,
-                       const int level    = 0,
-                       const bool verbose = false)
+inline MCMC_Sweeps mcmc_sweep(SBM_Network& net,
+                              const int num_sweeps,
+                              const double& eps,
+                              const bool variable_num_blocks,
+                              const bool track_pairs,
+                              const int level    = 0,
+                              const bool verbose = false)
 {
   const int block_level = level + 1;
 
@@ -170,7 +170,7 @@ MCMC_Sweeps mcmc_sweep(SBM_Network& net,
       results.block_consensus.update_pair_tracking_map(pair_moves);
     }
     ALLOW_USER_BREAKOUT; // Let R used break out of loop if need be
-  } // End multi-sweep loop
+  }                      // End multi-sweep loop
 
   if (variable_num_blocks) {
     // Cleanup the single empty block for each type
