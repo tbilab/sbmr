@@ -129,14 +129,32 @@ TEST_CASE("Move results information - Simple Unipartite", "[SBM]")
   REQUIRE(move_results.prob_ratio == Approx(0.6820954).epsilon(0.1));
 }
 
-// TEST_CASE("MCMC sweeps - Simple Bipartite", "[SBM]")
-// {
-//   auto my_sbm = simple_bipartite();
-//   mcmc_sweep(my_sbm,
-//              5,
-//              0.2,
-//              false,
-//              false,
-//              false);
-// }
+TEST_CASE("Block Merging - Simple Bipartite", "[SBM]")
+{
+  auto my_sbm = simple_bipartite();
 
+  // We will merge block a11 into a12. First make sure network is what we
+  // think it should be
+  auto a1  = my_sbm.get_node_by_id("a1");
+  auto a11 = a1->parent();
+  auto a2  = my_sbm.get_node_by_id("a2");
+  auto a12 = a2->parent();
+
+  REQUIRE(a12->num_children() == 2);
+  REQUIRE(a12->degree() == 5);
+  REQUIRE(my_sbm.num_nodes_of_type("a", 1) == 3);
+
+  // Now merge a11 into a12
+  OUT_MSG << "Merging a11 into a12." << std::endl;
+  my_sbm.merge_blocks(a12, a11);
+
+  REQUIRE(a12->num_children() == 3);
+  REQUIRE(a12->degree() == 7);
+  REQUIRE(my_sbm.num_nodes_of_type("a", 1) == 2);
+
+  REQUIRE(a1->parent() == a2->parent());
+
+  // Block a11 should have been deleted. Not sure why the arrow functions still return it...
+  // OUT_MSG << "A11 pointer object now has id of " << a11->id() << std::endl;
+  // REQUIRE_THROWS(a11->id());
+}
