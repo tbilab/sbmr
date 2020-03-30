@@ -286,13 +286,17 @@ class SBM_Network {
   void merge_blocks(Node* absorbed_block, Node* absorbing_block)
   {
     // Make a vector copy of all the children for absorbed block
-    const auto children_to_move = Node_Vec(absorbed_block->children());
+    // const auto children_to_move = Node_Vec(absorbed_block->children());
 
     // Place all children of absorbed block into absorbing block
-    for (const auto& child_node : children_to_move) {
-      child_node->set_parent(absorbing_block);
+    for (const auto& child_node : absorbed_block->children()) {
+      // Don't bother wasting computation on removing the child node
+      // from the absorbed block's children's list.
+      child_node->set_parent(absorbing_block, false);
     }
 
+    // Remove all children before removing and trigger destructor
+    absorbed_block->empty_children();
     delete_node(absorbed_block);
   }
 
