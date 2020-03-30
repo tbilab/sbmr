@@ -347,9 +347,11 @@ class SBM_Network {
     }
   }
 
-   void trim_levels(const int end_size)
+  void remove_higher_levels(const int last_level_index)
   {
-    const int num_levels_to_remove = num_levels() - end_size;
+    // Say we have three levels and want to get to just nodes (index = 0)
+    // num_levels() = 3 - 0 - 1 -> remove 2 levels
+    const int num_levels_to_remove = num_levels() - last_level_index - 1;
 
     for (int i = 0; i < num_levels_to_remove; i++) {
       // Remove the last layer of nodes.
@@ -359,7 +361,7 @@ class SBM_Network {
 
   void remove_blocks()
   {
-    trim_levels(1);
+    remove_higher_levels(0);
   }
 
   void delete_block_level()
