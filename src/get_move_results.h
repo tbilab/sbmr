@@ -7,8 +7,8 @@
 
 #include "Node.h"
 
-using Node_Edge_Counts = std::map<Node*, int>;
-using Edge_Count       = std::pair<Node*, int>;
+using Node_Edge_Counts = std::map<const Node*, int>;
+using Edge_Count       = std::pair<const Node*, int>;
 
 struct Move_Results {
   double entropy_delta  = 0.0;
@@ -22,7 +22,7 @@ struct Move_Results {
   }
 };
 
-inline void reduce_edge_count(Node_Edge_Counts& count_map, Node* block, const int dec_amt)
+inline void reduce_edge_count(Node_Edge_Counts& count_map, const Node* block, const int dec_amt)
 {
   const int new_value = count_map[block] - dec_amt;
   // If we've reduced the value to zero, then remove from map
@@ -33,7 +33,7 @@ inline void reduce_edge_count(Node_Edge_Counts& count_map, Node* block, const in
   }
 }
 
-inline void increase_edge_count(Node_Edge_Counts& count_map, Node* block, const int inc_amt)
+inline void increase_edge_count(Node_Edge_Counts& count_map, const Node* block, const int inc_amt)
 {
   count_map[block] += inc_amt;
 }
@@ -48,8 +48,8 @@ inline double ent(const double e_rs, const double e_r, const double e_s)
   return e_rs * std::log(e_rs / (e_r * e_s));
 }
 
-inline Move_Results get_move_results(Node* node,
-                                     Node* new_block,
+inline Move_Results get_move_results(const Node* node,
+                                     const Node* new_block,
                                      const int n_possible_neighbors,
                                      const double eps = 0.1)
 {
@@ -116,7 +116,7 @@ inline Move_Results get_move_results(Node* node,
 
   // Update edge count maps for post move
   for (const auto& node_block_count : node_neighbor_counts) {
-    Node* block          = node_block_count.first;
+    const Node* block          = node_block_count.first;
     const int e_to_block = node_block_count.second;
 
     if (block == new_block) {
