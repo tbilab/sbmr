@@ -104,7 +104,7 @@ MCMC_Sweeps mcmc_sweep(SBM_Network& net,
       // Calculate acceptance probability based on posterior changes
       auto proposal_results = get_move_results(curr_node,
                                                proposed_new_block,
-                                               net.num_possible_neighbors_for_node(curr_node),
+                                               net.num_possible_neighbors(curr_node),
                                                eps);
 
       // Make movement decision

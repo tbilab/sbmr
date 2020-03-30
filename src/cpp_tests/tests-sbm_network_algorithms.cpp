@@ -103,7 +103,7 @@ TEST_CASE("Move results information - Simple Bipartite", "[SBM]")
   // propose moving a2 into block with a1
   const auto move_results = get_move_results(a2,
                                              my_sbm.get_node_by_id("a1")->parent(),
-                                             my_sbm.num_possible_neighbors_for_node(a2),
+                                             my_sbm.num_possible_neighbors(a2),
                                              0.1);
 
   REQUIRE(move_results.entropy_delta == Approx(-0.5924696).epsilon(0.1));
@@ -122,7 +122,7 @@ TEST_CASE("Move results information - Simple Unipartite", "[SBM]")
 
   // Propose move of n4 to group c
   Node* n4                = my_sbm.get_node_by_id("n4");
-  const int B             = my_sbm.num_possible_neighbors_for_node(n4);
+  const int B             = my_sbm.num_possible_neighbors(n4);
   const auto move_results = get_move_results(n4, group_c, B, 0.5);
 
   REQUIRE(move_results.entropy_delta == Approx(-0.1117765).epsilon(0.1));

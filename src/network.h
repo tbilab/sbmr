@@ -217,11 +217,8 @@ class SBM_Network {
     return types.size();
   }
 
-  int num_possible_neighbors_for_node(Node* node) const
+  int num_possible_neighbors(const int type, const int level) const
   {
-    const int type  = node->type();
-    const int level = node->level();
-
     if (edge_types == unipartite) {
       return num_nodes_of_type(type, level + 1);
     }
@@ -235,6 +232,11 @@ class SBM_Network {
         [&](int n, const int type) {
           return n + num_nodes_of_type(type, level + 1);
         });
+  }
+
+  int num_possible_neighbors(Node* node) const {
+
+    return num_possible_neighbors(node->type(), node->level());
   }
 
   // =========================================================================
