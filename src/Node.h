@@ -118,6 +118,14 @@ class Node {
         != _children.end();
   }
 
+  Node* get_only_child() const
+  {
+    if (num_children() > 1)
+      LOGIC_ERROR("Cant get only child, block has more than one child");
+
+    return _children[0];
+  }
+
   // =========================================================================
   // Parent-Related methods
   // =========================================================================
