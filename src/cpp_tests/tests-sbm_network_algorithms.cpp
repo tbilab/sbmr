@@ -145,8 +145,7 @@ TEST_CASE("Block Merging - Simple Bipartite", "[SBM]")
   REQUIRE(my_sbm.num_nodes_of_type("a", 1) == 3);
 
   // Now merge a11 into a12
-  OUT_MSG << "Merging a11 into a12." << std::endl;
-  my_sbm.merge_blocks(a12, a11);
+  my_sbm.merge_blocks(a11, a12);
 
   REQUIRE(a12->num_children() == 3);
   REQUIRE(a12->degree() == 7);
@@ -157,4 +156,32 @@ TEST_CASE("Block Merging - Simple Bipartite", "[SBM]")
   // Block a11 should have been deleted. Not sure why the arrow functions still return it...
   // OUT_MSG << "A11 pointer object now has id of " << a11->id() << std::endl;
   // REQUIRE_THROWS(a11->id());
+}
+
+TEST_CASE("Block Merging - Simple Unipartite", "[SBM]")
+{
+  auto my_sbm = simple_unipartite();
+
+  // We will merge block block c into block b
+  auto b = my_sbm.get_node_by_id("n3")->parent();
+  auto c = my_sbm.get_node_by_id("n6")->parent();
+
+  REQUIRE(b->has_child(my_sbm.get_node_by_id("n4")));
+  REQUIRE(c->has_child(my_sbm.get_node_by_id("n5")));
+
+  REQUIRE(b->num_children() == 2);
+  REQUIRE(b->degree() == 9);
+  // n5 and n4 do not share a block
+  REQUIRE(my_sbm.get_node_by_id("n5")->parent() != my_sbm.get_node_by_id("n4")->parent());
+  REQUIRE(my_sbm.num_nodes_of_type("a", 1) == 3);
+
+  // Now merge c into b
+  my_sbm.merge_blocks(c, b);
+
+  REQUIRE(b->num_children() == 4);
+  REQUIRE(b->degree() == 16);
+  // n4 and n5 now do share their block
+  REQUIRE(my_sbm.get_node_by_id("n5")->parent() == my_sbm.get_node_by_id("n4")->parent());
+
+  REQUIRE(my_sbm.num_nodes_of_type("a", 1) == 2);
 }
