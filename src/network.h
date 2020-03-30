@@ -367,6 +367,12 @@ class SBM_Network {
     nodes.pop_back();
   }
 
+  void shuffle_nodes(const int type, const int level) {
+    check_for_level(level);
+    check_for_type(type);
+    sampler.shuffle(nodes[level][type]);
+  }
+
   // =============================================================================
   // Model Fitting
   // =============================================================================
