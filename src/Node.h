@@ -129,13 +129,13 @@ class Node {
   // =========================================================================
   // Parent-Related methods
   // =========================================================================
-  void set_parent(Node* new_parent)
+  void set_parent(Node* new_parent, const bool remove_from_old = true)
   {
     if (_level != new_parent->level() - 1)
       LOGIC_ERROR("Parent node must be one level above child");
 
     // Remove self from previous parent's children list (if it existed)
-    if (has_parent())
+    if (remove_from_old && has_parent())
       parent_node->remove_child(this);
 
     // Add this node to new parent's children list
