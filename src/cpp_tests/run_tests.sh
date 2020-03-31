@@ -32,6 +32,7 @@ g++ -std=c++11 ${OPTIMIZATION_LEVEL} -DNO_RCPP=1\
   cpp_tests/tests-Block_Concensus.cpp \
   cpp_tests/tests-mcmc_sweep.cpp \
   cpp_tests/tests-sbm_network_algorithms.cpp \
+  cpp_tests/tests-agglomerative_merge.cpp \
   -o cpp_tests/run_tests.o 
 
 # g++ -std=c++11 ${OPTIMIZATION_LEVEL} -DNO_RCPP=1\
