@@ -28,8 +28,14 @@ TEST_CASE("Agglomerative merge steps - Simple Bipartite", "[SBM]")
   // Make sure entropy has gone up as we would expect
   REQUIRE(single_merge.entropy_delta > 0);
 
-  // // Run again but this time merging the best 2
-  // SBM new_SBM = build_simple_SBM();
+  // Run again but this time merging the best 2
+  auto new_sbm = simple_bipartite();
+
+  const auto double_merge = agglomerative_merge(my_sbm,
+                                                1,    // block_level,
+                                                2,    // num_merges_to_make,
+                                                5,    // num_checks_per_block,
+                                                0.1); // eps
 
   // // Run aglomerative merge with best single merge done
   // Merge_Step double_merge = new_SBM.agglomerative_merge(1, 2, 5, 0.1);
