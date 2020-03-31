@@ -158,12 +158,17 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
 
     const auto block_pair = best_merge.second;
 
-    // Make sure we haven't already merged the culled block
-    // Also make sure that we haven't removed the block we're trying to merge into
-    const bool first_block_free  = merged_blocks.insert(block_pair.first()).second;
-    const bool second_block_free = merged_blocks.insert(block_pair.second()).second;
+    // Make sure we haven't already merged either of the two blocks
+    const bool first_block_free  = merged_blocks.find(block_pair.first()) == merged_blocks.end();
+    const bool second_block_free = merged_blocks.find(block_pair.second()) == merged_blocks.end();
 
-    if (first_block_free && second_block_free) merges_to_make.push_back(block_pair);
+    if (first_block_free && second_block_free) {
+      merges_to_make.push_back(block_pair);
+
+      // Insert these blocks into merged blocks so they wont be used again
+      merged_blocks.insert(block_pair.first());
+      merged_blocks.insert(block_pair.second());
+    } 
 
     // Update the results with entropy delta caused by this merge. We subtract
     // here because we negated the entropy delta when inserting into the queue
