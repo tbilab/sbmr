@@ -28,7 +28,8 @@ using Node_Set        = std::unordered_set<Node*>;
 using Node_Pair       = Ordered_Pair<Node*>;
 using Best_Move_Queue = std::priority_queue<std::pair<double, Node_Pair>>;
 
-inline double merge_entropy_delta(const Node* absorbing_block, const Node* absorbed_block){
+inline double merge_entropy_delta(const Node* absorbing_block, const Node* absorbed_block)
+{
 
   const int block_level            = absorbing_block->level();
   const int absorbing_block_degree = absorbing_block->degree();
@@ -56,9 +57,9 @@ inline double merge_entropy_delta(const Node* absorbing_block, const Node* absor
   }
 
   // Now merge the counts to absorbed block into the absorbing block and get rid of absorbed entry
-  // if the pair exists 
+  // if the pair exists
   const auto absorbing_to_absorbed_it = absorbing_block_neighbor_counts.find(absorbed_block);
-  if(absorbing_to_absorbed_it != absorbing_block_neighbor_counts.end()){
+  if (absorbing_to_absorbed_it != absorbing_block_neighbor_counts.end()) {
     absorbing_block_neighbor_counts[absorbing_block] += absorbing_block_neighbor_counts[absorbed_block];
     absorbing_block_neighbor_counts.erase(absorbed_block);
   }
@@ -74,7 +75,6 @@ inline double merge_entropy_delta(const Node* absorbing_block, const Node* absor
 
   return pre_merge_entropy - post_merge_entropy;
 }
-
 
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
@@ -136,7 +136,7 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
           // See if this combo of groups has already been looked at
           const bool pair_already_checked = !checked_pairs.insert(merge_pair).second;
           if (pair_already_checked) continue;
-          
+
           const auto merge_delta = merge_entropy_delta(block.get(), proposed_metablock->get_only_child());
 
           // Calculate entropy delta for merge and place into results queue.
