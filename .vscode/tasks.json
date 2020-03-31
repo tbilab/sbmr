@@ -4,19 +4,7 @@
       {
         "label": "Build debug w/ g++",
         "type": "shell",
-        "command": "g++",
-        "args": [
-          "-std=c++11",
-          "-g",
-          "src/debugging/debug.cpp",
-          "src/Node.cpp",
-          "src/Network.cpp",
-          "src/SBM.cpp",
-          "src/Block_Consensus.cpp",
-          "src/Sampler.cpp",
-          "-o",
-          "src/debugging/debug.out"
-        ]
+        "command": "g++ -std=c++11 -g src/debugging/debug.cpp -o src/debugging/debug.out",
       },
       {
         "label": "Run tests",
