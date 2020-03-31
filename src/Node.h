@@ -60,9 +60,7 @@ class Node {
   // Destructor
   ~Node()
   {
-    std::for_each(_children.begin(),
-                  _children.end(),
-                  [](Node* child) { child->remove_parent(); });
+    std::for_each(_children.begin(), _children.end(), [](Node* c) { c->remove_parent(); });
   }
 
   // Disable costly copy and move methods for error protection
@@ -112,16 +110,12 @@ class Node {
 
   bool has_child(Node* node) const
   {
-    return std::find(_children.begin(),
-                     _children.end(),
-                     node)
-        != _children.end();
+    return std::find(_children.begin(), _children.end(), node) != _children.end();
   }
 
   Node* get_only_child() const
   {
-    if (num_children() > 1)
-      LOGIC_ERROR("Cant get only child, block has more than one child");
+    if (num_children() > 1) LOGIC_ERROR("Cant get only child, block has more than one child");
 
     return _children[0];
   }
@@ -137,12 +131,10 @@ class Node {
   // =========================================================================
   void set_parent(Node* new_parent, const bool remove_from_old = true)
   {
-    if (_level != new_parent->level() - 1)
-      LOGIC_ERROR("Parent node must be one level above child");
+    if (_level != new_parent->level() - 1) LOGIC_ERROR("Parent node must be one level above child");
 
     // Remove self from previous parent's children list (if it existed)
-    if (remove_from_old && has_parent())
-      parent_node->remove_child(this);
+    if (remove_from_old && has_parent()) parent_node->remove_child(this);
 
     // Add this node to new parent's children list
     new_parent->add_child(this);
@@ -156,19 +148,18 @@ class Node {
   {
     // First we need to make sure that the requested level is not less than that
     // of the current node.
-    if (level_of_parent < _level)
-      LOGIC_ERROR("Requested parent level ("
-                  + as_str(level_of_parent)
-                  + ") lower than current node level ("
-                  + as_str(_level) + ").");
+    if (level_of_parent < _level) LOGIC_ERROR("Requested parent level ("
+                                              + as_str(level_of_parent)
+                                              + ") lower than current node level ("
+                                              + as_str(_level) + ").");
 
     // Start with this node as current node
     Node* current_node     = this;
     int current_node_level = _level;
 
     while (current_node_level != level_of_parent) {
-      if (!has_parent())
-        RANGE_ERROR("No parent at level " + as_str(level_of_parent) + " for " + id());
+      if (!has_parent()) RANGE_ERROR("No parent at level " + as_str(level_of_parent)
+                                     + " for " + id());
 
       // Traverse up parents until we've reached just below where we want to go
       current_node = current_node->parent();
@@ -241,8 +232,7 @@ class Node {
     }
 
     // Propagate edge changes up hierarchy
-    if (has_parent())
-      parent_node->update_neighbors(neighbors_to_update, update_type);
+    if (has_parent()) parent_node->update_neighbors(neighbors_to_update, update_type);
   }
 
   // =========================================================================
