@@ -28,6 +28,54 @@ using Node_Set        = std::unordered_set<Node*>;
 using Node_Pair       = Ordered_Pair<Node*>;
 using Best_Move_Queue = std::priority_queue<std::pair<double, Node_Pair>>;
 
+inline double merge_entropy_delta(const Node* absorbing_block, const Node* absorbed_block){
+
+  const int block_level            = absorbing_block->level();
+  const int absorbing_block_degree = absorbing_block->degree();
+  const int absorbed_block_degree  = absorbed_block->degree();
+  const int merged_degree          = absorbing_block_degree + absorbed_block_degree;
+
+  Edge_Count_Map absorbing_block_neighbor_counts = absorbing_block->gather_neighbors_at_level(block_level);
+  Edge_Count_Map absorbed_block_neighbor_counts  = absorbed_block->gather_neighbors_at_level(block_level);
+
+  // First get partial entropy from both blocks pre-merger
+  double pre_merge_entropy = 0.0;
+  for (const auto& a_to_t : absorbing_block_neighbor_counts) {
+    const Node* block_t = a_to_t.first;
+    const double scalar = block_t == absorbing_block ? 2 : 1;
+    pre_merge_entropy += ent(a_to_t.second, absorbing_block_degree, block_t->degree()) / scalar;
+  }
+  for (const auto& b_to_t : absorbed_block_neighbor_counts) {
+    const Node* block_t = b_to_t.first;
+    // Merge edge counts into absorbing blocks counts
+    absorbing_block_neighbor_counts[block_t] += b_to_t.second;
+
+    if (block_t == absorbing_block) continue; // Avoid double counting the a-b pair
+    const double scalar = block_t == absorbed_block ? 2 : 1;
+    pre_merge_entropy += ent(b_to_t.second, absorbed_block_degree, block_t->degree()) / scalar;
+  }
+
+  // Now merge the counts to absorbed block into the absorbing block and get rid of absorbed entry
+  // if the pair exists 
+  const auto absorbing_to_absorbed_it = absorbing_block_neighbor_counts.find(absorbed_block);
+  if(absorbing_to_absorbed_it != absorbing_block_neighbor_counts.end()){
+    absorbing_block_neighbor_counts[absorbing_block] += absorbing_block_neighbor_counts[absorbed_block];
+    absorbing_block_neighbor_counts.erase(absorbed_block);
+  }
+
+  double post_merge_entropy = 0.0;
+  for (const auto& a_to_t : absorbing_block_neighbor_counts) {
+    const Node* block_t     = a_to_t.first;
+    const bool is_absorbing = block_t == absorbing_block;
+    const int t_degree      = is_absorbing ? merged_degree : block_t->degree();
+    const double scalar     = is_absorbing ? 2 : 1;
+    post_merge_entropy += ent(a_to_t.second, merged_degree, t_degree) / scalar;
+  }
+
+  return pre_merge_entropy - post_merge_entropy;
+}
+
+
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
@@ -68,9 +116,9 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
         for (int j = i + 1; j < n_blocks_of_type; j++) {
           const auto block_j = blocks_of_type.at(j).get();
 
-          const auto move_delta = get_move_results(block_i, block_j->parent(), n_neighbors_for_type, eps).entropy_delta;
+          const auto merge_delta = merge_entropy_delta(block_i, block_j);
 
-          best_merges.push(std::make_pair(-move_delta, Node_Pair(block_i, block_j)));
+          best_merges.push(std::make_pair(-merge_delta, Node_Pair(block_i, block_j)));
         }
       }
     } else {
@@ -88,11 +136,11 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
           // See if this combo of groups has already been looked at
           const bool pair_already_checked = !checked_pairs.insert(merge_pair).second;
           if (pair_already_checked) continue;
-
-          const auto move_delta = get_move_results(block.get(), proposed_metablock, n_neighbors_for_type, eps).entropy_delta;
+          
+          const auto merge_delta = merge_entropy_delta(block.get(), proposed_metablock->get_only_child());
 
           // Calculate entropy delta for merge and place into results queue.
-          best_merges.push(std::make_pair(-move_delta, merge_pair));
+          best_merges.push(std::make_pair(-merge_delta, merge_pair));
         } // End of m merge checks
       }   // End of loop over nodes of a type
     }
