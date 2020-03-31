@@ -25,8 +25,8 @@ TEST_CASE("Agglomerative merge steps - Simple Bipartite", "[SBM]")
   const int change_in_blocks = num_initial_blocks - new_block_num;
   REQUIRE(change_in_blocks == 1);
 
-  // // Make sure entropy has gone up as we would expect
-  // REQUIRE(single_merge.entropy_delta > 0);
+  // Make sure entropy has gone up as we would expect
+  REQUIRE(single_merge.entropy_delta > 0);
 
   // // Run again but this time merging the best 2
   // SBM new_SBM = build_simple_SBM();

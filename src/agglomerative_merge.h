@@ -112,7 +112,8 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
     }
 
     // Update the results with entropy delta caused by this merge
-    results.entropy_delta += best_merge.first;
+    // We subtract because we negated the entropy delta when inserting into the queue
+    results.entropy_delta -= best_merge.first;
   }
 
   net.remove_last_level(); // Dump the highest level of blocks before making merges
