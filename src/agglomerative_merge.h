@@ -38,9 +38,9 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
                                       const double& eps)
 {
 
-  // Strip away any previous meta-block level if it existed
+  // Strip away any previous meta-block level if it existed and
+  // build a new level of meta-blocks with one metablock per block
   net.remove_higher_levels(block_level);
-  // Build a new level of meta-blocks with one metablock per block
   net.initialize_blocks();
 
   // Set to keep track of the attepted merge pairs
@@ -89,6 +89,9 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
   // Start by initializing a merge result struct
   auto results = Merge_Step();
 
+  std::vector<Node_Pair> top_distinct_merges;
+  top_distinct_merges.reserve(num_merges_to_make);
+
   // A set to keep track of what mergers have happened so as to not double up for a block
   Node_Set merged_blocks;
   for (int i = 0; i < num_merges_to_make; i++) {
@@ -104,11 +107,18 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
     const bool first_block_unmerged  = merged_blocks.insert(block_pair.first()).second;
     const bool second_block_unmerged = merged_blocks.insert(block_pair.second()).second;
 
-    if (first_block_unmerged && second_block_unmerged)
-      net.merge_blocks(block_pair.second(), block_pair.first());
+    if (first_block_unmerged && second_block_unmerged) {
+      top_distinct_merges.push_back(block_pair);
+    }
 
     // Update the results with entropy delta caused by this merge
     results.entropy_delta += best_merge.first;
+  }
+
+  net.remove_last_level(); // Dump the highest level of blocks before making merges
+
+  for (const auto& merge_pair : top_distinct_merges) {
+    net.merge_blocks(merge_pair.first(), merge_pair.second());
   }
 
   return results;
