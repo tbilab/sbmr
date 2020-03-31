@@ -35,7 +35,8 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
                                       const int block_level,
                                       const int num_merges_to_make,
                                       const int num_checks_per_block,
-                                      const double& eps)
+                                      const double& eps,
+                                      const bool allow_exhaustive = true)
 {
   // Strip away any previous meta-block level if it existed and
   // build a new level of meta-blocks with one metablock per block
@@ -51,35 +52,52 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
   for (int type = 0; type < net.num_types(); type++) {
 
     const auto& blocks_of_type     = net.get_nodes_of_type(type, block_level);
+    const int n_blocks_of_type     = blocks_of_type.size();
     const int n_neighbors_for_type = net.num_possible_neighbors(type, block_level);
+    // Compare how many checks will be done for merges. If this number is greater than just an exhaustive
+    // search of all possible pairs, and the user allows it, just perform an exhaustive search of mergers.
+    // The exhaustive search also benefits from not having to do the move proposal step.
+    // We're comparing n*m vs n*(n-1)/2 moves
+    const bool exhaustive_is_cheaper = num_checks_per_block >= (n_blocks_of_type - 1) / 2;
 
-    // I think that there should be an easy way to calculate the minimum number of checks
-    // needed to fully capture all pairs and it will be less than n_t
-    const int m = num_checks_per_block < blocks_of_type.size() ? num_checks_per_block : blocks_of_type.size();
-    if (m < 2) LOGIC_ERROR("To few blocks to perform merge.");
+    if (allow_exhaustive && exhaustive_is_cheaper) {
 
-    // Loop through each block and propose m moves using move proposal function
-    for (const auto& block : blocks_of_type) {
-      const Node* metablock = block->parent();
+      // Loop through all our nodes of this type in a pairwise fashion to get every possible pair
+      for (int i = 0; i < n_blocks_of_type; i++) {
+        const auto block_i = blocks_of_type.at(i).get();
+        for (int j = i + 1; j < n_blocks_of_type; j++) {
+          const auto block_j = blocks_of_type.at(j).get();
 
-      for (int i = 0; i < m; i++) {
-        const Node* proposed_metablock = net.propose_move(block.get(), eps);
-        const auto merge_pair          = Node_Pair(block.get(), proposed_metablock->get_only_child());
+          const auto move_delta = get_move_results(block_i, block_j->parent(), n_neighbors_for_type, eps).entropy_delta;
 
-        // Ignore if proposed metablock is just current metablock
-        if (metablock == proposed_metablock) continue;
+          best_merges.push(std::make_pair(-move_delta, Node_Pair(block_i, block_j)));
+        }
+      }
+    } else {
+      // Loop through each block and propose m moves using move proposal function
+      for (const auto& block : blocks_of_type) {
+        const Node* metablock = block->parent();
 
-        // See if this combo of groups has already been looked at
-        const bool pair_already_checked = !checked_pairs.insert(merge_pair).second;
-        if (pair_already_checked) continue;
+        for (int i = 0; i < num_checks_per_block; i++) {
+          const Node* proposed_metablock = net.propose_move(block.get(), eps);
+          const auto merge_pair          = Node_Pair(block.get(), proposed_metablock->get_only_child());
 
-        const auto move_delta = get_move_results(block.get(), proposed_metablock, n_neighbors_for_type, eps).entropy_delta;
+          // Ignore if proposed metablock is just current metablock
+          if (metablock == proposed_metablock) continue;
 
-        // Calculate entropy delta for merge and place into results queue.
-        best_merges.push(std::make_pair(-move_delta, merge_pair));
-      } // End of m merge checks
-    }   // End of loop over nodes of a type
-  }     // End of loop over types in level
+          // See if this combo of groups has already been looked at
+          const bool pair_already_checked = !checked_pairs.insert(merge_pair).second;
+          if (pair_already_checked) continue;
+
+          const auto move_delta = get_move_results(block.get(), proposed_metablock, n_neighbors_for_type, eps).entropy_delta;
+
+          // Calculate entropy delta for merge and place into results queue.
+          best_merges.push(std::make_pair(-move_delta, merge_pair));
+        } // End of m merge checks
+      }   // End of loop over nodes of a type
+    }
+
+  } // End of loop over types in level
 
   // Now we find the top merges...
   // Start by initializing a merge result struct
