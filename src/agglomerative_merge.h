@@ -143,13 +143,13 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
   // Start by initializing a merge result struct
   auto results = Merge_Step();
 
-  std::vector<Node_Pair> top_distinct_merges;
-  top_distinct_merges.reserve(num_merges_to_make);
+  std::vector<Node_Pair> merges_to_make;
+  merges_to_make.reserve(num_merges_to_make);
 
   // A set to keep track of what mergers have happened so as to not double up for a block
   Node_Set merged_blocks;
 
-  while (top_distinct_merges.size() < num_merges_to_make) {
+  while (merges_to_make.size() < num_merges_to_make) {
     if (best_merges.size() == 0) LOGIC_ERROR("Ran out of merges to use.");
 
     // Extract best remaining merge and remove from queue
@@ -160,19 +160,17 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
 
     // Make sure we haven't already merged the culled block
     // Also make sure that we haven't removed the block we're trying to merge into
-    const bool first_block_unmerged  = merged_blocks.insert(block_pair.first()).second;
-    const bool second_block_unmerged = merged_blocks.insert(block_pair.second()).second;
+    const bool first_block_free  = merged_blocks.insert(block_pair.first()).second;
+    const bool second_block_free = merged_blocks.insert(block_pair.second()).second;
 
-    if (first_block_unmerged && second_block_unmerged) {
-      top_distinct_merges.push_back(block_pair);
-    }
+    if (first_block_free && second_block_free) merges_to_make.push_back(block_pair);
 
     // Update the results with entropy delta caused by this merge. We subtract
     // here because we negated the entropy delta when inserting into the queue
     results.entropy_delta -= best_merge.first;
   }
 
-  for (const auto& merge_pair : top_distinct_merges) {
+  for (const auto& merge_pair : merges_to_make) {
     net.merge_blocks(merge_pair.first(), merge_pair.second());
   }
 
