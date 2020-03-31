@@ -31,18 +31,15 @@ TEST_CASE("Agglomerative merge steps - Simple Bipartite", "[SBM]")
   // Run again but this time merging the best 2
   auto new_sbm = simple_bipartite();
 
-  const auto double_merge = agglomerative_merge(my_sbm,
+  const auto double_merge = agglomerative_merge(new_sbm,
                                                 1,    // block_level,
                                                 2,    // num_merges_to_make,
                                                 5,    // num_checks_per_block,
                                                 0.1); // eps
 
-  // // Run aglomerative merge with best single merge done
-  // Merge_Step double_merge = new_SBM.agglomerative_merge(1, 2, 5, 0.1);
+  // Make sure that we now have two fewer blocks per type than before
+  REQUIRE(2 == num_initial_blocks - new_sbm.num_nodes_at_level(1));
 
-  // // Make sure that we now have two fewer blocks per type than before
-  // REQUIRE(2 == num_initial_blocks - new_SBM.get_level(1)->size());
-
-  // // Entropy should up even more with two merges
-  // REQUIRE(single_merge.entropy_delta < double_merge.entropy_delta);
+  // Entropy should up even more with two merges
+  REQUIRE(single_merge.entropy_delta < double_merge.entropy_delta);
 }
