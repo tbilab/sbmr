@@ -126,7 +126,8 @@ class Node {
     return _children[0];
   }
 
-  void empty_children() {
+  void empty_children()
+  {
     // Remove all children from vector
     _children.clear();
   }
