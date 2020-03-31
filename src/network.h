@@ -217,7 +217,7 @@ class SBM_Network {
     return types.size();
   }
 
-  int num_possible_neighbors(const int type, const int level) const
+  int num_possible_neighbor_blocks(const int type, const int level) const
   {
     if (edge_types == unipartite) {
       return num_nodes_of_type(type, level + 1);
@@ -234,10 +234,10 @@ class SBM_Network {
         });
   }
 
-  int num_possible_neighbors(Node* node) const
+  int num_possible_neighbor_blocks(Node* node) const
   {
 
-    return num_possible_neighbors(node->type(), node->level());
+    return num_possible_neighbor_blocks(node->type(), node->level());
   }
 
   // =========================================================================
@@ -420,7 +420,7 @@ class SBM_Network {
     }
   }
 
-  
+
   Node* propose_move(Node* node, const int level_of_proposed, const double eps = 0.1)
   {
     // Sample a random neighbor block
