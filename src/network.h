@@ -420,9 +420,9 @@ class SBM_Network {
     }
   }
 
-  Node* propose_move(Node* node, const double eps = 0.1)
+  
+  Node* propose_move(Node* node, const int level_of_proposed, const double eps = 0.1)
   {
-    const int block_level = node->level() + 1;
     // Sample a random neighbor block
     Node* neighbor_block = sampler.sample(node->neighbors(), node->degree())->parent();
 
@@ -430,7 +430,7 @@ class SBM_Network {
     const Node_Ptr_Vec& neighbor_edges_to_t = neighbor_block->neighbors_of_type(node->type());
 
     // Get a reference to all the blocks that the node-to-move _could_ join
-    const Node_UPtr_Vec& all_potential_blocks = get_nodes_of_type(node->type(), block_level);
+    const Node_UPtr_Vec& all_potential_blocks = get_nodes_of_type(node->type(), level_of_proposed);
 
     // Decide if we are going to choose a random block for our node
     const double ergo_amnt = eps * all_potential_blocks.size();
@@ -440,10 +440,20 @@ class SBM_Network {
 
     // Decide where we will get new block from and draw from potential candidates
     if (draw_from_neighbor) {
-      return sampler.sample(neighbor_edges_to_t)->parent_at_level(block_level);
+      return sampler.sample(neighbor_edges_to_t)->parent_at_level(level_of_proposed);
     } else {
       return sampler.sample(all_potential_blocks).get();
     }
+  }
+
+  // Default proposal that returns a potential new parent block
+  Node* propose_move(Node* node, const double eps = 0.1){
+    return propose_move(node, node->level() + 1, eps);
+  }
+
+  // Propose a merger with another node
+  Node* propose_merge(Node* node, const double eps = 0.1){
+    return propose_move(node, node->level(), eps);
   }
 
   // =============================================================================
