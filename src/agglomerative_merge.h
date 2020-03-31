@@ -94,12 +94,15 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
 
   // A set to keep track of what mergers have happened so as to not double up for a block
   Node_Set merged_blocks;
-  for (int i = 0; i < num_merges_to_make; i++) {
+  
+  while(top_distinct_merges.size() < num_merges_to_make){
     if (best_merges.size() == 0)
-      LOGIC_ERROR("Ran out of merges to run after " + as_str(i));
+      LOGIC_ERROR("Ran out of merges to use.");
 
-    // Extract best remaining merge
+    // Extract best remaining merge and remove from queue
     const auto best_merge = best_merges.top();
+    best_merges.pop();
+    
     const auto block_pair = best_merge.second;
 
     // Make sure we haven't already merged the culled block
@@ -114,6 +117,8 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
     // Update the results with entropy delta caused by this merge
     // We subtract because we negated the entropy delta when inserting into the queue
     results.entropy_delta -= best_merge.first;
+
+
   }
 
   net.remove_last_level(); // Dump the highest level of blocks before making merges
