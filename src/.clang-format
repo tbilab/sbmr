@@ -6,5 +6,8 @@ AlignTrailingComments: true
 AlignConsecutiveAssignments: true
 BreakBeforeTernaryOperators: true
 AlignAfterOpenBracket: Align
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
 ...
 

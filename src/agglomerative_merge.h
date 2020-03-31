@@ -37,7 +37,6 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
                                       const int num_checks_per_block,
                                       const double& eps)
 {
-
   // Strip away any previous meta-block level if it existed and
   // build a new level of meta-blocks with one metablock per block
   net.remove_higher_levels(block_level);
@@ -57,8 +56,7 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
     // I think that there should be an easy way to calculate the minimum number of checks
     // needed to fully capture all pairs and it will be less than n_t
     const int m = num_checks_per_block < blocks_of_type.size() ? num_checks_per_block : blocks_of_type.size();
-    if (m < 2)
-      LOGIC_ERROR("To few blocks to perform merge.");
+    if (m < 2) LOGIC_ERROR("To few blocks to perform merge.");
 
     // Loop through each block and propose m moves using move proposal function
     for (const auto& block : blocks_of_type) {
@@ -69,13 +67,11 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
         const auto merge_pair          = Node_Pair(block.get(), proposed_metablock->get_only_child());
 
         // Ignore if proposed metablock is just current metablock
-        if (metablock == proposed_metablock)
-          continue;
+        if (metablock == proposed_metablock) continue;
 
         // See if this combo of groups has already been looked at
         const bool pair_already_checked = !checked_pairs.insert(merge_pair).second;
-        if (pair_already_checked)
-          continue;
+        if (pair_already_checked) continue;
 
         const auto move_delta = get_move_results(block.get(), proposed_metablock, n_neighbors_for_type, eps).entropy_delta;
 
@@ -94,15 +90,14 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
 
   // A set to keep track of what mergers have happened so as to not double up for a block
   Node_Set merged_blocks;
-  
-  while(top_distinct_merges.size() < num_merges_to_make){
-    if (best_merges.size() == 0)
-      LOGIC_ERROR("Ran out of merges to use.");
+
+  while (top_distinct_merges.size() < num_merges_to_make) {
+    if (best_merges.size() == 0) LOGIC_ERROR("Ran out of merges to use.");
 
     // Extract best remaining merge and remove from queue
     const auto best_merge = best_merges.top();
     best_merges.pop();
-    
+
     const auto block_pair = best_merge.second;
 
     // Make sure we haven't already merged the culled block
@@ -114,14 +109,13 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
       top_distinct_merges.push_back(block_pair);
     }
 
-    // Update the results with entropy delta caused by this merge
-    // We subtract because we negated the entropy delta when inserting into the queue
+    // Update the results with entropy delta caused by this merge. We subtract
+    // here because we negated the entropy delta when inserting into the queue
     results.entropy_delta -= best_merge.first;
-
-
   }
 
-  net.remove_last_level(); // Dump the highest level of blocks before making merges
+  // Dump the highest level of blocks before making merges
+  net.remove_last_level();
 
   for (const auto& merge_pair : top_distinct_merges) {
     net.merge_blocks(merge_pair.first(), merge_pair.second());
