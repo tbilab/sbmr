@@ -234,7 +234,8 @@ class SBM_Network {
         });
   }
 
-  int num_possible_neighbors(Node* node) const {
+  int num_possible_neighbors(Node* node) const
+  {
 
     return num_possible_neighbors(node->type(), node->level());
   }
@@ -269,7 +270,8 @@ class SBM_Network {
     return node_ptr;
   }
 
-  Node* add_block_node(const int type_index, const int level = 1){
+  Node* add_block_node(const int type_index, const int level = 1)
+  {
     return add_node("bl_" + types[type_index] + "_" + as_str(block_counter++), type_index, level);
   }
 
@@ -285,9 +287,6 @@ class SBM_Network {
 
   void merge_blocks(Node* absorbed_block, Node* absorbing_block)
   {
-    // Make a vector copy of all the children for absorbed block
-    // const auto children_to_move = Node_Vec(absorbed_block->children());
-
     // Place all children of absorbed block into absorbing block
     for (const auto& child_node : absorbed_block->children()) {
       // Don't bother wasting computation on removing the child node
@@ -382,7 +381,7 @@ class SBM_Network {
     remove_higher_levels(0);
   }
 
-  void delete_block_level()
+  void remove_last_level()
   {
     // Only show error if trying to delete a single block.
     if (no_blocks())
@@ -392,7 +391,8 @@ class SBM_Network {
     nodes.pop_back();
   }
 
-  void shuffle_nodes(const int type, const int level) {
+  void shuffle_nodes(const int type, const int level)
+  {
     check_for_level(level);
     check_for_type(type);
     sampler.shuffle(nodes[level][type]);
@@ -412,7 +412,7 @@ class SBM_Network {
 
     // If the old block is now empty and we're removing empty blocks, delete it
     if (has_old_block && remove_empty && old_block->num_children() == 0) {
-      auto& block_vector            = nodes[old_block->level()][old_block->type()];
+      auto& block_vector           = nodes[old_block->level()][old_block->type()];
       const bool delete_successful = delete_from_vector(block_vector, old_block);
 
       if (!delete_successful)
@@ -422,6 +422,7 @@ class SBM_Network {
 
   Node* propose_move(Node* node, const double eps = 0.1)
   {
+    const int block_level = node->level() + 1;
     // Sample a random neighbor block
     Node* neighbor_block = sampler.sample(node->neighbors(), node->degree())->parent();
 
@@ -429,7 +430,7 @@ class SBM_Network {
     const Node_Ptr_Vec& neighbor_edges_to_t = neighbor_block->neighbors_of_type(node->type());
 
     // Get a reference to all the blocks that the node-to-move _could_ join
-    const Node_UPtr_Vec& all_potential_blocks = get_nodes_of_type(node->type(), node->level() + 1);
+    const Node_UPtr_Vec& all_potential_blocks = get_nodes_of_type(node->type(), block_level);
 
     // Decide if we are going to choose a random block for our node
     const double ergo_amnt = eps * all_potential_blocks.size();
@@ -439,7 +440,7 @@ class SBM_Network {
 
     // Decide where we will get new block from and draw from potential candidates
     if (draw_from_neighbor) {
-      return sampler.sample(neighbor_edges_to_t)->parent();
+      return sampler.sample(neighbor_edges_to_t)->parent_at_level(block_level);
     } else {
       return sampler.sample(all_potential_blocks).get();
     }
@@ -561,7 +562,7 @@ class SBM_Network {
     return get_nodes_of_type(get_type_index(type), level);
   }
 
-    // Apply a lambda function over all nodes in network
+  // Apply a lambda function over all nodes in network
   void for_all_nodes_at_level(const int level,
                               std::function<void(const Node_UPtr& node)> fn) const
   {
@@ -570,7 +571,7 @@ class SBM_Network {
       std::for_each(nodes_vec.begin(), nodes_vec.end(), fn);
     }
   }
-  
+
   Node* get_node_by_id(const string& id) const
   {
     const auto node_it = id_to_node.find(id);
@@ -581,5 +582,4 @@ class SBM_Network {
 
     return node_it->second;
   }
-
 };
