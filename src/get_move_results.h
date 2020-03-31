@@ -96,8 +96,7 @@ inline Move_Results get_move_results(const Node* node,
     const Node* block_t = old_to_t.first;
 
     // Don't double count the old-new edge counts
-    if (block_t == new_block)
-      continue;
+    if (block_t == new_block) continue;
 
     const int t_degree  = get_block_degree(block_t);
     const double scalar = block_t == old_block ? 2 : 1;
