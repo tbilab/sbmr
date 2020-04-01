@@ -6,6 +6,7 @@
 // #include "calc_edge_entropy.h"
 
 #include "Node.h"
+#include "model_helpers.h"
 
 using Node_Edge_Counts = std::map<const Node*, int>;
 using Edge_Count       = std::pair<const Node*, int>;
@@ -36,16 +37,6 @@ inline void reduce_edge_count(Node_Edge_Counts& count_map, const Node* block, co
 inline void increase_edge_count(Node_Edge_Counts& count_map, const Node* block, const int inc_amt)
 {
   count_map[block] += inc_amt;
-}
-
-inline double ent(const double e_rs, const double e_r, const double e_s)
-{
-  // OUT_MSG << "e_rs: " << e_rs
-  //         << ", e_r: " << e_r
-  //         << ", e_s: " << e_s
-  //         << " -> " << e_rs * std::log(e_rs / (e_r * e_s))
-  //         << std::endl;
-  return e_rs * std::log(e_rs / (e_r * e_s));
 }
 
 inline Move_Results get_move_results(const Node* node,
