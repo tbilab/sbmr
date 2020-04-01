@@ -1,4 +1,3 @@
-#include "../collapse_blocks.h"
 #include "../network.h"
 #include "build_testing_networks.h"
 #include "catch.hpp"
@@ -12,7 +11,7 @@ TEST_CASE("Agglomerative merge step - Simple Bipartite", "[SBM]")
   REQUIRE(num_initial_blocks == 6);
 
   // Run aglomerative merge with best single merge done
-  const auto single_merge = agglomerative_merge(my_sbm,
+  const auto single_merge = agglomerative_merge(&my_sbm,
                                                 1,    // block_level,
                                                 1,    // num_merges_to_make,
                                                 5,    // num_checks_per_block,
@@ -29,7 +28,7 @@ TEST_CASE("Agglomerative merge step - Simple Bipartite", "[SBM]")
   // Run again but this time merging the best 2
   auto new_sbm = simple_bipartite();
 
-  const auto double_merge = agglomerative_merge(new_sbm,
+  const auto double_merge = agglomerative_merge(&new_sbm,
                                                 1,    // block_level,
                                                 2,    // num_merges_to_make,
                                                 5,    // num_checks_per_block,
@@ -52,7 +51,7 @@ TEST_CASE("Agglomerative merge step - Simple Unipartite", "[SBM]")
   my_sbm.initialize_blocks(num_initial_blocks);
 
   // Run aglomerative merge with best single merge done
-  const auto single_merge = agglomerative_merge(my_sbm,
+  const auto single_merge = agglomerative_merge(&my_sbm,
                                                 1,    // block_level,
                                                 1,    // num_merges_to_make,
                                                 5,    // num_checks_per_block,
@@ -71,7 +70,7 @@ TEST_CASE("Agglomerative merge step - Simple Unipartite", "[SBM]")
   new_sbm.remove_block_levels_above(0);
   new_sbm.initialize_blocks(num_initial_blocks);
 
-  const auto double_merge = agglomerative_merge(new_sbm,
+  const auto double_merge = agglomerative_merge(&new_sbm,
                                                 1,    // block_level,
                                                 2,    // num_merges_to_make,
                                                 5,    // num_checks_per_block,
@@ -88,8 +87,7 @@ TEST_CASE("Collapse Blocks (no MCMC) - Simple Bipartite", "[SBM]")
 {
   auto my_sbm = simple_bipartite();
 
-  auto collapse_to_2_res = collapse_blocks(my_sbm,
-                                           0,     // node_level,
+  auto collapse_to_2_res = my_sbm.collapse_blocks(0,     // node_level,
                                            2,     // B_end,
                                            5,     // n_checks_per_block,
                                            0,     // n_mcmc_sweeps,
@@ -111,8 +109,7 @@ TEST_CASE("Collapse Blocks (no MCMC) - Simple Bipartite", "[SBM]")
 
 
   // Now do a collapse to 3 total groups
-  auto collapse_to_3_res = collapse_blocks(my_sbm,
-                                           0,     // node_level,
+  auto collapse_to_3_res = my_sbm.collapse_blocks(0,     // node_level,
                                            3,     // B_end,
                                            5,     // n_checks_per_block,
                                            0,     // n_mcmc_sweeps,
@@ -133,8 +130,7 @@ TEST_CASE("Collapse Blocks (no MCMC) - Simple Bipartite", "[SBM]")
   REQUIRE(collapse_to_3_res.states.size() > 1);
 
   // Now do a collapse to 2 total groups but with one merge per step due to a sigma less than 1
-  auto collapse_to_2_full_res = collapse_blocks(my_sbm,
-                                                0,     // node_level,
+  auto collapse_to_2_full_res = my_sbm.collapse_blocks(0,     // node_level,
                                                 2,     // B_end,
                                                 5,     // n_checks_per_block,
                                                 0,     // n_mcmc_sweeps,
@@ -155,8 +151,7 @@ TEST_CASE("Collapse Blocks (no MCMC) - Simple Bipartite", "[SBM]")
   REQUIRE(collapse_to_2_full_res.states.size() == 8 - 2);
 
   // Can't collapse network to a single block because we have more than 1 type
-  REQUIRE_THROWS(collapse_blocks(my_sbm,
-                                 0,      // node_level,
+  REQUIRE_THROWS(my_sbm.collapse_blocks(0,      // node_level,
                                  1,      // B_end,
                                  5,      // n_checks_per_block,
                                  0,      // n_mcmc_sweeps,
@@ -170,8 +165,7 @@ TEST_CASE("Collapse Blocks (no MCMC) - Simple Unipartite", "[SBM]")
 {
   auto my_sbm = simple_unipartite();
 
-  auto collapse_to_2_res = collapse_blocks(my_sbm,
-                                           0,     // node_level,
+  auto collapse_to_2_res = my_sbm.collapse_blocks(0,     // node_level,
                                            2,     // B_end,
                                            5,     // n_checks_per_block,
                                            0,     // n_mcmc_sweeps,
@@ -193,8 +187,7 @@ TEST_CASE("Collapse Blocks (no MCMC) - Simple Unipartite", "[SBM]")
 
 
   // Now do a collapse to 3 total groups
-  auto collapse_to_3_res = collapse_blocks(my_sbm,
-                                           0,     // node_level,
+  auto collapse_to_3_res = my_sbm.collapse_blocks(0,     // node_level,
                                            3,     // B_end,
                                            5,     // n_checks_per_block,
                                            0,     // n_mcmc_sweeps,
@@ -215,8 +208,7 @@ TEST_CASE("Collapse Blocks (no MCMC) - Simple Unipartite", "[SBM]")
   REQUIRE(collapse_to_3_res.states.size() > 1);
 
   // Now do a collapse to 2 total groups but with one merge per step due to a sigma less than 1
-  auto collapse_to_2_full_res = collapse_blocks(my_sbm,
-                                                0,     // node_level,
+  auto collapse_to_2_full_res = my_sbm.collapse_blocks( 0,     // node_level,
                                                 2,     // B_end,
                                                 5,     // n_checks_per_block,
                                                 0,     // n_mcmc_sweeps,
@@ -241,8 +233,7 @@ TEST_CASE("Collapse Blocks (w/ MCMC) - Simple Bipartite", "[SBM]")
 {
   auto my_sbm = simple_bipartite();
 
-  auto collapse_to_2_res = collapse_blocks(my_sbm,
-                                           0,     // node_level,
+  auto collapse_to_2_res = my_sbm.collapse_blocks(0,     // node_level,
                                            2,     // B_end,
                                            5,     // n_checks_per_block,
                                            5,     // n_mcmc_sweeps,
@@ -263,8 +254,7 @@ TEST_CASE("Collapse Blocks (w/ MCMC) - Simple Unipartite", "[SBM]")
 {
   auto my_sbm = simple_unipartite();
 
-  auto collapse_to_2_res = collapse_blocks(my_sbm,
-                                           0,     // node_level,
+  auto collapse_to_2_res = my_sbm.collapse_blocks(0,     // node_level,
                                            2,     // B_end,
                                            5,     // n_checks_per_block,
                                            5,     // n_mcmc_sweeps,

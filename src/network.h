@@ -5,9 +5,10 @@
 #include "Block_Consensus.h"
 #include "Sampler.h"
 #include "get_move_results.h"
+#include "agglomerative_merge.h"
 
-#include "unordered_map"
 #include "vector_helpers.h"
+
 #include <unordered_map>
 
 // These are seperate and will change based on compiler environemnt and only apply to the
@@ -18,19 +19,6 @@ using Input_Int_Vec    = std::vector<int>;
 template <typename T>
 using String_Map = std::unordered_map<string, T>;
 
-struct MCMC_Sweeps {
-  std::vector<double> sweep_entropy_delta;
-  std::vector<int> sweep_num_nodes_moved;
-  Block_Consensus block_consensus;
-  std::vector<string> nodes_moved;
-  double entropy_delta = 0.0;
-  MCMC_Sweeps(const int n)
-  {
-    // Preallocate the entropy change and num groups moved in sweep vectors and
-    sweep_entropy_delta.reserve(n);
-    sweep_num_nodes_moved.reserve(n);
-  }
-};
 
 struct State_Dump {
   std::vector<string> ids;
@@ -52,6 +40,31 @@ enum Partite_Structure {
   unipartite,             // One node type
   multipartite,           // Multiple node types, all possible edges between non_like types allowed
   multipartite_restricted // Multiple node types, only specific type combos allowed for edges
+};
+
+struct MCMC_Sweeps {
+  std::vector<double> sweep_entropy_delta;
+  std::vector<int> sweep_num_nodes_moved;
+  Block_Consensus block_consensus;
+  std::vector<string> nodes_moved;
+  double entropy_delta = 0.0;
+  MCMC_Sweeps(const int n)
+  {
+    // Preallocate the entropy change and num groups moved in sweep vectors and
+    sweep_entropy_delta.reserve(n);
+    sweep_num_nodes_moved.reserve(n);
+  }
+};
+
+struct Collapse_Results {
+  double entropy_delta = 0; // Will keep track of the overall entropy change from this collapse
+  int num_blocks;
+  std::vector<Block_Mergers> merge_steps; // Will keep track of results at each step of the merger
+  std::vector<State_Dump> states;
+  Collapse_Results(const int n)
+      : num_blocks(n)
+  {
+  }
 };
 
 class SBM_Network {
@@ -469,6 +482,95 @@ class SBM_Network {
   {
     return propose_move(node, node->level(), eps);
   }
+
+  Collapse_Results collapse_blocks(const int node_level,
+                                        const int B_end,
+                                        const int n_checks_per_block,
+                                        const int n_mcmc_sweeps,
+                                        const double& sigma,
+                                        const double& eps,
+                                        const bool report_all_steps = true,
+                                        const bool allow_exhaustive = true)
+{
+  // Make sure we have at least one final block per node type
+  if (num_types() > B_end) LOGIC_ERROR("Can't collapse a network with "
+                                           + as_str(num_types()) + " node types to "
+                                           + as_str(B_end)
+                                           + " blocks.\n There needs to be at least one block per node type.");
+
+  const int block_level = node_level + 1;
+  const bool using_mcmc = n_mcmc_sweeps > 0;
+
+  // Initialize struct to hold results of collapse
+  auto results = Collapse_Results(B_end);
+
+  // Remove any existing block level(s)
+  remove_block_levels_above(node_level);
+
+  // Initialize one-block-per-node
+  initialize_blocks();
+
+  // Setup variable to track the current number of blocks in the model
+  int B_cur = num_nodes_at_level(block_level);
+
+  // Lambda to calculate how many merges a step needs
+  auto calc_num_merges = [&B_end, &sigma](const int B) {
+    // How many blocks the sigma hueristic wants network to have after next move
+    // max of this value and target is taken to avoid overshooting goal
+    const int B_next = std::max(int(std::floor(double(B) / sigma)),
+                                B_end);
+
+    return std::max(B - B_next, 1);
+  };
+
+  // Keep doing merges until we've reached the desired number of blocks
+  while (B_cur > B_end) {
+    const int n_merges_to_make = calc_num_merges(B_cur);
+
+    // Perform merges
+    auto merge_result = agglomerative_merge(this,
+                                            block_level,
+                                            n_merges_to_make,
+                                            n_checks_per_block,
+                                            eps,
+                                            allow_exhaustive);
+    // Update B_cur
+    B_cur -= n_merges_to_make;
+
+    if (using_mcmc) {
+      // Update the merge results entropy delta with the changes caused by MCMC sweep
+      merge_result.entropy_delta += mcmc_sweep(n_mcmc_sweeps,
+                                                   eps,        // eps
+                                                   false,      // variable num blocks
+                                                   false,      // track pairs
+                                                   node_level, // level
+                                                   false)      // verbose
+                                        .entropy_delta;
+
+      // Check to see if we have any empty blocks after our MCMC sweep and remove them
+      auto empty_blocks = Node_Vec();
+      for_all_nodes_at_level(block_level, [&empty_blocks](const Node_UPtr& node) {
+        if (node->is_empty()) empty_blocks.push_back(node.get());
+      });
+
+      // Update current number of blocks to account for the empty blocks
+      B_cur -= empty_blocks.size();
+
+      // Remove those empty blocks
+      for (const auto& empty_block : empty_blocks) delete_node(empty_block);
+    }
+
+    // Update results stuct
+    results.entropy_delta += merge_result.entropy_delta;
+
+    if (report_all_steps) {
+      results.merge_steps.push_back(merge_result);
+      results.states.push_back(state());
+    }
+  }
+
+  return results;
+}
 
   // =============================================================================
   // Runs efficient MCMC sweep algorithm on desired node level

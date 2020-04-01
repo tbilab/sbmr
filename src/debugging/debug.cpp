@@ -10,8 +10,7 @@ int main(int argc, char** argv)
 {
   auto my_sbm = simple_bipartite();
 
-  auto collapse_to_2_res = collapse_blocks(my_sbm,
-                                           0,     // node_level,
+  auto collapse_to_2_res = my_sbm.collapse_blocks(0,     // node_level,
                                            2,     // B_end,
                                            5,     // n_checks_per_block,
                                            0,     // n_mcmc_sweeps,
