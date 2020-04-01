@@ -125,9 +125,8 @@ inline MCMC_Sweeps mcmc_sweep(SBM_Network& net,
           // the new block is empty block, this move will cause there to be no
           // empty blocks for this type
           const bool old_wont_be_empty = old_block->num_children() > 1;
-          const bool new_is_empty      = proposed_new_block->is_empty();
 
-          if (new_is_empty) {
+          if (proposed_new_block->is_empty()) {
             if (old_wont_be_empty) {
               // Need to add a new block node as we wont have any empty ones left
               net.add_block_node(curr_node->type(), block_level);
