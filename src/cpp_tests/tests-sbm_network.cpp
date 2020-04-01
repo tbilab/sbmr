@@ -168,20 +168,20 @@ TEST_CASE("Metablock initialization", "[Network]")
   REQUIRE(my_net.num_nodes_at_level(2) == 4);
 
   // Now remove the metablocks
-  my_net.set_highest_level(1);
+  my_net.remove_block_levels_above(1);
 
   // Should be back to two levels
   REQUIRE(my_net.num_levels() == 2);
 
   // Remove the blocks
-  my_net.set_highest_level(0);
+  my_net.remove_block_levels_above(0);
   REQUIRE(my_net.num_levels() == 1);
 
   // Cant remove data level of nodes when no levels are left
-  REQUIRE_THROWS(my_net.set_highest_level(-1));
+  REQUIRE_THROWS(my_net.remove_block_levels_above(-1));
   
   // Also cant set highest level above what currently exisets
-  REQUIRE_THROWS(my_net.set_highest_level(3));
+  REQUIRE_THROWS(my_net.remove_block_levels_above(3));
 }
 
 TEST_CASE("Swapping of blocks", "[Network]")
@@ -516,7 +516,7 @@ TEST_CASE("Counting edges", "[Network]")
   Node* b5 = my_net.add_node("b5", "b");
 
   // level one blocks
-  my_net.build_level();
+  my_net.build_block_level();
   Node* a11 = my_net.add_node("a11", "a", 1);
   Node* a12 = my_net.add_node("a12", "a", 1);
   Node* a13 = my_net.add_node("a13", "a", 1);
@@ -525,7 +525,7 @@ TEST_CASE("Counting edges", "[Network]")
   Node* b13 = my_net.add_node("b13", "b", 1);
 
   // level two blocks
-  my_net.build_level();
+  my_net.build_block_level();
   Node* a21 = my_net.add_node("a21", "a", 2);
   Node* a22 = my_net.add_node("a22", "a", 2);
   Node* b21 = my_net.add_node("b21", "b", 2);

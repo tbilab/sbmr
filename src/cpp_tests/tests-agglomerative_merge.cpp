@@ -50,7 +50,7 @@ TEST_CASE("Agglomerative merge steps - Simple Unipartite", "[SBM]")
 
   auto my_sbm = simple_unipartite();
   // We need to erase the original block stucture and give every node its own block to have enough blocks for this
-  my_sbm.set_highest_level(0);
+  my_sbm.remove_block_levels_above(0);
   my_sbm.initialize_blocks(num_initial_blocks);
 
   // Run aglomerative merge with best single merge done
@@ -70,7 +70,7 @@ TEST_CASE("Agglomerative merge steps - Simple Unipartite", "[SBM]")
 
   // Run again but this time merging the best 2
   auto new_sbm = simple_unipartite();
-  new_sbm.set_highest_level(0);
+  new_sbm.remove_block_levels_above(0);
   new_sbm.initialize_blocks(num_initial_blocks);
 
   const auto double_merge = agglomerative_merge(new_sbm,

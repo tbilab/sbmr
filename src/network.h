@@ -129,7 +129,7 @@ class SBM_Network {
                            ? multipartite
                            : multipartite_restricted)
   {
-    build_level(node_ids.size()); // Setup empty first level of nodes with conservative space reserving
+    build_block_level(node_ids.size()); // Setup empty first level of nodes with conservative space reserving
 
     // Fill in map to get allowed connection types if they are provided
     if (edge_types == multipartite_restricted) {
@@ -317,7 +317,7 @@ class SBM_Network {
     const int child_level         = block_level - 1;
 
     // Build empty level
-    build_level(one_block_per_node ? 0 : num_blocks);
+    build_block_level(one_block_per_node ? 0 : num_blocks);
 
     // Loop over all node types
     for (int type_i = 0; type_i < num_types(); type_i++) {
@@ -352,7 +352,7 @@ class SBM_Network {
     }
   }
 
-  void build_level(const int reserve_size = 0)
+  void build_block_level(const int reserve_size = 0)
   {
     nodes.emplace_back(num_types());
 
@@ -364,7 +364,7 @@ class SBM_Network {
     }
   }
 
-  void set_highest_level(const int last_level_index)
+  void remove_block_levels_above(const int last_level_index)
   {
     const int highest_index = num_levels() - 1;
 
@@ -480,8 +480,8 @@ class SBM_Network {
                     const std::vector<int>& levels,
                     const std::vector<string>& types)
   {
-    set_highest_level(0); // Remove all block levels
-    build_level();   // Add an empty block level to fill in
+    remove_block_levels_above(0); // Remove all block levels
+    build_block_level();   // Add an empty block level to fill in
 
     // Make a copy of the id_to_node map (We will later overwrite it)
     String_Map<Node*> node_by_id = id_to_node;
@@ -501,7 +501,7 @@ class SBM_Network {
       // Swap the maps as the blocks are now the child nodes
       if (last_level != level) {
         node_by_id = std::move(block_by_id); // block_by_id will be empty now
-        build_level();                       // Setup new level for blocks
+        build_block_level();                       // Setup new level for blocks
         last_level = level;                  // Update the current level
       }
 

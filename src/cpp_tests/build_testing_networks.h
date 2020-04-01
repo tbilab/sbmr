@@ -19,7 +19,7 @@ inline SBM_Network simple_bipartite()
   Node* b4 = my_sbm.add_node("b4", "b");
 
   // Make blocks
-  my_sbm.build_level();
+  my_sbm.build_block_level();
   Node* a11 = my_sbm.add_node("a11", "a", 1);
   Node* a12 = my_sbm.add_node("a12", "a", 1);
   Node* a13 = my_sbm.add_node("a13", "a", 1);
@@ -80,7 +80,7 @@ inline SBM_Network simple_unipartite()
   my_SBM.add_edge("n5", "n6");
 
   // Make 3 blocks
-  my_SBM.build_level();
+  my_SBM.build_block_level();
   Node* a = my_SBM.add_node("a", "a", 1);
   Node* b = my_SBM.add_node("b", "a", 1);
   Node* c = my_SBM.add_node("c", "a", 1);
