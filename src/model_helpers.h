@@ -1,3 +1,5 @@
+#pragma once
+
 // Helper functions that get used throughout code 
 #include <map>
 
