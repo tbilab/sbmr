@@ -55,9 +55,12 @@ inline Collapse_Results collapse_blocks(SBM_Network& net,
 
   // Lambda to calculate how many merges a step needs
   auto calc_num_merges = [&B_end, &sigma](const int B) {
-    const int target_num      = std::floor(double(B) / sigma);
-    const int merges_till_end = B - B_end;
-    return std::max(std::min(target_num, merges_till_end), 1);
+    // How many blocks the sigma hueristic wants network to have after next move
+    // max of this value and target is taken to avoid overshooting goal
+    const int B_next = std::max(int(std::floor(double(B) / sigma)),
+                                B_end);
+
+    return std::max(B - B_next, 1);
   };
 
   // Keep doing merges until we've reached the desired number of blocks
