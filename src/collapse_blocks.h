@@ -74,6 +74,8 @@ inline Collapse_Results collapse_blocks(SBM_Network& net,
                                             n_checks_per_block,
                                             eps,
                                             allow_exhaustive);
+    // Update B_cur
+    B_cur -= n_merges_to_make;
 
     if (using_mcmc) {
       // Update the merge results entropy delta with the changes caused by MCMC sweep
@@ -85,6 +87,18 @@ inline Collapse_Results collapse_blocks(SBM_Network& net,
                                                node_level, // level
                                                false)      // verbose
                                         .entropy_delta;
+
+      // Check to see if we have any empty blocks after our MCMC sweep and remove them
+      auto empty_blocks = Node_Vec();
+      net.for_all_nodes_at_level(block_level, [&empty_blocks](const Node_UPtr& node) {
+        if (node->num_children() == 0) empty_blocks.push_back(node.get());
+      });
+
+      // Update current number of blocks to account for the empty blocks
+      B_cur -= empty_blocks.size();
+
+      // Remove those empty blocks
+      for (const auto& empty_block : empty_blocks) net.delete_node(empty_block);
     }
 
     // Update results stuct
@@ -95,8 +109,7 @@ inline Collapse_Results collapse_blocks(SBM_Network& net,
       results.states.push_back(net.state());
     }
 
-    // Update B_cur
-    B_cur -= n_merges_to_make;
+    
   }
 
   return results;
