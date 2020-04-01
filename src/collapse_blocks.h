@@ -89,4 +89,6 @@ inline Collapse_Results collapse_blocks(SBM_Network& net,
     // Update B_cur
     B_cur -= n_merges_to_make;
   }
+
+  return results;
 }
