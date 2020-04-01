@@ -1,6 +1,6 @@
 #pragma once
 
-#include "network.h"
+#include "Node.h"
 #include <unordered_map>
 #include <unordered_set>
 
