@@ -241,7 +241,7 @@ class SBM_Network {
   }
 
   // =========================================================================
-  // Modification
+  // Node Modification
   // =========================================================================
   Node* add_node(const std::string& id,
                  const std::string& type = "a",
@@ -270,11 +270,6 @@ class SBM_Network {
     return node_ptr;
   }
 
-  Node* add_block_node(const int type_index, const int level = 1)
-  {
-    return add_node("bl_" + types[type_index] + "_" + as_str(block_counter++), type_index, level);
-  }
-
   template <typename Node_Ref>
   void delete_node(const Node_Ref& node_to_remove)
   {
@@ -283,20 +278,6 @@ class SBM_Network {
 
     if (!delete_successful)
       LOGIC_ERROR("Tried to delete a node that doesn't exist");
-  }
-
-  void merge_blocks(Node* absorbed_block, Node* absorbing_block)
-  {
-    // Place all children of absorbed block into absorbing block
-    for (const auto& child_node : absorbed_block->children()) {
-      // Don't bother wasting computation on removing the child node
-      // from the absorbed block's children's list.
-      child_node->set_parent(absorbing_block, false);
-    }
-
-    // Remove all children before removing and trigger destructor
-    absorbed_block->empty_children();
-    delete_node(absorbed_block);
   }
 
   void add_edge(const string& node_a, const string& node_b)
@@ -308,6 +289,28 @@ class SBM_Network {
 
     a->add_neighbor(b);
     b->add_neighbor(a);
+  }
+
+  void shuffle_nodes(const int type, const int level)
+  {
+    check_for_level(level);
+    check_for_type(type);
+    sampler.shuffle(nodes[level][type]);
+  }
+
+  // =========================================================================
+  // Block Specific Modification (node levels 1+)
+  // =========================================================================
+  void build_block_level(const int reserve_size = 0)
+  {
+    nodes.emplace_back(num_types());
+
+    // If we were told to reserve a size for each type vec, do so.
+    if (reserve_size > 0) {
+      for (auto& type_vec : nodes.at(num_levels() - 1)) {
+        type_vec.reserve(reserve_size);
+      }
+    }
   }
 
   void initialize_blocks(int num_blocks = -1)
@@ -352,23 +355,30 @@ class SBM_Network {
     }
   }
 
-  void build_block_level(const int reserve_size = 0)
+  Node* add_block_node(const int type_index, const int level = 1)
   {
-    nodes.emplace_back(num_types());
+    return add_node("bl_" + types[type_index] + "_" + as_str(block_counter++), type_index, level);
+  }
 
-    // If we were told to reserve a size for each type vec, do so.
-    if (reserve_size > 0) {
-      for (auto& type_vec : nodes.at(num_levels() - 1)) {
-        type_vec.reserve(reserve_size);
-      }
+  void merge_blocks(Node* absorbed_block, Node* absorbing_block)
+  {
+    // Place all children of absorbed block into absorbing block
+    for (const auto& child_node : absorbed_block->children()) {
+      // Don't bother wasting computation on removing the child node
+      // from the absorbed block's children's list.
+      child_node->set_parent(absorbing_block, false);
     }
+
+    // Remove all children before removing and trigger destructor
+    absorbed_block->empty_children();
+    delete_node(absorbed_block);
   }
 
   void remove_block_levels_above(const int last_level_index)
   {
     const int highest_index = num_levels() - 1;
 
-    // Make sure request makes sense. 
+    // Make sure request makes sense.
     if (last_level_index < 0) LOGIC_ERROR("Can't remove data level");
     if (last_level_index > highest_index) LOGIC_ERROR("Can't set highest level to "
                                                       + as_str(last_level_index)
@@ -383,13 +393,6 @@ class SBM_Network {
       // Remove the last layer of nodes.
       nodes.pop_back();
     }
-  }
-
-  void shuffle_nodes(const int type, const int level)
-  {
-    check_for_level(level);
-    check_for_type(type);
-    sampler.shuffle(nodes[level][type]);
   }
 
   // =============================================================================
@@ -413,7 +416,6 @@ class SBM_Network {
         LOGIC_ERROR("Tried to delete a node that doesn't exist");
     }
   }
-
 
   Node* propose_move(Node* node, const int level_of_proposed, const double eps = 0.1)
   {
@@ -441,12 +443,14 @@ class SBM_Network {
   }
 
   // Default proposal that returns a potential new parent block
-  Node* propose_move(Node* node, const double eps = 0.1){
+  Node* propose_move(Node* node, const double eps = 0.1)
+  {
     return propose_move(node, node->level() + 1, eps);
   }
 
   // Propose a merger with another node
-  Node* propose_merge(Node* node, const double eps = 0.1){
+  Node* propose_merge(Node* node, const double eps = 0.1)
+  {
     return propose_move(node, node->level(), eps);
   }
 
@@ -481,7 +485,7 @@ class SBM_Network {
                     const std::vector<string>& types)
   {
     remove_block_levels_above(0); // Remove all block levels
-    build_block_level();   // Add an empty block level to fill in
+    build_block_level();          // Add an empty block level to fill in
 
     // Make a copy of the id_to_node map (We will later overwrite it)
     String_Map<Node*> node_by_id = id_to_node;
@@ -501,7 +505,7 @@ class SBM_Network {
       // Swap the maps as the blocks are now the child nodes
       if (last_level != level) {
         node_by_id = std::move(block_by_id); // block_by_id will be empty now
-        build_block_level();                       // Setup new level for blocks
+        build_block_level();                 // Setup new level for blocks
         last_level = level;                  // Update the current level
       }
 
