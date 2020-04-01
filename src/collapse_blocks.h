@@ -32,6 +32,12 @@ inline Collapse_Results collapse_blocks(SBM_Network& net,
                                         const bool report_all_steps = true,
                                         const bool allow_exhaustive = true)
 {
+  // Make sure we have at least one final block per node type
+  if (net.num_types() < B_end) LOGIC_ERROR("Can't collapse a network with "
+                                           + as_str(net.num_types()) + " node types to "
+                                           + as_str(B_end)
+                                           + " blocks.\n There needs to be at least one block per node type.");
+
   const int block_level = node_level + 1;
   const bool using_mcmc = n_mcmc_sweeps > 0;
 
