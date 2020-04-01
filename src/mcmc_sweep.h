@@ -125,7 +125,7 @@ inline MCMC_Sweeps mcmc_sweep(SBM_Network& net,
           // the new block is empty block, this move will cause there to be no
           // empty blocks for this type
           const bool old_wont_be_empty = old_block->num_children() > 1;
-          const bool new_is_empty      = proposed_new_block->num_children() == 0;
+          const bool new_is_empty      = proposed_new_block->is_empty();
 
           if (new_is_empty) {
             if (old_wont_be_empty) {
@@ -178,7 +178,7 @@ inline MCMC_Sweeps mcmc_sweep(SBM_Network& net,
     // Cleanup the single empty block for each type
     for (const auto& blocks_of_type : net.get_nodes_at_level(block_level)) {
       for (const auto& block : blocks_of_type) {
-        if (block->num_children() == 0) {
+        if (block->is_empty()) {
           net.delete_node(block);
           break; // No need to continue so break out (also would cause problems because we just modified the vector we're looping over)
         }

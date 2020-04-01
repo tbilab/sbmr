@@ -108,6 +108,11 @@ class Node {
     return _children.size();
   }
 
+  bool is_empty() const
+  {
+    return num_children() == 0;
+  }
+
   bool has_child(Node* node) const
   {
     return std::find(_children.begin(), _children.end(), node) != _children.end();

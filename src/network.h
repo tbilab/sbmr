@@ -409,7 +409,7 @@ class SBM_Network {
     child_node->set_parent(new_block);
 
     // If the old block is now empty and we're removing empty blocks, delete it
-    if (has_old_block && remove_empty && old_block->num_children() == 0) {
+    if (has_old_block && remove_empty && old_block->is_empty()) {
       auto& block_vector           = nodes[old_block->level()][old_block->type()];
       const bool delete_successful = delete_from_vector(block_vector, old_block);
 

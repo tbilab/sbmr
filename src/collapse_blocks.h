@@ -91,7 +91,7 @@ inline Collapse_Results collapse_blocks(SBM_Network& net,
       // Check to see if we have any empty blocks after our MCMC sweep and remove them
       auto empty_blocks = Node_Vec();
       net.for_all_nodes_at_level(block_level, [&empty_blocks](const Node_UPtr& node) {
-        if (node->num_children() == 0) empty_blocks.push_back(node.get());
+        if (node->is_empty()) empty_blocks.push_back(node.get());
       });
 
       // Update current number of blocks to account for the empty blocks
