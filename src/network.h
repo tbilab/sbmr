@@ -22,6 +22,7 @@ struct State_Dump {
   std::vector<string> types;
   std::vector<string> parents;
   std::vector<int> levels;
+  State_Dump() {};
   State_Dump(const int size)
   {
     ids.reserve(size);
