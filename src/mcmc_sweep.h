@@ -9,6 +9,7 @@ struct MCMC_Sweeps {
   std::vector<int> sweep_num_nodes_moved;
   Block_Consensus block_consensus;
   std::vector<string> nodes_moved;
+  double entropy_delta = 0.0;
   MCMC_Sweeps(const int n)
   {
     // Preallocate the entropy change and num groups moved in sweep vectors and
@@ -164,6 +165,7 @@ inline MCMC_Sweeps mcmc_sweep(SBM_Network& net,
     // Update results for this sweep
     results.sweep_num_nodes_moved.push_back(num_nodes_moved);
     results.sweep_entropy_delta.push_back(entropy_delta);
+    results.entropy_delta += entropy_delta;
 
     // Update the concensus pairs map with results if needed.
     if (track_pairs) {
