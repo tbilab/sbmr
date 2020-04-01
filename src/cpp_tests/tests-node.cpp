@@ -1,5 +1,4 @@
 #include "../Node.h"
-#include "print_helpers.h"
 #include "catch.hpp"
 
 TEST_CASE("Basic Initialization", "[Node]")

@@ -26,7 +26,6 @@ fi
 g++ -std=c++11 ${OPTIMIZATION_LEVEL} -DNO_RCPP=1\
   cpp_tests/tests-main.o \
   cpp_tests/tests-node.cpp \
-  cpp_tests/tests-edge.cpp \
   cpp_tests/tests-sampler.cpp \
   cpp_tests/tests-sbm_network.cpp \
   cpp_tests/tests-Block_Concensus.cpp \
