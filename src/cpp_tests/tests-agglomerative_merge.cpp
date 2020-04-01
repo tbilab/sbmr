@@ -165,3 +165,74 @@ TEST_CASE("Collapse Blocks (no MCMC) - Simple Bipartite", "[SBM]")
                                  true,   // report all steps,
                                  true)); // Allow exhaustive)
 }
+
+TEST_CASE("Collapse Blocks (no MCMC) - Simple Unipartite", "[SBM]")
+{
+  auto my_sbm = simple_unipartite();
+
+  auto collapse_to_2_res = collapse_blocks(my_sbm,
+                                           0,     // node_level,
+                                           2,     // B_end,
+                                           5,     // n_checks_per_block,
+                                           0,     // n_mcmc_sweeps,
+                                           1.1,   // sigma,
+                                           0.01,  // eps,
+                                           true,  // report all steps,
+                                           true); // Allow exhaustive
+
+  // Does the network have the requested number of blocks?
+  REQUIRE(my_sbm.num_nodes_at_level(1) == 2);
+
+  // Was entropy delta strictly positive?
+  // Make sure entropy has gone up as we would expect
+  REQUIRE(collapse_to_2_res.entropy_delta > 0);
+
+  // Are our step reporting vectors the correct size?
+  REQUIRE(collapse_to_2_res.merge_steps.size() > 1);
+  REQUIRE(collapse_to_2_res.states.size() > 1);
+
+
+  // Now do a collapse to 3 total groups
+  auto collapse_to_3_res = collapse_blocks(my_sbm,
+                                           0,     // node_level,
+                                           3,     // B_end,
+                                           5,     // n_checks_per_block,
+                                           0,     // n_mcmc_sweeps,
+                                           1.1,   // sigma,
+                                           0.01,  // eps,
+                                           true,  // report all steps,
+                                           true); // Allow exhaustive
+
+  // Does the network have the requested number of blocks?
+  REQUIRE(my_sbm.num_nodes_at_level(1) == 3);
+
+  // Was entropy delta strictly positive?
+  // Make sure entropy has gone up as we would expect
+  REQUIRE(collapse_to_3_res.entropy_delta > 0);
+
+  // Are our step reporting vectors the correct size?
+  REQUIRE(collapse_to_3_res.merge_steps.size() > 1);
+  REQUIRE(collapse_to_3_res.states.size() > 1);
+
+  // Now do a collapse to 2 total groups but with one merge per step due to a sigma less than 1
+  auto collapse_to_2_full_res = collapse_blocks(my_sbm,
+                                                0,     // node_level,
+                                                2,     // B_end,
+                                                5,     // n_checks_per_block,
+                                                0,     // n_mcmc_sweeps,
+                                                0.8,   // sigma,
+                                                0.01,  // eps,
+                                                true,  // report all steps,
+                                                true); // Allow exhaustive
+
+  // Does the network have the requested number of blocks?
+  REQUIRE(my_sbm.num_nodes_at_level(1) == 2);
+
+  // Was entropy delta strictly positive?
+  // Make sure entropy has gone up as we would expect
+  REQUIRE(collapse_to_2_full_res.entropy_delta > 0);
+
+  // Are our step reporting vectors the correct size?
+  REQUIRE(collapse_to_2_full_res.merge_steps.size() == 6 - 2);
+  REQUIRE(collapse_to_2_full_res.states.size() == 6 - 2);
+}
