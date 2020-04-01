@@ -364,31 +364,25 @@ class SBM_Network {
     }
   }
 
-  void remove_higher_levels(const int last_level_index)
+  void set_highest_level(const int last_level_index)
   {
+    const int highest_index = num_levels() - 1;
+
+    // Make sure request makes sense. 
+    if (last_level_index < 0) LOGIC_ERROR("Can't remove data level");
+    if (last_level_index > highest_index) LOGIC_ERROR("Can't set highest level to "
+                                                      + as_str(last_level_index)
+                                                      + ", highest level in network is "
+                                                      + as_str(highest_index));
+
     // Say we have three levels and want to get to just nodes (index = 0)
     // num_levels() = 3 - 0 - 1 -> remove 2 levels
-    const int num_levels_to_remove = num_levels() - last_level_index - 1;
+    const int num_levels_to_remove = highest_index - last_level_index;
 
     for (int i = 0; i < num_levels_to_remove; i++) {
       // Remove the last layer of nodes.
       nodes.pop_back();
     }
-  }
-
-  void remove_blocks()
-  {
-    remove_higher_levels(0);
-  }
-
-  void remove_last_level()
-  {
-    // Only show error if trying to delete a single block.
-    if (no_blocks())
-      LOGIC_ERROR("No block level to delete.");
-
-    // Remove the last layer of nodes.
-    nodes.pop_back();
   }
 
   void shuffle_nodes(const int type, const int level)
@@ -486,7 +480,7 @@ class SBM_Network {
                     const std::vector<int>& levels,
                     const std::vector<string>& types)
   {
-    remove_blocks(); // Remove all block levels
+    set_highest_level(0); // Remove all block levels
     build_level();   // Add an empty block level to fill in
 
     // Make a copy of the id_to_node map (We will later overwrite it)
