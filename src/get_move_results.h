@@ -23,22 +23,6 @@ struct Move_Results {
   }
 };
 
-inline void reduce_edge_count(Node_Edge_Counts& count_map, const Node* block, const int dec_amt)
-{
-  const int new_value = count_map[block] - dec_amt;
-  // If we've reduced the value to zero, then remove from map
-  if (new_value == 0) {
-    count_map.erase(block);
-  } else {
-    count_map[block] = new_value;
-  }
-}
-
-inline void increase_edge_count(Node_Edge_Counts& count_map, const Node* block, const int inc_amt)
-{
-  count_map[block] += inc_amt;
-}
-
 inline Move_Results get_move_results(const Node* node,
                                      const Node* new_block,
                                      const int n_possible_neighbors,
