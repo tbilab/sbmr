@@ -1,10 +1,9 @@
 #include "../network.h"
-#include "../agglomerative_merge.h"
+#include "../collapse_blocks.h"
 #include "build_testing_networks.h"
 #include "catch.hpp"
 
-
-TEST_CASE("Agglomerative merge steps - Simple Bipartite", "[SBM]")
+TEST_CASE("Agglomerative merge step - Simple Bipartite", "[SBM]")
 {
   auto my_sbm = simple_bipartite();
 
@@ -43,8 +42,7 @@ TEST_CASE("Agglomerative merge steps - Simple Bipartite", "[SBM]")
   REQUIRE(single_merge.entropy_delta < double_merge.entropy_delta);
 }
 
-
-TEST_CASE("Agglomerative merge steps - Simple Unipartite", "[SBM]")
+TEST_CASE("Agglomerative merge step - Simple Unipartite", "[SBM]")
 {
   const int num_initial_blocks = 4;
 
@@ -84,4 +82,20 @@ TEST_CASE("Agglomerative merge steps - Simple Unipartite", "[SBM]")
 
   // Entropy should up even more with two merges
   REQUIRE(single_merge.entropy_delta < double_merge.entropy_delta);
+}
+
+
+TEST_CASE("Collapse Blocks (no MCMC) - Simple Bipartite", "[SBM]")
+{
+  auto my_sbm = simple_bipartite();
+
+  auto collapse_to_2_res = collapse_blocks(my_sbm,
+                                           0,     // node_level,
+                                           2,     // B_end,
+                                           5,     // n_checks_per_block,
+                                           0,     // n_mcmc_sweeps,
+                                           1.1,   // sigma,
+                                           0.01,  // eps,
+                                           true,  // report all steps,
+                                           true); // Allow exhaustive
 }
