@@ -74,7 +74,7 @@ inline double merge_entropy_delta(const Node_Pair& merge_pair)
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
 template <typename Network>
-inline Block_Mergers agglomerative_merge(Network& net,
+inline Block_Mergers agglomerative_merge(Network* net,
                                          const int block_level,
                                          const int num_merges_to_make,
                                          const int num_checks_per_block,
@@ -87,8 +87,8 @@ inline Block_Mergers agglomerative_merge(Network& net,
   // Priority queue to keep track of best moves
   Best_Move_Queue best_merges;
 
-  for (int type = 0; type < net.num_types(); type++) {
-    const auto& blocks_of_type = net.get_nodes_of_type(type, block_level);
+  for (int type = 0; type < net->num_types(); type++) {
+    const auto& blocks_of_type = net->get_nodes_of_type(type, block_level);
     const int n_blocks_of_type = blocks_of_type.size();
 
     // Compare how many checks will be done for merges. If this number is greater than just an exhaustive
@@ -114,7 +114,7 @@ inline Block_Mergers agglomerative_merge(Network& net,
         const auto block_i = block.get();
 
         for (int i = 0; i < num_checks_per_block; i++) {
-          Node* block_j = net.propose_merge(block_i, eps);
+          Node* block_j = net->propose_merge(block_i, eps);
 
           // Ignore if proposal if it's just the block itself
           if (block_i == block_j) continue;
@@ -174,7 +174,7 @@ inline Block_Mergers agglomerative_merge(Network& net,
 
   // Finally, go through and make all requested merges
   for (const auto& merge_pair : merges_to_make) {
-    net.merge_blocks(merge_pair.first(), merge_pair.second());
+    net->merge_blocks(merge_pair.first(), merge_pair.second());
   }
 
   return results;
