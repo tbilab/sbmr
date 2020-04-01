@@ -88,13 +88,13 @@ TEST_CASE("Collapse Blocks (no MCMC) - Simple Bipartite", "[SBM]")
   auto my_sbm = simple_bipartite();
 
   auto collapse_to_2_res = my_sbm.collapse_blocks(0,     // node_level,
-                                           2,     // B_end,
-                                           5,     // n_checks_per_block,
-                                           0,     // n_mcmc_sweeps,
-                                           1.1,   // sigma,
-                                           0.01,  // eps,
-                                           true,  // report all steps,
-                                           true); // Allow exhaustive
+                                                  2,     // B_end,
+                                                  5,     // n_checks_per_block,
+                                                  0,     // n_mcmc_sweeps,
+                                                  1.1,   // sigma,
+                                                  0.01,  // eps,
+                                                  true,  // report all steps,
+                                                  true); // Allow exhaustive
 
   // Does the network have the requested number of blocks?
   REQUIRE(my_sbm.num_nodes_at_level(1) == 2);
@@ -107,16 +107,15 @@ TEST_CASE("Collapse Blocks (no MCMC) - Simple Bipartite", "[SBM]")
   REQUIRE(collapse_to_2_res.merge_steps.size() > 1);
   REQUIRE(collapse_to_2_res.states.size() > 1);
 
-
   // Now do a collapse to 3 total groups
   auto collapse_to_3_res = my_sbm.collapse_blocks(0,     // node_level,
-                                           3,     // B_end,
-                                           5,     // n_checks_per_block,
-                                           0,     // n_mcmc_sweeps,
-                                           1.1,   // sigma,
-                                           0.01,  // eps,
-                                           true,  // report all steps,
-                                           true); // Allow exhaustive
+                                                  3,     // B_end,
+                                                  5,     // n_checks_per_block,
+                                                  0,     // n_mcmc_sweeps,
+                                                  1.1,   // sigma,
+                                                  0.01,  // eps,
+                                                  true,  // report all steps,
+                                                  true); // Allow exhaustive
 
   // Does the network have the requested number of blocks?
   REQUIRE(my_sbm.num_nodes_at_level(1) == 3);
@@ -131,13 +130,13 @@ TEST_CASE("Collapse Blocks (no MCMC) - Simple Bipartite", "[SBM]")
 
   // Now do a collapse to 2 total groups but with one merge per step due to a sigma less than 1
   auto collapse_to_2_full_res = my_sbm.collapse_blocks(0,     // node_level,
-                                                2,     // B_end,
-                                                5,     // n_checks_per_block,
-                                                0,     // n_mcmc_sweeps,
-                                                0.8,   // sigma,
-                                                0.01,  // eps,
-                                                true,  // report all steps,
-                                                true); // Allow exhaustive
+                                                       2,     // B_end,
+                                                       5,     // n_checks_per_block,
+                                                       0,     // n_mcmc_sweeps,
+                                                       0.8,   // sigma,
+                                                       0.01,  // eps,
+                                                       true,  // report all steps,
+                                                       true); // Allow exhaustive
 
   // Does the network have the requested number of blocks?
   REQUIRE(my_sbm.num_nodes_at_level(1) == 2);
@@ -152,13 +151,13 @@ TEST_CASE("Collapse Blocks (no MCMC) - Simple Bipartite", "[SBM]")
 
   // Can't collapse network to a single block because we have more than 1 type
   REQUIRE_THROWS(my_sbm.collapse_blocks(0,      // node_level,
-                                 1,      // B_end,
-                                 5,      // n_checks_per_block,
-                                 0,      // n_mcmc_sweeps,
-                                 0.8,    // sigma,
-                                 0.01,   // eps,
-                                 true,   // report all steps,
-                                 true)); // Allow exhaustive)
+                                        1,      // B_end,
+                                        5,      // n_checks_per_block,
+                                        0,      // n_mcmc_sweeps,
+                                        0.8,    // sigma,
+                                        0.01,   // eps,
+                                        true,   // report all steps,
+                                        true)); // Allow exhaustive)
 }
 
 TEST_CASE("Collapse Blocks (no MCMC) - Simple Unipartite", "[SBM]")
@@ -166,13 +165,13 @@ TEST_CASE("Collapse Blocks (no MCMC) - Simple Unipartite", "[SBM]")
   auto my_sbm = simple_unipartite();
 
   auto collapse_to_2_res = my_sbm.collapse_blocks(0,     // node_level,
-                                           2,     // B_end,
-                                           5,     // n_checks_per_block,
-                                           0,     // n_mcmc_sweeps,
-                                           1.1,   // sigma,
-                                           0.01,  // eps,
-                                           true,  // report all steps,
-                                           true); // Allow exhaustive
+                                                  2,     // B_end,
+                                                  5,     // n_checks_per_block,
+                                                  0,     // n_mcmc_sweeps,
+                                                  1.1,   // sigma,
+                                                  0.01,  // eps,
+                                                  true,  // report all steps,
+                                                  true); // Allow exhaustive
 
   // Does the network have the requested number of blocks?
   REQUIRE(my_sbm.num_nodes_at_level(1) == 2);
@@ -185,16 +184,15 @@ TEST_CASE("Collapse Blocks (no MCMC) - Simple Unipartite", "[SBM]")
   REQUIRE(collapse_to_2_res.merge_steps.size() > 1);
   REQUIRE(collapse_to_2_res.states.size() > 1);
 
-
   // Now do a collapse to 3 total groups
   auto collapse_to_3_res = my_sbm.collapse_blocks(0,     // node_level,
-                                           3,     // B_end,
-                                           5,     // n_checks_per_block,
-                                           0,     // n_mcmc_sweeps,
-                                           1.1,   // sigma,
-                                           0.01,  // eps,
-                                           true,  // report all steps,
-                                           true); // Allow exhaustive
+                                                  3,     // B_end,
+                                                  5,     // n_checks_per_block,
+                                                  0,     // n_mcmc_sweeps,
+                                                  1.1,   // sigma,
+                                                  0.01,  // eps,
+                                                  true,  // report all steps,
+                                                  true); // Allow exhaustive
 
   // Does the network have the requested number of blocks?
   REQUIRE(my_sbm.num_nodes_at_level(1) == 3);
@@ -208,14 +206,14 @@ TEST_CASE("Collapse Blocks (no MCMC) - Simple Unipartite", "[SBM]")
   REQUIRE(collapse_to_3_res.states.size() > 1);
 
   // Now do a collapse to 2 total groups but with one merge per step due to a sigma less than 1
-  auto collapse_to_2_full_res = my_sbm.collapse_blocks( 0,     // node_level,
-                                                2,     // B_end,
-                                                5,     // n_checks_per_block,
-                                                0,     // n_mcmc_sweeps,
-                                                0.8,   // sigma,
-                                                0.01,  // eps,
-                                                true,  // report all steps,
-                                                true); // Allow exhaustive
+  auto collapse_to_2_full_res = my_sbm.collapse_blocks(0,     // node_level,
+                                                       2,     // B_end,
+                                                       5,     // n_checks_per_block,
+                                                       0,     // n_mcmc_sweeps,
+                                                       0.8,   // sigma,
+                                                       0.01,  // eps,
+                                                       true,  // report all steps,
+                                                       true); // Allow exhaustive
 
   // Does the network have the requested number of blocks?
   REQUIRE(my_sbm.num_nodes_at_level(1) == 2);
@@ -234,15 +232,15 @@ TEST_CASE("Collapse Blocks (w/ MCMC) - Simple Bipartite", "[SBM]")
   auto my_sbm = simple_bipartite();
 
   auto collapse_to_2_res = my_sbm.collapse_blocks(0,     // node_level,
-                                           2,     // B_end,
-                                           5,     // n_checks_per_block,
-                                           5,     // n_mcmc_sweeps,
-                                           1.1,   // sigma,
-                                           0.01,  // eps,
-                                           true,  // report all steps,
-                                           true); // Allow exhaustive
+                                                  2,     // B_end,
+                                                  5,     // n_checks_per_block,
+                                                  5,     // n_mcmc_sweeps,
+                                                  1.1,   // sigma,
+                                                  0.01,  // eps,
+                                                  true,  // report all steps,
+                                                  true); // Allow exhaustive
 
-  // Does the network have the requested number of blocks or fewer? 
+  // Does the network have the requested number of blocks or fewer?
   REQUIRE(my_sbm.num_nodes_at_level(1) <= 2);
 
   // Are our step reporting vectors the correct size?
@@ -255,15 +253,15 @@ TEST_CASE("Collapse Blocks (w/ MCMC) - Simple Unipartite", "[SBM]")
   auto my_sbm = simple_unipartite();
 
   auto collapse_to_2_res = my_sbm.collapse_blocks(0,     // node_level,
-                                           2,     // B_end,
-                                           5,     // n_checks_per_block,
-                                           5,     // n_mcmc_sweeps,
-                                           1.1,   // sigma,
-                                           0.01,  // eps,
-                                           true,  // report all steps,
-                                           true); // Allow exhaustive
+                                                  2,     // B_end,
+                                                  5,     // n_checks_per_block,
+                                                  5,     // n_mcmc_sweeps,
+                                                  1.1,   // sigma,
+                                                  0.01,  // eps,
+                                                  true,  // report all steps,
+                                                  true); // Allow exhaustive
 
-  // Does the network have the requested number of blocks or fewer? 
+  // Does the network have the requested number of blocks or fewer?
   REQUIRE(my_sbm.num_nodes_at_level(1) <= 2);
 
   // Are our step reporting vectors the correct size?
