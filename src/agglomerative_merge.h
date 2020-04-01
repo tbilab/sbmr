@@ -6,7 +6,6 @@
 #include "model_helpers.h"
 #include "network.h"
 
-
 struct Block_Mergers {
   double entropy_delta = 0.0;
   std::vector<string> merge_from;
@@ -76,11 +75,11 @@ inline double merge_entropy_delta(const Node_Pair& merge_pair)
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
 inline Block_Mergers agglomerative_merge(SBM_Network& net,
-                                      const int block_level,
-                                      const int num_merges_to_make,
-                                      const int num_checks_per_block,
-                                      const double& eps,
-                                      const bool allow_exhaustive = true)
+                                         const int block_level,
+                                         const int num_merges_to_make,
+                                         const int num_checks_per_block,
+                                         const double& eps,
+                                         const bool allow_exhaustive = true)
 {
   // Set to keep track of the attepted merge pairs
   auto checked_pairs = Ordered_Pair_Set<Node*>();
@@ -166,13 +165,14 @@ inline Block_Mergers agglomerative_merge(SBM_Network& net,
       // Insert blocks into results for mergers
       results.merge_from.push_back(block_pair.first()->id());
       results.merge_into.push_back(block_pair.second()->id());
-    } 
+    }
 
     // Update the results with entropy delta caused by this merge. We subtract
     // here because we negated the entropy delta when inserting into the queue
     results.entropy_delta -= best_merge.first;
   }
 
+  // Finally, go through and make all requested merges
   for (const auto& merge_pair : merges_to_make) {
     net.merge_blocks(merge_pair.first(), merge_pair.second());
   }
