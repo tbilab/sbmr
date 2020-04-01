@@ -1,9 +1,7 @@
 #include "../get_move_results.h"
 #include "../network.h"
 #include "build_testing_networks.h"
-// #include "../mcmc_sweep.h"
 #include "catch.hpp"
-
 
 TEST_CASE("Generate Node move proposals - Simple Bipartite", "[SBM]")
 {

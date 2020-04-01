@@ -1,7 +1,6 @@
 #pragma once
 
 #include "agglomerative_merge.h"
-#include "mcmc_sweep.h"
 #include "network.h"
 
 struct Collapse_Results {
@@ -79,13 +78,12 @@ inline Collapse_Results collapse_blocks(SBM_Network& net,
 
     if (using_mcmc) {
       // Update the merge results entropy delta with the changes caused by MCMC sweep
-      merge_result.entropy_delta += mcmc_sweep(net,
-                                               n_mcmc_sweeps,
-                                               eps,        // eps
-                                               false,      // variable num blocks
-                                               false,      // track pairs
-                                               node_level, // level
-                                               false)      // verbose
+      merge_result.entropy_delta += net.mcmc_sweep(n_mcmc_sweeps,
+                                                   eps,        // eps
+                                                   false,      // variable num blocks
+                                                   false,      // track pairs
+                                                   node_level, // level
+                                                   false)      // verbose
                                         .entropy_delta;
 
       // Check to see if we have any empty blocks after our MCMC sweep and remove them
@@ -108,8 +106,6 @@ inline Collapse_Results collapse_blocks(SBM_Network& net,
       results.merge_steps.push_back(merge_result);
       results.states.push_back(net.state());
     }
-
-    
   }
 
   return results;

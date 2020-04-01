@@ -21,10 +21,12 @@ inline string as_str(const T& val) { return std::to_string(val); }
 
 // For a bit of clarity
 using Node_UPtr      = std::unique_ptr<Node>;
+using Node_UPtr_Vec  = std::vector<Node_UPtr>;
 using Node_Ptr_Vec   = std::vector<Node*>;
 using Edges_By_Type  = std::vector<Node_Ptr_Vec>;
 using Node_Vec       = std::vector<Node*>;
 using Edge_Count_Map = std::map<const Node*, int>;
+using Type_Vec       = std::vector<std::vector<Node_UPtr>>;
 
 enum Update_Type { Add,
                    Remove };
