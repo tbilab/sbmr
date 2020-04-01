@@ -110,7 +110,7 @@ class Node {
 
   bool is_empty() const
   {
-    return num_children() == 0;
+    return _children.empty();
   }
 
   bool has_child(Node* node) const
