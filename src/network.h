@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Block_Consensus.h"
 #include "Node.h"
+
+#include "Block_Consensus.h"
 #include "Sampler.h"
 #include "get_move_results.h"
 
