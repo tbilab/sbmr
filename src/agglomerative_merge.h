@@ -4,7 +4,6 @@
 
 #include "Ordered_Pair.h"
 #include "model_helpers.h"
-#include "network.h"
 
 struct Block_Mergers {
   double entropy_delta = 0.0;
@@ -74,7 +73,8 @@ inline double merge_entropy_delta(const Node_Pair& merge_pair)
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-inline Block_Mergers agglomerative_merge(SBM_Network& net,
+template <typename Network>
+inline Block_Mergers agglomerative_merge(Network& net,
                                          const int block_level,
                                          const int num_merges_to_make,
                                          const int num_checks_per_block,
