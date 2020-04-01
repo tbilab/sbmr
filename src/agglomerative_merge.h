@@ -3,24 +3,18 @@
 #include <queue>
 
 #include "Ordered_Pair.h"
-#include "get_move_results.h"
-#include "mcmc_sweep.h"
+#include "model_helpers.h"
 #include "network.h"
 
-struct Merge_Step {
-  double entropy_delta;
-  double entropy;
-  // State_Dump state;
-  int num_blocks;
-  Merge_Step()
-      : entropy_delta(0)
+
+struct Block_Mergers {
+  double entropy_delta = 0.0;
+  std::vector<string> merge_from;
+  std::vector<string> merge_into;
+  Block_Mergers(const int n)
   {
-  }
-  Merge_Step(const double e, const State_Dump s, const int n)
-      : entropy_delta(e)
-      // , state(s)
-      , num_blocks(n)
-  {
+    merge_from.reserve(n);
+    merge_into.reserve(n);
   }
 };
 
@@ -81,7 +75,7 @@ inline double merge_entropy_delta(const Node_Pair& merge_pair)
 // =============================================================================
 // Runs efficient MCMC sweep algorithm on desired node level
 // =============================================================================
-inline Merge_Step agglomerative_merge(SBM_Network& net,
+inline Block_Mergers agglomerative_merge(SBM_Network& net,
                                       const int block_level,
                                       const int num_merges_to_make,
                                       const int num_checks_per_block,
@@ -141,7 +135,7 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
 
   // Now we find the top merges...
   // Start by initializing a merge result struct
-  auto results = Merge_Step();
+  auto results = Block_Mergers(num_merges_to_make);
 
   std::vector<Node_Pair> merges_to_make;
   merges_to_make.reserve(num_merges_to_make);
@@ -168,6 +162,10 @@ inline Merge_Step agglomerative_merge(SBM_Network& net,
       // Insert these blocks into merged blocks so they wont be used again
       merged_blocks.insert(block_pair.first());
       merged_blocks.insert(block_pair.second());
+
+      // Insert blocks into results for mergers
+      results.merge_from.push_back(block_pair.first()->id());
+      results.merge_into.push_back(block_pair.second()->id());
     } 
 
     // Update the results with entropy delta caused by this merge. We subtract
