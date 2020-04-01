@@ -179,7 +179,7 @@ TEST_CASE("Metablock initialization", "[Network]")
 
   // Cant remove data level of nodes when no levels are left
   REQUIRE_THROWS(my_net.remove_block_levels_above(-1));
-  
+
   // Also cant set highest level above what currently exisets
   REQUIRE_THROWS(my_net.remove_block_levels_above(3));
 }
@@ -207,16 +207,16 @@ TEST_CASE("Swapping of blocks", "[Network]")
   Node* block1 = my_net.get_node_by_id("n1")->parent();
 
   my_net.swap_blocks(node2,
-              block1,
-              true);
+                     block1,
+                     true);
 
   // There should now be one less block of type n
   REQUIRE(my_net.num_nodes_of_type("n", 1) == 2);
 
   // Now do the same for the m type nodes but don't delete the empty block
   my_net.swap_blocks(my_net.get_nodes_of_type("m")[1].get(),
-              my_net.get_nodes_of_type("m")[0]->parent(),
-              false);
+                     my_net.get_nodes_of_type("m")[0]->parent(),
+                     false);
 
   // There should be no change in the number of blocks
   REQUIRE(my_net.num_nodes_of_type("m", 1) == 3);
@@ -292,8 +292,8 @@ TEST_CASE("State dumping and restoring", "[Network")
 
   // Now give merge a1 and a2 to same parent and remove a1s old parent
   my_net.swap_blocks(a1,
-              a2->parent(),
-              true);
+                     a2->parent(),
+                     true);
 
   // Dump model state again
   State_Dump state2 = my_net.state();
@@ -402,13 +402,13 @@ TEST_CASE("State dumping and restoring: w/ metablocks", "[Network")
 
 TEST_CASE("Building with vectors -- Unipartite", "[Network]")
 {
-  const std::vector<string> nodes_id{"a1", "a2", "a3"};
-  const std::vector<string> nodes_type{"a", "a", "a"};
-  const std::vector<string> types_name{"a"};
+  const std::vector<string> nodes_id { "a1", "a2", "a3" };
+  const std::vector<string> nodes_type { "a", "a", "a" };
+  const std::vector<string> types_name { "a" };
 
   // Fully connected network (Except a3, which is not connected to itself)
-  const std::vector<string> edges_from{"a1", "a1", "a1", "a2", "a2"};
-  const std::vector<string>   edges_to{"a1", "a2", "a3", "a2", "a3"};
+  const std::vector<string> edges_from { "a1", "a1", "a1", "a2", "a2" };
+  const std::vector<string> edges_to { "a1", "a2", "a3", "a2", "a3" };
 
   SBM_Network my_net { nodes_id, nodes_type,
                        edges_from, edges_to,
@@ -421,13 +421,13 @@ TEST_CASE("Building with vectors -- Unipartite", "[Network]")
 
 TEST_CASE("Building with vectors -- Bipartite", "[Network]")
 {
-  const std::vector<string> nodes_id{"a1", "a2", "b1", "b2"};
-  const std::vector<string> nodes_type{"a", "a", "b", "b"};
-  const std::vector<string> types_name{"a", "b"};
+  const std::vector<string> nodes_id { "a1", "a2", "b1", "b2" };
+  const std::vector<string> nodes_type { "a", "a", "b", "b" };
+  const std::vector<string> types_name { "a", "b" };
 
   // Fully connected bipartite network
-  const std::vector<string> edges_from{"a1", "a1", "a2", "a2"};
-  const std::vector<string>   edges_to{"b1", "b2", "b1", "b2"};
+  const std::vector<string> edges_from { "a1", "a1", "a2", "a2" };
+  const std::vector<string> edges_to { "b1", "b2", "b1", "b2" };
 
   SBM_Network my_net { nodes_id, nodes_type,
                        edges_from, edges_to,
@@ -441,13 +441,13 @@ TEST_CASE("Building with vectors -- Bipartite", "[Network]")
 
 TEST_CASE("Building with vectors -- Tripartite", "[Network]")
 {
-  const std::vector<string> nodes_id{"a1", "a2", "b1", "c1", "c2"};
-  const std::vector<string> nodes_type{"a", "a", "b", "c", "c"};
-  const std::vector<string> types_name{"a", "b", "c"};
+  const std::vector<string> nodes_id { "a1", "a2", "b1", "c1", "c2" };
+  const std::vector<string> nodes_type { "a", "a", "b", "c", "c" };
+  const std::vector<string> types_name { "a", "b", "c" };
 
   // Only has connections from a-b and a-c
-  const std::vector<string> edges_from{"a1", "a1", "a2", "a2"};
-  const std::vector<string>   edges_to{"b1", "c1", "b1", "c2"};
+  const std::vector<string> edges_from { "a1", "a1", "a2", "a2" };
+  const std::vector<string> edges_to { "b1", "c1", "b1", "c2" };
 
   SBM_Network my_net { nodes_id, nodes_type,
                        edges_from, edges_to,
@@ -462,16 +462,16 @@ TEST_CASE("Building with vectors -- Tripartite", "[Network]")
 
 TEST_CASE("Building with vectors -- Restricted tripartite", "[Network]")
 {
-  const std::vector<string> nodes_id{"a1", "a2", "b1", "b2", "c1", "c2"};
-  const std::vector<string> nodes_type{"a", "a", "b", "b", "c", "c"};
-  const std::vector<string> types_name{"a", "b", "c"};
+  const std::vector<string> nodes_id { "a1", "a2", "b1", "b2", "c1", "c2" };
+  const std::vector<string> nodes_type { "a", "a", "b", "b", "c", "c" };
+  const std::vector<string> types_name { "a", "b", "c" };
 
-  const std::vector<string> edges_from{"a1", "a1", "a2", "b1", "b1", "b2"};
-  const std::vector<string>   edges_to{"b1", "b2", "b1", "c1", "c2", "c1"};
+  const std::vector<string> edges_from { "a1", "a1", "a2", "b1", "b1", "b2" };
+  const std::vector<string> edges_to { "b1", "b2", "b1", "c1", "c2", "c1" };
 
   // Has connections from a-b and b-c
-  const std::vector<string> type_from{"a", "b"};
-  const std::vector<string>   type_to{"b", "c"};
+  const std::vector<string> type_from { "a", "b" };
+  const std::vector<string> type_to { "b", "c" };
 
   SBM_Network my_net { nodes_id, nodes_type,
                        edges_from, edges_to,
@@ -488,19 +488,19 @@ TEST_CASE("Building with vectors -- Restricted tripartite", "[Network]")
   // Try adding an edges with unallowed types
   const std::vector<string> bad_edges_from { "b1", "a1", "a1", "a2", "a2", "b1", "b1" };
   const std::vector<string> bad_edges_to { "b2", "b1", "c1", "b1", "c2", "c2", "c1" };
-  
+
   // Will complain
   REQUIRE_THROWS(
       SBM_Network { nodes_id, nodes_type,
                     bad_edges_from, bad_edges_to,
                     types_name,
                     42,
-                    type_from, type_to});
+                    type_from, type_to });
 }
 
 TEST_CASE("Counting edges", "[Network]")
 {
-  SBM_Network my_net{{ "a", "b" }, 42};
+  SBM_Network my_net { { "a", "b" }, 42 };
 
   // Base-level nodes
   Node* a1 = my_net.add_node("a1", "a");

@@ -1,6 +1,6 @@
 #pragma once
 
-// Helper functions that get used throughout code 
+// Helper functions that get used throughout code
 #include <map>
 
 inline double ent(const double e_rs, const double e_r, const double e_s)
@@ -16,7 +16,7 @@ inline double ent(const double e_rs, const double e_r, const double e_s)
 template <typename T>
 using Const_Ptr = const T*;
 
-template <typename T> 
+template <typename T>
 using Count_Map = std::map<T, int>;
 
 template <typename T>

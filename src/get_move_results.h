@@ -90,7 +90,7 @@ inline Move_Results get_move_results(const Node* node,
 
   // Update edge count maps for post move
   for (const auto& node_block_count : node_neighbor_counts) {
-    const Node* block          = node_block_count.first;
+    const Node* block    = node_block_count.first;
     const int e_to_block = node_block_count.second;
 
     if (block == new_block) {

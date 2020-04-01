@@ -164,9 +164,9 @@ TEST_CASE("Edge count gathering (unipartite)", "[Node]")
   connect_nodes(n5.get(), n6.get());
 
   // Make 3 blocks
-  Node_UPtr a = Node_UPtr(new Node {"a", 1, 0});
-  Node_UPtr b = Node_UPtr(new Node {"b", 1, 0});
-  Node_UPtr c = Node_UPtr(new Node {"c", 1, 0});
+  Node_UPtr a = Node_UPtr(new Node { "a", 1, 0 });
+  Node_UPtr b = Node_UPtr(new Node { "b", 1, 0 });
+  Node_UPtr c = Node_UPtr(new Node { "c", 1, 0 });
 
   // Assign nodes to their blocks
   n1->set_parent(a.get());
@@ -198,12 +198,12 @@ TEST_CASE("Edge count gathering (unipartite)", "[Node]")
 
 TEST_CASE("Edge count gathering after moving (unipartite)", "[Node]")
 {
-  Node_UPtr n1 = Node_UPtr(new Node { "n1", 0, 0, 1});
-  Node_UPtr n2 = Node_UPtr(new Node { "n2", 0, 0, 1});
-  Node_UPtr n3 = Node_UPtr(new Node { "n3", 0, 0, 1});
-  Node_UPtr n4 = Node_UPtr(new Node { "n4", 0, 0, 1});
-  Node_UPtr n5 = Node_UPtr(new Node { "n5", 0, 0, 1});
-  Node_UPtr n6 = Node_UPtr(new Node { "n6", 0, 0, 1});
+  Node_UPtr n1 = Node_UPtr(new Node { "n1", 0, 0, 1 });
+  Node_UPtr n2 = Node_UPtr(new Node { "n2", 0, 0, 1 });
+  Node_UPtr n3 = Node_UPtr(new Node { "n3", 0, 0, 1 });
+  Node_UPtr n4 = Node_UPtr(new Node { "n4", 0, 0, 1 });
+  Node_UPtr n5 = Node_UPtr(new Node { "n5", 0, 0, 1 });
+  Node_UPtr n6 = Node_UPtr(new Node { "n6", 0, 0, 1 });
 
   // Add edges
   connect_nodes(n1.get(), n2.get());
@@ -220,9 +220,9 @@ TEST_CASE("Edge count gathering after moving (unipartite)", "[Node]")
   connect_nodes(n5.get(), n6.get());
 
   // Make 3 blocks
-  Node_UPtr a = Node_UPtr(new Node { "a", 1, 0});
-  Node_UPtr b = Node_UPtr(new Node { "b", 1, 0});
-  Node_UPtr c = Node_UPtr(new Node { "c", 1, 0});
+  Node_UPtr a = Node_UPtr(new Node { "a", 1, 0 });
+  Node_UPtr b = Node_UPtr(new Node { "b", 1, 0 });
+  Node_UPtr c = Node_UPtr(new Node { "c", 1, 0 });
 
   // Assign nodes to their blocks
   n1->set_parent(a.get());

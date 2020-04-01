@@ -1,7 +1,6 @@
-#include "build_testing_networks.h"
 #include "../Block_Consensus.h"
+#include "build_testing_networks.h"
 #include "catch.hpp"
-
 
 TEST_CASE("Building block concensus - Simple Bipartite", "[SBM]")
 {
@@ -12,7 +11,7 @@ TEST_CASE("Building block concensus - Simple Bipartite", "[SBM]")
 
   consensus.initialize(my_sbm.get_nodes_at_level(0));
 
-  // There should be nt(nt-1)/2 pairs for each type t with nt nodes. 
+  // There should be nt(nt-1)/2 pairs for each type t with nt nodes.
   REQUIRE(consensus.size() == 12);
 }
 
@@ -25,7 +24,7 @@ TEST_CASE("Building block concensus - Simple Unipartite", "[SBM]")
 
   consensus.initialize(my_sbm.get_nodes_at_level(0));
 
-  // There should be nt(nt-1)/2 pairs for each type t with nt nodes. 
+  // There should be nt(nt-1)/2 pairs for each type t with nt nodes.
   // 6*5/2
   REQUIRE(consensus.size() == 15);
 }

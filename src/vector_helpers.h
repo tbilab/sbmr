@@ -1,11 +1,11 @@
 #ifndef __VECTOR_HELPERS_INCLUDED__
 #define __VECTOR_HELPERS_INCLUDED__
 
-#include <utility>
-#include <vector>
+#include "error_and_message_macros.h"
 #include <map>
 #include <random>
-#include "error_and_message_macros.h"
+#include <utility>
+#include <vector>
 
 template <typename T>
 using Vec_of_Vecs = std::vector<std::vector<T>>;
