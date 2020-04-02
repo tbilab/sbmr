@@ -764,10 +764,7 @@ class SBM_Network {
     return state;
   }
 
-  void update_state(const std::vector<string>& ids,
-                    const std::vector<string>& parents,
-                    const std::vector<int>& levels,
-                    const std::vector<string>& types)
+  void update_state(const State_Dump& state)
   {
     remove_block_levels_above(0); // Remove all block levels
     build_block_level();          // Add an empty block level to fill in
@@ -780,11 +777,11 @@ class SBM_Network {
 
     // Loop through entries of the state dump
     int last_level = 0;
-    for (int i = 0; i < ids.size(); i++) {
-      const string& id     = ids[i];
-      const string& parent = parents[i];
-      const string& type   = types[i];
-      const int level      = levels[i];
+    for (int i = 0; i < state.size(); i++) {
+      const string& id     = state.ids[i];
+      const string& parent = state.parents[i];
+      const string& type   = state.types[i];
+      const int level      = state.levels[i];
 
       // If the level of the current entry has gone up
       // Swap the maps as the blocks are now the child nodes
@@ -814,11 +811,7 @@ class SBM_Network {
       // Connect node and parent to eachother
       current_node->set_parent(parent_node);
     }
-  }
-
-  void update_state(const State_Dump& state)
-  {
-    update_state(state.ids, state.parents, state.levels, state.types);
+    // update_state(state.ids, state.parents, state.levels, state.types);
   }
 
   // =========================================================================
