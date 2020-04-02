@@ -170,6 +170,19 @@ class SBM_Network {
     return nodes.at(level).at(type_i).size();
   }
 
+  // Get a vector of raw pointers to all nodes in a given level with no type separation
+  Node_Vec get_flat_level(const int level) const
+  {
+    Node_Vec all_nodes;
+    all_nodes.reserve(num_nodes_at_level(level));
+
+    for_all_nodes_at_level(level, [&all_nodes](const Node_UPtr& node) {
+      all_nodes.push_back(node.get());
+    });
+
+    return all_nodes;
+  }
+
   public:
   // Have sampler object be public for use by other functions
   Sampler sampler;
@@ -808,18 +821,7 @@ class SBM_Network {
     return nodes[level];
   }
 
-  // Get a vector of raw pointers to all nodes in a given level with no type separation
-  Node_Vec get_flat_level(const int level) const
-  {
-    Node_Vec all_nodes;
-    all_nodes.reserve(num_nodes_at_level(level));
 
-    for_all_nodes_at_level(level, [&all_nodes](const Node_UPtr& node) {
-      all_nodes.push_back(node.get());
-    });
-
-    return all_nodes;
-  }
 
   const Node_UPtr_Vec& get_nodes_of_type(const int type_index, const int level = 0) const
   {
