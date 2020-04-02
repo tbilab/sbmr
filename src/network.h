@@ -139,22 +139,7 @@ public:
               const InOut_String_Vec& allowed_edges_b = {})
       : SBM_Network(node_ids, node_types, all_types, random_seed)
   {
-    // We have restricted multipartite structure if allowed edges are not empty
-    if (allowed_edges_a.size() != 0) {
-      // Set partite structure to reflect
-      edge_types = multipartite_restricted;
-
-      // Load the allowed type pairs into the edge validation variables
-      for (int i = 0; i < allowed_edges_a.size(); i++) {
-        validate_edge(get_type_index(to_str(allowed_edges_a[i])),
-                      get_type_index(to_str(allowed_edges_b[i])),
-                      true);
-      }
-    }
-
-    // Connect nodes with edges
-    for (int i = 0; i < edges_a.size(); i++) add_edge(to_str(edges_a[i]),
-                                                      to_str(edges_b[i]));
+    add_edges(edges_a, edges_b, allowed_edges_a, allowed_edges_b);
   }
 
   // Empty network without any nodes or edges
@@ -324,6 +309,29 @@ public:
 
     a->add_neighbor(b);
     b->add_neighbor(a);
+  }
+
+  void add_edges(const InOut_String_Vec& edges_a,
+                 const InOut_String_Vec& edges_b,
+                 const InOut_String_Vec& allowed_edges_a = {},
+                 const InOut_String_Vec& allowed_edges_b = {})
+  {
+    // We have restricted multipartite structure if allowed edges are not empty
+    if (allowed_edges_a.size() != 0) {
+      // Set partite structure to reflect
+      edge_types = multipartite_restricted;
+
+      // Load the allowed type pairs into the edge validation variables
+      for (int i = 0; i < allowed_edges_a.size(); i++) {
+        validate_edge(get_type_index(to_str(allowed_edges_a[i])),
+                      get_type_index(to_str(allowed_edges_b[i])),
+                      true);
+      }
+    }
+
+    // Connect nodes with edges
+    for (int i = 0; i < edges_a.size(); i++) add_edge(to_str(edges_a[i]),
+                                                      to_str(edges_b[i]));
   }
 
   void build_block_level(const int reserve_size = 0)
