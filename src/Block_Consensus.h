@@ -12,6 +12,7 @@ struct Pair_Status {
       , times_connected(0) {};
 };
 
+
 using Pair_Set = std::unordered_set<string>;
 using Pair_Map = std::unordered_map<string, Pair_Status>;
 
@@ -25,12 +26,13 @@ inline string make_pair_key(const string& id_a,
 }
 
 class Block_Consensus {
-  private:
-  // Holds the pairs of nodes to connection status and counts
-  Pair_Map consensus_pairs;
-
+  
   public:
-  int size() const { return consensus_pairs.size(); }
+  
+  // Holds the pairs of nodes to connection status and counts
+  Pair_Map node_pairs;
+  
+  int size() const { return node_pairs.size(); }
   // Initialies containers when needed
   void initialize(const Type_Vec& node_level)
   {
@@ -47,7 +49,7 @@ class Block_Consensus {
              node_b_it != nodes_of_type.end();
              node_b_it++) {
           // Initialize pair info for group
-          consensus_pairs.emplace(
+          node_pairs.emplace(
               make_pair_key((*node_a_it)->id(), (*node_b_it)->id()),
               Pair_Status((*node_a_it)->parent() == (*node_b_it)->parent())); // Checks if in same group
         }
@@ -58,7 +60,7 @@ class Block_Consensus {
   // Updates the pair statuses and iterates based on a set of changed pairs
   void update_pair_tracking_map(const Pair_Set& updated_pairs)
   {
-    for (auto& pair : consensus_pairs) {
+    for (auto& pair : node_pairs) {
 
       // Check if this pair was updated on last sweep
       auto sweep_change_loc   = updated_pairs.find(pair.first);
@@ -95,4 +97,8 @@ class Block_Consensus {
       }
     }
   }
+
+
+
+
 };
