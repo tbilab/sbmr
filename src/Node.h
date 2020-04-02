@@ -35,16 +35,16 @@ enum Update_Type { Add,
 // Main node class declaration
 //=================================
 class Node {
-  private:
+private:
   Node* parent_node = nullptr; // What node contains this node (aka its cluster)
+  int _degree       = 0;       // How many neighbors does this node have?
+  Node_Vec _children;          // Nodes that are contained within node (if node is cluster)
+  string _id;                  // Unique integer id for node
+  int _level;                  // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
+  int _type;                   // What type of node is this?
   Edges_By_Type _neighbors;
-  Node_Vec _children; // Nodes that are contained within node (if node is cluster)
-  int _degree = 0;    // How many neighbors does this node have?
-  string _id;         // Unique integer id for node
-  int _type;          // What type of node is this?
-  int _level;         // What level does this node sit at (0 = data, 1 = cluster, 2 = super-clusters, ...)
 
-  public:
+public:
   // =========================================================================
   // Constructors
   // =========================================================================
@@ -53,8 +53,8 @@ class Node {
        const int type,
        const int num_types = 1)
       : _id(node_id)
-      , _type(type)
       , _level(level)
+      , _type(type)
       , _neighbors(num_types)
   {
   }
