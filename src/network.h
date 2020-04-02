@@ -114,8 +114,8 @@ public:
               const InOut_String_Vec& node_types,
               const InOut_String_Vec& all_types,
               const int random_seed = 42)
-      : types(all_types)
-      , type_name_to_int(build_val_to_index_map(all_types))
+      : types(to_str_vec(all_types))
+      , type_name_to_int(build_val_to_index_map(to_str_vec(all_types)))
       , edge_types(all_types.size() == 1 ? unipartite : multipartite)
       , sampler(random_seed)
   {
@@ -126,9 +126,10 @@ public:
     build_block_level(node_ids.size());
 
     // Add nodes to network
-    for (int i = 0; i < node_ids.size(); i++) add_node(node_ids[i],
-                                                       node_types[i]);
+    for (int i = 0; i < node_ids.size(); i++) add_node(to_str(node_ids[i]),
+                                                       to_str(node_types[i]));
   }
+
 
   // Takes bulk node and edge information
   SBM_Network(const InOut_String_Vec& node_ids,
@@ -148,16 +149,16 @@ public:
 
       // Load the allowed type pairs into the edge validation variables
       for (int i = 0; i < allowed_edges_a.size(); i++) {
-        validate_edge(get_type_index(allowed_edges_a[i]),
-                      get_type_index(allowed_edges_b[i]),
+        validate_edge(get_type_index(to_str(allowed_edges_a[i])),
+                      get_type_index(to_str(allowed_edges_b[i])),
                       true);
       }
     }
 
     // Connect nodes with edges
-    for (int i = 0; i < edges_a.size(); i++) {
-      add_edge(edges_a[i], edges_b[i]);
-    }
+    for (int i = 0; i < edges_a.size(); i++) add_edge(to_str(edges_a[i]),
+                                                      to_str(edges_b[i]));
+
   }
 
   // Empty network without any nodes or edges
@@ -755,9 +756,9 @@ public:
     // Loop through entries of the state dump
     int last_level = 0;
     for (int i = 0; i < ids.size(); i++) {
-      const string& id     = ids[i];
-      const string& parent = parents[i];
-      const string& type   = types[i];
+      const string& id     = to_str(ids[i]);
+      const string& parent = to_str(parents[i]);
+      const string& type   = to_str(types[i]);
       const int level      = levels[i];
 
       // If the level of the current entry has gone up
