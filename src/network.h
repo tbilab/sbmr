@@ -1,12 +1,13 @@
 #pragma once
 
-#include "Node.h"
-
+// Helper classes
 #include "Block_Consensus.h"
+#include "Node.h"
 #include "Sampler.h"
+
+// Helper functions
 #include "agglomerative_merge.h"
 #include "get_move_results.h"
-
 #include "vector_helpers.h"
 
 #include <unordered_map>
