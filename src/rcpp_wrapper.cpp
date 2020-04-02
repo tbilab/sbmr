@@ -133,6 +133,9 @@ RCPP_MODULE(SBM_Network)
       .method("add_edge",
               &SBM_Network::add_edge,
               "Connects two nodes in network (at level 0) by their ids (string).")
+      .method("add_edges",
+              &SBM_Network::add_edges,
+              "Takes two character vectors of node ids (string) and connects the nodes with edges in network")
       .method("initialize_blocks",
               &SBM_Network::initialize_blocks,
               "Adds a desired number of blocks and randomly assigns them for a given level. num_blocks = -1 means every node gets their own block")
