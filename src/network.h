@@ -315,13 +315,6 @@ class SBM_Network {
     b->add_neighbor(a);
   }
 
-  void shuffle_nodes(const int type, const int level)
-  {
-    check_for_level(level);
-    check_for_type(type);
-    sampler.shuffle(nodes[level][type]);
-  }
-
   // =========================================================================
   // Block Specific Modification (node levels 1+)
   // =========================================================================
