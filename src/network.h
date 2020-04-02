@@ -68,7 +68,7 @@ struct Collapse_Results {
 
 class SBM_Network {
 
-  private:
+private:
   // =========================================================================
   // Data/Attributes
   // =========================================================================
@@ -83,7 +83,7 @@ class SBM_Network {
   // Keeps track of how many block we've had to avoid duplicate ids
   int block_counter = 0;
 
-  public:
+public:
   // =========================================================================
   // Constructors
   // =========================================================================
@@ -158,7 +158,7 @@ class SBM_Network {
   // =========================================================================
   // Information
   // =========================================================================
-  private:
+private:
   int num_nodes_of_type(const int type_i, const int level = 0) const
   {
     check_for_level(level);
@@ -166,7 +166,7 @@ class SBM_Network {
     return nodes.at(level).at(type_i).size();
   }
 
-  public:
+public:
   int num_nodes() const
   {
     return total_num_elements(nodes);
@@ -216,7 +216,7 @@ class SBM_Network {
   // =========================================================================
   // Node and Block Modification
   // =========================================================================
-  private:
+private:
   Node* add_node(const std::string& id,
                  const int type_index = 0,
                  const int level      = 0)
@@ -274,7 +274,7 @@ class SBM_Network {
     }
   }
 
-  public:
+public:
   Node* add_node(const std::string& id,
                  const std::string& type = "a",
                  const int level         = 0)
@@ -774,7 +774,7 @@ class SBM_Network {
   // =========================================================================
   // Node Grabbers
   // =========================================================================
-  private:
+private:
   int get_type_index(const string name) const
   {
     const auto name_it = type_name_to_int.find(name);
@@ -822,7 +822,7 @@ class SBM_Network {
     }
   }
 
-  public:
+public:
   const Type_Vec& get_nodes_at_level(const int level) const
   {
     check_for_level(level);
