@@ -301,15 +301,15 @@ private:
   }
 
 public:
-  Node* add_node(const InOut_String& id,
-                 const InOut_String& type,
+  Node* add_node(const string& id,
+                 const string& type,
                  const int level = 0)
   {
     return add_node(to_str(id), get_type_index(to_str(type)), level);
   }
 
-  void add_node_no_ret(const InOut_String& id,
-                       const InOut_String& type,
+  void add_node_no_ret(const string& id,
+                       const string& type,
                        const int level)
   {
     add_node(to_str(id), get_type_index(to_str(type)), level);
