@@ -46,25 +46,36 @@ public:
   int size() const { return ids.size(); }
 };
 
-enum Partite_Structure {
-  unipartite,             // One node type
-  multipartite,           // Multiple node types, all possible edges between non_like types allowed
-  multipartite_restricted // Multiple node types, only specific type combos allowed for edges
-};
+class MCMC_Sweeps {
+private:
+  int i = 0;
 
-struct MCMC_Sweeps {
+public:
   InOut_Double_Vec sweep_entropy_delta;
   InOut_Int_Vec sweep_num_nodes_moved;
   Block_Consensus block_consensus;
   InOut_String_Vec nodes_moved;
   double entropy_delta = 0.0;
   MCMC_Sweeps(const int n)
+      : sweep_entropy_delta(n)
+      , sweep_num_nodes_moved(n)
   {
-    // Preallocate the entropy change and num groups moved in sweep vectors and
-    sweep_entropy_delta.reserve(n);
-    sweep_num_nodes_moved.reserve(n);
+  }
+  void add(const double& e_delta, const int n_nodes)
+  {
+    sweep_entropy_delta[i]   = e_delta;
+    sweep_num_nodes_moved[i] = n_nodes;
+    i++;
   }
 };
+
+enum Partite_Structure {
+  unipartite,             // One node type
+  multipartite,           // Multiple node types, all possible edges between non_like types allowed
+  multipartite_restricted // Multiple node types, only specific type combos allowed for edges
+};
+
+
 
 struct Collapse_Results {
   double entropy_delta = 0; // Will keep track of the overall entropy change from this collapse
@@ -103,10 +114,10 @@ public:
               const InOut_String_Vec& node_types,
               const InOut_String_Vec& all_types,
               const int random_seed = 42)
-      : sampler(random_seed)
-      , types(all_types)
+      : types(all_types)
       , type_name_to_int(build_val_to_index_map(all_types))
       , edge_types(all_types.size() == 1 ? unipartite : multipartite)
+      , sampler(random_seed)
   {
     // Make sure we don't already have nodes
     if (num_levels() > 0) LOGIC_ERROR("Can only bulk add nodes to empty network");
@@ -582,8 +593,7 @@ public:
       } // End current sweep
 
       // Update results for this sweep
-      results.sweep_num_nodes_moved.push_back(num_nodes_moved);
-      results.sweep_entropy_delta.push_back(entropy_delta);
+      results.add(entropy_delta, num_nodes_moved);
       results.entropy_delta += entropy_delta;
 
       // Update the concensus pairs map with results if needed.
