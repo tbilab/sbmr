@@ -12,7 +12,6 @@
 
 #include <unordered_map>
 
-
 template <typename T>
 using String_Map = std::unordered_map<string, T>;
 
@@ -99,6 +98,28 @@ public:
   // =========================================================================
   // Constructors
   // =========================================================================
+  // Just takes node information and no edges
+  SBM_Network(const InOut_String_Vec& node_ids,
+              const InOut_String_Vec& node_types,
+              const InOut_String_Vec& all_types,
+              const int random_seed = 42)
+      : sampler(random_seed)
+      , types(all_types)
+      , type_name_to_int(build_val_to_index_map(all_types))
+      , edge_types(all_types.size() == 1 ? unipartite : multipartite)
+  {
+    // Make sure we don't already have nodes
+    if (num_levels() > 0) LOGIC_ERROR("Can only bulk add nodes to empty network");
+
+    // Setup empty first level of nodes with conservative space reserving
+    build_block_level(node_ids.size());
+
+    // Add nodes to network
+    for (int i = 0; i < node_ids.size(); i++) add_node(node_ids[i],
+                                                       node_types[i]);
+  }
+
+  // Takes bulk node and edge information
   SBM_Network(const InOut_String_Vec& node_ids,
               const InOut_String_Vec& node_types,
               const InOut_String_Vec& edges_a,
@@ -107,29 +128,19 @@ public:
               const int random_seed                   = 42,
               const InOut_String_Vec& allowed_edges_a = {},
               const InOut_String_Vec& allowed_edges_b = {})
-      : sampler(random_seed)
-      , types(all_types)
-      , type_name_to_int(build_val_to_index_map(all_types))
-      , edge_types(all_types.size() == 1
-                       ? unipartite
-                       : allowed_edges_a.size() == 0
-                           ? multipartite
-                           : multipartite_restricted)
+      : SBM_Network(node_ids, node_types, all_types, random_seed)
   {
-    // Setup empty first level of nodes with conservative space reserving
-    build_block_level(node_ids.size());
+    // We have restricted multipartite structure if allowed edges are not empty
+    if (allowed_edges_a.size() != 0) {
+      // Set partite structure to reflect
+      edge_types = multipartite_restricted;
 
-    // Fill in map to get allowed connection types if they are provided
-    if (edge_types == multipartite_restricted) {
+      // Load the allowed type pairs into the edge validation variables
       for (int i = 0; i < allowed_edges_a.size(); i++) {
         validate_edge(get_type_index(allowed_edges_a[i]),
-                      get_type_index(allowed_edges_b[i]), true);
+                      get_type_index(allowed_edges_b[i]),
+                      true);
       }
-    }
-
-    // Add nodes to network
-    for (int i = 0; i < node_ids.size(); i++) {
-      add_node(node_ids[i], node_types[i]);
     }
 
     // Connect nodes with edges
@@ -138,20 +149,15 @@ public:
     }
   }
 
-  // Builds a network without any nodes or edges
-  // Calls the main constructor with empty node and edge vectors
+  // Empty network without any nodes or edges
   SBM_Network(const InOut_String_Vec& all_types       = { "node" },
               const int random_seed                   = 42,
               const InOut_String_Vec& allowed_edges_a = {},
               const InOut_String_Vec& allowed_edges_b = {})
       : SBM_Network(InOut_String_Vec {},
                     InOut_String_Vec {},
-                    InOut_String_Vec {},
-                    InOut_String_Vec {},
                     all_types,
-                    random_seed,
-                    allowed_edges_a,
-                    allowed_edges_b)
+                    random_seed)
   {
   }
 
@@ -707,7 +713,7 @@ public:
 
     // No need to record the last level's nodes as they are already included
     // in the previous node's parent slot
-    const int n_nodes_in_last_level = num_nodes_at_level(n_levels-1);
+    const int n_nodes_in_last_level = num_nodes_at_level(n_levels - 1);
 
     // Initialize the return struct
     State_Dump state(num_nodes() - n_nodes_in_last_level);
