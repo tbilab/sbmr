@@ -5,15 +5,25 @@
 #include "Ordered_Pair.h"
 #include "model_helpers.h"
 
-struct Block_Mergers {
+class Block_Mergers {
+private:
+  int i = 0;
+
+public:
   double entropy_delta = 0.0;
-  std::vector<string> merge_from;
-  std::vector<string> merge_into;
-  int n_blocks; 
+  int n_blocks;
+  InOut_String_Vec merge_from;
+  InOut_String_Vec merge_into;
   Block_Mergers(const int n)
+      : merge_from(n)
+      , merge_into(n)
   {
-    merge_from.reserve(n);
-    merge_into.reserve(n);
+  }
+  void add(const string& from, const string& into)
+  {
+    merge_from[i] = from;
+    merge_into[i] = into;
+    i++;
   }
 };
 
@@ -163,9 +173,9 @@ inline Block_Mergers agglomerative_merge(Network* net,
       merged_blocks.insert(block_pair.first());
       merged_blocks.insert(block_pair.second());
 
-      // Insert blocks into results for mergers
-      results.merge_from.push_back(block_pair.first()->id());
-      results.merge_into.push_back(block_pair.second()->id());
+      // Insert blocks into results for mergers,
+      results.add(block_pair.first()->id(),
+                  block_pair.second()->id());
     }
 
     // Update the results with entropy delta caused by this merge. We subtract
