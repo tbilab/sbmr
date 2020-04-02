@@ -26,16 +26,6 @@ public:
   InOut_String_Vec parents;
   InOut_Int_Vec levels;
   State_Dump() {};
-  State_Dump(const InOut_String_Vec& id,
-             const InOut_String_Vec& type,
-             const InOut_String_Vec& parent,
-             const InOut_Int_Vec& level)
-      : ids(id)
-      , types(type)
-      , parents(parent)
-      , levels(level)
-  {
-  }
   State_Dump(const int size)
       : ids(size)
       , types(size)
@@ -734,7 +724,10 @@ public:
     return state;
   }
 
-  void update_state(const State_Dump& state)
+  void update_state(const InOut_String_Vec& ids,
+                    const InOut_String_Vec& types,
+                    const InOut_String_Vec& parents,
+                    const InOut_Int_Vec& levels)
   {
     remove_block_levels_above(0); // Remove all block levels
     build_block_level();          // Add an empty block level to fill in
@@ -747,11 +740,11 @@ public:
 
     // Loop through entries of the state dump
     int last_level = 0;
-    for (int i = 0; i < state.size(); i++) {
-      const string& id     = state.ids[i];
-      const string& parent = state.parents[i];
-      const string& type   = state.types[i];
-      const int level      = state.levels[i];
+    for (int i = 0; i < ids.size(); i++) {
+      const string& id     = ids[i];
+      const string& parent = parents[i];
+      const string& type   = types[i];
+      const int level      = levels[i];
 
       // If the level of the current entry has gone up
       // Swap the maps as the blocks are now the child nodes

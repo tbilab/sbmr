@@ -308,7 +308,7 @@ TEST_CASE("State dumping and restoring", "[Network")
   REQUIRE(parent_from_state(state2, "a1") == parent_from_state(state2, "a2"));
 
   // Restore to original state
-  my_net.update_state(state1);
+  my_net.update_state(state1.ids, state1.types, state1.parents, state1.levels);
   REQUIRE(my_net.num_levels() == 2);
 
   State_Dump state3 = my_net.state();
@@ -337,7 +337,7 @@ TEST_CASE("State dumping and restoring", "[Network")
 
   REQUIRE(my_net2.num_levels() == 1);
 
-  my_net2.update_state(state2);
+  my_net2.update_state(state2.ids, state2.types, state2.parents, state2.levels);
   REQUIRE(my_net2.num_levels() == 2);
   REQUIRE(my_net2.num_nodes_at_level(1) == 5);
 
@@ -391,7 +391,7 @@ TEST_CASE("State dumping and restoring: w/ metablocks", "[Network")
   REQUIRE(my_net2.num_nodes_at_level(0) == 8);
 
   // Load dumped state from first model to this new model
-  my_net2.update_state(state1);
+  my_net2.update_state(state1.ids, state1.types, state1.parents, state1.levels);
 
   // Now check to make sure the size matches the previous model
   REQUIRE(my_net2.num_levels() == 3);
