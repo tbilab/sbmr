@@ -183,6 +183,17 @@ class SBM_Network {
     return all_nodes;
   }
 
+
+  // Apply a lambda function over all nodes in network
+  void for_all_nodes_at_level(const int level,
+                              std::function<void(const Node_UPtr& node)> fn) const
+  {
+    check_for_level(level);
+    for (const auto& nodes_vec : nodes.at(level)) {
+      std::for_each(nodes_vec.begin(), nodes_vec.end(), fn);
+    }
+  }
+
   public:
   // Have sampler object be public for use by other functions
   Sampler sampler;
@@ -835,15 +846,6 @@ class SBM_Network {
     return get_nodes_of_type(get_type_index(type), level);
   }
 
-  // Apply a lambda function over all nodes in network
-  void for_all_nodes_at_level(const int level,
-                              std::function<void(const Node_UPtr& node)> fn) const
-  {
-    check_for_level(level);
-    for (const auto& nodes_vec : nodes.at(level)) {
-      std::for_each(nodes_vec.begin(), nodes_vec.end(), fn);
-    }
-  }
 
   Node* get_node_by_id(const string& id) const
   {
