@@ -69,135 +69,21 @@ struct Collapse_Results {
 class SBM_Network {
 
   private:
-  // Data
+  // =========================================================================
+  // Data/Attributes
+  // =========================================================================
   std::vector<Type_Vec> nodes;
   std::vector<string> types;
   Int_Map<string> type_name_to_int;
   std::map<int, std::set<int>> connection_types;
   String_Map<Node*> id_to_node;
   Partite_Structure edge_types;
-
-  int block_counter = 0; // Keeps track of how many block we've had
-
-  // =========================================================================
-  // Private helper methods
-  // =========================================================================
-  int get_type_index(const string name) const
-  {
-    const auto name_it = type_name_to_int.find(name);
-
-    // If this is a previously unseen type, add new entry
-    if (name_it == type_name_to_int.end())
-      LOGIC_ERROR("Type " + name + " doesn't exist in network");
-
-    return name_it->second;
-  }
-
-  void check_for_level(const int level) const
-  {
-    // Make sure we have the requested level
-    if (level >= nodes.size())
-      RANGE_ERROR("Node requested in level that does not exist");
-  }
-
-  void check_for_type(const int type_index) const
-  {
-    if (type_index >= num_types())
-      RANGE_ERROR("Type " + as_str(type_index) + " does not exist in network.");
-  }
-
-  void validate_edge(const int type_a, const int type_b, const bool loading = false)
-  {
-    if (edge_types == unipartite) {
-      return; // Do nothing
-    }
-
-    if (loading || edge_types == multipartite) {
-      // Load the type into connection types for later use
-      connection_types[type_a].insert(type_b);
-      connection_types[type_b].insert(type_a);
-    } else {
-      // If we're in a restricted multipartite network
-      // make sure that this is an acceptable edgetype combo
-      const bool edge_not_allowed = connection_types.at(type_a).count(type_b) == 0;
-
-      if (edge_not_allowed)
-        LOGIC_ERROR("Connection provided between nodes of types "
-                    + types[type_a] + " & " + types[type_b]
-                    + " which was not a specified combination in allowed edge types");
-    }
-  }
-
-  Node* add_node(const std::string& id,
-                 const int type_index = 0,
-                 const int level      = 0)
-  {
-    // Build new node pointer outside of vector first for ease of pointer retrieval
-    auto new_node = Node_UPtr(new Node(id, level, type_index, num_types()));
-
-    // Get raw pointer to node to return
-    Node* node_ptr = new_node.get();
-
-    // Place this node in the id-to-node map if its a data-level node
-    if (level == 0)
-      id_to_node.emplace(id, node_ptr);
-
-    // Move node unique pointer into its type in map
-    nodes[level][type_index].push_back(std::move(new_node));
-
-    return node_ptr;
-  }
-
-  template <typename Node_Ref>
-  void delete_node(const Node_Ref& node_to_remove)
-  {
-    auto& node_vector            = nodes[node_to_remove->level()][node_to_remove->type()];
-    const bool delete_successful = delete_from_vector(node_vector, node_to_remove);
-
-    if (!delete_successful)
-      LOGIC_ERROR("Tried to delete a node that doesn't exist");
-  }
-
-  Node* add_block_node(const int type_index, const int level = 1)
-  {
-    return add_node("bl_" + types[type_index] + "_" + as_str(block_counter++), type_index, level);
-  }
-
-  int num_nodes_of_type(const int type_i, const int level = 0) const
-  {
-    check_for_level(level);
-    check_for_type(type_i);
-    return nodes.at(level).at(type_i).size();
-  }
-
-  // Get a vector of raw pointers to all nodes in a given level with no type separation
-  Node_Vec get_flat_level(const int level) const
-  {
-    Node_Vec all_nodes;
-    all_nodes.reserve(num_nodes_at_level(level));
-
-    for_all_nodes_at_level(level, [&all_nodes](const Node_UPtr& node) {
-      all_nodes.push_back(node.get());
-    });
-
-    return all_nodes;
-  }
-
-
-  // Apply a lambda function over all nodes in network
-  void for_all_nodes_at_level(const int level,
-                              std::function<void(const Node_UPtr& node)> fn) const
-  {
-    check_for_level(level);
-    for (const auto& nodes_vec : nodes.at(level)) {
-      std::for_each(nodes_vec.begin(), nodes_vec.end(), fn);
-    }
-  }
-
-  public:
-  // Have sampler object be public for use by other functions
   Sampler sampler;
 
+  // Keeps track of how many block we've had to avoid duplicate ids
+  int block_counter = 0;
+
+  public:
   // =========================================================================
   // Constructors
   // =========================================================================
@@ -272,6 +158,15 @@ class SBM_Network {
   // =========================================================================
   // Information
   // =========================================================================
+  private:
+  int num_nodes_of_type(const int type_i, const int level = 0) const
+  {
+    check_for_level(level);
+    check_for_type(type_i);
+    return nodes.at(level).at(type_i).size();
+  }
+
+  public:
   int num_nodes() const
   {
     return total_num_elements(nodes);
@@ -319,8 +214,67 @@ class SBM_Network {
   }
 
   // =========================================================================
-  // Node Modification
+  // Node and Block Modification
   // =========================================================================
+  private:
+  Node* add_node(const std::string& id,
+                 const int type_index = 0,
+                 const int level      = 0)
+  {
+    // Build new node pointer outside of vector first for ease of pointer retrieval
+    auto new_node = Node_UPtr(new Node(id, level, type_index, num_types()));
+
+    // Get raw pointer to node to return
+    Node* node_ptr = new_node.get();
+
+    // Place this node in the id-to-node map if its a data-level node
+    if (level == 0)
+      id_to_node.emplace(id, node_ptr);
+
+    // Move node unique pointer into its type in map
+    nodes[level][type_index].push_back(std::move(new_node));
+
+    return node_ptr;
+  }
+
+  template <typename Node_Ref>
+  void delete_node(const Node_Ref& node_to_remove)
+  {
+    auto& node_vector            = nodes[node_to_remove->level()][node_to_remove->type()];
+    const bool delete_successful = delete_from_vector(node_vector, node_to_remove);
+
+    if (!delete_successful)
+      LOGIC_ERROR("Tried to delete a node that doesn't exist");
+  }
+
+  Node* add_block_node(const int type_index, const int level = 1)
+  {
+    return add_node("bl_" + types[type_index] + "_" + as_str(block_counter++), type_index, level);
+  }
+
+  void validate_edge(const int type_a, const int type_b, const bool loading = false)
+  {
+    if (edge_types == unipartite) {
+      return; // Do nothing
+    }
+
+    if (loading || edge_types == multipartite) {
+      // Load the type into connection types for later use
+      connection_types[type_a].insert(type_b);
+      connection_types[type_b].insert(type_a);
+    } else {
+      // If we're in a restricted multipartite network
+      // make sure that this is an acceptable edgetype combo
+      const bool edge_not_allowed = connection_types.at(type_a).count(type_b) == 0;
+
+      if (edge_not_allowed)
+        LOGIC_ERROR("Connection provided between nodes of types "
+                    + types[type_a] + " & " + types[type_b]
+                    + " which was not a specified combination in allowed edge types");
+    }
+  }
+
+  public:
   Node* add_node(const std::string& id,
                  const std::string& type = "a",
                  const int level         = 0)
@@ -339,9 +293,6 @@ class SBM_Network {
     b->add_neighbor(a);
   }
 
-  // =========================================================================
-  // Block Specific Modification (node levels 1+)
-  // =========================================================================
   void build_block_level(const int reserve_size = 0)
   {
     nodes.emplace_back(num_types());
@@ -452,7 +403,7 @@ class SBM_Network {
     }
   }
 
-  Node* propose_move(Node* node, const int level_of_proposed, const double eps = 0.1)
+  Node* propose_move(Node* node, const int to_level, const double eps = 0.1)
   {
     // Sample a random neighbor block
     Node* neighbor_block = sampler.sample(node->neighbors(), node->degree())->parent();
@@ -461,7 +412,7 @@ class SBM_Network {
     const Node_Ptr_Vec& neighbor_edges_to_t = neighbor_block->neighbors_of_type(node->type());
 
     // Get a reference to all the blocks that the node-to-move _could_ join
-    const Node_UPtr_Vec& all_potential_blocks = get_nodes_of_type(node->type(), level_of_proposed);
+    const Node_UPtr_Vec& all_potential_blocks = get_nodes_of_type(node->type(), to_level);
 
     // Decide if we are going to choose a random block for our node
     const double ergo_amnt = eps * all_potential_blocks.size();
@@ -471,7 +422,7 @@ class SBM_Network {
 
     // Decide where we will get new block from and draw from potential candidates
     if (draw_from_neighbor) {
-      return sampler.sample(neighbor_edges_to_t)->parent_at_level(level_of_proposed);
+      return sampler.sample(neighbor_edges_to_t)->parent_at_level(to_level);
     } else {
       return sampler.sample(all_potential_blocks).get();
     }
@@ -489,98 +440,6 @@ class SBM_Network {
     return propose_move(node, node->level(), eps);
   }
 
-  Collapse_Results collapse_blocks(const int node_level,
-                                   const int B_end,
-                                   const int n_checks_per_block,
-                                   const int n_mcmc_sweeps,
-                                   const double& sigma,
-                                   const double& eps,
-                                   const bool report_all_steps = true,
-                                   const bool allow_exhaustive = true)
-  {
-    // Make sure we have at least one final block per node type
-    if (num_types() > B_end) LOGIC_ERROR("Can't collapse a network with "
-                                         + as_str(num_types()) + " node types to "
-                                         + as_str(B_end)
-                                         + " blocks.\n There needs to be at least one block per node type.");
-
-    const int block_level = node_level + 1;
-    const bool using_mcmc = n_mcmc_sweeps > 0;
-
-    // Initialize struct to hold results of collapse
-    auto results = Collapse_Results(B_end);
-
-    // Remove any existing block level(s)
-    remove_block_levels_above(node_level);
-
-    // Initialize one-block-per-node
-    initialize_blocks();
-
-    // Setup variable to track the current number of blocks in the model
-    int B_cur = num_nodes_at_level(block_level);
-
-    // Lambda to calculate how many merges a step needs
-    auto calc_num_merges = [&B_end, &sigma](const int B) {
-      // How many blocks the sigma hueristic wants network to have after next move
-      // max of this value and target is taken to avoid overshooting goal
-      const int B_next = std::max(int(std::floor(double(B) / sigma)),
-                                  B_end);
-
-      return std::max(B - B_next, 1);
-    };
-
-    // Keep doing merges until we've reached the desired number of blocks
-    while (B_cur > B_end) {
-      const int n_merges_to_make = calc_num_merges(B_cur);
-
-      // Perform merges
-      auto merge_result = agglomerative_merge(this,
-                                              block_level,
-                                              n_merges_to_make,
-                                              n_checks_per_block,
-                                              eps,
-                                              allow_exhaustive);
-      // Update B_cur
-      B_cur -= n_merges_to_make;
-
-      if (using_mcmc) {
-        // Update the merge results entropy delta with the changes caused by MCMC sweep
-        merge_result.entropy_delta += mcmc_sweep(n_mcmc_sweeps,
-                                                 eps,        // eps
-                                                 false,      // variable num blocks
-                                                 false,      // track pairs
-                                                 node_level, // level
-                                                 false)      // verbose
-                                          .entropy_delta;
-
-        // Check to see if we have any empty blocks after our MCMC sweep and remove them
-        auto empty_blocks = Node_Vec();
-        for_all_nodes_at_level(block_level, [&empty_blocks](const Node_UPtr& node) {
-          if (node->is_empty()) empty_blocks.push_back(node.get());
-        });
-
-        // Update current number of blocks to account for the empty blocks
-        B_cur -= empty_blocks.size();
-
-        // Remove those empty blocks
-        for (const auto& empty_block : empty_blocks) delete_node(empty_block);
-      }
-
-      // Update results stuct
-      results.entropy_delta += merge_result.entropy_delta;
-
-      if (report_all_steps) {
-        results.merge_steps.push_back(merge_result);
-        results.states.push_back(state());
-      }
-    }
-
-    return results;
-  }
-
-  // =============================================================================
-  // Runs efficient MCMC sweep algorithm on desired node level
-  // =============================================================================
   MCMC_Sweeps mcmc_sweep(const int num_sweeps,
                          const double& eps,
                          const bool variable_num_blocks,
@@ -746,6 +605,95 @@ class SBM_Network {
     return results;
   }
 
+  Collapse_Results collapse_blocks(const int node_level,
+                                   const int B_end,
+                                   const int n_checks_per_block,
+                                   const int n_mcmc_sweeps,
+                                   const double& sigma,
+                                   const double& eps,
+                                   const bool report_all_steps = true,
+                                   const bool allow_exhaustive = true)
+  {
+    // Make sure we have at least one final block per node type
+    if (num_types() > B_end) LOGIC_ERROR("Can't collapse a network with "
+                                         + as_str(num_types()) + " node types to "
+                                         + as_str(B_end)
+                                         + " blocks.\n There needs to be at least one block per node type.");
+
+    const int block_level = node_level + 1;
+    const bool using_mcmc = n_mcmc_sweeps > 0;
+
+    // Initialize struct to hold results of collapse
+    auto results = Collapse_Results(B_end);
+
+    // Remove any existing block level(s)
+    remove_block_levels_above(node_level);
+
+    // Initialize one-block-per-node
+    initialize_blocks();
+
+    // Setup variable to track the current number of blocks in the model
+    int B_cur = num_nodes_at_level(block_level);
+
+    // Lambda to calculate how many merges a step needs
+    auto calc_num_merges = [&B_end, &sigma](const int B) {
+      // How many blocks the sigma hueristic wants network to have after next move
+      // max of this value and target is taken to avoid overshooting goal
+      const int B_next = std::max(int(std::floor(double(B) / sigma)),
+                                  B_end);
+
+      return std::max(B - B_next, 1);
+    };
+
+    // Keep doing merges until we've reached the desired number of blocks
+    while (B_cur > B_end) {
+      const int n_merges_to_make = calc_num_merges(B_cur);
+
+      // Perform merges
+      auto merge_result = agglomerative_merge(this,
+                                              block_level,
+                                              n_merges_to_make,
+                                              n_checks_per_block,
+                                              eps,
+                                              allow_exhaustive);
+      // Update B_cur
+      B_cur -= n_merges_to_make;
+
+      if (using_mcmc) {
+        // Update the merge results entropy delta with the changes caused by MCMC sweep
+        merge_result.entropy_delta += mcmc_sweep(n_mcmc_sweeps,
+                                                 eps,        // eps
+                                                 false,      // variable num blocks
+                                                 false,      // track pairs
+                                                 node_level, // level
+                                                 false)      // verbose
+                                          .entropy_delta;
+
+        // Check to see if we have any empty blocks after our MCMC sweep and remove them
+        auto empty_blocks = Node_Vec();
+        for_all_nodes_at_level(block_level, [&empty_blocks](const Node_UPtr& node) {
+          if (node->is_empty()) empty_blocks.push_back(node.get());
+        });
+
+        // Update current number of blocks to account for the empty blocks
+        B_cur -= empty_blocks.size();
+
+        // Remove those empty blocks
+        for (const auto& empty_block : empty_blocks) delete_node(empty_block);
+      }
+
+      // Update results stuct
+      results.entropy_delta += merge_result.entropy_delta;
+
+      if (report_all_steps) {
+        results.merge_steps.push_back(merge_result);
+        results.states.push_back(state());
+      }
+    }
+
+    return results;
+  }
+
   // =============================================================================
   // Model State
   // =============================================================================
@@ -826,13 +774,60 @@ class SBM_Network {
   // =========================================================================
   // Node Grabbers
   // =========================================================================
+  private:
+  int get_type_index(const string name) const
+  {
+    const auto name_it = type_name_to_int.find(name);
+
+    // If this is a previously unseen type, add new entry
+    if (name_it == type_name_to_int.end())
+      LOGIC_ERROR("Type " + name + " doesn't exist in network");
+
+    return name_it->second;
+  }
+
+  void check_for_level(const int level) const
+  {
+    // Make sure we have the requested level
+    if (level >= nodes.size())
+      RANGE_ERROR("Node requested in level that does not exist");
+  }
+
+  void check_for_type(const int type_index) const
+  {
+    if (type_index >= num_types())
+      RANGE_ERROR("Type " + as_str(type_index) + " does not exist in network.");
+  }
+
+  // Get a vector of raw pointers to all nodes in a given level with no type separation
+  Node_Vec get_flat_level(const int level) const
+  {
+    Node_Vec all_nodes;
+    all_nodes.reserve(num_nodes_at_level(level));
+
+    for_all_nodes_at_level(level, [&all_nodes](const Node_UPtr& node) {
+      all_nodes.push_back(node.get());
+    });
+
+    return all_nodes;
+  }
+
+  // Apply a lambda function over all nodes in network
+  void for_all_nodes_at_level(const int level,
+                              std::function<void(const Node_UPtr& node)> fn) const
+  {
+    check_for_level(level);
+    for (const auto& nodes_vec : nodes.at(level)) {
+      std::for_each(nodes_vec.begin(), nodes_vec.end(), fn);
+    }
+  }
+
+  public:
   const Type_Vec& get_nodes_at_level(const int level) const
   {
     check_for_level(level);
     return nodes[level];
   }
-
-
 
   const Node_UPtr_Vec& get_nodes_of_type(const int type_index, const int level = 0) const
   {
@@ -845,7 +840,6 @@ class SBM_Network {
   {
     return get_nodes_of_type(get_type_index(type), level);
   }
-
 
   Node* get_node_by_id(const string& id) const
   {
