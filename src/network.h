@@ -133,6 +133,26 @@ class SBM_Network {
     }
   }
 
+  Node* add_node(const std::string& id,
+                 const int type_index = 0,
+                 const int level      = 0)
+  {
+    // Build new node pointer outside of vector first for ease of pointer retrieval
+    auto new_node = Node_UPtr(new Node(id, level, type_index, num_types()));
+
+    // Get raw pointer to node to return
+    Node* node_ptr = new_node.get();
+
+    // Place this node in the id-to-node map if its a data-level node
+    if (level == 0)
+      id_to_node.emplace(id, node_ptr);
+
+    // Move node unique pointer into its type in map
+    nodes[level][type_index].push_back(std::move(new_node));
+
+    return node_ptr;
+  }
+
   public:
   // Have sampler object be public for use by other functions
   Sampler sampler;
@@ -278,25 +298,6 @@ class SBM_Network {
     return add_node(id, get_type_index(type), level);
   }
 
-  Node* add_node(const std::string& id,
-                 const int type_index = 0,
-                 const int level      = 0)
-  {
-    // Build new node pointer outside of vector first for ease of pointer retrieval
-    auto new_node = Node_UPtr(new Node(id, level, type_index, num_types()));
-
-    // Get raw pointer to node to return
-    Node* node_ptr = new_node.get();
-
-    // Place this node in the id-to-node map if its a data-level node
-    if (level == 0)
-      id_to_node.emplace(id, node_ptr);
-
-    // Move node unique pointer into its type in map
-    nodes[level][type_index].push_back(std::move(new_node));
-
-    return node_ptr;
-  }
 
   template <typename Node_Ref>
   void delete_node(const Node_Ref& node_to_remove)
