@@ -12,10 +12,6 @@
 
 #include <unordered_map>
 
-// These are seperate and will change based on compiler environemnt and only apply to the
-// constructor and externally callable methods.
-using Input_String_Vec = std::vector<string>;
-using Input_Int_Vec    = std::vector<int>;
 
 template <typename T>
 using String_Map = std::unordered_map<string, T>;
@@ -88,14 +84,14 @@ public:
   // =========================================================================
   // Constructors
   // =========================================================================
-  SBM_Network(const Input_String_Vec& node_ids,
-              const Input_String_Vec& node_types,
-              const Input_String_Vec& edges_a,
-              const Input_String_Vec& edges_b,
-              const Input_String_Vec& all_types,
+  SBM_Network(const InOut_String_Vec& node_ids,
+              const InOut_String_Vec& node_types,
+              const InOut_String_Vec& edges_a,
+              const InOut_String_Vec& edges_b,
+              const InOut_String_Vec& all_types,
               const int random_seed                   = 42,
-              const Input_String_Vec& allowed_edges_a = {},
-              const Input_String_Vec& allowed_edges_b = {})
+              const InOut_String_Vec& allowed_edges_a = {},
+              const InOut_String_Vec& allowed_edges_b = {})
       : sampler(random_seed)
       , types(all_types)
       , type_name_to_int(build_val_to_index_map(all_types))
@@ -129,14 +125,14 @@ public:
 
   // Builds a network without any nodes or edges
   // Calls the main constructor with empty node and edge vectors
-  SBM_Network(const Input_String_Vec& all_types       = { "node" },
+  SBM_Network(const InOut_String_Vec& all_types       = { "node" },
               const int random_seed                   = 42,
-              const Input_String_Vec& allowed_edges_a = {},
-              const Input_String_Vec& allowed_edges_b = {})
-      : SBM_Network(Input_String_Vec {},
-                    Input_String_Vec {},
-                    Input_String_Vec {},
-                    Input_String_Vec {},
+              const InOut_String_Vec& allowed_edges_a = {},
+              const InOut_String_Vec& allowed_edges_b = {})
+      : SBM_Network(InOut_String_Vec {},
+                    InOut_String_Vec {},
+                    InOut_String_Vec {},
+                    InOut_String_Vec {},
                     all_types,
                     random_seed,
                     allowed_edges_a,
@@ -673,6 +669,9 @@ public:
 
       // Update results stuct
       results.entropy_delta += merge_result.entropy_delta;
+
+      // Add info on how many blocks are remaining to merge info
+      merge_result.n_blocks = B_cur;
 
       if (report_all_steps) {
         results.merge_steps.push_back(merge_result);

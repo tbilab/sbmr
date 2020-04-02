@@ -13,6 +13,11 @@
 #define WARN_ABOUT(msg) std::cerr << std::string(msg) << std::endl
 #define OUT_MSG std::cout
 #define ALLOW_USER_BREAKOUT
+
+using InOut_String_Vec = std::vector<std::string>;
+using InOut_Int_Vec    = std::vector<int>;
+using InOut_Double_Vec = std::vector<double>;
+
 #else
 #include <Rcpp.h>
 // Eases the process of wrapping functions to get errors forwarded to R
@@ -28,6 +33,12 @@
 
 #define OUT_MSG Rcpp::Rcout
 #define ALLOW_USER_BREAKOUT Rcpp::checkUserInterrupt()
+
+using InOut_String_Vec = Rcpp::CharacterVector;
+using InOut_Int_Vec    = Rcpp::IntegerVector;
+using InOut_Double_Vec = Rcpp::NumericVector;
+
+
 #endif
 
 #endif
