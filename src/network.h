@@ -75,8 +75,6 @@ enum Partite_Structure {
   multipartite_restricted // Multiple node types, only specific type combos allowed for edges
 };
 
-
-
 struct Collapse_Results {
   double entropy_delta = 0; // Will keep track of the overall entropy change from this collapse
   int num_blocks;
@@ -127,9 +125,8 @@ public:
 
     // Add nodes to network
     for (int i = 0; i < node_ids.size(); i++) add_node(to_str(node_ids[i]),
-                                                            to_str(node_types[i]));
+                                                       to_str(node_types[i]));
   }
-
 
   // Takes bulk node and edge information
   SBM_Network(const InOut_String_Vec& node_ids,
@@ -158,7 +155,6 @@ public:
     // Connect nodes with edges
     for (int i = 0; i < edges_a.size(); i++) add_edge(to_str(edges_a[i]),
                                                       to_str(edges_b[i]));
-
   }
 
   // Empty network without any nodes or edges
@@ -304,7 +300,6 @@ private:
     }
   }
 
-
 public:
   Node* add_node(const InOut_String& id,
                  const InOut_String& type,
@@ -312,7 +307,7 @@ public:
   {
     return add_node(to_str(id), get_type_index(to_str(type)), level);
   }
-  
+
   void add_node_no_ret(const InOut_String& id,
                        const InOut_String& type,
                        const int level)
