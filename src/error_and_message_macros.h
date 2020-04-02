@@ -10,9 +10,7 @@
 #include <iostream>
 #define LOGIC_ERROR(msg) throw std::logic_error(msg)
 #define RANGE_ERROR(msg) throw std::range_error(msg)
-#define WARN_ABOUT(msg)          \
-  const std::string w_msg = msg; \
-  std::cerr << w_msg << std::endl
+#define WARN_ABOUT(msg) std::cerr << std::string(msg) << std::endl
 #define OUT_MSG std::cout
 #define ALLOW_USER_BREAKOUT
 #else
