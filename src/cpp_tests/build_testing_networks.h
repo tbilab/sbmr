@@ -8,15 +8,15 @@ inline SBM_Network simple_bipartite()
   SBM_Network my_sbm { { "a", "b" }, 42 };
 
   // Add nodes to graph first
-  Node* a1 = my_sbm.add_node("a1", "a");
-  Node* a2 = my_sbm.add_node("a2", "a");
-  Node* a3 = my_sbm.add_node("a3", "a");
-  Node* a4 = my_sbm.add_node("a4", "a");
+  Node* a1 = my_sbm.add_data_node("a1", "a");
+  Node* a2 = my_sbm.add_data_node("a2", "a");
+  Node* a3 = my_sbm.add_data_node("a3", "a");
+  Node* a4 = my_sbm.add_data_node("a4", "a");
 
-  Node* b1 = my_sbm.add_node("b1", "b");
-  Node* b2 = my_sbm.add_node("b2", "b");
-  Node* b3 = my_sbm.add_node("b3", "b");
-  Node* b4 = my_sbm.add_node("b4", "b");
+  Node* b1 = my_sbm.add_data_node("b1", "b");
+  Node* b2 = my_sbm.add_data_node("b2", "b");
+  Node* b3 = my_sbm.add_data_node("b3", "b");
+  Node* b4 = my_sbm.add_data_node("b4", "b");
 
   // Make blocks
   my_sbm.build_block_level();
@@ -58,12 +58,12 @@ inline SBM_Network simple_unipartite()
   SBM_Network my_SBM { { "a" }, 42 };
 
   // Add nodes to graph first
-  Node* n1 = my_SBM.add_node("n1", "a");
-  Node* n2 = my_SBM.add_node("n2", "a");
-  Node* n3 = my_SBM.add_node("n3", "a");
-  Node* n4 = my_SBM.add_node("n4", "a");
-  Node* n5 = my_SBM.add_node("n5", "a");
-  Node* n6 = my_SBM.add_node("n6", "a");
+  Node* n1 = my_SBM.add_data_node("n1", "a");
+  Node* n2 = my_SBM.add_data_node("n2", "a");
+  Node* n3 = my_SBM.add_data_node("n3", "a");
+  Node* n4 = my_SBM.add_data_node("n4", "a");
+  Node* n5 = my_SBM.add_data_node("n5", "a");
+  Node* n6 = my_SBM.add_data_node("n6", "a");
 
   // Add edges
   my_SBM.add_edge("n1", "n2");
