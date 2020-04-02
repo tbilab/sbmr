@@ -106,11 +106,6 @@ class SBM_Network {
       RANGE_ERROR("Type " + as_str(type_index) + " does not exist in network.");
   }
 
-  bool no_blocks() const
-  {
-    return num_levels() == 1;
-  }
-
   void validate_edge(const int type_a, const int type_b, const bool loading = false)
   {
     if (edge_types == unipartite) {
