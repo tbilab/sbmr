@@ -153,6 +153,11 @@ class SBM_Network {
     return node_ptr;
   }
 
+  Node* add_block_node(const int type_index, const int level = 1)
+  {
+    return add_node("bl_" + types[type_index] + "_" + as_str(block_counter++), type_index, level);
+  }
+
   public:
   // Have sampler object be public for use by other functions
   Sampler sampler;
@@ -298,7 +303,6 @@ class SBM_Network {
     return add_node(id, get_type_index(type), level);
   }
 
-
   template <typename Node_Ref>
   void delete_node(const Node_Ref& node_to_remove)
   {
@@ -369,7 +373,6 @@ class SBM_Network {
 
       for (int i = 0; i < num_blocks; i++) {
         add_block_node(type_i, block_level);
-        // add_node("b_" + as_str(block_counter++), type_i, block_level);
       }
 
       // Shuffle child nodes if we're randomly assigning blocks
@@ -382,11 +385,6 @@ class SBM_Network {
         nodes_of_type[i]->set_parent(blocks_of_type[i % num_blocks].get());
       }
     }
-  }
-
-  Node* add_block_node(const int type_index, const int level = 1)
-  {
-    return add_node("bl_" + types[type_index] + "_" + as_str(block_counter++), type_index, level);
   }
 
   void merge_blocks(Node* absorbed_block, Node* absorbing_block)
@@ -804,8 +802,10 @@ class SBM_Network {
       Node* parent_node = [&]() {
         const auto parent_it = block_by_id.find(parent);
         // If this block is newly seen, create it
-        if (parent_it == block_by_id.end())
+        if (parent_it == block_by_id.end()) {
+          block_counter++;
           return block_by_id.emplace(parent, add_node(parent, type, level + 1)).first->second;
+        }
         return parent_it->second;
       }();
 
