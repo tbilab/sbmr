@@ -7,13 +7,13 @@ TEST_CASE("Basic initialization of network", "[Network]")
   SBM_Network my_net({ "m", "n" }, 42);
 
   // Add some nodes to Network
-  my_net.add_data_node("n1", "n");
-  my_net.add_data_node("n2", "n");
-  my_net.add_data_node("n3", "n");
-  my_net.add_data_node("m1", "m");
-  my_net.add_data_node("m2", "m");
-  my_net.add_data_node("m3", "m");
-  my_net.add_data_node("m4", "m");
+  my_net.add_node("n1", "n");
+  my_net.add_node("n2", "n");
+  my_net.add_node("n3", "n");
+  my_net.add_node("m1", "m");
+  my_net.add_node("m2", "m");
+  my_net.add_node("m3", "m");
+  my_net.add_node("m4", "m");
 
   REQUIRE(my_net.num_nodes() == 7);
   REQUIRE(my_net.num_nodes_at_level(0) == 7);
@@ -38,12 +38,12 @@ TEST_CASE("Default block initialization", "[Network]")
   SBM_Network my_net({ "a", "b" }, 42);
 
   // Start with a few nodes in the network
-  my_net.add_data_node("a1", "a");
-  my_net.add_data_node("a2", "a");
-  my_net.add_data_node("a3", "a");
-  my_net.add_data_node("b1", "b");
-  my_net.add_data_node("b2", "b");
-  my_net.add_data_node("b3", "b");
+  my_net.add_node("a1", "a");
+  my_net.add_node("a2", "a");
+  my_net.add_node("a3", "a");
+  my_net.add_node("b1", "b");
+  my_net.add_node("b2", "b");
+  my_net.add_node("b3", "b");
 
   // Give every node its own block
   my_net.initialize_blocks();
@@ -74,24 +74,24 @@ TEST_CASE("Initializing a block for every node", "[Network]")
 {
   SBM_Network my_net({ "a", "b" }, 42);
 
-  my_net.add_data_node("a1", "a");
-  my_net.add_data_node("a2", "a");
-  my_net.add_data_node("a3", "a");
-  my_net.add_data_node("a4", "a");
-  my_net.add_data_node("a5", "a");
-  my_net.add_data_node("a10", "a");
-  my_net.add_data_node("a11", "a");
-  my_net.add_data_node("a13", "a");
-  my_net.add_data_node("a14", "a");
-  my_net.add_data_node("a6", "a");
-  my_net.add_data_node("a7", "a");
-  my_net.add_data_node("a8", "a");
-  my_net.add_data_node("a9", "a");
-  my_net.add_data_node("a12", "a");
-  my_net.add_data_node("b1", "b");
-  my_net.add_data_node("b2", "b");
-  my_net.add_data_node("b3", "b");
-  my_net.add_data_node("b4", "b");
+  my_net.add_node("a1", "a");
+  my_net.add_node("a2", "a");
+  my_net.add_node("a3", "a");
+  my_net.add_node("a4", "a");
+  my_net.add_node("a5", "a");
+  my_net.add_node("a10", "a");
+  my_net.add_node("a11", "a");
+  my_net.add_node("a13", "a");
+  my_net.add_node("a14", "a");
+  my_net.add_node("a6", "a");
+  my_net.add_node("a7", "a");
+  my_net.add_node("a8", "a");
+  my_net.add_node("a9", "a");
+  my_net.add_node("a12", "a");
+  my_net.add_node("b1", "b");
+  my_net.add_node("b2", "b");
+  my_net.add_node("b3", "b");
+  my_net.add_node("b4", "b");
 
   // There should be a total of 18 nodes at base level
   REQUIRE(my_net.num_nodes_at_level(0) == 18);
@@ -111,27 +111,27 @@ TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
 {
   SBM_Network my_net({ "a", "b" }, 42);
 
-  my_net.add_data_node("a1", "a");
-  my_net.add_data_node("a2", "a");
-  my_net.add_data_node("a3", "a");
-  my_net.add_data_node("a4", "a");
-  my_net.add_data_node("a5", "a");
-  my_net.add_data_node("a6", "a");
-  my_net.add_data_node("a7", "a");
-  my_net.add_data_node("a8", "a");
-  my_net.add_data_node("a9", "a");
-  my_net.add_data_node("a10", "a");
+  my_net.add_node("a1", "a");
+  my_net.add_node("a2", "a");
+  my_net.add_node("a3", "a");
+  my_net.add_node("a4", "a");
+  my_net.add_node("a5", "a");
+  my_net.add_node("a6", "a");
+  my_net.add_node("a7", "a");
+  my_net.add_node("a8", "a");
+  my_net.add_node("a9", "a");
+  my_net.add_node("a10", "a");
 
-  my_net.add_data_node("b1", "b");
-  my_net.add_data_node("b2", "b");
-  my_net.add_data_node("b3", "b");
-  my_net.add_data_node("b4", "b");
-  my_net.add_data_node("b5", "b");
-  my_net.add_data_node("b6", "b");
-  my_net.add_data_node("b7", "b");
-  my_net.add_data_node("b8", "b");
-  my_net.add_data_node("b9", "b");
-  my_net.add_data_node("b10", "b");
+  my_net.add_node("b1", "b");
+  my_net.add_node("b2", "b");
+  my_net.add_node("b3", "b");
+  my_net.add_node("b4", "b");
+  my_net.add_node("b5", "b");
+  my_net.add_node("b6", "b");
+  my_net.add_node("b7", "b");
+  my_net.add_node("b8", "b");
+  my_net.add_node("b9", "b");
+  my_net.add_node("b10", "b");
 
   // Distribute 3 total blocks for each type across nodes randomly
   my_net.initialize_blocks(3);
@@ -146,13 +146,13 @@ TEST_CASE("Metablock initialization", "[Network]")
   SBM_Network my_net({ "m", "n" }, 42);
 
   // Add some nodes to Network
-  my_net.add_data_node("n1", "n");
-  my_net.add_data_node("n2", "n");
-  my_net.add_data_node("n3", "n");
-  my_net.add_data_node("m1", "m");
-  my_net.add_data_node("m2", "m");
-  my_net.add_data_node("m3", "m");
-  my_net.add_data_node("m4", "m");
+  my_net.add_node("n1", "n");
+  my_net.add_node("n2", "n");
+  my_net.add_node("n3", "n");
+  my_net.add_node("m1", "m");
+  my_net.add_node("m2", "m");
+  my_net.add_node("m3", "m");
+  my_net.add_node("m4", "m");
 
   my_net.initialize_blocks(3);
 
@@ -189,12 +189,12 @@ TEST_CASE("Swapping of blocks", "[Network]")
   SBM_Network my_net({ "m", "n" }, 42);
 
   // Add some nodes to Network
-  my_net.add_data_node("n1", "n");
-  my_net.add_data_node("n2", "n");
-  my_net.add_data_node("n3", "n");
-  my_net.add_data_node("m1", "m");
-  my_net.add_data_node("m2", "m");
-  my_net.add_data_node("m3", "m");
+  my_net.add_node("n1", "n");
+  my_net.add_node("n2", "n");
+  my_net.add_node("n3", "n");
+  my_net.add_node("m1", "m");
+  my_net.add_node("m2", "m");
+  my_net.add_node("m3", "m");
 
   my_net.initialize_blocks();
 
@@ -265,13 +265,13 @@ TEST_CASE("State dumping and restoring", "[Network")
   SBM_Network my_net({ "a", "b" }, 42);
 
   // Start with a few nodes in the network
-  my_net.add_data_node("a1", "a");
-  my_net.add_data_node("a2", "a");
-  my_net.add_data_node("a3", "a");
+  my_net.add_node("a1", "a");
+  my_net.add_node("a2", "a");
+  my_net.add_node("a3", "a");
 
-  my_net.add_data_node("b1", "b");
-  my_net.add_data_node("b2", "b");
-  my_net.add_data_node("b3", "b");
+  my_net.add_node("b1", "b");
+  my_net.add_node("b2", "b");
+  my_net.add_node("b3", "b");
 
   // Give every node its own block
   my_net.initialize_blocks();
@@ -328,12 +328,12 @@ TEST_CASE("State dumping and restoring", "[Network")
   SBM_Network my_net2({ "a", "b" }, 42);
 
   // Start with a few nodes in the network
-  my_net2.add_data_node("a1", "a");
-  my_net2.add_data_node("a2", "a");
-  my_net2.add_data_node("a3", "a");
-  my_net2.add_data_node("b1", "b");
-  my_net2.add_data_node("b3", "b");
-  my_net2.add_data_node("b2", "b");
+  my_net2.add_node("a1", "a");
+  my_net2.add_node("a2", "a");
+  my_net2.add_node("a3", "a");
+  my_net2.add_node("b1", "b");
+  my_net2.add_node("b3", "b");
+  my_net2.add_node("b2", "b");
 
   REQUIRE(my_net2.num_levels() == 1);
 
@@ -350,15 +350,15 @@ TEST_CASE("State dumping and restoring: w/ metablocks", "[Network")
   SBM_Network my_net({ "a", "b" }, 42);
 
   // Start with a few nodes in the network
-  my_net.add_data_node("a1", "a");
-  my_net.add_data_node("a2", "a");
-  my_net.add_data_node("a3", "a");
-  my_net.add_data_node("a4", "a");
+  my_net.add_node("a1", "a");
+  my_net.add_node("a2", "a");
+  my_net.add_node("a3", "a");
+  my_net.add_node("a4", "a");
 
-  my_net.add_data_node("b1", "b");
-  my_net.add_data_node("b2", "b");
-  my_net.add_data_node("b3", "b");
-  my_net.add_data_node("b4", "b");
+  my_net.add_node("b1", "b");
+  my_net.add_node("b2", "b");
+  my_net.add_node("b3", "b");
+  my_net.add_node("b4", "b");
 
   // Give every node its own block
   my_net.initialize_blocks();
@@ -378,14 +378,14 @@ TEST_CASE("State dumping and restoring: w/ metablocks", "[Network")
   SBM_Network my_net2({ "a", "b" }, 42);
 
   // Start with a few nodes in the network
-  my_net2.add_data_node("a1", "a");
-  my_net2.add_data_node("a2", "a");
-  my_net2.add_data_node("a3", "a");
-  my_net2.add_data_node("a4", "a");
-  my_net2.add_data_node("b1", "b");
-  my_net2.add_data_node("b2", "b");
-  my_net2.add_data_node("b3", "b");
-  my_net2.add_data_node("b4", "b");
+  my_net2.add_node("a1", "a");
+  my_net2.add_node("a2", "a");
+  my_net2.add_node("a3", "a");
+  my_net2.add_node("a4", "a");
+  my_net2.add_node("b1", "b");
+  my_net2.add_node("b2", "b");
+  my_net2.add_node("b3", "b");
+  my_net2.add_node("b4", "b");
 
   REQUIRE(my_net2.num_levels() == 1);
   REQUIRE(my_net2.num_nodes_at_level(0) == 8);
@@ -503,17 +503,17 @@ TEST_CASE("Counting edges", "[Network]")
   SBM_Network my_net { { "a", "b" }, 42 };
 
   // Base-level nodes
-  Node* a1 = my_net.add_data_node("a1", "a");
-  Node* a2 = my_net.add_data_node("a2", "a");
-  Node* a3 = my_net.add_data_node("a3", "a");
-  Node* a4 = my_net.add_data_node("a4", "a");
-  Node* a5 = my_net.add_data_node("a5", "a");
+  Node* a1 = my_net.add_node("a1", "a");
+  Node* a2 = my_net.add_node("a2", "a");
+  Node* a3 = my_net.add_node("a3", "a");
+  Node* a4 = my_net.add_node("a4", "a");
+  Node* a5 = my_net.add_node("a5", "a");
 
-  Node* b1 = my_net.add_data_node("b1", "b");
-  Node* b2 = my_net.add_data_node("b2", "b");
-  Node* b3 = my_net.add_data_node("b3", "b");
-  Node* b4 = my_net.add_data_node("b4", "b");
-  Node* b5 = my_net.add_data_node("b5", "b");
+  Node* b1 = my_net.add_node("b1", "b");
+  Node* b2 = my_net.add_node("b2", "b");
+  Node* b3 = my_net.add_node("b3", "b");
+  Node* b4 = my_net.add_node("b4", "b");
+  Node* b5 = my_net.add_node("b5", "b");
 
   // level one blocks
   my_net.build_block_level();

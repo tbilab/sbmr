@@ -126,7 +126,7 @@ public:
     build_block_level(node_ids.size());
 
     // Add nodes to network
-    for (int i = 0; i < node_ids.size(); i++) add_data_node(to_str(node_ids[i]),
+    for (int i = 0; i < node_ids.size(); i++) add_node(to_str(node_ids[i]),
                                                             to_str(node_types[i]));
   }
 
@@ -306,25 +306,19 @@ private:
 
 
 public:
-  Node* add_data_node(const std::string& id,
-                      const std::string& type)
-  {
-    return add_node(id, get_type_index(type), 0);
-  }
-  
   Node* add_node(const InOut_String& id,
                  const InOut_String& type,
-                 const int level)
+                 const int level = 0)
   {
     return add_node(to_str(id), get_type_index(to_str(type)), level);
   }
-
-  // Node* add_node(const InOut_String& id,
-  //                const InOut_String& type = "a",
-  //                const int level          = 0)
-  // {
-  //   return add_node(to_str(id), get_type_index(to_str(type)), level);
-  // }
+  
+  void add_node_no_ret(const InOut_String& id,
+                       const InOut_String& type,
+                       const int level)
+  {
+    add_node(to_str(id), get_type_index(to_str(type)), level);
+  }
 
   void add_edge(const string& node_a, const string& node_b)
   {
