@@ -150,10 +150,8 @@ public:
   }
 
   // Empty network without any nodes or edges
-  SBM_Network(const InOut_String_Vec& all_types       = { "node" },
-              const int random_seed                   = 42,
-              const InOut_String_Vec& allowed_edges_a = {},
-              const InOut_String_Vec& allowed_edges_b = {})
+  SBM_Network(const InOut_String_Vec& all_types = { "node" },
+              const int random_seed             = 42)
       : SBM_Network(InOut_String_Vec {},
                     InOut_String_Vec {},
                     all_types,
