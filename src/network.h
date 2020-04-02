@@ -148,6 +148,16 @@ class SBM_Network {
     return node_ptr;
   }
 
+  template <typename Node_Ref>
+  void delete_node(const Node_Ref& node_to_remove)
+  {
+    auto& node_vector            = nodes[node_to_remove->level()][node_to_remove->type()];
+    const bool delete_successful = delete_from_vector(node_vector, node_to_remove);
+
+    if (!delete_successful)
+      LOGIC_ERROR("Tried to delete a node that doesn't exist");
+  }
+
   Node* add_block_node(const int type_index, const int level = 1)
   {
     return add_node("bl_" + types[type_index] + "_" + as_str(block_counter++), type_index, level);
@@ -254,7 +264,6 @@ class SBM_Network {
     return nodes.size();
   }
 
-
   int num_nodes_of_type(const string& type, const int level = 0) const
   {
     check_for_level(level);
@@ -293,16 +302,6 @@ class SBM_Network {
                  const int level         = 0)
   {
     return add_node(id, get_type_index(type), level);
-  }
-
-  template <typename Node_Ref>
-  void delete_node(const Node_Ref& node_to_remove)
-  {
-    auto& node_vector            = nodes[node_to_remove->level()][node_to_remove->type()];
-    const bool delete_successful = delete_from_vector(node_vector, node_to_remove);
-
-    if (!delete_successful)
-      LOGIC_ERROR("Tried to delete a node that doesn't exist");
   }
 
   void add_edge(const string& node_a, const string& node_b)
