@@ -9,6 +9,7 @@ struct Block_Mergers {
   double entropy_delta = 0.0;
   std::vector<string> merge_from;
   std::vector<string> merge_into;
+  int n_blocks; 
   Block_Mergers(const int n)
   {
     merge_from.reserve(n);
