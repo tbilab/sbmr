@@ -26,6 +26,16 @@ public:
   InOut_String_Vec parents;
   InOut_Int_Vec levels;
   State_Dump() {};
+  State_Dump(const InOut_String_Vec& id,
+             const InOut_String_Vec& type,
+             const InOut_String_Vec& parent,
+             const InOut_Int_Vec& level)
+      : ids(id)
+      , types(type)
+      , parents(parent)
+      , levels(level)
+  {
+  }
   State_Dump(const int size)
       : ids(size)
       , types(size)
