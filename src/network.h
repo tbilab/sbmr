@@ -153,6 +153,13 @@ class SBM_Network {
     return add_node("bl_" + types[type_index] + "_" + as_str(block_counter++), type_index, level);
   }
 
+  int num_nodes_of_type(const int type_i, const int level = 0) const
+  {
+    check_for_level(level);
+    check_for_type(type_i);
+    return nodes.at(level).at(type_i).size();
+  }
+
   public:
   // Have sampler object be public for use by other functions
   Sampler sampler;
@@ -247,12 +254,6 @@ class SBM_Network {
     return nodes.size();
   }
 
-  int num_nodes_of_type(const int type_i, const int level = 0) const
-  {
-    check_for_level(level);
-    check_for_type(type_i);
-    return nodes.at(level).at(type_i).size();
-  }
 
   int num_nodes_of_type(const string& type, const int level = 0) const
   {
