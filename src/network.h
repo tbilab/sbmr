@@ -16,18 +16,33 @@
 template <typename T>
 using String_Map = std::unordered_map<string, T>;
 
-struct State_Dump {
-  std::vector<string> ids;
-  std::vector<string> types;
-  std::vector<string> parents;
-  std::vector<int> levels;
+class State_Dump {
+private:
+  int i = 0;
+
+public:
+  InOut_String_Vec ids;
+  InOut_String_Vec types;
+  InOut_String_Vec parents;
+  InOut_Int_Vec levels;
   State_Dump() {};
   State_Dump(const int size)
+      : ids(size)
+      , types(size)
+      , parents(size)
+      , levels(size)
   {
-    ids.reserve(size);
-    types.reserve(size);
-    parents.reserve(size);
-    levels.reserve(size);
+  }
+  void add(const string& id,
+           const string& type,
+           const string& parent,
+           const int level)
+  {
+    ids[i]     = id;
+    types[i]   = type;
+    parents[i] = parent;
+    levels[i]  = level;
+    i++;
   }
   int size() const { return ids.size(); }
 };
@@ -39,10 +54,10 @@ enum Partite_Structure {
 };
 
 struct MCMC_Sweeps {
-  std::vector<double> sweep_entropy_delta;
-  std::vector<int> sweep_num_nodes_moved;
+  InOut_Double_Vec sweep_entropy_delta;
+  InOut_Int_Vec sweep_num_nodes_moved;
   Block_Consensus block_consensus;
-  std::vector<string> nodes_moved;
+  InOut_String_Vec nodes_moved;
   double entropy_delta = 0.0;
   MCMC_Sweeps(const int n)
   {
@@ -687,19 +702,22 @@ public:
   // =============================================================================
   State_Dump state() const
   {
-    if (num_levels() == 1) LOGIC_ERROR("No state to export - Try adding blocks");
-
-    // Initialize the return struct
-    State_Dump state(num_nodes());
+    const int n_levels = num_levels();
+    if (n_levels == 1) LOGIC_ERROR("No state to export - Try adding blocks");
 
     // No need to record the last level's nodes as they are already included
     // in the previous node's parent slot
+    const int n_nodes_in_last_level = num_nodes_at_level(n_levels-1);
+
+    // Initialize the return struct
+    State_Dump state(num_nodes() - n_nodes_in_last_level);
+
     for (int level = 0; level < num_levels() - 1; level++) {
       for_all_nodes_at_level(level, [&](const Node_UPtr& node) {
-        state.ids.push_back(node->id());
-        state.types.push_back(types[node->type()]);
-        state.parents.push_back(node->parent()->id());
-        state.levels.push_back(level);
+        state.add(node->id(),
+                  types[node->type()],
+                  node->parent()->id(),
+                  level);
       });
     }
 
