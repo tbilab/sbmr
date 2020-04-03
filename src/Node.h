@@ -35,7 +35,7 @@ enum Update_Type { Add,
 // Main node class declaration
 //=================================
 class Node {
-private:
+  private:
   Node* parent_node = nullptr; // What node contains this node (aka its cluster)
   int _degree       = 0;       // How many neighbors does this node have?
   Node_Vec _children;          // Nodes that are contained within node (if node is cluster)
@@ -44,7 +44,7 @@ private:
   int _type;                   // What type of node is this?
   Edges_By_Type _neighbors;
 
-public:
+  public:
   // =========================================================================
   // Constructors
   // =========================================================================
@@ -151,7 +151,7 @@ public:
   }
 
   // Get parent of node at a given level
-  Node* parent_at_level(const int level_of_parent)
+  Node* parent_at_level(const int level_of_parent) const
   {
     // First we need to make sure that the requested level is not less than that
     // of the current node.
@@ -161,8 +161,8 @@ public:
                                               + as_str(_level) + ").");
 
     // Start with this node as current node
-    Node* current_node     = this;
-    int current_node_level = _level;
+    Node* current_node     = parent_node;
+    int current_node_level = _level + 1;
 
     while (current_node_level != level_of_parent) {
       if (!has_parent()) RANGE_ERROR("No parent at level " + as_str(level_of_parent)
@@ -170,7 +170,7 @@ public:
 
       // Traverse up parents until we've reached just below where we want to go
       current_node = current_node->parent();
-      current_node_level++;
+      current_node_level++;f
     }
 
     // Return the final node, aka the parent at desired level
@@ -199,6 +199,10 @@ public:
   {
     // Setup an neighbor count map for node
     Edge_Count_Map neighbors_counts;
+
+    // for_all_neighbors([&](const Node* node){
+    //   neighbors_counts[node->parent_at_level(level)]++;
+    // });
 
     for (const auto& nodes_of_type : _neighbors) {
       for (const auto& node : nodes_of_type) {
@@ -240,6 +244,14 @@ public:
 
     // Propagate edge changes up hierarchy
     if (has_parent()) parent_node->update_neighbors(neighbors_to_update, update_type);
+  }
+
+  // Apply a lambda function over all nodes in network
+  void for_all_neighbors(std::function<void(const Node* node)> fn) const
+  {
+    for (const auto& neighbors_of_type : _neighbors) {
+      std::for_each(neighbors_of_type.begin(), neighbors_of_type.end(), fn);
+    }
   }
 
   // =========================================================================
