@@ -16,10 +16,10 @@ template <typename T>
 using String_Map = std::unordered_map<string, T>;
 
 class State_Dump {
-private:
+  private:
   int i = 0;
 
-public:
+  public:
   InOut_String_Vec ids;
   InOut_String_Vec types;
   InOut_String_Vec parents;
@@ -47,10 +47,10 @@ public:
 };
 
 class MCMC_Sweeps {
-private:
+  private:
   int i = 0;
 
-public:
+  public:
   InOut_Double_Vec sweep_entropy_delta;
   InOut_Int_Vec sweep_num_nodes_moved;
   Block_Consensus block_consensus;
@@ -88,7 +88,7 @@ struct Collapse_Results {
 
 class SBM_Network {
 
-private:
+  private:
   // =========================================================================
   // Data/Attributes
   // =========================================================================
@@ -103,7 +103,7 @@ private:
   // Keeps track of how many block we've had to avoid duplicate ids
   int block_counter = 0;
 
-public:
+  public:
   // =========================================================================
   // Constructors
   // =========================================================================
@@ -168,7 +168,7 @@ public:
   // =========================================================================
   // Information
   // =========================================================================
-private:
+  private:
   int num_nodes_of_type(const int type_i, const int level = 0) const
   {
     check_for_level(level);
@@ -176,7 +176,7 @@ private:
     return nodes[level][type_i].size();
   }
 
-public:
+  public:
   int num_nodes() const
   {
     return total_num_elements(nodes);
@@ -220,10 +220,28 @@ public:
         });
   }
 
+  Ordered_Pair_Int_Map<Node*> block_to_block_edge_counts(const int level) const
+  {
+    if (level == 0) LOGIC_ERROR("Level 0 is not block level");
+
+    auto edge_counts = Ordered_Pair_Int_Map<Node*>();
+
+    auto gather_blocks_neighbors = [&edge_counts](const Node_UPtr& block_i) {
+      for (const auto& neighbors_of_type : block_i->neighbors()) {
+        for (const auto& block_j : neighbors_of_type) {
+          edge_counts[Ordered_Pair<Node*>(block_i.get(), block_j)]++;
+        }
+      }
+    };
+    for_all_nodes_at_level(level, gather_blocks_neighbors);
+
+    return edge_counts;
+  }
+
   // =========================================================================
   // Node and Block Modification
   // =========================================================================
-private:
+  private:
   Node* add_node(const std::string& id,
                  const int type_index = 0,
                  const int level      = 0)
@@ -285,7 +303,7 @@ private:
     }
   }
 
-public:
+  public:
   Node* add_node(const string& id,
                  const string& type,
                  const int level = 0)
@@ -806,7 +824,7 @@ public:
   // =========================================================================
   // Node Grabbers
   // =========================================================================
-private:
+  private:
   int get_type_index(const string name) const
   {
     const auto name_it = type_name_to_int.find(name);
@@ -852,7 +870,7 @@ private:
     }
   }
 
-public:
+  public:
   const Type_Vec& get_nodes_at_level(const int level) const
   {
     check_for_level(level);

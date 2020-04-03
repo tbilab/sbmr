@@ -52,3 +52,6 @@ struct Ordered_Pair_Hash {
 
 template <typename T>
 using Ordered_Pair_Set = std::unordered_set<Ordered_Pair<T>, Ordered_Pair_Hash<T>>;
+
+template <typename T>
+using Ordered_Pair_Int_Map = std::unordered_map<Ordered_Pair<T>, int, Ordered_Pair_Hash<T>>;
