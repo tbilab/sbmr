@@ -14,8 +14,8 @@ template <>
 SEXP wrap(const MCMC_Sweeps&);
 template <>
 SEXP wrap(const Collapse_Results&);
-// template<>
-// std::string as(SEXP);
+template<>
+SEXP wrap(const Edge_Counts&);
 
 
 
@@ -29,7 +29,6 @@ inline DataFrame state_to_df(const State_Dump& state)
     _["level"]            = state.levels,
     _["stringsAsFactors"] = false);
 }
-
 }
 
 
@@ -78,6 +77,30 @@ SEXP wrap(const MCMC_Sweeps& results)
 }
 
 template <>
+SEXP wrap(const Edge_Counts& edge_counts)
+{
+  const int n = edge_counts.size();
+
+  auto a_blocks = CharacterVector(n);
+  auto b_blocks = CharacterVector(n);
+  auto counts   = IntegerVector(n);
+
+  int i = 0;
+
+  for (const auto& edge_to_count : edge_counts) {
+    a_blocks[i] = edge_to_count.first.first();
+    b_blocks[i] = edge_to_count.first.second();
+    counts[i]   = edge_to_count.second;
+    i++;
+  }
+
+  return DataFrame::create(_["block_a"]          = a_blocks,
+                           _["block_b"]          = b_blocks,
+                           _["n_edges"]          = counts,
+                           _["stringsAsFactors"] = false);
+}
+
+template <>
 SEXP wrap(const Collapse_Results& collapse_results)
 {
   const int n_steps = collapse_results.merge_steps.size();
@@ -99,15 +122,7 @@ SEXP wrap(const Collapse_Results& collapse_results)
   return entropy_results;
 }
 
-// template <>
-// std::string as(SEXP txt)
-// {
-//   try {
-//     return std::string(txt);
-//   } catch(...) {
-//     throw(not_compatible);
-//   }
-// }
+
 
 } // End RCPP namespace
 
