@@ -222,7 +222,7 @@ class SBM_Network {
         });
   }
 
-  Edge_Counts block_to_block_edge_counts(const int level) const
+  Edge_Counts get_interblock_edge_counts(const int level) const
   {
     if (level == 0) LOGIC_ERROR("Level 0 is not block level");
 
