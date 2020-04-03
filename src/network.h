@@ -15,6 +15,7 @@
 template <typename T>
 using String_Map = std::unordered_map<string, T>;
 
+using Edge_Counts = Ordered_Pair_Int_Map<const Node*>;
 
 class State_Dump {
   private:
@@ -221,11 +222,11 @@ class SBM_Network {
         });
   }
 
-  Ordered_Pair_Int_Map<const Node*> block_to_block_edge_counts(const int level) const
+  Edge_Counts block_to_block_edge_counts(const int level) const
   {
     if (level == 0) LOGIC_ERROR("Level 0 is not block level");
 
-    auto counts = Ordered_Pair_Int_Map<const Node*>();
+    auto counts = Edge_Counts();
 
     auto gather_blocks_neighbors = [&counts](const Node_UPtr& block_i) {
       block_i->for_all_neighbors([&](const Node* block_j) {
