@@ -170,7 +170,7 @@ class Node {
 
       // Traverse up parents until we've reached just below where we want to go
       current_node = current_node->parent();
-      current_node_level++;f
+      current_node_level++;
     }
 
     // Return the final node, aka the parent at desired level
@@ -198,19 +198,11 @@ class Node {
   Edge_Count_Map gather_neighbors_at_level(const int level) const
   {
     // Setup an neighbor count map for node
-    Edge_Count_Map neighbors_counts;
+    Edge_Count_Map counts;
 
-    // for_all_neighbors([&](const Node* node){
-    //   neighbors_counts[node->parent_at_level(level)]++;
-    // });
+    for_all_neighbors([&](const Node* n){counts[n->parent_at_level(level)]++;});
 
-    for (const auto& nodes_of_type : _neighbors) {
-      for (const auto& node : nodes_of_type) {
-        neighbors_counts[node->parent_at_level(level)]++;
-      }
-    }
-
-    return neighbors_counts;
+    return counts;
   }
 
   void add_neighbor(Node* node)
