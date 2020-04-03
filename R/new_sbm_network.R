@@ -30,6 +30,7 @@
 #'   \describe{ \item{`n_nodes`}{Number of unique nodes in the current model.
 #'   Equivalent to `nrow(sbm_network$nodes)`.} \item{`n_edges`}{Number of edges
 #'   in the current model. Equivalent to `nrow(sbm_network$edges)`.}
+#'   \item{`node_types`}{"Vector of the unique types for nodes in network"}
 #'   \item{`from_column`}{Raw quosure representing the `edges_from_column`
 #'   argument. This is kept so bipartite network types can be inferred and no
 #'   modification of the passed `edges` dataframe needs to take place.}
@@ -301,6 +302,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                  n_edges = nrow(edges),
                  from_column = from_column,
                  to_column = to_column,
+                 node_types = unique(nodes$type),
                  edge_types = edge_types,
                  random_seed = random_seed)
 
