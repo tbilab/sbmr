@@ -161,20 +161,21 @@ class Node {
                                               + as_str(_level) + ").");
 
     // Start with this node as current node
-    Node* current_node     = parent_node;
-    int current_node_level = _level + 1;
+    Node* cur_node     = parent_node;
+    int cur_node_level = _level + 1;
 
-    while (current_node_level != level_of_parent) {
-      if (!has_parent()) RANGE_ERROR("No parent at level " + as_str(level_of_parent)
-                                     + " for " + id());
-
+    while (cur_node_level != level_of_parent && cur_node->has_parent()) {
       // Traverse up parents until we've reached just below where we want to go
-      current_node = current_node->parent();
-      current_node_level++;
+      cur_node = cur_node->parent();
+      cur_node_level++;
     }
 
+    if (cur_node_level != level_of_parent) RANGE_ERROR("No parent at level "
+                                                       + as_str(level_of_parent)
+                                                       + " for " + id());
+
     // Return the final node, aka the parent at desired level
-    return current_node;
+    return cur_node;
   }
 
   bool has_parent() const { return parent_node != nullptr; }
