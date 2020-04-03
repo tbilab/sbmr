@@ -57,33 +57,34 @@ verify_model.sbm_network <- function(sbm, show_messages = FALSE, warn_about_rand
     }
   }
 
+
+
   if(has_random_seed){
-    # Instantiate instance of sbm class with random seed
-    sbm_model <- methods::new(SBM, as.integer(attr(sbm, 'random_seed')))
+    seed <- attr(sbm, 'random_seed')
   } else {
-    # Instantiate instance of sbm class with no random seed
-    sbm_model <- methods::new(SBM)
+    seed <- 42
   }
 
+  # Load network model with nodes and random seed
+  sbm_model <- methods::new(SBM, sbm$nodes$id, sbm$nodes$type, unique(sbm$nodes$type), seed)
 
-  # Fill in all the needed nodes
-  # bind the integer types to nodes before sending them to model
-  purrr::walk2(sbm$nodes$id, sbm$nodes$type, function(id, type){ sbm_model$add_node(id, type, 0L) })
 
-  # If the model has a allowed node pairs list, let model know before adding edges
+  # If the model has a allowed node pairs list, extract them
   allowed_pairs <- attr(sbm, 'edge_types')
   if(not_null(allowed_pairs)){
-    sbm_model$add_edge_types(dplyr::pull(allowed_pairs, !!attr(sbm, "from_column")),
-                             dplyr::pull(allowed_pairs, !!attr(sbm, "to_column")))
+    allowed_edges_from <- dplyr::pull(allowed_pairs, !!attr(sbm, "from_column"))
+    allowed_edges_to <- dplyr::pull(allowed_pairs, !!attr(sbm, "to_column"))
+  } else {
+    allowed_edges_from <- character()
+    allowed_edges_to <- character()
   }
 
-  # Fill in the edges
-  from_nodes <- dplyr::pull(sbm$edges, !!attr(sbm, "from_column"))
-  to_nodes <- dplyr::pull(sbm$edges, !!attr(sbm, "to_column"))
-  for(i in 1:attr(sbm, "n_edges")){
-    sbm_model$add_edge(from_nodes[i],
-                       to_nodes[i])
-  }
+  # Fill in the edges for model
+  sbm_model$add_edges(dplyr::pull(sbm$edges, !!attr(sbm, "from_column")),
+                      dplyr::pull(sbm$edges, !!attr(sbm, "to_column")),
+                      allowed_edges_from,
+                      allowed_edges_to)
+
 
   if (has_state_already) {
     if(show_messages) message("Reloading saved model state.")
