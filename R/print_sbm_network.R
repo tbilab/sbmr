@@ -32,7 +32,7 @@
 print.sbm_network <- function(x, ...){
   N <- attr(x, "n_nodes")
   E <- attr(x, "n_edges")
-  n_types <- length(unique(x$nodes$type))
+  n_types <- length(attr(x, "node_types"))
   type_msg <- if(n_types > 1) glue::glue("of {n_types} types") else "of a single type"
   cat(glue::glue("SBM Network with {N} nodes {type_msg} and {E} edges."), "\n", "\n")
 
