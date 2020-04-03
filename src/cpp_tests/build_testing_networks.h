@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../network.h"
+#include "../SBM.h"
 
 
 inline SBM simple_bipartite()

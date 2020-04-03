@@ -1,4 +1,4 @@
-#include "../network.h"
+#include "../SBM.h"
 #include "build_testing_networks.h"
 #include "catch.hpp"
 

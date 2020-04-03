@@ -1,4 +1,4 @@
-#include "../network.h"
+#include "../SBM.h"
 #include "catch.hpp"
 #include <set>
 

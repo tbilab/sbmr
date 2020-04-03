@@ -2,7 +2,7 @@
 // tests that are failing and then stepping through to see what's going on.
 #include "../collapse_blocks.h"
 #include "../cpp_tests/build_testing_networks.h"
-#include "../network.h"
+#include "../SBM.h"
 
 #include <iostream>
 

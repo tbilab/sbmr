@@ -1,6 +1,6 @@
 #include <RcppCommon.h>
 
-#include "network.h"
+#include "SBM.h"
 
 using Node_Ptr = Node*;
 
