@@ -300,6 +300,16 @@ new_sbm_network <- function(edges = dplyr::tibble(),
     random_seed <- ceiling(runif(1, 0, 1e6))
   }
 
+  # Setup the allowed edge types with empty if not specified
+  if(is.null(edge_types)){
+    allowed_edge_types <- dplyr::tibble(from = character(),
+                                        to = character())
+  } else {
+    allowed_edge_types <- edge_types %>%
+      dplyr::rename(from = !!attr(sbm, "from_column"),
+                    to = !!attr(sbm, "to_column"))
+  }
+
 
   # Build object
   x <- structure(list(nodes = nodes,
@@ -310,7 +320,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                  from_column = from_column,
                  to_column = to_column,
                  node_types = unique(nodes$type),
-                 edge_types = edge_types,
+                 edge_types = allowed_edge_types,
                  random_seed = random_seed)
 
   # Initialize a model if requested
