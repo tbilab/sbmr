@@ -3,9 +3,9 @@
 #include "../network.h"
 
 
-inline SBM_Network simple_bipartite()
+inline SBM simple_bipartite()
 {
-  SBM_Network my_sbm { { "a", "b" }, 42 };
+  SBM my_sbm { { "a", "b" }, 42 };
 
   // Add nodes to graph first
   Node* a1 = my_sbm.add_node("a1", "a");
@@ -53,9 +53,9 @@ inline SBM_Network simple_bipartite()
   return my_sbm;
 }
 
-inline SBM_Network simple_unipartite()
+inline SBM simple_unipartite()
 {
-  SBM_Network my_SBM { { "a" }, 42 };
+  SBM my_SBM { { "a" }, 42 };
 
   // Add nodes to graph first
   Node* n1 = my_SBM.add_node("n1", "a");

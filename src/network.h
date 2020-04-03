@@ -88,7 +88,7 @@ struct Collapse_Results {
   }
 };
 
-class SBM_Network {
+class SBM {
 
   private:
   // =========================================================================
@@ -110,7 +110,7 @@ class SBM_Network {
   // Constructors
   // =========================================================================
   // Just takes node information and no edges
-  SBM_Network(const InOut_String_Vec& node_ids,
+  SBM(const InOut_String_Vec& node_ids,
               const InOut_String_Vec& node_types,
               const InOut_String_Vec& all_types,
               const int random_seed = 42)
@@ -131,7 +131,7 @@ class SBM_Network {
   }
 
   // Takes bulk node and edge information
-  SBM_Network(const InOut_String_Vec& node_ids,
+  SBM(const InOut_String_Vec& node_ids,
               const InOut_String_Vec& node_types,
               const InOut_String_Vec& edges_a,
               const InOut_String_Vec& edges_b,
@@ -139,15 +139,15 @@ class SBM_Network {
               const int random_seed                   = 42,
               const InOut_String_Vec& allowed_edges_a = {},
               const InOut_String_Vec& allowed_edges_b = {})
-      : SBM_Network(node_ids, node_types, all_types, random_seed)
+      : SBM(node_ids, node_types, all_types, random_seed)
   {
     add_edges(edges_a, edges_b, allowed_edges_a, allowed_edges_b);
   }
 
   // Empty network without any nodes or edges
-  SBM_Network(const InOut_String_Vec& all_types = { "node" },
+  SBM(const InOut_String_Vec& all_types = { "node" },
               const int random_seed             = 42)
-      : SBM_Network(InOut_String_Vec {},
+      : SBM(InOut_String_Vec {},
                     InOut_String_Vec {},
                     all_types,
                     random_seed)
@@ -155,7 +155,7 @@ class SBM_Network {
   }
 
   // Move constructor
-  SBM_Network(SBM_Network&& moved_net)
+  SBM(SBM&& moved_net)
   {
     nodes            = std::move(moved_net.nodes);
     types            = std::move(moved_net.types);

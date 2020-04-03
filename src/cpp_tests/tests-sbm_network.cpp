@@ -4,7 +4,7 @@
 
 TEST_CASE("Basic initialization of network", "[Network]")
 {
-  SBM_Network my_net({ "m", "n" }, 42);
+  SBM my_net({ "m", "n" }, 42);
 
   // Add some nodes to Network
   my_net.add_node("n1", "n");
@@ -35,7 +35,7 @@ TEST_CASE("Basic initialization of network", "[Network]")
 
 TEST_CASE("Default block initialization", "[Network]")
 {
-  SBM_Network my_net({ "a", "b" }, 42);
+  SBM my_net({ "a", "b" }, 42);
 
   // Start with a few nodes in the network
   my_net.add_node("a1", "a");
@@ -72,7 +72,7 @@ TEST_CASE("Default block initialization", "[Network]")
 
 TEST_CASE("Initializing a block for every node", "[Network]")
 {
-  SBM_Network my_net({ "a", "b" }, 42);
+  SBM my_net({ "a", "b" }, 42);
 
   my_net.add_node("a1", "a");
   my_net.add_node("a2", "a");
@@ -109,7 +109,7 @@ TEST_CASE("Initializing a block for every node", "[Network]")
 
 TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
 {
-  SBM_Network my_net({ "a", "b" }, 42);
+  SBM my_net({ "a", "b" }, 42);
 
   my_net.add_node("a1", "a");
   my_net.add_node("a2", "a");
@@ -143,7 +143,7 @@ TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
 
 TEST_CASE("Metablock initialization", "[Network]")
 {
-  SBM_Network my_net({ "m", "n" }, 42);
+  SBM my_net({ "m", "n" }, 42);
 
   // Add some nodes to Network
   my_net.add_node("n1", "n");
@@ -186,7 +186,7 @@ TEST_CASE("Metablock initialization", "[Network]")
 
 TEST_CASE("Swapping of blocks", "[Network]")
 {
-  SBM_Network my_net({ "m", "n" }, 42);
+  SBM my_net({ "m", "n" }, 42);
 
   // Add some nodes to Network
   my_net.add_node("n1", "n");
@@ -262,7 +262,7 @@ string parent_from_state(const State_Dump& state, const string& node_id)
 
 TEST_CASE("State dumping and restoring", "[Network")
 {
-  SBM_Network my_net({ "a", "b" }, 42);
+  SBM my_net({ "a", "b" }, 42);
 
   // Start with a few nodes in the network
   my_net.add_node("a1", "a");
@@ -325,7 +325,7 @@ TEST_CASE("State dumping and restoring", "[Network")
   // We can also build a brand new network without any previous groups and have it assume
   // the state from before
 
-  SBM_Network my_net2({ "a", "b" }, 42);
+  SBM my_net2({ "a", "b" }, 42);
 
   // Start with a few nodes in the network
   my_net2.add_node("a1", "a");
@@ -347,7 +347,7 @@ TEST_CASE("State dumping and restoring", "[Network")
 
 TEST_CASE("State dumping and restoring: w/ metablocks", "[Network")
 {
-  SBM_Network my_net({ "a", "b" }, 42);
+  SBM my_net({ "a", "b" }, 42);
 
   // Start with a few nodes in the network
   my_net.add_node("a1", "a");
@@ -375,7 +375,7 @@ TEST_CASE("State dumping and restoring: w/ metablocks", "[Network")
   State_Dump state1 = my_net.state();
 
   // Build a new model that doesn't have any state
-  SBM_Network my_net2({ "a", "b" }, 42);
+  SBM my_net2({ "a", "b" }, 42);
 
   // Start with a few nodes in the network
   my_net2.add_node("a1", "a");
@@ -410,7 +410,7 @@ TEST_CASE("Building with vectors -- Unipartite", "[Network]")
   const std::vector<string> edges_from { "a1", "a1", "a1", "a2", "a2" };
   const std::vector<string> edges_to { "a1", "a2", "a3", "a2", "a3" };
 
-  SBM_Network my_net { nodes_id, nodes_type,
+  SBM my_net { nodes_id, nodes_type,
                        edges_from, edges_to,
                        types_name };
 
@@ -429,7 +429,7 @@ TEST_CASE("Building with vectors -- Bipartite", "[Network]")
   const std::vector<string> edges_from { "a1", "a1", "a2", "a2" };
   const std::vector<string> edges_to { "b1", "b2", "b1", "b2" };
 
-  SBM_Network my_net { nodes_id, nodes_type,
+  SBM my_net { nodes_id, nodes_type,
                        edges_from, edges_to,
                        types_name };
 
@@ -449,7 +449,7 @@ TEST_CASE("Building with vectors -- Tripartite", "[Network]")
   const std::vector<string> edges_from { "a1", "a1", "a2", "a2" };
   const std::vector<string> edges_to { "b1", "c1", "b1", "c2" };
 
-  SBM_Network my_net { nodes_id, nodes_type,
+  SBM my_net { nodes_id, nodes_type,
                        edges_from, edges_to,
                        types_name };
 
@@ -473,7 +473,7 @@ TEST_CASE("Building with vectors -- Restricted tripartite", "[Network]")
   const std::vector<string> type_from { "a", "b" };
   const std::vector<string> type_to { "b", "c" };
 
-  SBM_Network my_net { nodes_id, nodes_type,
+  SBM my_net { nodes_id, nodes_type,
                        edges_from, edges_to,
                        types_name,
                        42,
@@ -491,7 +491,7 @@ TEST_CASE("Building with vectors -- Restricted tripartite", "[Network]")
 
   // Will complain
   REQUIRE_THROWS(
-      SBM_Network { nodes_id, nodes_type,
+      SBM { nodes_id, nodes_type,
                     bad_edges_from, bad_edges_to,
                     types_name,
                     42,
@@ -500,7 +500,7 @@ TEST_CASE("Building with vectors -- Restricted tripartite", "[Network]")
 
 TEST_CASE("Counting edges", "[Network]")
 {
-  SBM_Network my_net { { "a", "b" }, 42 };
+  SBM my_net { { "a", "b" }, 42 };
 
   // Base-level nodes
   Node* a1 = my_net.add_node("a1", "a");
