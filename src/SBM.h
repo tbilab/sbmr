@@ -16,7 +16,7 @@ template <typename T>
 using String_Map = std::unordered_map<string, T>;
 
 using Const_Node_Pair = Ordered_Pair<const Node*>;
-using Edge_Counts = Ordered_Pair_Int_Map<const Node*>;
+using Edge_Counts     = Ordered_Pair_Int_Map<const Node*>;
 
 class State_Dump {
   private:
@@ -866,7 +866,12 @@ class SBM {
   void check_for_level(const int level) const
   {
     // Make sure we have the requested level
-    if (level >= nodes.size()) RANGE_ERROR("Node requested in level that does not exist");
+    if (level < 0) {
+      RANGE_ERROR("Node levels must be positive. Requested level: " + as_str(level));
+    } else if (level >= nodes.size()) {
+      RANGE_ERROR("Can't access level " + as_str(level)
+                  + ". Network only has " + as_str(nodes.size() - 1) + " block levels.");
+    }
   }
 
   void check_for_type(const int type_index) const
