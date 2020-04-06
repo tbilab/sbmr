@@ -275,11 +275,16 @@ class SBM {
                  const int level      = 0)
   {
     check_for_level(level);
-    
-    if(num_levels() > level + 1) {
+
+    if (num_levels() > level + 1) {
       LOGIC_ERROR("Can't add a node to a network with block structure. This invalidates the model state. Remove block structure with reset_blocks() method.");
     }
-    
+
+    if (level == 0 && id_to_node.find(id) != id_to_node.end()) {
+      // Make sure we aren't repeating an id for a node
+      LOGIC_ERROR("Network already has a node with id " + id);
+    }
+
     // Build new node pointer outside vector for ease of pointer retrieval
     auto new_node = Node_UPtr(new Node(id, level, type_index, num_types()));
 
@@ -434,7 +439,9 @@ class SBM {
     }
   }
 
-  void reset_blocks(){
+  void reset_blocks()
+  {
+    block_counter = 0;
     remove_block_levels_above(0);
   }
 
