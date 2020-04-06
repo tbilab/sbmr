@@ -55,36 +55,30 @@
 #'   get_num_blocks()
 #'
 #'
-initialize_blocks <- function(sbm, num_blocks = NULL, level = 0){
+initialize_blocks <- function(sbm, num_blocks = NULL){
   UseMethod("initialize_blocks")
 }
 
-initialize_blocks.default <- function(sbm, num_blocks = NULL, level = 0){
+initialize_blocks.default <- function(sbm, num_blocks = NULL){
   cat("Block initialization generic.")
 }
 
 #' @export
-initialize_blocks.sbm_network <- function(sbm, num_blocks = NULL, level = 0){
+initialize_blocks.sbm_network <- function(sbm, num_blocks = NULL){
   # Make sure we have an SBM object to work with
   sbm <- verify_model(sbm)
 
   one_block_per_node <- is.null(num_blocks)
-  num_nodes_at_level <- sum(attr(sbm, 'state')$level == level)
 
   # Check all the possible error conditions
   if(one_block_per_node){
     num_blocks <- -1
-  } else
-  if(num_blocks < 1){
+  } else if(num_blocks < 1){
     stop(glue::glue("Can't initialize {num_blocks} blocks."))
-  } else
-  if(num_blocks > num_nodes_at_level){
-    stop(glue::glue("Network only has {num_nodes_at_level} nodes at level {level}. ",
-                    "Can't initialize {num_blocks} blocks."))
   }
 
   # Send message to RCPP class to initialize proper number of nodes
-  attr(sbm, 'model')$initialize_blocks(as.integer(level), as.integer(num_blocks))
+  attr(sbm, 'model')$initialize_blocks(as.integer(num_blocks))
 
   # Update state attribute
   attr(sbm, "state") <- attr(sbm, 'model')$get_state()
