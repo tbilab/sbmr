@@ -87,8 +87,8 @@ SEXP wrap(const Edge_Counts& edge_counts)
   int i = 0;
 
   for (const auto& edge_to_count : edge_counts) {
-    a_blocks[i] = edge_to_count.first.first();
-    b_blocks[i] = edge_to_count.first.second();
+    a_blocks[i] = edge_to_count.first.first()->id();
+    b_blocks[i] = edge_to_count.first.second()->id();
     counts[i]   = edge_to_count.second;
     i++;
   }

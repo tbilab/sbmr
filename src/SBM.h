@@ -15,6 +15,7 @@
 template <typename T>
 using String_Map = std::unordered_map<string, T>;
 
+using Const_Node_Pair = Ordered_Pair<const Node*>;
 using Edge_Counts = Ordered_Pair_Int_Map<const Node*>;
 
 class State_Dump {
@@ -254,9 +255,10 @@ class SBM {
 
     auto counts = Edge_Counts();
 
-    auto gather_blocks_neighbors = [&counts](const Node_UPtr& block_i) {
-      block_i->for_all_neighbors([&](const Node* block_j) {
-        counts[Ordered_Pair<const Node*>(block_i.get(), block_j)]++;
+    auto gather_blocks_neighbors = [&](const Node_UPtr& block_i) {
+      block_i->for_all_neighbors([&](const Node* node_j) {
+        counts[Const_Node_Pair(block_i.get(),
+                               node_j->parent_at_level(level))]++;
       });
     };
     for_all_nodes_at_level(level, gather_blocks_neighbors);
