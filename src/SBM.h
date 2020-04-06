@@ -274,6 +274,8 @@ class SBM {
                  const int type_index = 0,
                  const int level      = 0)
   {
+    check_for_level(level);
+    
     // Build new node pointer outside vector for ease of pointer retrieval
     auto new_node = Node_UPtr(new Node(id, level, type_index, num_types()));
 
