@@ -10,5 +10,5 @@ AllowShortCaseLabelsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: true
 AllowShortLoopsOnASingleLine: true
 # AccessModifierOffset: -2
-...h
+...
 
