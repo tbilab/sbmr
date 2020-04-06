@@ -19,7 +19,6 @@ SEXP wrap(const Edge_Counts&);
 template <>
 SEXP wrap(const Block_Counts&);
 
-
 // Create and return dump of state as dataframe
 inline DataFrame state_to_df(const State_Dump& state)
 {
@@ -140,10 +139,13 @@ RCPP_MODULE(SBM)
                    InOut_String_Vec, // node types
                    InOut_String_Vec, // all types
                    int>("Setup network with just nodes loaded")
+      // all types
+      .constructor<InOut_String_Vec, int>("Setup empty network with no nodes loaded")
 
-      .constructor<InOut_String_Vec, // all types
-                   int>("Setup empty network with no nodes loaded")
-
+      .const_method("num_nodes_at_level", &SBM::num_nodes_at_level,
+                    "Returns number of nodes of all types for given level in network")
+      .const_method("num_levels", &SBM::num_levels,
+                    "Total number of levels. E.g. 2 = data-nodes and single block level")
       .const_method("block_counts", &SBM::block_counts,
                     "Gets dataframe of counts of blocks by type.")
       .const_method("get_state", &SBM::state,
