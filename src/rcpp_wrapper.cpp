@@ -16,6 +16,9 @@ template <>
 SEXP wrap(const Collapse_Results&);
 template <>
 SEXP wrap(const Edge_Counts&);
+template <>
+SEXP wrap(const Block_Counts&);
+
 
 // Create and return dump of state as dataframe
 inline DataFrame state_to_df(const State_Dump& state)
@@ -98,6 +101,14 @@ SEXP wrap(const Edge_Counts& edge_counts)
 }
 
 template <>
+SEXP wrap(const Block_Counts& block_counts)
+{
+  return DataFrame::create(_["block_id"]         = block_counts.ids,
+                           _["count"]            = block_counts.counts,
+                           _["stringsAsFactors"] = false);
+}
+
+template <>
 SEXP wrap(const Collapse_Results& collapse_results)
 {
   const int n_steps = collapse_results.merge_steps.size();
@@ -133,6 +144,8 @@ RCPP_MODULE(SBM)
       .constructor<InOut_String_Vec, // all types
                    int>("Setup empty network with no nodes loaded")
 
+      .const_method("block_counts", &SBM::block_counts,
+                    "Gets dataframe of counts of blocks by type.")
       .const_method("get_state", &SBM::state,
                     "Exports the current state of the network as dataframe with each node as a row and columns for node id, parent id, node type, and node level.")
       .const_method("get_interblock_edge_counts", &SBM::get_interblock_edge_counts,

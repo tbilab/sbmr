@@ -88,6 +88,16 @@ struct Collapse_Results {
   }
 };
 
+struct Block_Counts {
+  InOut_String_Vec ids;
+  InOut_Int_Vec counts;
+  Block_Counts(const int T)
+      : ids(T)
+      , counts(T)
+  {
+  }
+};
+
 class SBM {
 
   private:
@@ -111,9 +121,9 @@ class SBM {
   // =========================================================================
   // Just takes node information and no edges
   SBM(const InOut_String_Vec& node_ids,
-              const InOut_String_Vec& node_types,
-              const InOut_String_Vec& all_types,
-              const int random_seed = 42)
+      const InOut_String_Vec& node_types,
+      const InOut_String_Vec& all_types,
+      const int random_seed = 42)
       : types(to_str_vec(all_types))
       , type_name_to_int(build_val_to_index_map(to_str_vec(all_types)))
       , edge_types(all_types.size() == 1 ? unipartite : multipartite)
@@ -132,13 +142,13 @@ class SBM {
 
   // Takes bulk node and edge information
   SBM(const InOut_String_Vec& node_ids,
-              const InOut_String_Vec& node_types,
-              const InOut_String_Vec& edges_a,
-              const InOut_String_Vec& edges_b,
-              const InOut_String_Vec& all_types,
-              const int random_seed                   = 42,
-              const InOut_String_Vec& allowed_edges_a = {},
-              const InOut_String_Vec& allowed_edges_b = {})
+      const InOut_String_Vec& node_types,
+      const InOut_String_Vec& edges_a,
+      const InOut_String_Vec& edges_b,
+      const InOut_String_Vec& all_types,
+      const int random_seed                   = 42,
+      const InOut_String_Vec& allowed_edges_a = {},
+      const InOut_String_Vec& allowed_edges_b = {})
       : SBM(node_ids, node_types, all_types, random_seed)
   {
     add_edges(edges_a, edges_b, allowed_edges_a, allowed_edges_b);
@@ -146,11 +156,11 @@ class SBM {
 
   // Empty network without any nodes or edges
   SBM(const InOut_String_Vec& all_types = { "node" },
-              const int random_seed             = 42)
+      const int random_seed             = 42)
       : SBM(InOut_String_Vec {},
-                    InOut_String_Vec {},
-                    all_types,
-                    random_seed)
+            InOut_String_Vec {},
+            all_types,
+            random_seed)
   {
   }
 
@@ -203,6 +213,22 @@ class SBM {
   int num_types() const
   {
     return types.size();
+  }
+
+  Block_Counts block_counts(const int level = 1) const
+  {
+    check_for_level(level);
+
+    const int T = types.size();
+
+    auto b_c = Block_Counts(T);
+
+    for (int t_i = 0; t_i < T; t_i++) {
+      b_c.ids[t_i]    = types[t_i];
+      b_c.counts[t_i] = nodes[level][t_i].size();
+    }
+
+    return b_c;
   }
 
   int num_possible_neighbor_blocks(Node* node) const
