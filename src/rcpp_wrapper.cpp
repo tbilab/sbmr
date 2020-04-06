@@ -160,6 +160,8 @@ RCPP_MODULE(SBM)
               "Takes two character vectors of node ids (string) and connects the nodes with edges in network")
       .method("initialize_blocks", &SBM::initialize_blocks,
               "Adds a desired number of blocks and randomly assigns them for a given level. num_blocks = -1 means every node gets their own block")
+      .method("reset_blocks", &SBM::reset_blocks,
+              "Erases all block levels in network.")
       .method("update_state", &SBM::update_state,
               "Takes model state export as given by SBM$get_state() and returns model to specified state. This is useful for resetting model before running various algorithms such as agglomerative merging.")
       .method("mcmc_sweep", &SBM::mcmc_sweep,

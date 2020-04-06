@@ -276,6 +276,10 @@ class SBM {
   {
     check_for_level(level);
     
+    if(num_levels() > level + 1) {
+      LOGIC_ERROR("Can't add a node to a network with block structure. This invalidates the model state. Remove block structure with reset_blocks() method.");
+    }
+    
     // Build new node pointer outside vector for ease of pointer retrieval
     auto new_node = Node_UPtr(new Node(id, level, type_index, num_types()));
 
@@ -428,6 +432,10 @@ class SBM {
         nodes_of_type[i]->set_parent(blocks_of_type[i % num_blocks].get());
       }
     }
+  }
+
+  void reset_blocks(){
+    remove_block_levels_above(0);
   }
 
   void merge_blocks(Node* absorbed_block, Node* absorbing_block)
