@@ -233,7 +233,7 @@ test_that("Agglomerative merging", {
 
   # Just reporting the final step should... just report the final step
   expect_equal(names(collapse_results_just_final),
-               c("entropy_delta", "state", "num_blocks"))
+               c("entropy_delta", "state", "n_blocks"))
 
 })
 

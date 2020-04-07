@@ -117,7 +117,7 @@ SEXP wrap(const Collapse_Results& collapse_results)
   if (just_final_result) {
     return List::create(_["entropy_delta"] = collapse_results.entropy_delta,
                         _["state"]         = state_to_df(collapse_results.states[0]),
-                        _["num_blocks"]    = collapse_results.num_blocks);
+                        _["n_blocks"]    = collapse_results.n_blocks);
   }
 
   List entropy_results(n_steps);
@@ -130,7 +130,7 @@ SEXP wrap(const Collapse_Results& collapse_results)
                                       _["merge_from"]    = step.merge_from,
                                       _["merge_into"]    = step.merge_into,
                                       _["state"]         = state_to_df(collapse_results.states[i]),
-                                      _["num_blocks"]    = step.n_blocks);
+                                      _["n_blocks"]    = step.n_blocks);
   }
 
   return entropy_results;
@@ -166,7 +166,7 @@ RCPP_MODULE(SBM)
       .method("add_edges", &SBM::add_edges,
               "Takes two character vectors of node ids (string) and connects the nodes with edges in network")
       .method("initialize_blocks", &SBM::initialize_blocks,
-              "Adds a desired number of blocks and randomly assigns them for a given level. num_blocks = -1 means every node gets their own block")
+              "Adds a desired number of blocks and randomly assigns them for a given level. n_blocks = -1 means every node gets their own block")
       .method("reset_blocks", &SBM::reset_blocks,
               "Erases all block levels in network.")
       .method("update_state", &SBM::update_state,

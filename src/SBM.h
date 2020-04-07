@@ -80,11 +80,11 @@ enum Partite_Structure {
 
 struct Collapse_Results {
   double entropy_delta = 0; // Will keep track of the overall entropy change from this collapse
-  int num_blocks;
+  int n_blocks;
   std::vector<Block_Mergers> merge_steps; // Will keep track of results at each step of the merger
   std::vector<State_Dump> states;
   Collapse_Results(const int n)
-      : num_blocks(n)
+      : n_blocks(n)
   {
   }
 };
@@ -415,14 +415,14 @@ class SBM {
     }
   }
 
-  void initialize_blocks(int num_blocks = -1)
+  void initialize_blocks(int n_blocks = -1)
   {
-    const bool one_block_per_node = num_blocks == -1;
+    const bool one_block_per_node = n_blocks == -1;
     const int block_level         = num_levels();
     const int child_level         = block_level - 1;
 
     // Build empty level
-    build_block_level(one_block_per_node ? 0 : num_blocks);
+    build_block_level(one_block_per_node ? 0 : n_blocks);
 
     // Loop over all node types
     for (int type_i = 0; type_i < num_types(); type_i++) {
@@ -431,14 +431,14 @@ class SBM {
       Node_UPtr_Vec& blocks_of_type = nodes[child_level + 1][type_i];
 
       // If we're in the 1-block-per-node mode make sure we reflect that in reserved size
-      if (one_block_per_node) num_blocks = nodes_of_type.size();
+      if (one_block_per_node) n_blocks = nodes_of_type.size();
 
-      if (num_blocks > nodes_of_type.size()) LOGIC_ERROR("Can't initialize more blocks than there are nodes of a given type");
+      if (n_blocks > nodes_of_type.size()) LOGIC_ERROR("Can't initialize more blocks than there are nodes of a given type");
 
       // Reserve enough spaces for the blocks to be inserted
-      blocks_of_type.reserve(num_blocks);
+      blocks_of_type.reserve(n_blocks);
 
-      for (int i = 0; i < num_blocks; i++) add_block_node(type_i, block_level);
+      for (int i = 0; i < n_blocks; i++) add_block_node(type_i, block_level);
 
       // Shuffle child nodes if we're randomly assigning blocks
       if (!one_block_per_node) sampler.shuffle(nodes_of_type);
@@ -446,7 +446,7 @@ class SBM {
       // Loop through now shuffled children nodes
       for (int i = 0; i < nodes_of_type.size(); i++) {
         // Add blocks one at a time, looping back after end to each node
-        nodes_of_type[i]->set_parent(blocks_of_type[i % num_blocks].get());
+        nodes_of_type[i]->set_parent(blocks_of_type[i % n_blocks].get());
       }
     }
   }
@@ -555,7 +555,7 @@ class SBM {
 
   MCMC_Sweeps mcmc_sweep(const int num_sweeps,
                          const double& eps,
-                         const bool variable_num_blocks,
+                         const bool variable_n_blocks,
                          const bool track_pairs,
                          const int level    = 0,
                          const bool verbose = false)
@@ -578,7 +578,7 @@ class SBM {
     }
 
     // If allowing a variable number of blocks, initialize empty block for each type
-    if (variable_num_blocks) {
+    if (variable_n_blocks) {
       for (int type = 0; type < num_types(); type++) {
         add_block_node(type, block_level);
       }
@@ -641,8 +641,8 @@ class SBM {
         // Is the move accepted?
         if (move_accepted) {
 
-          bool remove_empty_block = variable_num_blocks;
-          if (variable_num_blocks) {
+          bool remove_empty_block = variable_n_blocks;
+          if (variable_n_blocks) {
             // If the old block will still have children after the move and
             // the new block is empty block, this move will cause there to be no
             // empty blocks for this type
@@ -690,7 +690,7 @@ class SBM {
 
     } // End multi-sweep loop
 
-    if (variable_num_blocks) {
+    if (variable_n_blocks) {
       // Cleanup the single empty block for each type
       for (const auto& blocks_of_type : get_nodes_at_level(block_level)) {
         for (const auto& block : blocks_of_type) {
