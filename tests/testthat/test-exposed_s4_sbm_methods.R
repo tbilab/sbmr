@@ -202,4 +202,25 @@ test_that("MCMC sweeps, w/ pair tracking", {
   expect_equal(nrow(sweeps$pairing_counts), (4*3/2) + (3*2/2))
 })
 
+test_that("Agglomerative merging", {
+
+  sbm <- new_sbm_network(edges, edges_from_column = a_node, edges_to_column = b_node, bipartite_edges = TRUE) %>%
+    attr("model")
+
+  # Run block collapsing with one block per merge
+  collapse_results <- sbm$collapse_blocks(0,    # node_level,
+                                          2,    # B_end,
+                                          3,    # n_checks_per_block,
+                                          0,    # n_mcmc_sweeps,
+                                          0.9,  # sigma,
+                                          0.01, # eps,
+                                          TRUE, # report_all_steps = true,
+                                          TRUE) # allow_exhaustive = true
+
+
+
+
+
+
+})
 
