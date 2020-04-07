@@ -14,17 +14,17 @@ test_that("Level counting and initialization", {
     attr("model")
 
   # No block structure to start
-  expect_equal(sbm$num_levels(), 1)
+  expect_equal(sbm$n_levels(), 1)
 
   # Build a level of blocks
   sbm$initialize_blocks(-1)
 
   # Now we have two levels (node + block)
-  expect_equal(sbm$num_levels(), 2)
+  expect_equal(sbm$n_levels(), 2)
 
   # Initializing another level will stack on top
   sbm$initialize_blocks(3)
-  expect_equal(sbm$num_levels(), 3)
+  expect_equal(sbm$n_levels(), 3)
 })
 
 test_that("Counting and adding nodes", {
@@ -32,15 +32,15 @@ test_that("Counting and adding nodes", {
     attr("model")
 
   # To start with we should have 7 nodes a1,a2,a3,b1,b2,b3,b4
-  expect_equal(sbm$num_nodes_at_level(0), 7)
+  expect_equal(sbm$n_nodes_at_level(0), 7)
 
   # Can't get counts for block level because we don't have it
-  expect_error(sbm$num_nodes_at_level(1), "Can't access level 1. Network only has 0 block levels.", fixed = TRUE)
+  expect_error(sbm$n_nodes_at_level(1), "Can't access level 1. Network only has 0 block levels.", fixed = TRUE)
   sbm$initialize_blocks(-1)
-  expect_equal(sbm$num_nodes_at_level(1), sbm$num_nodes_at_level(0))
+  expect_equal(sbm$n_nodes_at_level(1), sbm$n_nodes_at_level(0))
 
   # Cant get counts for negative levels
-  expect_error(sbm$num_nodes_at_level(-1), "Node levels must be positive. Requested level: -1", fixed = TRUE)
+  expect_error(sbm$n_nodes_at_level(-1), "Node levels must be positive. Requested level: -1", fixed = TRUE)
 
   # Can't add a node to network with existing blocks
   expect_error(
@@ -53,7 +53,7 @@ test_that("Counting and adding nodes", {
   sbm$add_node("test_node", "node", level = 0)
 
   # Hopefully we now have an additional block at our lowest level
-  expect_equal(sbm$num_nodes_at_level(0), 8)
+  expect_equal(sbm$n_nodes_at_level(0), 8)
 
   # Cant add node twice
   expect_error(
@@ -69,21 +69,21 @@ test_that("Initializing blocks", {
 
   # Requesting -1 blocks will get you one block per node
   sbm$initialize_blocks(-1)
-  expect_equal(sbm$num_nodes_at_level(1), 7)
+  expect_equal(sbm$n_nodes_at_level(1), 7)
 
   # Initializing blocks again will make metablocks
-  expect_equal(sbm$num_levels(), 2)
+  expect_equal(sbm$n_levels(), 2)
   sbm$initialize_blocks(-1)
-  expect_equal(sbm$num_levels(), 3)
-  expect_equal(sbm$num_nodes_at_level(2), 7)
+  expect_equal(sbm$n_levels(), 3)
+  expect_equal(sbm$n_nodes_at_level(2), 7)
 
   # We can reset all block structure
   sbm$reset_blocks()
-  expect_equal(sbm$num_levels(), 1)
+  expect_equal(sbm$n_levels(), 1)
 
   # We can request a specific number of blocks to be built for our nodes
   sbm$initialize_blocks(3)
-  expect_equal(sbm$num_nodes_at_level(1), 3)
+  expect_equal(sbm$n_nodes_at_level(1), 3)
 })
 
 test_that("State loading and saving works", {
@@ -170,7 +170,7 @@ test_that("MCMC sweeps, no pair tracking", {
 
   n_sweeps <- 100
 
-  sweeps <- sbm$mcmc_sweep(n_sweeps, # num_sweeps
+  sweeps <- sbm$mcmc_sweep(n_sweeps, # n_sweeps
                            0.01,     # eps
                            TRUE,     # variable_num_blocks
                            FALSE,    # track_pairs
@@ -220,7 +220,7 @@ test_that("Agglomerative merging", {
 
   # Reporting all steps should, return as many list elements as there are possible steps
   expect_equal(length(collapse_results),
-               sbm$num_nodes_at_level(0) - final_num_blocks)
+               sbm$n_nodes_at_level(0) - final_num_blocks)
 
   collapse_results_just_final <- sbm$collapse_blocks(0,    # node_level,
                                           final_num_blocks,    # B_end,
