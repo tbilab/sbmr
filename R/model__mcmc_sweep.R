@@ -87,22 +87,19 @@ mcmc_sweep.sbm_network <- function(sbm,
                                    level = 0,
                                    verbose = FALSE){
   sbm <- verify_model(sbm)
-  results <- attr(sbm, 'model')$mcmc_sweep(as.integer(level),
-                                  as.integer(num_sweeps),
-                                  eps,
-                                  variable_num_blocks,
-                                  track_pairs,
-                                  verbose)
 
+  results <- attr(sbm, 'model')$mcmc_sweep(as.integer(num_sweeps),
+                                           eps,
+                                           variable_num_blocks,
+                                           track_pairs,
+                                           as.integer(level),
+                                           verbose)
 
   if (track_pairs) {
     # Clean up pair connections results
     results$pairing_counts <- results$pairing_counts %>%
       tidyr::separate(.data$node_pair, into = c("node_a", "node_b"), sep = "--") %>%
       dplyr::mutate(proportion_connected = .data$times_connected/num_sweeps)
-  } else {
-    # Remove the empty pair counts results
-    results['pairing_counts'] <- NULL
   }
 
   # Update state attribute of s3 object
