@@ -118,12 +118,11 @@ SEXP wrap(const Collapse_Results& collapse_results)
 
     const auto& step = collapse_results.merge_steps[i];
 
-    entropy_results.push_back(
-        List::create(_["entropy_delta"] = step.entropy_delta,
-                     _["merge_from"]    = step.merge_from,
-                     _["merge_into"]    = step.merge_into,
-                     _["state"]         = state_to_df(collapse_results.states[i]),
-                     _["num_blocks"]    = step.n_blocks));
+    entropy_results[i] = List::create(_["entropy_delta"] = step.entropy_delta,
+                                      _["merge_from"]    = step.merge_from,
+                                      _["merge_into"]    = step.merge_into,
+                                      _["state"]         = state_to_df(collapse_results.states[i]),
+                                      _["num_blocks"]    = step.n_blocks);
   }
 
   return entropy_results;
