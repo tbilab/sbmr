@@ -14,8 +14,8 @@ TEST_CASE("Basic mcmc sweep - Simple Bipartite", "[SBM]")
                                      0,      // level
                                      false); //verbose
 
-  REQUIRE(sweep_res.sweep_entropy_delta.size() == n_sweeps);
-  REQUIRE(sweep_res.sweep_num_nodes_moved.size() == n_sweeps);
+  REQUIRE(sweep_res.entropy_deltas.size() == n_sweeps);
+  REQUIRE(sweep_res.n_nodes_moved.size() == n_sweeps);
 }
 
 TEST_CASE("Basic mcmc sweep - Simple Unipartite", "[SBM]")
@@ -31,8 +31,8 @@ TEST_CASE("Basic mcmc sweep - Simple Unipartite", "[SBM]")
                                      0,      // level
                                      false); //verbose
 
-  REQUIRE(sweep_res.sweep_entropy_delta.size() == n_sweeps);
-  REQUIRE(sweep_res.sweep_num_nodes_moved.size() == n_sweeps);
+  REQUIRE(sweep_res.entropy_deltas.size() == n_sweeps);
+  REQUIRE(sweep_res.n_nodes_moved.size() == n_sweeps);
 }
 
 TEST_CASE("MCMC sweeps w/ varying epsilon - Simple Bipartite", "[SBM]")

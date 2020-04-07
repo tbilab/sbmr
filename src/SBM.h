@@ -54,20 +54,20 @@ class MCMC_Sweeps {
   int i = 0;
 
   public:
-  InOut_Double_Vec sweep_entropy_delta;
-  InOut_Int_Vec sweep_num_nodes_moved;
+  InOut_Double_Vec entropy_deltas;
+  InOut_Int_Vec n_nodes_moved;
   Block_Consensus block_consensus;
   InOut_String_Vec nodes_moved;
   double entropy_delta = 0.0;
   MCMC_Sweeps(const int n)
-      : sweep_entropy_delta(n)
-      , sweep_num_nodes_moved(n)
+      : entropy_deltas(n)
+      , n_nodes_moved(n)
   {
   }
   void add(const double& e_delta, const int n_nodes)
   {
-    sweep_entropy_delta[i]   = e_delta;
-    sweep_num_nodes_moved[i] = n_nodes;
+    entropy_deltas[i]   = e_delta;
+    n_nodes_moved[i] = n_nodes;
     i++;
   }
 };

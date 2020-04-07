@@ -51,8 +51,8 @@ SEXP wrap(const MCMC_Sweeps& results)
   auto results_df = List::create(
       _["nodes_moved"] = results.nodes_moved,
       _["sweep_info"]  = DataFrame::create(
-          _["entropy_delta"]    = results.sweep_entropy_delta,
-          _["num_nodes_moved"]  = results.sweep_num_nodes_moved,
+          _["entropy_delta"]    = results.entropy_deltas,
+          _["num_nodes_moved"]  = results.n_nodes_moved,
           _["stringsAsFactors"] = false));
 
   if (tracked_pairs) {
