@@ -6,10 +6,10 @@
 #include "model_helpers.h"
 
 class Block_Mergers {
-private:
+  private:
   int i = 0;
 
-public:
+  public:
   double entropy_delta = 0.0;
   int n_blocks;
   InOut_String_Vec merge_from;

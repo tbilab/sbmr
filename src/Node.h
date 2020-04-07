@@ -201,7 +201,7 @@ class Node {
     // Setup an neighbor count map for node
     Edge_Count_Map counts;
 
-    for_all_neighbors([&](const Node* n){counts[n->parent_at_level(level)]++;});
+    for_all_neighbors([&](const Node* n) { counts[n->parent_at_level(level)]++; });
 
     return counts;
   }

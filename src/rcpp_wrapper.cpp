@@ -52,7 +52,7 @@ SEXP wrap(const MCMC_Sweeps& results)
       _["nodes_moved"] = results.nodes_moved,
       _["sweep_info"]  = DataFrame::create(
           _["entropy_delta"]    = results.entropy_deltas,
-          _["n_nodes_moved"]  = results.n_nodes_moved,
+          _["n_nodes_moved"]    = results.n_nodes_moved,
           _["stringsAsFactors"] = false));
 
   if (tracked_pairs) {
@@ -117,7 +117,7 @@ SEXP wrap(const Collapse_Results& collapse_results)
   if (just_final_result) {
     return List::create(_["entropy_delta"] = collapse_results.entropy_delta,
                         _["state"]         = state_to_df(collapse_results.states[0]),
-                        _["n_blocks"]    = collapse_results.n_blocks);
+                        _["n_blocks"]      = collapse_results.n_blocks);
   }
 
   List entropy_results(n_steps);
@@ -130,7 +130,7 @@ SEXP wrap(const Collapse_Results& collapse_results)
                                       _["merge_from"]    = step.merge_from,
                                       _["merge_into"]    = step.merge_into,
                                       _["state"]         = state_to_df(collapse_results.states[i]),
-                                      _["n_blocks"]    = step.n_blocks);
+                                      _["n_blocks"]      = step.n_blocks);
   }
 
   return entropy_results;

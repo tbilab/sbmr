@@ -12,7 +12,6 @@ struct Pair_Status {
       , times_connected(0) {};
 };
 
-
 using Pair_Set = std::unordered_set<string>;
 using Pair_Map = std::unordered_map<string, Pair_Status>;
 
@@ -26,12 +25,11 @@ inline string make_pair_key(const string& id_a,
 }
 
 class Block_Consensus {
-  
+
   public:
-  
   // Holds the pairs of nodes to connection status and counts
   Pair_Map node_pairs;
-  
+
   int size() const { return node_pairs.size(); }
   // Initialies containers when needed
   void initialize(const Type_Vec& node_level)
@@ -97,8 +95,4 @@ class Block_Consensus {
       }
     }
   }
-
-
-
-
 };

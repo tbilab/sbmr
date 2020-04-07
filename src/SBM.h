@@ -66,8 +66,8 @@ class MCMC_Sweeps {
   }
   void add(const double& e_delta, const int n_nodes)
   {
-    entropy_deltas[i]   = e_delta;
-    n_nodes_moved[i] = n_nodes;
+    entropy_deltas[i] = e_delta;
+    n_nodes_moved[i]  = n_nodes;
     i++;
   }
 };
@@ -597,7 +597,7 @@ class SBM {
 
     for (int i = 0; i < n_sweeps; i++) {
       // Book keeper variables for this sweeps stats
-      int n_nodes_moved  = 0;
+      int n_nodes_moved    = 0;
       double entropy_delta = 0;
 
       // Shuffle order of nodes to be run through for sweep
@@ -717,9 +717,9 @@ class SBM {
   {
     // Make sure we have at least one final block per node type
     if (n_types() > B_end) LOGIC_ERROR("Can't collapse a network with "
-                                         + as_str(n_types()) + " node types to "
-                                         + as_str(B_end)
-                                         + " blocks.\n There needs to be at least one block per node type.");
+                                       + as_str(n_types()) + " node types to "
+                                       + as_str(B_end)
+                                       + " blocks.\n There needs to be at least one block per node type.");
 
     const int block_level = node_level + 1;
     const bool using_mcmc = n_mcmc_sweeps > 0;
@@ -795,7 +795,7 @@ class SBM {
       }
     }
 
-    if(!report_all_steps){
+    if (!report_all_steps) {
       results.states.push_back(state());
     }
 
@@ -909,7 +909,7 @@ class SBM {
   void check_for_type(const int type_index) const
   {
     if (type_index >= n_types()) RANGE_ERROR("Type " + as_str(type_index)
-                                               + " does not exist in network.");
+                                             + " does not exist in network.");
   }
 
   // Get a vector of raw pointers to all nodes in a given level with no type separation
