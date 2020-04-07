@@ -27,7 +27,6 @@ test_that("Level counting and initialization", {
   expect_equal(sbm$num_levels(), 3)
 })
 
-
 test_that("Counting and adding nodes", {
   sbm <- new_sbm_network(edges, edges_from_column = a_node, edges_to_column = b_node) %>%
     attr("model")
@@ -151,13 +150,48 @@ test_that("Interblock edge counts", {
 
 
 })
-#
-# edges <- dplyr::tribble(
-#   ~a_node, ~b_node,
-#   "a1"   , "b1"   ,
-#   "a1"   , "b2"   ,
-#   "a1"   , "b3"   ,
-#   "a2"   , "b1"   ,
-#   "a2"   , "b4"   ,
-#   "a3"   , "b1"
-# )
+
+test_that("MCMC sweeps, no pair tracking", {
+
+  sbm <- new_sbm_network(edges, edges_from_column = a_node, edges_to_column = b_node, bipartite_edges = TRUE) %>%
+    attr("model")
+
+  # Give each node their own block
+  sbm$initialize_blocks(-1)
+
+  n_sweeps <- 100
+
+  sweeps <- sbm$mcmc_sweep(n_sweeps, # num_sweeps
+                           0.01,     # eps
+                           TRUE,     # variable_num_blocks
+                           FALSE,    # track_pairs
+                           0,        # level
+                           FALSE)    # verbose
+
+  expect_equal(nrow(sweeps$sweep_info), n_sweeps)
+  expect_null(sweeps$pairing_counts)
+})
+
+
+test_that("MCMC sweeps, w/ pair tracking", {
+
+  sbm <- new_sbm_network(edges, edges_from_column = a_node, edges_to_column = b_node, bipartite_edges = TRUE) %>%
+    attr("model")
+
+  # Give each node their own block
+  sbm$initialize_blocks(-1)
+
+  n_sweeps <- 100
+
+  sweeps <- sbm$mcmc_sweep(n_sweeps, # num_sweeps
+                           0.01,     # eps
+                           TRUE,     # variable_num_blocks
+                           TRUE,     # track_pairs
+                           0,        # level
+                           FALSE)    # verbose
+
+  expect_equal(nrow(sweeps$sweep_info), n_sweeps)
+  expect_equal(nrow(sweeps$pairing_counts), (4*3/2) + (3*2/2))
+})
+
+
