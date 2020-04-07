@@ -222,18 +222,17 @@ test_that("Agglomerative merging", {
   expect_equal(length(collapse_results),
                sbm$n_nodes_at_level(0) - final_num_blocks)
 
-  collapse_results_just_final <- sbm$collapse_blocks(0,    # node_level,
-                                          final_num_blocks,    # B_end,
-                                          3,    # n_checks_per_block,
-                                          0,    # n_mcmc_sweeps,
-                                          0.9,  # sigma,
-                                          0.01, # eps,
-                                          FALSE, # report_all_steps = true,
-                                          TRUE) # allow_exhaustive = true
+  just_final <- sbm$collapse_blocks(0,                # node_level,
+                                    final_num_blocks, # B_end,
+                                    3,                # n_checks_per_block,
+                                    0,                # n_mcmc_sweeps,
+                                    0.9,              # sigma,
+                                    0.01,             # eps,
+                                    FALSE,            # report_all_steps = true,
+                                    TRUE)             # allow_exhaustive = true
 
   # Just reporting the final step should... just report the final step
   expect_equal(names(collapse_results_just_final),
                c("entropy_delta", "state", "n_blocks"))
-
 })
 
