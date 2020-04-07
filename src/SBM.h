@@ -555,7 +555,7 @@ class SBM {
 
   MCMC_Sweeps mcmc_sweep(const int n_sweeps,
                          const double& eps,
-                         const bool variable_n_blocks,
+                         const bool variable_num_blocks,
                          const bool track_pairs,
                          const int level    = 0,
                          const bool verbose = false)
@@ -578,7 +578,7 @@ class SBM {
     }
 
     // If allowing a variable number of blocks, initialize empty block for each type
-    if (variable_n_blocks) {
+    if (variable_num_blocks) {
       for (int type = 0; type < n_types(); type++) {
         add_block_node(type, block_level);
       }
@@ -641,8 +641,8 @@ class SBM {
         // Is the move accepted?
         if (move_accepted) {
 
-          bool remove_empty_block = variable_n_blocks;
-          if (variable_n_blocks) {
+          bool remove_empty_block = variable_num_blocks;
+          if (variable_num_blocks) {
             // If the old block will still have children after the move and
             // the new block is empty block, this move will cause there to be no
             // empty blocks for this type
@@ -690,7 +690,7 @@ class SBM {
 
     } // End multi-sweep loop
 
-    if (variable_n_blocks) {
+    if (variable_num_blocks) {
       // Cleanup the single empty block for each type
       for (const auto& blocks_of_type : get_nodes_at_level(block_level)) {
         for (const auto& block : blocks_of_type) {
@@ -737,7 +737,7 @@ class SBM {
     int B_cur = n_nodes_at_level(block_level);
 
     // Lambda to calculate how many merges a step needs
-    auto calc_n_merges = [&B_end, &sigma](const int B) {
+    auto calc_num_merges = [&B_end, &sigma](const int B) {
       // How many blocks the sigma hueristic wants network to have after next move
       // max of this value and target is taken to avoid overshooting goal
       const int B_next = std::max(int(std::floor(double(B) / sigma)),
@@ -748,7 +748,7 @@ class SBM {
 
     // Keep doing merges until we've reached the desired number of blocks
     while (B_cur > B_end) {
-      const int n_merges_to_make = calc_n_merges(B_cur);
+      const int n_merges_to_make = calc_num_merges(B_cur);
 
       // Perform merges
       auto merge_result = agglomerative_merge(this,

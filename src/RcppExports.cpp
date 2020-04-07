@@ -5,15 +5,15 @@
 
 using namespace Rcpp;
 
-
 RcppExport SEXP _rcpp_module_boot_SBM();
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_rcpp_module_boot_SBM", (DL_FUNC) &_rcpp_module_boot_SBM, 0},
-    {NULL, NULL, 0}
+  { "_rcpp_module_boot_SBM", (DL_FUNC)&_rcpp_module_boot_SBM, 0 },
+  { NULL, NULL, 0 }
 };
 
-RcppExport void R_init_sbmR(DllInfo *dll) {
-    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
-    R_useDynamicSymbols(dll, FALSE);
+RcppExport void R_init_sbmR(DllInfo* dll)
+{
+  R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+  R_useDynamicSymbols(dll, FALSE);
 }
