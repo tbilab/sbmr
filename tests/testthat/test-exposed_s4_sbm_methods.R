@@ -141,13 +141,22 @@ test_that("Interblock edge counts", {
 
   original_count <- get_a1_to_b1_block_counts(block_edge_counts)
 
+  # Attempting to add an edge to the network with blocks will give an error.
+  expect_error(sbm$add_edge("a1", "b1"),
+               "Block structure present in network. Adding an edge invalidates the model state. Remove block structure with reset_blocks() method.",
+               fixed = TRUE)
+
+  # We can follow the instructions and proceed again
   # Add an edge between a1 and b1 to network
+  sbm$reset_blocks()
   sbm$add_edge("a1", "b1")
+  sbm$initialize_blocks(-1)
+  a1_block <- sbm_state$parent[sbm_state$id == "a1"]
+  b1_block <- sbm_state$parent[sbm_state$id == "b1"]
 
   # Recheck the block edge counts, the value should have incremented up by 1
-  sbm$get_interblock_edge_counts(1) %>%
-    get_a1_to_b1_block_counts()
-
+  expect_equal(get_a1_to_b1_block_counts(sbm$get_interblock_edge_counts(1)),
+               original_count + 1)
 
 })
 
@@ -171,7 +180,6 @@ test_that("MCMC sweeps, no pair tracking", {
   expect_equal(nrow(sweeps$sweep_info), n_sweeps)
   expect_null(sweeps$pairing_counts)
 })
-
 
 test_that("MCMC sweeps, w/ pair tracking", {
 
