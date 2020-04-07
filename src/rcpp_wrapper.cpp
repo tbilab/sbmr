@@ -112,6 +112,14 @@ SEXP wrap(const Collapse_Results& collapse_results)
 {
   const int n_steps = collapse_results.merge_steps.size();
 
+  const bool just_final_result = n_steps == 0;
+
+  if (just_final_result) {
+    return List::create(_["entropy_delta"] = collapse_results.entropy_delta,
+                        _["state"]         = state_to_df(collapse_results.states[0]),
+                        _["num_blocks"]    = collapse_results.num_blocks);
+  }
+
   List entropy_results(n_steps);
 
   for (int i = 0; i < n_steps; i++) {
