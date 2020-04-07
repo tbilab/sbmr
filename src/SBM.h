@@ -189,6 +189,11 @@ class SBM {
     return nodes[level][type_i].size();
   }
 
+  bool node_level_has_blocks(const int level) const
+  {
+    return num_levels() > level + 1;
+  }
+
   public:
   int num_nodes() const
   {
@@ -263,6 +268,9 @@ class SBM {
     };
     for_all_nodes_at_level(level, gather_blocks_neighbors);
 
+    // Go through and divide all counts by two because we've double counted each edge
+    for (auto& pair_count : counts) pair_count.second /= 2;
+
     return counts;
   }
 
@@ -276,7 +284,7 @@ class SBM {
   {
     check_for_level(level);
 
-    if (num_levels() > level + 1) {
+    if (node_level_has_blocks(level)) {
       LOGIC_ERROR("Can't add a node to a network with block structure. This invalidates the model state. Remove block structure with reset_blocks() method.");
     }
 
@@ -362,6 +370,10 @@ class SBM {
     Node* a = get_node_by_id(node_a);
     Node* b = get_node_by_id(node_b);
 
+    if (node_level_has_blocks(0)) {
+      LOGIC_ERROR("Block structure present in network. Adding an edge invalidates the model state. Remove block structure with reset_blocks() method.");
+    }
+    
     validate_edge(a->type(), b->type());
 
     a->add_neighbor(b);
