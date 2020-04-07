@@ -48,31 +48,31 @@ SEXP wrap(const MCMC_Sweeps& results)
   const int n_pairs        = results.block_consensus.node_pairs.size();
   const bool tracked_pairs = n_pairs > 0;
 
-  // Initialize vectors to hold pair tracking results, if needed.
-  auto node_pair       = CharacterVector(n_pairs);
-  auto times_connected = IntegerVector(n_pairs);
+  auto results_df = List::create(
+      _["nodes_moved"] = results.nodes_moved,
+      _["sweep_info"]  = DataFrame::create(
+          _["entropy_delta"]    = results.sweep_entropy_delta,
+          _["num_nodes_moved"]  = results.sweep_num_nodes_moved,
+          _["stringsAsFactors"] = false));
 
   if (tracked_pairs) {
+    // Initialize vectors to hold pair tracking results, if needed.
+    auto node_pair       = CharacterVector(n_pairs);
+    auto times_connected = IntegerVector(n_pairs);
+
     int i = 0;
     for (const auto& pair : results.block_consensus.node_pairs) {
       node_pair[i]       = pair.first;
       times_connected[i] = pair.second.times_connected;
       i++;
     }
+
+    results_df["pairing_counts"] = DataFrame::create(_["node_pair"]        = node_pair,
+                                                     _["times_connected"]  = times_connected,
+                                                     _["stringsAsFactors"] = false);
   }
 
-  // package up results into a list
-  return List::create(
-      _["nodes_moved"] = results.nodes_moved,
-      _["sweep_info"]  = DataFrame::create(
-          _["entropy_delta"]    = results.sweep_entropy_delta,
-          _["num_nodes_moved"]  = results.sweep_num_nodes_moved,
-          _["stringsAsFactors"] = false),
-      _["pairing_counts"] = tracked_pairs
-          ? DataFrame::create(_["node_pair"]        = node_pair,
-                              _["times_connected"]  = times_connected,
-                              _["stringsAsFactors"] = false)
-          : "NA");
+  return results_df;
 }
 
 template <>
@@ -102,7 +102,7 @@ SEXP wrap(const Edge_Counts& edge_counts)
 template <>
 SEXP wrap(const Block_Counts& block_counts)
 {
-  return DataFrame::create(_["block_id"]         = block_counts.ids,
+  return DataFrame::create(_["type_id"]          = block_counts.ids,
                            _["count"]            = block_counts.counts,
                            _["stringsAsFactors"] = false);
 }
