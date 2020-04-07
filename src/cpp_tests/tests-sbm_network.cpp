@@ -515,6 +515,17 @@ TEST_CASE("Counting edges", "[Network]")
   Node* b4 = my_net.add_node("b4", "b");
   Node* b5 = my_net.add_node("b5", "b");
 
+  // Add edges
+  my_net.add_edge("a1", "b1");
+  my_net.add_edge("a1", "b2");
+  my_net.add_edge("a2", "b1");
+  my_net.add_edge("a2", "b3");
+  my_net.add_edge("a2", "b5");
+  my_net.add_edge("a3", "b2");
+  my_net.add_edge("a4", "b4");
+  my_net.add_edge("a4", "b5");
+  my_net.add_edge("a5", "b3");
+
   // level one blocks
   my_net.build_block_level();
   Node* a11 = my_net.add_node("a11", "a", 1);
@@ -531,16 +542,6 @@ TEST_CASE("Counting edges", "[Network]")
   Node* b21 = my_net.add_node("b21", "b", 2);
   Node* b22 = my_net.add_node("b22", "b", 2);
 
-  // Add edges
-  my_net.add_edge("a1", "b1");
-  my_net.add_edge("a1", "b2");
-  my_net.add_edge("a2", "b1");
-  my_net.add_edge("a2", "b3");
-  my_net.add_edge("a2", "b5");
-  my_net.add_edge("a3", "b2");
-  my_net.add_edge("a4", "b4");
-  my_net.add_edge("a4", "b5");
-  my_net.add_edge("a5", "b3");
 
   // Set hierarchy
 

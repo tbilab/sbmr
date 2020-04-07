@@ -18,6 +18,16 @@ inline SBM simple_bipartite()
   Node* b3 = my_sbm.add_node("b3", "b");
   Node* b4 = my_sbm.add_node("b4", "b");
 
+  // Add edges
+  my_sbm.add_edge("a1", "b1");
+  my_sbm.add_edge("a1", "b2");
+  my_sbm.add_edge("a2", "b1");
+  my_sbm.add_edge("a2", "b2");
+  my_sbm.add_edge("a3", "b1");
+  my_sbm.add_edge("a3", "b2");
+  my_sbm.add_edge("a3", "b4");
+  my_sbm.add_edge("a4", "b3");
+
   // Make blocks
   my_sbm.build_block_level();
   Node* a11 = my_sbm.add_node("a11", "a", 1);
@@ -27,18 +37,6 @@ inline SBM simple_bipartite()
   Node* b12 = my_sbm.add_node("b12", "b", 1);
   Node* b13 = my_sbm.add_node("b13", "b", 1);
 
-  // Add edges
-  my_sbm.add_edge("a1", "b1");
-  my_sbm.add_edge("a1", "b2");
-
-  my_sbm.add_edge("a2", "b1");
-  my_sbm.add_edge("a2", "b2");
-
-  my_sbm.add_edge("a3", "b1");
-  my_sbm.add_edge("a3", "b2");
-  my_sbm.add_edge("a3", "b4");
-
-  my_sbm.add_edge("a4", "b3");
 
   // Assign nodes to their blocks
   a1->set_parent(a11);
