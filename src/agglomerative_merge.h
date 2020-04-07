@@ -87,8 +87,8 @@ inline double merge_entropy_delta(const Node_Pair& merge_pair)
 template <typename Network>
 inline Block_Mergers agglomerative_merge(Network* net,
                                          const int block_level,
-                                         const int num_merges_to_make,
-                                         const int num_checks_per_block,
+                                         const int n_merges_to_make,
+                                         const int n_checks_per_block,
                                          const double& eps,
                                          const bool allow_exhaustive = true)
 {
@@ -98,7 +98,7 @@ inline Block_Mergers agglomerative_merge(Network* net,
   // Priority queue to keep track of best moves
   Best_Move_Queue best_merges;
 
-  for (int type = 0; type < net->num_types(); type++) {
+  for (int type = 0; type < net->n_types(); type++) {
     const auto& blocks_of_type = net->get_nodes_of_type(type, block_level);
     const int n_blocks_of_type = blocks_of_type.size();
 
@@ -106,7 +106,7 @@ inline Block_Mergers agglomerative_merge(Network* net,
     // search of all possible pairs, and the user allows it, just perform an exhaustive search of mergers.
     // The exhaustive search also benefits from not having to do the move proposal step.
     // We're comparing n*m vs n*(n-1)/2 moves
-    const bool exhaustive_is_cheaper = num_checks_per_block >= (n_blocks_of_type - 1) / 2;
+    const bool exhaustive_is_cheaper = n_checks_per_block >= (n_blocks_of_type - 1) / 2;
 
     if (allow_exhaustive && exhaustive_is_cheaper) {
 
@@ -124,7 +124,7 @@ inline Block_Mergers agglomerative_merge(Network* net,
       for (const auto& block : blocks_of_type) {
         const auto block_i = block.get();
 
-        for (int i = 0; i < num_checks_per_block; i++) {
+        for (int i = 0; i < n_checks_per_block; i++) {
           Node* block_j = net->propose_merge(block_i, eps);
 
           // Ignore if proposal if it's just the block itself
@@ -145,15 +145,15 @@ inline Block_Mergers agglomerative_merge(Network* net,
 
   // Now we find the top merges...
   // Start by initializing a merge result struct
-  auto results = Block_Mergers(num_merges_to_make);
+  auto results = Block_Mergers(n_merges_to_make);
 
   std::vector<Node_Pair> merges_to_make;
-  merges_to_make.reserve(num_merges_to_make);
+  merges_to_make.reserve(n_merges_to_make);
 
   // A set to keep track of what mergers have happened so as to not double up for a block
   Node_Set merged_blocks;
 
-  while (merges_to_make.size() < num_merges_to_make) {
+  while (merges_to_make.size() < n_merges_to_make) {
     if (best_merges.size() == 0) LOGIC_ERROR("Ran out of merges to use.");
 
     // Extract best remaining merge and remove from queue

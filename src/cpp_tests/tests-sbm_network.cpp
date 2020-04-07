@@ -15,22 +15,22 @@ TEST_CASE("Basic initialization of network", "[Network]")
   my_net.add_node("m3", "m");
   my_net.add_node("m4", "m");
 
-  REQUIRE(my_net.num_nodes() == 7);
-  REQUIRE(my_net.num_nodes_at_level(0) == 7);
-  REQUIRE(my_net.num_nodes_of_type("m", 0) == 4);
-  REQUIRE(my_net.num_nodes_of_type("n", 0) == 3);
+  REQUIRE(my_net.n_nodes() == 7);
+  REQUIRE(my_net.n_nodes_at_level(0) == 7);
+  REQUIRE(my_net.n_nodes_of_type("m", 0) == 4);
+  REQUIRE(my_net.n_nodes_of_type("n", 0) == 3);
 
   my_net.initialize_blocks(2);
 
   // We should now have added four new nodes at the block level (1)
-  REQUIRE(my_net.num_nodes() == 11);
-  REQUIRE(my_net.num_nodes_at_level(0) == 7);
-  REQUIRE(my_net.num_nodes_at_level(1) == 4);
-  REQUIRE(my_net.num_nodes_of_type("m", 1) == 2);
-  REQUIRE(my_net.num_nodes_of_type("n", 1) == 2);
+  REQUIRE(my_net.n_nodes() == 11);
+  REQUIRE(my_net.n_nodes_at_level(0) == 7);
+  REQUIRE(my_net.n_nodes_at_level(1) == 4);
+  REQUIRE(my_net.n_nodes_of_type("m", 1) == 2);
+  REQUIRE(my_net.n_nodes_of_type("n", 1) == 2);
 
   // We should have two levels
-  REQUIRE(my_net.num_levels() == 2);
+  REQUIRE(my_net.n_levels() == 2);
 }
 
 TEST_CASE("Default block initialization", "[Network]")
@@ -49,7 +49,7 @@ TEST_CASE("Default block initialization", "[Network]")
   my_net.initialize_blocks();
 
   // There should be same number of nodes at block level as data level
-  REQUIRE(my_net.num_nodes_at_level(0) == my_net.num_nodes_at_level(1));
+  REQUIRE(my_net.n_nodes_at_level(0) == my_net.n_nodes_at_level(1));
 
   // Make sure every node has a parent node
   REQUIRE(my_net.get_node_by_id("a1")->has_parent());
@@ -67,7 +67,7 @@ TEST_CASE("Default block initialization", "[Network]")
                                    my_net.get_node_by_id("b2")->parent()->id(),
                                    my_net.get_node_by_id("b3")->parent()->id() };
 
-  REQUIRE(unique_blocks.size() == my_net.num_nodes_at_level(1));
+  REQUIRE(unique_blocks.size() == my_net.n_nodes_at_level(1));
 }
 
 TEST_CASE("Initializing a block for every node", "[Network]")
@@ -94,17 +94,17 @@ TEST_CASE("Initializing a block for every node", "[Network]")
   my_net.add_node("b4", "b");
 
   // There should be a total of 18 nodes at base level
-  REQUIRE(my_net.num_nodes_at_level(0) == 18);
+  REQUIRE(my_net.n_nodes_at_level(0) == 18);
 
   // And zero nodes at the block level
-  REQUIRE(my_net.num_levels() == 1);
+  REQUIRE(my_net.n_levels() == 1);
 
   // Now assiging every node their own parent block
   my_net.initialize_blocks();
 
   // There should now be a second level with 18 nodes
-  REQUIRE(my_net.num_levels() == 2);
-  REQUIRE(my_net.num_nodes_at_level(1) == 18);
+  REQUIRE(my_net.n_levels() == 2);
+  REQUIRE(my_net.n_nodes_at_level(1) == 18);
 }
 
 TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
@@ -137,8 +137,8 @@ TEST_CASE("Randomly assigning a given number of blocks", "[Network]")
   my_net.initialize_blocks(3);
 
   // There should now be three block nodes of each type
-  REQUIRE(my_net.num_nodes_of_type("a", 1) == 3);
-  REQUIRE(my_net.num_nodes_of_type("b", 1) == 3);
+  REQUIRE(my_net.n_nodes_of_type("a", 1) == 3);
+  REQUIRE(my_net.n_nodes_of_type("b", 1) == 3);
 }
 
 TEST_CASE("Metablock initialization", "[Network]")
@@ -157,25 +157,25 @@ TEST_CASE("Metablock initialization", "[Network]")
   my_net.initialize_blocks(3);
 
   // We should now have added six new blocks
-  REQUIRE(my_net.num_levels() == 2);
-  REQUIRE(my_net.num_nodes_at_level(1) == 6);
+  REQUIRE(my_net.n_levels() == 2);
+  REQUIRE(my_net.n_nodes_at_level(1) == 6);
 
   // Now we can initialize metablocks for those blocks
   my_net.initialize_blocks(2);
 
   // We should now have three levels with the third having 4 blocks
-  REQUIRE(my_net.num_levels() == 3);
-  REQUIRE(my_net.num_nodes_at_level(2) == 4);
+  REQUIRE(my_net.n_levels() == 3);
+  REQUIRE(my_net.n_nodes_at_level(2) == 4);
 
   // Now remove the metablocks
   my_net.remove_block_levels_above(1);
 
   // Should be back to two levels
-  REQUIRE(my_net.num_levels() == 2);
+  REQUIRE(my_net.n_levels() == 2);
 
   // Remove the blocks
   my_net.remove_block_levels_above(0);
-  REQUIRE(my_net.num_levels() == 1);
+  REQUIRE(my_net.n_levels() == 1);
 
   // Cant remove data level of nodes when no levels are left
   REQUIRE_THROWS(my_net.remove_block_levels_above(-1));
@@ -199,8 +199,8 @@ TEST_CASE("Swapping of blocks", "[Network]")
   my_net.initialize_blocks();
 
   // Make sure network is how we desired it to be
-  REQUIRE(my_net.num_nodes_of_type("n", 1) == 3);
-  REQUIRE(my_net.num_nodes_of_type("m", 1) == 3);
+  REQUIRE(my_net.n_nodes_of_type("n", 1) == 3);
+  REQUIRE(my_net.n_nodes_of_type("m", 1) == 3);
 
   // Merge second node into first nodes block
   Node* node2  = my_net.get_node_by_id("n2");
@@ -211,7 +211,7 @@ TEST_CASE("Swapping of blocks", "[Network]")
                      true);
 
   // There should now be one less block of type n
-  REQUIRE(my_net.num_nodes_of_type("n", 1) == 2);
+  REQUIRE(my_net.n_nodes_of_type("n", 1) == 2);
 
   // Now do the same for the m type nodes but don't delete the empty block
   my_net.swap_blocks(my_net.get_nodes_of_type("m")[1].get(),
@@ -219,7 +219,7 @@ TEST_CASE("Swapping of blocks", "[Network]")
                      false);
 
   // There should be no change in the number of blocks
-  REQUIRE(my_net.num_nodes_of_type("m", 1) == 3);
+  REQUIRE(my_net.n_nodes_of_type("m", 1) == 3);
 }
 
 bool state_has_entry(const State_Dump& state,
@@ -309,7 +309,7 @@ TEST_CASE("State dumping and restoring", "[Network")
 
   // Restore to original state
   my_net.update_state(state1.ids, state1.types, state1.parents, state1.levels);
-  REQUIRE(my_net.num_levels() == 2);
+  REQUIRE(my_net.n_levels() == 2);
 
   State_Dump state3 = my_net.state();
 
@@ -320,7 +320,7 @@ TEST_CASE("State dumping and restoring", "[Network")
   REQUIRE(parent_from_state(state3, "a1") != parent_from_state(state3, "a2"));
 
   // The size of the network is correct...
-  REQUIRE(my_net.num_nodes_at_level(1) == 6);
+  REQUIRE(my_net.n_nodes_at_level(1) == 6);
 
   // We can also build a brand new network without any previous groups and have it assume
   // the state from before
@@ -335,11 +335,11 @@ TEST_CASE("State dumping and restoring", "[Network")
   my_net2.add_node("b3", "b");
   my_net2.add_node("b2", "b");
 
-  REQUIRE(my_net2.num_levels() == 1);
+  REQUIRE(my_net2.n_levels() == 1);
 
   my_net2.update_state(state2.ids, state2.types, state2.parents, state2.levels);
-  REQUIRE(my_net2.num_levels() == 2);
-  REQUIRE(my_net2.num_nodes_at_level(1) == 5);
+  REQUIRE(my_net2.n_levels() == 2);
+  REQUIRE(my_net2.n_nodes_at_level(1) == 5);
 
   REQUIRE(my_net2.get_node_by_id("a1")->parent()
           == my_net2.get_node_by_id("a2")->parent());
@@ -366,10 +366,10 @@ TEST_CASE("State dumping and restoring: w/ metablocks", "[Network")
   // Distribute two metablocks per type accross the blocks
   my_net.initialize_blocks(2);
 
-  REQUIRE(my_net.num_levels() == 3);
-  REQUIRE(my_net.num_nodes_at_level(0) == 8);
-  REQUIRE(my_net.num_nodes_at_level(1) == 8);
-  REQUIRE(my_net.num_nodes_at_level(2) == 4);
+  REQUIRE(my_net.n_levels() == 3);
+  REQUIRE(my_net.n_nodes_at_level(0) == 8);
+  REQUIRE(my_net.n_nodes_at_level(1) == 8);
+  REQUIRE(my_net.n_nodes_at_level(2) == 4);
 
   // Dump model state
   State_Dump state1 = my_net.state();
@@ -387,17 +387,17 @@ TEST_CASE("State dumping and restoring: w/ metablocks", "[Network")
   my_net2.add_node("b3", "b");
   my_net2.add_node("b4", "b");
 
-  REQUIRE(my_net2.num_levels() == 1);
-  REQUIRE(my_net2.num_nodes_at_level(0) == 8);
+  REQUIRE(my_net2.n_levels() == 1);
+  REQUIRE(my_net2.n_nodes_at_level(0) == 8);
 
   // Load dumped state from first model to this new model
   my_net2.update_state(state1.ids, state1.types, state1.parents, state1.levels);
 
   // Now check to make sure the size matches the previous model
-  REQUIRE(my_net2.num_levels() == 3);
-  REQUIRE(my_net2.num_nodes_at_level(0) == 8);
-  REQUIRE(my_net2.num_nodes_at_level(1) == 8);
-  REQUIRE(my_net2.num_nodes_at_level(2) == 4);
+  REQUIRE(my_net2.n_levels() == 3);
+  REQUIRE(my_net2.n_nodes_at_level(0) == 8);
+  REQUIRE(my_net2.n_nodes_at_level(1) == 8);
+  REQUIRE(my_net2.n_nodes_at_level(2) == 4);
 }
 
 TEST_CASE("Building with vectors -- Unipartite", "[Network]")
@@ -414,9 +414,9 @@ TEST_CASE("Building with vectors -- Unipartite", "[Network]")
                        edges_from, edges_to,
                        types_name };
 
-  REQUIRE(my_net.num_nodes() == 3);
-  REQUIRE(my_net.num_types() == 1);
-  REQUIRE(my_net.num_nodes_of_type("a") == 3);
+  REQUIRE(my_net.n_nodes() == 3);
+  REQUIRE(my_net.n_types() == 1);
+  REQUIRE(my_net.n_nodes_of_type("a") == 3);
 }
 
 TEST_CASE("Building with vectors -- Bipartite", "[Network]")
@@ -433,10 +433,10 @@ TEST_CASE("Building with vectors -- Bipartite", "[Network]")
                        edges_from, edges_to,
                        types_name };
 
-  REQUIRE(my_net.num_nodes() == 4);
-  REQUIRE(my_net.num_types() == 2);
-  REQUIRE(my_net.num_nodes_of_type("a") == 2);
-  REQUIRE(my_net.num_nodes_of_type("b") == 2);
+  REQUIRE(my_net.n_nodes() == 4);
+  REQUIRE(my_net.n_types() == 2);
+  REQUIRE(my_net.n_nodes_of_type("a") == 2);
+  REQUIRE(my_net.n_nodes_of_type("b") == 2);
 }
 
 TEST_CASE("Building with vectors -- Tripartite", "[Network]")
@@ -453,11 +453,11 @@ TEST_CASE("Building with vectors -- Tripartite", "[Network]")
                        edges_from, edges_to,
                        types_name };
 
-  REQUIRE(my_net.num_nodes() == 5);
-  REQUIRE(my_net.num_types() == 3);
-  REQUIRE(my_net.num_nodes_of_type("a") == 2);
-  REQUIRE(my_net.num_nodes_of_type("b") == 1);
-  REQUIRE(my_net.num_nodes_of_type("c") == 2);
+  REQUIRE(my_net.n_nodes() == 5);
+  REQUIRE(my_net.n_types() == 3);
+  REQUIRE(my_net.n_nodes_of_type("a") == 2);
+  REQUIRE(my_net.n_nodes_of_type("b") == 1);
+  REQUIRE(my_net.n_nodes_of_type("c") == 2);
 }
 
 TEST_CASE("Building with vectors -- Restricted tripartite", "[Network]")
@@ -479,11 +479,11 @@ TEST_CASE("Building with vectors -- Restricted tripartite", "[Network]")
                        42,
                        type_from, type_to };
 
-  REQUIRE(my_net.num_nodes() == 6);
-  REQUIRE(my_net.num_types() == 3);
-  REQUIRE(my_net.num_nodes_of_type("a") == 2);
-  REQUIRE(my_net.num_nodes_of_type("b") == 2);
-  REQUIRE(my_net.num_nodes_of_type("c") == 2);
+  REQUIRE(my_net.n_nodes() == 6);
+  REQUIRE(my_net.n_types() == 3);
+  REQUIRE(my_net.n_nodes_of_type("a") == 2);
+  REQUIRE(my_net.n_nodes_of_type("b") == 2);
+  REQUIRE(my_net.n_nodes_of_type("c") == 2);
 
   // Try adding an edges with unallowed types
   const std::vector<string> bad_edges_from { "b1", "a1", "a1", "a2", "a2", "b1", "b1" };

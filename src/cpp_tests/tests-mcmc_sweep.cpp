@@ -42,8 +42,8 @@ TEST_CASE("MCMC sweeps w/ varying epsilon - Simple Bipartite", "[SBM]")
 
   // Loop over a few different epsilon values
   std::vector<double> epsilons = { 0.01, 0.9 };
-  std::vector<double> avg_num_moves;
-  avg_num_moves.reserve(n_sweeps);
+  std::vector<double> avg_n_moves;
+  avg_n_moves.reserve(n_sweeps);
 
   for (const auto& epsilon : epsilons) {
 
@@ -54,11 +54,11 @@ TEST_CASE("MCMC sweeps w/ varying epsilon - Simple Bipartite", "[SBM]")
                                        false,   // track pairs
                                        0,       // level
                                        false);  // verbose
-    avg_num_moves.push_back(sweep_res.nodes_moved.size() / double(n_sweeps));
+    avg_n_moves.push_back(sweep_res.nodes_moved.size() / double(n_sweeps));
   }
 
   // Make sure that we have a more move-prone model when we have a high epsilon value...
-  REQUIRE(avg_num_moves.at(0) < avg_num_moves.at(1));
+  REQUIRE(avg_n_moves.at(0) < avg_n_moves.at(1));
 }
 
 TEST_CASE("MCMC sweeps w/ varying epsilon - Simple Unipartite", "[SBM]")
@@ -68,8 +68,8 @@ TEST_CASE("MCMC sweeps w/ varying epsilon - Simple Unipartite", "[SBM]")
 
   // Loop over a few different epsilon values
   std::vector<double> epsilons = { 0.01, 0.9 };
-  std::vector<double> avg_num_moves;
-  avg_num_moves.reserve(n_sweeps);
+  std::vector<double> avg_n_moves;
+  avg_n_moves.reserve(n_sweeps);
 
   for (const auto& epsilon : epsilons) {
 
@@ -80,9 +80,9 @@ TEST_CASE("MCMC sweeps w/ varying epsilon - Simple Unipartite", "[SBM]")
                                        false,   // track pairs
                                        0,       // level
                                        false);  // verbose
-    avg_num_moves.push_back(sweep_res.nodes_moved.size() / double(n_sweeps));
+    avg_n_moves.push_back(sweep_res.nodes_moved.size() / double(n_sweeps));
   }
 
   // Make sure that we have a more move-prone model when we have a high epsilon value...
-  REQUIRE(avg_num_moves.at(0) < avg_num_moves.at(1));
+  REQUIRE(avg_n_moves.at(0) < avg_n_moves.at(1));
 }

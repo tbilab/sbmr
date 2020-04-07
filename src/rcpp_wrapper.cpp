@@ -52,7 +52,7 @@ SEXP wrap(const MCMC_Sweeps& results)
       _["nodes_moved"] = results.nodes_moved,
       _["sweep_info"]  = DataFrame::create(
           _["entropy_delta"]    = results.entropy_deltas,
-          _["num_nodes_moved"]  = results.n_nodes_moved,
+          _["n_nodes_moved"]  = results.n_nodes_moved,
           _["stringsAsFactors"] = false));
 
   if (tracked_pairs) {
@@ -149,9 +149,9 @@ RCPP_MODULE(SBM)
       // all types
       .constructor<InOut_String_Vec, int>("Setup empty network with no nodes loaded")
 
-      .const_method("num_nodes_at_level", &SBM::num_nodes_at_level,
+      .const_method("n_nodes_at_level", &SBM::n_nodes_at_level,
                     "Returns number of nodes of all types for given level in network")
-      .const_method("num_levels", &SBM::num_levels,
+      .const_method("n_levels", &SBM::n_levels,
                     "Total number of levels. E.g. 2 = data-nodes and single block level")
       .const_method("block_counts", &SBM::block_counts,
                     "Gets dataframe of counts of blocks by type.")

@@ -51,11 +51,11 @@ class Node {
   Node(const string& node_id,
        const int level,
        const int type,
-       const int num_types = 1)
+       const int n_types = 1)
       : _id(node_id)
       , _level(level)
       , _type(type)
-      , _neighbors(num_types)
+      , _neighbors(n_types)
   {
   }
 
@@ -105,7 +105,7 @@ class Node {
     update_neighbors(child->neighbors(), Remove);
   }
 
-  int num_children() const
+  int n_children() const
   {
     return _children.size();
   }
@@ -122,7 +122,7 @@ class Node {
 
   Node* get_only_child() const
   {
-    if (num_children() > 1) LOGIC_ERROR("Cant get only child, block has more than one child");
+    if (n_children() > 1) LOGIC_ERROR("Cant get only child, block has more than one child");
 
     return _children[0];
   }

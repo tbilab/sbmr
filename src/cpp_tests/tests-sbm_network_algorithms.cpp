@@ -10,21 +10,21 @@ TEST_CASE("Generate Node move proposals - Simple Bipartite", "[SBM]")
 
   auto my_sbm = simple_bipartite();
 
-  int num_trials        = 200;
-  int num_times_no_move = 0;
+  int n_trials        = 200;
+  int n_times_no_move = 0;
   Node* a1              = my_sbm.get_node_by_id("a1");
   Node* old_block       = a1->parent();
 
   // Run multiple trials and of move and see how often a given node is moved
-  for (int i = 0; i < num_trials; ++i) {
+  for (int i = 0; i < n_trials; ++i) {
     // Do move attempt (dry run)
     Node* new_block = my_sbm.propose_move(a1, eps);
 
     if (new_block == old_block)
-      num_times_no_move++;
+      n_times_no_move++;
   }
 
-  double frac_of_time_no_change = double(num_times_no_move) / double(num_trials);
+  double frac_of_time_no_change = double(n_times_no_move) / double(n_trials);
   // Prob of a1 staying in a1_1 should be approximately (2 + eps)/(6 + 4*eps)
   // Make sure model's decisions to move a1 reflects this.
   double two   = 2;
@@ -41,7 +41,7 @@ TEST_CASE("Generate Node move proposals - Simple Unipartite", "[SBM]")
 
   auto my_sbm = simple_unipartite();
 
-  int num_trials = 2000;
+  int n_trials = 2000;
   Node* n5       = my_sbm.get_node_by_id("n5");
   Node* b        = my_sbm.get_node_by_id("n4")->parent();
 
@@ -51,18 +51,18 @@ TEST_CASE("Generate Node move proposals - Simple Unipartite", "[SBM]")
   std::map<string, int> times_to_block;
 
   // Run multiple trials and of move and see how often a given node is moved
-  for (int i = 0; i < num_trials; ++i) {
+  for (int i = 0; i < n_trials; ++i) {
     // Do move attempt (dry run)
     times_to_block[my_sbm.propose_move(n5, eps)->id()]++;
   }
 
-  REQUIRE(double(times_to_block.at("a")) / double(num_trials)
+  REQUIRE(double(times_to_block.at("a")) / double(n_trials)
           == Approx(0.3033066).epsilon(tol));
 
-  REQUIRE(double(times_to_block.at("b")) / double(num_trials)
+  REQUIRE(double(times_to_block.at("b")) / double(n_trials)
           == Approx(0.4155352).epsilon(tol));
 
-  REQUIRE(double(times_to_block.at("c")) / double(num_trials)
+  REQUIRE(double(times_to_block.at("c")) / double(n_trials)
           == Approx(0.2811582).epsilon(tol));
 
   // Value calculated in R using the following:
@@ -95,13 +95,13 @@ TEST_CASE("Move results information - Simple Bipartite", "[SBM]")
   auto my_sbm = simple_bipartite();
 
   // Make sure we have correct number of blocks
-  REQUIRE(my_sbm.num_nodes_at_level(1) == 6);
+  REQUIRE(my_sbm.n_nodes_at_level(1) == 6);
 
   auto a2 = my_sbm.get_node_by_id("a2");
   // propose moving a2 into block with a1
   const auto move_results = get_move_results(a2,
                                              my_sbm.get_node_by_id("a1")->parent(),
-                                             my_sbm.num_possible_neighbor_blocks(a2),
+                                             my_sbm.n_possible_neighbor_blocks(a2),
                                              0.1);
 
   REQUIRE(move_results.entropy_delta == Approx(-0.5924696).epsilon(0.1));
@@ -120,7 +120,7 @@ TEST_CASE("Move results information - Simple Unipartite", "[SBM]")
 
   // Propose move of n4 to group c
   Node* n4                = my_sbm.get_node_by_id("n4");
-  const int B             = my_sbm.num_possible_neighbor_blocks(n4);
+  const int B             = my_sbm.n_possible_neighbor_blocks(n4);
   const auto move_results = get_move_results(n4, group_c, B, 0.5);
 
   REQUIRE(move_results.entropy_delta == Approx(-0.1117765).epsilon(0.1));
@@ -138,16 +138,16 @@ TEST_CASE("Block Merging - Simple Bipartite", "[SBM]")
   auto a2  = my_sbm.get_node_by_id("a2");
   auto a12 = a2->parent();
 
-  REQUIRE(a12->num_children() == 2);
+  REQUIRE(a12->n_children() == 2);
   REQUIRE(a12->degree() == 5);
-  REQUIRE(my_sbm.num_nodes_of_type("a", 1) == 3);
+  REQUIRE(my_sbm.n_nodes_of_type("a", 1) == 3);
 
   // Now merge a11 into a12
   my_sbm.merge_blocks(a11, a12);
 
-  REQUIRE(a12->num_children() == 3);
+  REQUIRE(a12->n_children() == 3);
   REQUIRE(a12->degree() == 7);
-  REQUIRE(my_sbm.num_nodes_of_type("a", 1) == 2);
+  REQUIRE(my_sbm.n_nodes_of_type("a", 1) == 2);
 
   REQUIRE(a1->parent() == a2->parent());
 
@@ -167,19 +167,19 @@ TEST_CASE("Block Merging - Simple Unipartite", "[SBM]")
   REQUIRE(b->has_child(my_sbm.get_node_by_id("n4")));
   REQUIRE(c->has_child(my_sbm.get_node_by_id("n5")));
 
-  REQUIRE(b->num_children() == 2);
+  REQUIRE(b->n_children() == 2);
   REQUIRE(b->degree() == 9);
   // n5 and n4 do not share a block
   REQUIRE(my_sbm.get_node_by_id("n5")->parent() != my_sbm.get_node_by_id("n4")->parent());
-  REQUIRE(my_sbm.num_nodes_of_type("a", 1) == 3);
+  REQUIRE(my_sbm.n_nodes_of_type("a", 1) == 3);
 
   // Now merge c into b
   my_sbm.merge_blocks(c, b);
 
-  REQUIRE(b->num_children() == 4);
+  REQUIRE(b->n_children() == 4);
   REQUIRE(b->degree() == 16);
   // n4 and n5 now do share their block
   REQUIRE(my_sbm.get_node_by_id("n5")->parent() == my_sbm.get_node_by_id("n4")->parent());
 
-  REQUIRE(my_sbm.num_nodes_of_type("a", 1) == 2);
+  REQUIRE(my_sbm.n_nodes_of_type("a", 1) == 2);
 }

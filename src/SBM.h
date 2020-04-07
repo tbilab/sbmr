@@ -131,7 +131,7 @@ class SBM {
       , sampler(random_seed)
   {
     // Make sure we don't already have nodes
-    if (num_levels() > 0) LOGIC_ERROR("Can only bulk add nodes to empty network");
+    if (n_levels() > 0) LOGIC_ERROR("Can only bulk add nodes to empty network");
 
     // Setup empty first level of nodes with conservative space reserving
     build_block_level(node_ids.size());
@@ -182,7 +182,7 @@ class SBM {
   // Information
   // =========================================================================
   private:
-  int num_nodes_of_type(const int type_i, const int level = 0) const
+  int n_nodes_of_type(const int type_i, const int level = 0) const
   {
     check_for_level(level);
     check_for_type(type_i);
@@ -191,32 +191,32 @@ class SBM {
 
   bool node_level_has_blocks(const int level) const
   {
-    return num_levels() > level + 1;
+    return n_levels() > level + 1;
   }
 
   public:
-  int num_nodes() const
+  int n_nodes() const
   {
     return n_total_elements(nodes);
   }
 
-  int num_nodes_at_level(const int level) const
+  int n_nodes_at_level(const int level) const
   {
     check_for_level(level);
     return n_total_elements(nodes[level]);
   }
 
-  int num_levels() const
+  int n_levels() const
   {
     return nodes.size();
   }
 
-  int num_nodes_of_type(const string& type, const int level = 0) const
+  int n_nodes_of_type(const string& type, const int level = 0) const
   {
-    return num_nodes_of_type(get_type_index(type), level);
+    return n_nodes_of_type(get_type_index(type), level);
   }
 
-  int num_types() const
+  int n_types() const
   {
     return types.size();
   }
@@ -237,11 +237,11 @@ class SBM {
     return b_c;
   }
 
-  int num_possible_neighbor_blocks(Node* node) const
+  int n_possible_neighbor_blocks(Node* node) const
   {
     const int type  = node->type();
     const int level = node->level();
-    if (edge_types == unipartite) return num_nodes_of_type(type, level + 1);
+    if (edge_types == unipartite) return n_nodes_of_type(type, level + 1);
 
     const std::set<int>& node_neighbor_types = connection_types.at(type);
 
@@ -250,7 +250,7 @@ class SBM {
         node_neighbor_types.end(),
         0,
         [&](int n, const int type) {
-          return n + num_nodes_of_type(type, level + 1);
+          return n + n_nodes_of_type(type, level + 1);
         });
   }
 
@@ -294,7 +294,7 @@ class SBM {
     }
 
     // Build new node pointer outside vector for ease of pointer retrieval
-    auto new_node = Node_UPtr(new Node(id, level, type_index, num_types()));
+    auto new_node = Node_UPtr(new Node(id, level, type_index, n_types()));
 
     // Get raw pointer to node to return
     Node* node_ptr = new_node.get();
@@ -405,11 +405,11 @@ class SBM {
 
   void build_block_level(const int reserve_size = 0)
   {
-    nodes.emplace_back(num_types());
+    nodes.emplace_back(n_types());
 
     // If we were told to reserve a size for each type vec, do so.
     if (reserve_size > 0) {
-      for (auto& type_vec : nodes[num_levels() - 1]) {
+      for (auto& type_vec : nodes[n_levels() - 1]) {
         type_vec.reserve(reserve_size);
       }
     }
@@ -418,14 +418,14 @@ class SBM {
   void initialize_blocks(int n_blocks = -1)
   {
     const bool one_block_per_node = n_blocks == -1;
-    const int block_level         = num_levels();
+    const int block_level         = n_levels();
     const int child_level         = block_level - 1;
 
     // Build empty level
     build_block_level(one_block_per_node ? 0 : n_blocks);
 
     // Loop over all node types
-    for (int type_i = 0; type_i < num_types(); type_i++) {
+    for (int type_i = 0; type_i < n_types(); type_i++) {
 
       Node_UPtr_Vec& nodes_of_type  = nodes[child_level][type_i];
       Node_UPtr_Vec& blocks_of_type = nodes[child_level + 1][type_i];
@@ -473,7 +473,7 @@ class SBM {
 
   void remove_block_levels_above(const int last_level_index)
   {
-    const int highest_index = num_levels() - 1;
+    const int highest_index = n_levels() - 1;
 
     // Make sure request makes sense.
     if (last_level_index < 0) LOGIC_ERROR("Can't remove data level");
@@ -483,10 +483,10 @@ class SBM {
                                                       + as_str(highest_index));
 
     // Say we have three levels and want to get to just nodes (index = 0)
-    // num_levels() = 3 - 0 - 1 -> remove 2 levels
-    const int num_levels_to_remove = highest_index - last_level_index;
+    // n_levels() = 3 - 0 - 1 -> remove 2 levels
+    const int n_levels_to_remove = highest_index - last_level_index;
 
-    for (int i = 0; i < num_levels_to_remove; i++) {
+    for (int i = 0; i < n_levels_to_remove; i++) {
       // Remove the last layer of nodes.
       nodes.pop_back();
     }
@@ -553,7 +553,7 @@ class SBM {
     return propose_move(node, node->level(), eps);
   }
 
-  MCMC_Sweeps mcmc_sweep(const int num_sweeps,
+  MCMC_Sweeps mcmc_sweep(const int n_sweeps,
                          const double& eps,
                          const bool variable_n_blocks,
                          const bool track_pairs,
@@ -563,13 +563,13 @@ class SBM {
     const int block_level = level + 1;
 
     // Initialize structure that contains the returned values for this/these sweeps
-    MCMC_Sweeps results(num_sweeps);
+    MCMC_Sweeps results(n_sweeps);
 
     // Initialize pair tracking map if needed
     if (track_pairs) results.block_consensus.initialize(get_nodes_at_level(level));
 
     // Check if we have any blocks ready in the network...
-    const bool no_blocks_present = num_levels() > block_level + 1;
+    const bool no_blocks_present = n_levels() > block_level + 1;
 
     if (no_blocks_present) {
       initialize_blocks();
@@ -579,7 +579,7 @@ class SBM {
 
     // If allowing a variable number of blocks, initialize empty block for each type
     if (variable_n_blocks) {
-      for (int type = 0; type < num_types(); type++) {
+      for (int type = 0; type < n_types(); type++) {
         add_block_node(type, block_level);
       }
     }
@@ -595,9 +595,9 @@ class SBM {
     // Initialize a vector of nodes that will be passed through for a sweep.
     auto nodes = get_flat_level(level);
 
-    for (int i = 0; i < num_sweeps; i++) {
+    for (int i = 0; i < n_sweeps; i++) {
       // Book keeper variables for this sweeps stats
-      int num_nodes_moved  = 0;
+      int n_nodes_moved  = 0;
       double entropy_delta = 0;
 
       // Shuffle order of nodes to be run through for sweep
@@ -628,7 +628,7 @@ class SBM {
         // Calculate acceptance probability based on posterior changes
         auto proposal_results = get_move_results(curr_node,
                                                  proposed_new_block,
-                                                 num_possible_neighbor_blocks(curr_node),
+                                                 n_possible_neighbor_blocks(curr_node),
                                                  eps);
 
         // Make movement decision
@@ -646,7 +646,7 @@ class SBM {
             // If the old block will still have children after the move and
             // the new block is empty block, this move will cause there to be no
             // empty blocks for this type
-            const bool old_wont_be_empty = old_block->num_children() > 1;
+            const bool old_wont_be_empty = old_block->n_children() > 1;
 
             if (proposed_new_block->is_empty()) {
               if (old_wont_be_empty) {
@@ -664,7 +664,7 @@ class SBM {
 
           // Update results
           results.nodes_moved.push_back(curr_node->id());
-          num_nodes_moved++;
+          n_nodes_moved++;
           entropy_delta += proposal_results.entropy_delta;
 
           if (track_pairs) Block_Consensus::update_changed_pairs(curr_node->id(),
@@ -680,7 +680,7 @@ class SBM {
       } // End current sweep
 
       // Update results for this sweep
-      results.add(entropy_delta, num_nodes_moved);
+      results.add(entropy_delta, n_nodes_moved);
       results.entropy_delta += entropy_delta;
 
       // Update the concensus pairs map with results if needed.
@@ -716,8 +716,8 @@ class SBM {
                                    const bool allow_exhaustive = true)
   {
     // Make sure we have at least one final block per node type
-    if (num_types() > B_end) LOGIC_ERROR("Can't collapse a network with "
-                                         + as_str(num_types()) + " node types to "
+    if (n_types() > B_end) LOGIC_ERROR("Can't collapse a network with "
+                                         + as_str(n_types()) + " node types to "
                                          + as_str(B_end)
                                          + " blocks.\n There needs to be at least one block per node type.");
 
@@ -734,10 +734,10 @@ class SBM {
     initialize_blocks();
 
     // Setup variable to track the current number of blocks in the model
-    int B_cur = num_nodes_at_level(block_level);
+    int B_cur = n_nodes_at_level(block_level);
 
     // Lambda to calculate how many merges a step needs
-    auto calc_num_merges = [&B_end, &sigma](const int B) {
+    auto calc_n_merges = [&B_end, &sigma](const int B) {
       // How many blocks the sigma hueristic wants network to have after next move
       // max of this value and target is taken to avoid overshooting goal
       const int B_next = std::max(int(std::floor(double(B) / sigma)),
@@ -748,7 +748,7 @@ class SBM {
 
     // Keep doing merges until we've reached the desired number of blocks
     while (B_cur > B_end) {
-      const int n_merges_to_make = calc_num_merges(B_cur);
+      const int n_merges_to_make = calc_n_merges(B_cur);
 
       // Perform merges
       auto merge_result = agglomerative_merge(this,
@@ -807,17 +807,16 @@ class SBM {
   // =============================================================================
   State_Dump state() const
   {
-    const int n_levels = num_levels();
-    if (n_levels == 1) LOGIC_ERROR("No state to export - Try adding blocks");
+    if (n_levels() == 1) LOGIC_ERROR("No state to export - Try adding blocks");
 
     // No need to record the last level's nodes as they are already included
     // in the previous node's parent slot
-    const int n_nodes_in_last_level = num_nodes_at_level(n_levels - 1);
+    const int n_nodes_in_last_level = n_nodes_at_level(n_levels() - 1);
 
     // Initialize the return struct
-    State_Dump state(num_nodes() - n_nodes_in_last_level);
+    State_Dump state(n_nodes() - n_nodes_in_last_level);
 
-    for (int level = 0; level < num_levels() - 1; level++) {
+    for (int level = 0; level < n_levels() - 1; level++) {
       for_all_nodes_at_level(level, [&](const Node_UPtr& node) {
         state.add(node->id(),
                   types[node->type()],
@@ -909,7 +908,7 @@ class SBM {
 
   void check_for_type(const int type_index) const
   {
-    if (type_index >= num_types()) RANGE_ERROR("Type " + as_str(type_index)
+    if (type_index >= n_types()) RANGE_ERROR("Type " + as_str(type_index)
                                                + " does not exist in network.");
   }
 
@@ -917,7 +916,7 @@ class SBM {
   Node_Vec get_flat_level(const int level) const
   {
     Node_Vec all_nodes;
-    all_nodes.reserve(num_nodes_at_level(level));
+    all_nodes.reserve(n_nodes_at_level(level));
 
     for_all_nodes_at_level(level, [&all_nodes](const Node_UPtr& node) {
       all_nodes.push_back(node.get());
