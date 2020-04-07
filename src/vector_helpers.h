@@ -73,7 +73,7 @@ struct Size_Sum {
 
 // Total number of elements in a vector of vectors
 template <typename T>
-int total_num_elements(const Vec_of_Vecs<T>& vec_of_vecs)
+int n_total_elements(const Vec_of_Vecs<T>& vec_of_vecs)
 {
   Size_Sum<T> sum_sizes;
   return std::accumulate(vec_of_vecs.begin(), vec_of_vecs.end(), 0, sum_sizes);
@@ -81,7 +81,7 @@ int total_num_elements(const Vec_of_Vecs<T>& vec_of_vecs)
 
 // Total number of elements in a vector of vectors of vectors... all the way down
 template <typename T>
-int total_num_elements(const std::vector<Vec_of_Vecs<T>>& vec_of_vec_of_vecs)
+int n_total_elements(const std::vector<Vec_of_Vecs<T>>& vec_of_vec_of_vecs)
 {
   Size_Sum<T> sum_sizes;
   return std::accumulate(vec_of_vec_of_vecs.begin(), vec_of_vec_of_vecs.end(), 0, sum_sizes);
@@ -105,7 +105,7 @@ template <typename T>
 T& get_random_element(Vec_of_Vecs<T>& vec_of_vecs, std::mt19937& random_generator)
 {
   // Make a random uniform to index into vectors
-  const int n = total_num_elements(vec_of_vecs);
+  const int n = n_total_elements(vec_of_vecs);
   if (n == 0)
     RANGE_ERROR("Can't take a random sample of empty vectors");
 

@@ -197,13 +197,13 @@ class SBM {
   public:
   int num_nodes() const
   {
-    return total_num_elements(nodes);
+    return n_total_elements(nodes);
   }
 
   int num_nodes_at_level(const int level) const
   {
     check_for_level(level);
-    return total_num_elements(nodes[level]);
+    return n_total_elements(nodes[level]);
   }
 
   int num_levels() const
