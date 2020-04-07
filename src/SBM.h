@@ -373,7 +373,7 @@ class SBM {
     if (node_level_has_blocks(0)) {
       LOGIC_ERROR("Block structure present in network. Adding an edge invalidates the model state. Remove block structure with reset_blocks() method.");
     }
-    
+
     validate_edge(a->type(), b->type());
 
     a->add_neighbor(b);
@@ -793,6 +793,10 @@ class SBM {
         results.merge_steps.push_back(merge_result);
         results.states.push_back(state());
       }
+    }
+
+    if(!report_all_steps){
+      results.states.push_back(state());
     }
 
     return results;
