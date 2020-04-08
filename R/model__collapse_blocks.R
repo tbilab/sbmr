@@ -61,7 +61,7 @@
 collapse_blocks <- function(sbm,
                             desired_num_blocks = 1,
                             num_mcmc_sweeps = 0,
-                            sigma = 2,
+                            sigma = 1.5,
                             eps = 0.1,
                             num_block_proposals = 5,
                             level = 0,
