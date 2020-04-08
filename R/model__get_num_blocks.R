@@ -42,10 +42,15 @@ get_num_blocks.default <- function(sbm){
 
 #' @export
 get_num_blocks.sbm_network <- function(sbm){
-  verify_model(sbm) %>%
-    get_state() %>%
-    dplyr::filter(level == 1) %>%
-    nrow()
+
+  model <- verify_model(sbm) %>%
+    attr('model')
+
+  if(model$n_levels() > 1) {
+    return(model$n_nodes_at_level(1))
+  } else {
+    return(0)
+  }
 }
 
 
