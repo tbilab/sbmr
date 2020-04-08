@@ -8,10 +8,11 @@ collapse_blocks(
   sbm,
   desired_num_blocks = 1,
   num_mcmc_sweeps = 0,
-  sigma = 2,
+  sigma = 1.5,
   eps = 0.1,
   num_block_proposals = 5,
   level = 0,
+  allow_exhaustive = TRUE,
   report_all_steps = TRUE
 )
 }
@@ -43,6 +44,10 @@ searched exhaustively.}
 
 \item{level}{Level of nodes who's blocks will have their block membership run
 through MCMC proposal-accept routine.}
+
+\item{allow_exhaustive}{If the number of proposals for a blocks merges is
+less than the number of proposals needed to check all possible merge
+combinations, should the model check all possible combinations?}
 
 \item{report_all_steps}{Should the model state be provided for every merge
 step or just the final one? If collapsing is being used to infer
