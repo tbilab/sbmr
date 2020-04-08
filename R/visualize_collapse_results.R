@@ -72,8 +72,7 @@ visualize_collapse_results.sbm_network <- function(sbm,
 
   if(!is.null(heuristic)){
 
-    collapse_results <- collapse_results %>%
-      dplyr::arrange(n_blocks)
+    collapse_results <- dplyr::arrange(collapse_results, n_blocks)
 
     if (use_entropy_value_for_score){
       collapse_results <- dplyr::mutate(collapse_results, score = build_score_fn(heuristic)(entropy, n_blocks))
@@ -85,9 +84,7 @@ visualize_collapse_results.sbm_network <- function(sbm,
   collapse_results %>%
     dplyr::select(entropy_delta, n_blocks) %>%
     tidyr::pivot_longer(-n_blocks) %>%
-    dplyr::mutate(
-      name = stringr::str_replace_all(name, "_", " ")
-    ) %>%
+    dplyr::mutate(name = stringr::str_replace_all(name, "_", " ")) %>%
     ggplot2::ggplot(ggplot2::aes(x = n_blocks, y = value)) +
     ggplot2::geom_point() +
     ggplot2::geom_line() +
