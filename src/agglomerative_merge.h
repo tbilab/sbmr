@@ -5,29 +5,20 @@
 #include "Ordered_Pair.h"
 #include "model_helpers.h"
 
-class Block_Mergers {
-  private:
-  int i = 0;
+struct Block_Mergers {
 
-  public:
   double entropy_delta = 0.0;
   int n_blocks;
   InOut_String_Vec merge_from;
   InOut_String_Vec merge_into;
-  Block_Mergers(const int n)
-      : merge_from(n)
-      , merge_into(n)
-  {
-  }
   void add(const string& from, const string& into)
   {
-    merge_from[i] = from;
-    merge_into[i] = into;
-    i++;
+    merge_from.push_back(from);
+    merge_into.push_back(into);
   }
   int n_merges_made() const
   {
-    return i;
+    return merge_from.size();
   }
 };
 
@@ -149,7 +140,7 @@ inline Block_Mergers agglomerative_merge(Network* net,
 
   // Now we find the top merges...
   // Start by initializing a merge result struct
-  auto results = Block_Mergers(n_merges_to_make);
+  auto results = Block_Mergers();
 
   std::vector<Node_Pair> merges_to_make;
   merges_to_make.reserve(n_merges_to_make);
