@@ -178,16 +178,16 @@ test_that("Randomly initializing blocks in network", {
                             prob_of_edge = 1,
                             random_seed = 42) %>%
     initialize_blocks() %>%
-    initialize_blocks(level = 1)
+    initialize_blocks()
 
   model_state <- get_state(net)
 
-  # There should now be fifteen total nodes in state
-  expect_equal(nrow(model_state), 15)
+  # There should now be 10 total nodes in state
+  expect_equal(nrow(model_state), 10)
 
-  # With five total blocks sitting at level 2
+  # With five total blocks sitting at level 1
   expect_equal(
-    sum(model_state$level == 2),
+    sum(model_state$level == 1),
     5
   )
 })
