@@ -71,9 +71,6 @@ add_node.sbm_network <- function(sbm, id, type = NULL, show_messages = TRUE){
     if(already_has_model){
       # Add node to s4 model class
       attr(sbm, 'model')$add_node(id, type, 0L)
-
-      # Update state with new nodes [inefficient]
-      attr(sbm, "state") <- attr(sbm, 'model')$get_state()
     }
 
   } else {
