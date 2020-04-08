@@ -86,9 +86,6 @@ test_that("Add edge", {
   expect_equal(attr(net, 'n_edges'), pre_addition_edges + 1)
 })
 
-
-
-
 test_that("Randomly initializing blocks in network", {
   # Default value is 1 block per node
   expect_equal(
@@ -116,7 +113,7 @@ test_that("Randomly initializing blocks in network", {
                        prob_of_edge = 1,
                        random_seed = 42) %>%
       initialize_blocks(num_blocks = 10),
-    "Network only has 5 nodes at level 0. Can't initialize 10 blocks"
+    "Can't initialize 10 blocks as there are only 5 nodes"
   )
 
   # Can't request negative numbers of blocks
