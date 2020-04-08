@@ -56,36 +56,13 @@ verify_model.sbm_network <- function(sbm, show_messages = FALSE, warn_about_rand
     }
   }
 
-
-  # Load network model with nodes and random seed
-  sbm_model <- methods::new(SBM,
-                            sbm$nodes$id,
-                            sbm$nodes$type,
-                            attr(sbm, "node_types"),
-                            attr(sbm, "random_seed"))
-
-  # Fill in the edges for model
-  sbm_model$add_edges(dplyr::pull(sbm$edges, !!attr(sbm, "from_column")),
-                      dplyr::pull(sbm$edges, !!attr(sbm, "to_column")),
-                      attr(sbm, 'edge_types')$from,
-                      attr(sbm, 'edge_types')$to)
-
-  # If model has cached block structure, reload it here
-  if (has_state_already) {
-    if(show_messages) message("Reloading saved model state.")
-
-    # Reload using saved state to get model back to working condition
-    previous_state <- attr(sbm, "state")
-
-    # Reload state using the s4 method for doing so exposed by rcpp
-    sbm_model$update_state(previous_state$id,
-                           previous_state$type,
-                           previous_state$parent,
-                           previous_state$level)
-  }
-
   # Assign sbm_model object to name model in sbm_network object
-  attr(sbm, 'model') <- sbm_model
+  attr(sbm, 'model') <- new_sbm_s4(nodes = sbm$nodes,
+                                   edges = dplyr::rename(sbm$edges, a = !!attr(sbm, "from_column"), b = !!attr(sbm, "to_column")),
+                                   node_types = attr(sbm, "node_types"),
+                                   allowed_edge_types = attr(sbm, "allowed_edge_types"),
+                                   state =  attr(sbm, "state"),
+                                   random_seed = attr(sbm, "random_seed"))
 
   # Give back sbm_network object
   sbm
