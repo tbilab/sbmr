@@ -153,6 +153,10 @@ RCPP_MODULE(SBM)
                     "Returns number of nodes of all types for given level in network")
       .const_method("n_levels", &SBM::n_levels,
                     "Total number of levels. E.g. 2 = data-nodes and single block level")
+      .const_method("n_types", &SBM::n_types,
+                    "How many node types are in model?")
+      .const_method("node_types", &SBM::node_types,
+                    "Returns a vector of all the node types in model")
       .const_method("n_edges", &SBM::n_edges,
                     "How many edges are in the network?")
       .const_method("block_counts", &SBM::block_counts,

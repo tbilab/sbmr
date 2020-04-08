@@ -203,7 +203,7 @@ class SBM {
     return n_total_elements(nodes);
   }
 
-  int n_edges() const 
+  int n_edges() const
   {
     return _n_edges;
   }
@@ -227,6 +227,18 @@ class SBM {
   int n_types() const
   {
     return types.size();
+  }
+
+  InOut_String_Vec node_types() const
+  {
+    // This method does a copy of a vector and strings so it's expensive
+    // and should not be used for performance critical parts of model
+    auto type_copy = InOut_String_Vec(n_types());
+
+    for (int t_i = 0; t_i < n_types(); t_i++) {
+      type_copy[t_i] = types[t_i];
+    }
+    return type_copy;
   }
 
   Block_Counts block_counts(const int level = 1) const
@@ -386,7 +398,7 @@ class SBM {
 
     a->add_neighbor(b);
     b->add_neighbor(a);
-    
+
     _n_edges++;
   }
 
