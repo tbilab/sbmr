@@ -87,52 +87,6 @@ test_that("Add edge", {
 })
 
 
-test_that("Set node parent", {
-  # Start with bipartite network with 6 nodes
-  net <- dplyr::tribble(
-      ~a_node, ~b_node,
-      "a1"   , "b1"   ,
-      "a1"   , "b2"   ,
-      "a1"   , "b3"   ,
-      "a2"   , "b1"   ,
-      "a3"   , "b1"
-    ) %>%
-  new_sbm_network(bipartite_edges = TRUE,
-                  edges_from_col = a_node,
-                  edges_to_col = b_node,
-                  random_seed = 42)
-
-
-  # Make a parent node and assign it to a1
-  net <- set_node_parent(net, child_id = 'a1', parent_id = 'a1_parent')
-
-  new_state <- get_state(net)
-  # Now we should have a state with 6 total nodes...
-  expect_equal(nrow(new_state), 7)
-
-  # One of which has the id of node_1_parent...
-  index_of_new_parent <- which(new_state$id == 'a1_parent')
-
-  # Check new parent exists
-  expect_equal(length(index_of_new_parent), 1)
-
-  # Make sure it has the proper level
-  expect_equal(new_state$level[index_of_new_parent], 1)
-
-  # Make sure it has the proper type
-  expect_equal(new_state$type[index_of_new_parent], 'a_node')
-
-  # The node a1 should have a parent of a1_parent
-  expect_equal(new_state$parent[new_state$id == "a1"], 'a1_parent')
-
-  # Now we can add a parent to the parent
-  net <- set_node_parent(net, child_id = 'a1_parent', parent_id = 'a1_grandparent')
-
-  new_new_state <- get_state(net)
-  index_of_new_grandparent <- which(new_new_state$id == 'a1_grandparent')
-  # Make sure grandparent has proper level
-  expect_equal(new_new_state$level[index_of_new_grandparent], 2)
-})
 
 
 test_that("Randomly initializing blocks in network", {

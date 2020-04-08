@@ -11,7 +11,7 @@
 #'
 #' @family advanced
 #'
-#' @inheritParams set_node_parent
+#' @inheritParams add_node
 #' @param num_blocks Total number of blocks to initialize for each unique node
 #'   type. If set to `-1`, then a single block is made for every node.
 #'
