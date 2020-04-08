@@ -27,7 +27,7 @@ setClass("Rcpp_SBM")
 # object
 setMethod("show", "Rcpp_SBM" , function(object) {
 
-  cat(paste("SBM S4 class with", object$n_nodes_at_level(0), "nodes.\n"))
+  cat(paste("SBM S4 class with", object$n_nodes_at_level(0), "nodes and", object$n_edges(), "edges.\n"))
 
   n_block_levels <- object$n_levels() - 1
 

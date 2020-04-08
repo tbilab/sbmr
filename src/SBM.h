@@ -116,6 +116,9 @@ class SBM {
   // Keeps track of how many block we've had to avoid duplicate ids
   int block_counter = 0;
 
+  // Keep track of how many edges we have in the model
+  int _n_edges = 0;
+
   public:
   // =========================================================================
   // Constructors
@@ -198,6 +201,11 @@ class SBM {
   int n_nodes() const
   {
     return n_total_elements(nodes);
+  }
+
+  int n_edges() const 
+  {
+    return _n_edges;
   }
 
   int n_nodes_at_level(const int level) const
@@ -378,6 +386,8 @@ class SBM {
 
     a->add_neighbor(b);
     b->add_neighbor(a);
+    
+    _n_edges++;
   }
 
   void add_edges(const InOut_String_Vec& edges_a,
