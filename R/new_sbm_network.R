@@ -163,7 +163,6 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                             random_seed = NULL,
                             remove_isolated_nodes = TRUE){
 
-
   # Setup some tidy eval stuff for the column names
   to_column <- rlang::enquo(edges_to_column)
   from_column <- rlang::enquo(edges_from_column)
@@ -306,8 +305,8 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                                         b = character())
   } else {
     allowed_edge_types <- allowed_edge_types %>%
-      dplyr::rename(a = !!attr(sbm, "from_column"),
-                    b = !!attr(sbm, "to_column"))
+      dplyr::rename(a = !!from_column,
+                    b = !!to_column)
   }
 
 
