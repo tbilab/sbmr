@@ -784,7 +784,7 @@ class SBM {
                                               eps,
                                               allow_exhaustive);
       // Update B_cur
-      B_cur -= n_merges_to_make;
+      B_cur -= merge_result.n_merges_made();
 
       if (using_mcmc) {
         // Update the merge results entropy delta with the changes caused by MCMC sweep

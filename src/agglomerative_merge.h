@@ -25,6 +25,10 @@ class Block_Mergers {
     merge_into[i] = into;
     i++;
   }
+  int n_merges_made() const
+  {
+    return i;
+  }
 };
 
 using Node_Set        = std::unordered_set<Node*>;
@@ -154,8 +158,11 @@ inline Block_Mergers agglomerative_merge(Network* net,
   Node_Set merged_blocks;
 
   while (merges_to_make.size() < n_merges_to_make) {
-    if (best_merges.size() == 0) LOGIC_ERROR("Ran out of merges to use.");
 
+    if (best_merges.size() == 0) {
+      WARN_ABOUT("Ran of merges during agglomerative merging step. Try raising num_block_proposals and/or lowering sigma.");
+      break;
+    }
     // Extract best remaining merge and remove from queue
     const auto best_merge = best_merges.top();
     best_merges.pop();
