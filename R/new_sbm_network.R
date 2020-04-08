@@ -55,7 +55,7 @@
 #'   network is just being visualized or described.
 #' @param default_node_type What should nodes that the type is generated for be
 #'   called?
-#' @param edge_types A dataframe in the same format of as `edges` that contains
+#' @param allowed_edge_types A dataframe in the same format of as `edges` that contains
 #'   allowed pairs (order does not matter) of possible node type combinations
 #'   across edges. For instance: nodes of type pollinator are allowed to connect
 #'   to flower nodes but not to other pollinator nodes. If this is left
@@ -136,19 +136,19 @@
 #' new_sbm_network(edges = edges_tripartite,
 #'                 nodes = nodes_tripartite)
 #'
-#' # the edge_types argument lets you explicitely tell the
+#' # the allowed_edge_types argument lets you explicitely tell the
 #' # model what each type of node is allowed to connect to.
 #' # Here we use it to enforce tripartite structure where nodes of
 #' # the a type can connect to either b or c but b and c can only
 #' # connect to a.
 #'
-#' edge_types <- dplyr::tribble(~from, ~to,
+#' allowed_edge_types <- dplyr::tribble(~from, ~to,
 #'                                "a", "b",
 #'                                "a", "c")
 #' \dontrun{
 #' new_sbm_network(edges = edges_tripartite,
 #'                 nodes = nodes_tripartite,
-#'                 edge_types = edge_types)
+#'                 allowed_edge_types = allowed_edge_types)
 #' }
 #'
 new_sbm_network <- function(edges = dplyr::tibble(),
@@ -157,7 +157,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                             edges_to_column = to,
                             bipartite_edges = FALSE,
                             setup_model = TRUE,
-                            edge_types = NULL,
+                            allowed_edge_types = NULL,
                             default_node_type = "node",
                             show_warnings = interactive(),
                             random_seed = NULL,
@@ -301,13 +301,13 @@ new_sbm_network <- function(edges = dplyr::tibble(),
   }
 
   # Setup the allowed edge types with empty if not specified
-  if(is.null(edge_types)){
-    allowed_edge_types <- dplyr::tibble(from = character(),
-                                        to = character())
+  if(is.null(allowed_edge_types)){
+    allowed_edge_types <- dplyr::tibble(a = character(),
+                                        b = character())
   } else {
-    allowed_edge_types <- edge_types %>%
-      dplyr::rename(from = !!attr(sbm, "from_column"),
-                    to = !!attr(sbm, "to_column"))
+    allowed_edge_types <- allowed_edge_types %>%
+      dplyr::rename(a = !!attr(sbm, "from_column"),
+                    b = !!attr(sbm, "to_column"))
   }
 
 
@@ -320,7 +320,7 @@ new_sbm_network <- function(edges = dplyr::tibble(),
                  from_column = from_column,
                  to_column = to_column,
                  node_types = unique(nodes$type),
-                 edge_types = allowed_edge_types,
+                 allowed_edge_types = allowed_edge_types,
                  random_seed = random_seed)
 
   # Initialize a model if requested
