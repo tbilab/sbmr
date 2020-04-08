@@ -126,7 +126,7 @@ test_that("Interblock edge counts", {
 
   sbm_state <- sbm$get_state()
 
-  # Not the blocks for a1 and b1
+  # Note blocks for a1 and b1
   a1_block <- sbm_state$parent[sbm_state$id == "a1"]
   b1_block <- sbm_state$parent[sbm_state$id == "b1"]
 
