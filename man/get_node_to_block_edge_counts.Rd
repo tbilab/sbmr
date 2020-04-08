@@ -40,7 +40,6 @@ Other advanced:
 \code{\link{add_edge}()},
 \code{\link{add_node}()},
 \code{\link{initialize_blocks}()},
-\code{\link{set_node_parent}()},
 \code{\link{update_state}()}
 }
 \concept{advanced}

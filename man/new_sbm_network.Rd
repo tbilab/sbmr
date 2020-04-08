@@ -11,10 +11,11 @@ new_sbm_network(
   edges_to_column = to,
   bipartite_edges = FALSE,
   setup_model = TRUE,
-  edge_types = NULL,
+  allowed_edge_types = NULL,
   default_node_type = "node",
   show_warnings = interactive(),
-  random_seed = NULL
+  random_seed = NULL,
+  remove_isolated_nodes = TRUE
 )
 }
 \arguments{
@@ -35,9 +36,9 @@ column?}
 \item{setup_model}{Should an SBM model object be added? Set to \code{FALSE} if
 network is just being visualized or described.}
 
-\item{edge_types}{A dataframe in the same format of as \code{edges} that contains
+\item{allowed_edge_types}{A dataframe in the same format of as \code{edges} that contains
 allowed pairs (order does not matter) of possible node type combinations
-across edges. For instance: nodes of type polinator are allowed to connect
+across edges. For instance: nodes of type pollinator are allowed to connect
 to flower nodes but not to other pollinator nodes. If this is left
 undefined, it is inferred from edges.}
 
@@ -45,13 +46,17 @@ undefined, it is inferred from edges.}
 called?}
 
 \item{show_warnings}{Do you want to be warned when minor problems are
-detected by function? Usefull to disable when not running in an interactive
+detected by function? Useful to disable when not running in an interactive
 mode etc.}
 
 \item{random_seed}{Integer seed to be passed to model's internal random
 sampling engine. Note that if the model is restored from a saved state this
 seed will be initialized again to the start value which will harm
 reproducability.}
+
+\item{remove_isolated_nodes}{Should the network filter out nodes that have no
+edges? This option should only be set to \code{FALSE} for visualization purposes
+as the SBM model needs at least one edge for every node to work.}
 }
 \value{
 An S3 object of class \code{sbm_network}. For details see
@@ -88,6 +93,7 @@ A few attributes are contained by the class as well:
 \describe{ \item{\code{n_nodes}}{Number of unique nodes in the current model.
 Equivalent to \code{nrow(sbm_network$nodes)}.} \item{\code{n_edges}}{Number of edges
 in the current model. Equivalent to \code{nrow(sbm_network$edges)}.}
+\item{\code{node_types}}{"Vector of the unique types for nodes in network"}
 \item{\code{from_column}}{Raw quosure representing the \code{edges_from_column}
 argument. This is kept so bipartite network types can be inferred and no
 modification of the passed \code{edges} dataframe needs to take place.}
@@ -158,19 +164,19 @@ nodes_tripartite <- dplyr::tribble(
 new_sbm_network(edges = edges_tripartite,
                 nodes = nodes_tripartite)
 
-# the edge_types argument lets you explicitely tell the
+# the allowed_edge_types argument lets you explicitely tell the
 # model what each type of node is allowed to connect to.
 # Here we use it to enforce tripartite structure where nodes of
 # the a type can connect to either b or c but b and c can only
 # connect to a.
 
-edge_types <- dplyr::tribble(~from, ~to,
+allowed_edge_types <- dplyr::tribble(~from, ~to,
                                "a", "b",
                                "a", "c")
 \dontrun{
 new_sbm_network(edges = edges_tripartite,
                 nodes = nodes_tripartite,
-                edge_types = edge_types)
+                allowed_edge_types = allowed_edge_types)
 }
 
 }

@@ -28,7 +28,6 @@ reference:
   desc: Functions that are used to modify the model at a low-level. These are usually reserved for more advanced use-cases.
   contents:
   - starts_with('add_')
-  - set_node_parent
   - initialize_blocks
   - update_state
   - verify_model
