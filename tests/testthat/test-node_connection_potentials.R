@@ -30,8 +30,10 @@ test_that("Error thrown when stated connection potentials are violated", {
   expect_error(
     new_sbm_network(edges = edges_tripartite,
                     nodes = nodes_tripartite,
-                    edge_types = edge_types,
-                    random_seed = 42)
+                    allowed_edge_types = edge_types,
+                    random_seed = 42),
+    "Connection provided between nodes of types b & c which was not a specified combination in allowed edge types",
+    fixed = TRUE
   )
 
 })
