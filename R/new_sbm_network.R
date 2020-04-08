@@ -293,12 +293,6 @@ new_sbm_network <- function(edges = dplyr::tibble(),
     nodes <- dplyr::filter(nodes, not_in(id, unconnected_nodes))
   }
 
-  # If a random seed was not passed, generate one
-  if(is.null(random_seed)){
-    # Generate a random integer between 0 and a million for seed
-    random_seed <- ceiling(runif(1, 0, 1e6))
-  }
-
   # Setup the allowed edge types with empty if not specified
   if(is.null(allowed_edge_types)){
     allowed_edge_types <- dplyr::tibble(a = character(),
