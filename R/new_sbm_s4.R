@@ -38,23 +38,10 @@
 #'
 new_sbm_s4 <- function(nodes,
                        edges,
-                       allowed_edge_types,
-                       node_types,
-                       state,
-                       random_seed){
-
-  if(missing(random_seed)){
-    # Generate a random integer between 0 and a million for seed
-    random_seed <- ceiling(runif(1, 0, 1e6))
-  }
-
-  if(missing(node_types)){
-    node_types <- unique(nodes$type)
-  }
-
-  if(missing(allowed_edge_types)){
-    allowed_edge_types <- dplyr::tibble(a = character(), b = character())
-  }
+                       allowed_edge_types = dplyr::tibble(a = character(), b = character()),
+                       node_types = unique(nodes$type),
+                       random_seed = ceiling(runif(1, 0, 1e6)),
+                       state){
 
   # Load network model with nodes and random seed
   sbm_model <- methods::new(SBM,
