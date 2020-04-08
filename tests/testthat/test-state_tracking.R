@@ -105,7 +105,7 @@ test_that("No costly duplication of S4 class is done when assigning s3 class cop
                                  n_nodes_per_block = 40,
                                  setup_model = TRUE,
                                  random_seed = 42) %>%
-    initialize_blocks(num_blocks = 5)
+    initialize_blocks(n_blocks = 5)
 
   # Take snapshot of model and state before sweep
   pre_sweep_model_address <- lobstr::obj_addr(attr(net, 'model'))
@@ -127,7 +127,7 @@ test_that("S3 class attributes are immutable", {
                                  n_nodes_per_block = 40,
                                  setup_model = TRUE,
                                  random_seed = 42) %>%
-    initialize_blocks(num_blocks = 5)
+    initialize_blocks(n_blocks = 5)
 
   # Take snapshot of model and state before sweep
   pre_sweep_attr_state <- attr(net, 'state')

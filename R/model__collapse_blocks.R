@@ -13,7 +13,7 @@
 #'   agglomerative merge step. This allows the model to allow nodes to find
 #'   their most natural resting place in a given collapsed state. Larger values
 #'   will slow down runtime but can potentially lead for more stable results.
-#' @param desired_num_blocks How many blocks should this given merge drop down
+#' @param desired_n_blocks How many blocks should this given merge drop down
 #'   to. If the network has more than one node type this number is multiplied by
 #'   the total number of types.
 #' @param num_block_proposals Controls how many merger proposals are drawn for
@@ -59,7 +59,7 @@
 #'   visualize_collapse_results()
 #'
 collapse_blocks <- function(sbm,
-                            desired_num_blocks = 1,
+                            desired_n_blocks = 1,
                             num_mcmc_sweeps = 0,
                             sigma = 1.5,
                             eps = 0.1,
@@ -73,7 +73,7 @@ collapse_blocks <- function(sbm,
 
 #' @export
 collapse_blocks.sbm_network <- function(sbm,
-                                        desired_num_blocks = 1,
+                                        desired_n_blocks = 1,
                                         num_mcmc_sweeps = 0,
                                         sigma = 2,
                                         eps = 0.1,
@@ -88,7 +88,7 @@ collapse_blocks.sbm_network <- function(sbm,
 
   collapse_results <- attr(sbm, 'model')$collapse_blocks(
     as.integer(level),
-    as.integer(desired_num_blocks),
+    as.integer(desired_n_blocks),
     as.integer(num_block_proposals),
     as.integer(num_mcmc_sweeps),
     sigma,

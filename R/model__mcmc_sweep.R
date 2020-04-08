@@ -15,7 +15,7 @@
 #'   proposals.
 #' @param level Level of nodes who's blocks will have their block membership run
 #'   through MCMC proposal-accept routine.
-#' @param variable_num_blocks Should the model allow new blocks to be created or
+#' @param variable_n_blocks Should the model allow new blocks to be created or
 #'   empty blocks removed while sweeping or should number of blocks remain
 #'   constant?
 #' @param track_pairs Return a dataframe with all pairs of nodes along with the
@@ -37,13 +37,13 @@
 #'
 #' # Start with a small simulated network with random block assignments
 #' net <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 15) %>%
-#'   initialize_blocks(num_blocks = 4)
+#'   initialize_blocks(n_blocks = 4)
 #'
 #' # Calculate entropy with random blocks
 #' get_entropy(net)
 #'
 #' # Run some MCMC sweeps
-#' net <- mcmc_sweep(net, num_sweeps = 25, variable_num_blocks = FALSE)
+#' net <- mcmc_sweep(net, num_sweeps = 25, variable_n_blocks = FALSE)
 #'
 #' # Entropy after sweeps
 #' get_entropy(net)
@@ -61,7 +61,7 @@
 mcmc_sweep <- function(sbm,
                        num_sweeps = 1,
                        eps = 0.1,
-                       variable_num_blocks = TRUE,
+                       variable_n_blocks = TRUE,
                        track_pairs = FALSE,
                        level = 0,
                        verbose = FALSE){
@@ -71,7 +71,7 @@ mcmc_sweep <- function(sbm,
 mcmc_sweep.default <- function(sbm,
                                num_sweeps = 1,
                                eps = 0.1,
-                               variable_num_blocks = TRUE,
+                               variable_n_blocks = TRUE,
                                track_pairs = FALSE,
                                level = 0,
                                verbose = FALSE){
@@ -82,7 +82,7 @@ mcmc_sweep.default <- function(sbm,
 mcmc_sweep.sbm_network <- function(sbm,
                                    num_sweeps = 1,
                                    eps = 0.1,
-                                   variable_num_blocks = TRUE,
+                                   variable_n_blocks = TRUE,
                                    track_pairs = FALSE,
                                    level = 0,
                                    verbose = FALSE){
@@ -90,7 +90,7 @@ mcmc_sweep.sbm_network <- function(sbm,
 
   results <- attr(sbm, 'model')$mcmc_sweep(as.integer(num_sweeps),
                                            eps,
-                                           variable_num_blocks,
+                                           variable_n_blocks,
                                            track_pairs,
                                            as.integer(level),
                                            verbose)

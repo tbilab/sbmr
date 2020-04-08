@@ -4,7 +4,7 @@ test_that("Random seeds make reproducable SBMS works", {
 
   # Lets first generate some network data to use
   # Dont initialize model as we just want the data here.
-  # network_data <- sim_basic_block_network(n_blocks = num_blocks, n_nodes_per_block = 30, setup_model = FALSE)
+  # network_data <- sim_basic_block_network(n_blocks = n_blocks, n_nodes_per_block = 30, setup_model = FALSE)
   network_data <- sim_random_network(n_nodes = 100, prob_of_edge = 0.5, setup_model = FALSE)
 
   initialize_sweep_snapshot <- . %>%

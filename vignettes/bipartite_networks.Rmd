@@ -64,7 +64,7 @@ visualize_network(pollinator_net, node_color_col = 'type', node_shape_col = 'non
 
 ```{r}
 pollinator_net <- pollinator_net %>% 
-  collapse_blocks(desired_num_blocks = 4,
+  collapse_blocks(desired_n_blocks = 4,
                   num_mcmc_sweeps = 5,
                   sigma = 1.1)
 ```

@@ -27,9 +27,6 @@ get_collapse_results <- function(sbm){
   UseMethod("get_collapse_results")
 }
 
-get_collapse_results.default <- function(sbm){
-  cat("get_collapse_results generic")
-}
 
 #' @export
 get_collapse_results.sbm_network <- function(sbm){

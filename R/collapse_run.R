@@ -81,7 +81,7 @@ collapse_run.sbm_network <- function(sbm,
       function(desired_num){
         # Initialize model and make sure to not warn about cached model and random seeds if present
         verify_model(sbm, warn_about_random_seed = FALSE) %>%
-          collapse_blocks(desired_num_blocks = desired_num,
+          collapse_blocks(desired_n_blocks = desired_num,
                           sigma = sigma,
                           eps = eps,
                           report_all_steps = FALSE,
@@ -101,7 +101,7 @@ collapse_run.sbm_network <- function(sbm,
     results <- purrr::map_dfr(
       collapse_results,
       ~dplyr::tibble(entropy = .$entropy,
-                     num_blocks = .$num_blocks)
+                     n_blocks = .$n_blocks)
     ) %>%
       dplyr::mutate(state = purrr::map(collapse_results, 'state'))
   }

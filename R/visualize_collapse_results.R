@@ -55,11 +55,6 @@ visualize_collapse_results <- function(sbm,
   UseMethod("visualize_collapse_results")
 }
 
-visualize_collapse_results.default <- function(sbm,
-                                               use_entropy_value_for_score = FALSE,
-                                               heuristic = NULL){
-  cat("visualize_collapse_results generic")
-}
 
 #' @export
 visualize_collapse_results.sbm_network <- function(sbm,
@@ -78,27 +73,27 @@ visualize_collapse_results.sbm_network <- function(sbm,
   if(!is.null(heuristic)){
 
     collapse_results <- collapse_results %>%
-      dplyr::arrange(num_blocks)
+      dplyr::arrange(n_blocks)
 
     if (use_entropy_value_for_score){
-      collapse_results <- dplyr::mutate(collapse_results, score = build_score_fn(heuristic)(entropy, num_blocks))
+      collapse_results <- dplyr::mutate(collapse_results, score = build_score_fn(heuristic)(entropy, n_blocks))
     } else {
-      collapse_results <- dplyr::mutate(collapse_results, score = build_score_fn(heuristic)(entropy_delta, num_blocks))
+      collapse_results <- dplyr::mutate(collapse_results, score = build_score_fn(heuristic)(entropy_delta, n_blocks))
     }
   }
 
   collapse_results %>%
-    dplyr::select(-state) %>%
-    tidyr::pivot_longer(-num_blocks) %>%
+    dplyr::select(entropy_delta, n_blocks) %>%
+    tidyr::pivot_longer(-n_blocks) %>%
     dplyr::mutate(
       name = stringr::str_replace_all(name, "_", " ")
     ) %>%
-    ggplot2::ggplot(ggplot2::aes(x = num_blocks, y = value)) +
+    ggplot2::ggplot(ggplot2::aes(x = n_blocks, y = value)) +
     ggplot2::geom_point() +
     ggplot2::geom_line() +
     ggplot2::facet_grid(name~., scales = 'free_y') +
     ggplot2::labs(x = "number of blocks", y = "")
 }
 
-utils::globalVariables(c("entropy", "num_blocks", "state", "name"))
+utils::globalVariables(c("entropy", "n_blocks", "state", "name"))
 

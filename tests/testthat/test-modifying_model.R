@@ -102,7 +102,7 @@ test_that("Randomly initializing blocks in network", {
     sim_random_network(n_nodes = 15,
                        prob_of_edge = 1,
                        random_seed = 42) %>%
-      initialize_blocks(num_blocks = 3) %>%
+      initialize_blocks(n_blocks = 3) %>%
       n_blocks(),
     3
   )
@@ -112,7 +112,7 @@ test_that("Randomly initializing blocks in network", {
     sim_random_network(n_nodes = 5,
                        prob_of_edge = 1,
                        random_seed = 42) %>%
-      initialize_blocks(num_blocks = 10),
+      initialize_blocks(n_blocks = 10),
     "Can't initialize 10 blocks as there are only 5 nodes"
   )
 
@@ -121,7 +121,7 @@ test_that("Randomly initializing blocks in network", {
     sim_random_network(n_nodes = 5,
                        prob_of_edge = 1,
                        random_seed = 42) %>%
-      initialize_blocks(num_blocks = -2),
+      initialize_blocks(n_blocks = -2),
     "Can't initialize -2 blocks."
   )
 

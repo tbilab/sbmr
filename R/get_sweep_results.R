@@ -14,8 +14,8 @@
 #'
 #' # Start with a small random network
 #' net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 15) %>%
-#'   initialize_blocks(num_blocks = 4) %>%
-#'   mcmc_sweep(num_sweeps = 4, variable_num_blocks = FALSE)
+#'   initialize_blocks(n_blocks = 4) %>%
+#'   mcmc_sweep(num_sweeps = 4, variable_n_blocks = FALSE)
 #'
 #' # Retrieve the sweep results from network
 #' get_sweep_results(net)

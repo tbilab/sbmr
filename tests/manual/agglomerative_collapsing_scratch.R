@@ -22,7 +22,7 @@ single_collapse <- my_sbm %>%
   collapse_blocks(report_all_steps = TRUE,
                   sigma = 1.1,
                   num_mcmc_sweeps = 0,
-                  desired_num_blocks = 2)
+                  desired_n_blocks = 2)
 
 visualize_collapse_results(single_collapse)
 
@@ -30,7 +30,7 @@ my_sbm <- choose_best_collapse_state(my_sbm, single_collapse, use_entropy_value_
 
 single_collapse %>%
   pivot_longer(c(entropy, entropy_delta)) %>%
-  ggplot(aes(x = num_blocks, y = value)) +
+  ggplot(aes(x = n_blocks, y = value)) +
   geom_line() +
   geom_point() +
   facet_grid(rows = vars(name), scales = "free_y")
@@ -42,9 +42,9 @@ distance_between_line_and_pt <- function(x1,y1,x2,y2,px,py){
 
 
 single_collapse %>%
-  arrange(num_blocks) %>%
-  filter(num_blocks < 25) %>%
-  select(value = entropy, k = num_blocks) %>%
+  arrange(n_blocks) %>%
+  filter(n_blocks < 25) %>%
+  select(value = entropy, k = n_blocks) %>%
   mutate(
     distance_to_line = distance_between_line_and_pt(lag(k), lag(value),
                                                     lead(k), lead(value),
@@ -69,8 +69,8 @@ my_sbm <- choose_best_collapse_state(my_sbm, single_collapse, heuristic = 'dev_f
 window_size <- 2
 
 single_collapse %>%
-  arrange(num_blocks) %>%
-  filter(num_blocks < 25) %>%
+  arrange(n_blocks) %>%
+  filter(n_blocks < 25) %>%
   mutate(
     rolling_avg = rolling_mean(entropy, window = window_size),
     rolling_avg_before = dplyr::lag(rolling_avg, 1),
@@ -79,7 +79,7 @@ single_collapse %>%
     score = neighbor_ratio
   ) %>%
   pivot_longer(c(entropy, score)) %>%
-  ggplot(aes(x = num_blocks, y = value)) +
+  ggplot(aes(x = n_blocks, y = value)) +
   geom_line() +
   geom_point() +
   geom_vline(xintercept = n_blocks, color = 'orangered') +
@@ -87,7 +87,7 @@ single_collapse %>%
 
 
 single_collapse %>%
-  filter(num_blocks == n_blocks) %>%
+  filter(n_blocks == n_blocks) %>%
   pluck('state', 1) %>%
   filter(level == 0) %>%
   right_join(network$nodes, by = 'id')%>%
@@ -136,7 +136,7 @@ collapse_results %>%
     score = entropy - lag(entropy)
   ) %>%
   pivot_longer(c(score, entropy)) %>%
-  ggplot(aes(x = num_blocks, y = value)) +
+  ggplot(aes(x = n_blocks, y = value)) +
   geom_line() +
   facet_grid(name~., scales = "free_y") +
   geom_vline(xintercept = n_blocks, color = 'orangered')
@@ -181,7 +181,7 @@ my_sbm %>%
 
 num_sweeps <- 2
 
-sweep_results <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps, track_pairs = FALSE, variable_num_blocks = TRUE)
+sweep_results <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps, track_pairs = FALSE, variable_n_blocks = TRUE)
 
 sweep_results$sweep_info %>%
   mutate(sweep = 1:n(),

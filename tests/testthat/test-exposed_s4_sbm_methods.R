@@ -172,7 +172,7 @@ test_that("MCMC sweeps, no pair tracking", {
 
   sweeps <- sbm$mcmc_sweep(n_sweeps, # n_sweeps
                            0.01,     # eps
-                           TRUE,     # variable_num_blocks
+                           TRUE,     # variable_n_blocks
                            FALSE,    # track_pairs
                            0,        # level
                            FALSE)    # verbose
@@ -193,7 +193,7 @@ test_that("MCMC sweeps, w/ pair tracking", {
 
   sweeps <- sbm$mcmc_sweep(n_sweeps, # num_sweeps
                            0.01,     # eps
-                           TRUE,     # variable_num_blocks
+                           TRUE,     # variable_n_blocks
                            TRUE,     # track_pairs
                            0,        # level
                            FALSE)    # verbose
@@ -207,10 +207,10 @@ test_that("Agglomerative merging", {
   sbm <- new_sbm_network(edges, edges_from_column = a_node, edges_to_column = b_node, bipartite_edges = TRUE) %>%
     attr("model")
 
-  final_num_blocks <- 2
+  final_n_blocks <- 2
   # Run block collapsing with one block per merge
   collapse_results <- sbm$collapse_blocks(0,    # node_level,
-                                          final_num_blocks,    # B_end,
+                                          final_n_blocks,    # B_end,
                                           3,    # n_checks_per_block,
                                           0,    # n_mcmc_sweeps,
                                           0.9,  # sigma,
@@ -220,10 +220,10 @@ test_that("Agglomerative merging", {
 
   # Reporting all steps should, return as many list elements as there are possible steps
   expect_equal(length(collapse_results),
-               sbm$n_nodes_at_level(0) - final_num_blocks)
+               sbm$n_nodes_at_level(0) - final_n_blocks)
 
   just_final <- sbm$collapse_blocks(0,                # node_level,
-                                    final_num_blocks, # B_end,
+                                    final_n_blocks, # B_end,
                                     3,                # n_checks_per_block,
                                     0,                # n_mcmc_sweeps,
                                     0.9,              # sigma,

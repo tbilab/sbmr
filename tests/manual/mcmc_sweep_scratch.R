@@ -23,7 +23,7 @@ num_sweeps <- 100
 sweep_results <- mcmc_sweep(my_sbm,
                             num_sweeps = num_sweeps,
                             track_pairs = FALSE,
-                            variable_num_blocks = TRUE,
+                            variable_n_blocks = TRUE,
                             verbose = FALSE)
 
 
@@ -65,7 +65,7 @@ my_sbm %>% get_entropy()
 #
 # for(sweep in 1:num_sweeps){
 #   # One sweep
-#   sweep_results <- mcmc_sweep(my_sbm, num_sweeps = 1, track_pairs = FALSE, variable_num_blocks = FALSE)
+#   sweep_results <- mcmc_sweep(my_sbm, num_sweeps = 1, track_pairs = FALSE, variable_n_blocks = FALSE)
 #
 #   # Extract entropy delta
 #   delta <- sweep_results$sweep_info$entropy_delta[1]
@@ -103,7 +103,7 @@ my_sbm %>% get_entropy()
 #   geom_line()
 #
 #
-# sweep_results <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps, track_pairs = FALSE, variable_num_blocks = TRUE)
+# sweep_results <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps, track_pairs = FALSE, variable_n_blocks = TRUE)
 #
 # sweep_stats <- sweep_results$sweep_info %>%
 #   mutate(sweep = 1:n(),

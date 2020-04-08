@@ -40,7 +40,7 @@ test_that("Requesting just the final merge step returns just the final merge ste
   net <- sim_basic_block_network(n_blocks = 2,
                                  n_nodes_per_block = 30,
                                  random_seed = 42) %>%
-    collapse_blocks(desired_num_blocks = 4,
+    collapse_blocks(desired_n_blocks = 4,
                     num_mcmc_sweeps = 0,
                     sigma = 1.4,
                     report_all_steps = FALSE)

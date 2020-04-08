@@ -15,7 +15,7 @@
 network <- sim_basic_block_network(n_blocks = 3,
                                    n_nodes_per_block = 40,
                                    setup_model = TRUE) %>%
-  initialize_blocks(num_blocks = 5)
+  initialize_blocks(n_blocks = 5)
 
 n_blocks(network)
 
