@@ -70,13 +70,12 @@ update_state.default <- function(sbm, state_df){
 
 #' @export
 update_state.sbm_network <- function(sbm, state_df){
-
   attr(sbm, 'state') <- state_df
 
   attr(sbm, 'model')$update_state(state_df$id,
-                                     state_df$parent,
-                                     state_df$level,
-                                     state_df$type)
+                                  state_df$type,
+                                  state_df$parent,
+                                  state_df$level)
 
   sbm
 }
