@@ -16,11 +16,6 @@
 #' @param desired_num_blocks How many blocks should this given merge drop down
 #'   to. If the network has more than one node type this number is multiplied by
 #'   the total number of types.
-#' @param report_all_steps  Should the model state be provided for every merge
-#'   step or just the final one? If collapsing is being used to infer
-#'   hierarcichal structure in data or inspection is desired this should be set
-#'   to `TRUE`, otherwise it will slow down collapsing due to increased data
-#'   transfer.
 #' @param num_block_proposals Controls how many merger proposals are drawn for
 #'   each block in the model. A larger number will increase the exploration of
 #'   merge potentials but may lead the model to local minimums. If the number of
@@ -29,6 +24,14 @@
 #' @param sigma Controls the rate of collapse. At each step of the collapsing
 #'   the model will try and remove `current_num_nodes(1 - 1/sigma)` nodes from
 #'   the model. So a larger sigma means a faster collapse rate.
+#' @param allow_exhaustive If the number of proposals for a blocks merges is
+#'   less than the number of proposals needed to check all possible merge
+#'   combinations, should the model check all possible combinations?
+#' @param report_all_steps  Should the model state be provided for every merge
+#'   step or just the final one? If collapsing is being used to infer
+#'   hierarcichal structure in data or inspection is desired this should be set
+#'   to `TRUE`, otherwise it will slow down collapsing due to increased data
+#'   transfer.
 #'
 #' @inherit new_sbm_network return
 #' @export
@@ -62,20 +65,11 @@ collapse_blocks <- function(sbm,
                             eps = 0.1,
                             num_block_proposals = 5,
                             level = 0,
+                            allow_exhaustive = TRUE,
                             report_all_steps = TRUE){
   UseMethod("collapse_blocks")
 }
 
-collapse_blocks.default <- function(sbm,
-                                    desired_num_blocks = 1,
-                                    num_mcmc_sweeps = 0,
-                                    sigma = 2,
-                                    eps = 0.1,
-                                    num_block_proposals = 5,
-                                    level = 0,
-                                    report_all_steps = TRUE){
-  cat("collapse_blocks generic")
-}
 
 #' @export
 collapse_blocks.sbm_network <- function(sbm,
@@ -85,6 +79,7 @@ collapse_blocks.sbm_network <- function(sbm,
                                         eps = 0.1,
                                         num_block_proposals = 5,
                                         level = 0,
+                                        allow_exhaustive = TRUE,
                                         report_all_steps = TRUE){
   # We call verify_model here in case this is being called in another thread using
   # the collapse_run function. In that case the pointer to the s4 class will be stale
@@ -93,20 +88,21 @@ collapse_blocks.sbm_network <- function(sbm,
 
   collapse_results <- attr(sbm, 'model')$collapse_blocks(
     as.integer(level),
-    as.integer(num_mcmc_sweeps),
     as.integer(desired_num_blocks),
     as.integer(num_block_proposals),
+    as.integer(num_mcmc_sweeps),
     sigma,
     eps,
-    report_all_steps
+    report_all_steps,
+    allow_exhaustive
   )
 
-  sbm$collapse_results <-collapse_results %>% purrr::map_dfr(
-    ~dplyr::tibble(entropy = .$entropy,
-                   entropy_delta = .$entropy_delta,
-                   num_blocks = .$num_blocks)
+  sbm$collapse_results <- collapse_results %>% purrr::map_dfr(
+    ~dplyr::tibble(entropy_delta = .$entropy_delta,
+                   n_blocks = .$n_blocks)
   ) %>%
-    dplyr::mutate(state = purrr::map(collapse_results, 'state'))
+    dplyr::mutate(state = purrr::map(collapse_results, 'state'),
+                  merges = purrr::map(collapse_results, ~dplyr::tibble(from = .$merge_from, into = .$merge_into)))
 
   sbm
 }
