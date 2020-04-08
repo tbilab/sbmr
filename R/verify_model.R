@@ -35,12 +35,11 @@ verify_model <- function(sbm, show_messages = FALSE, warn_about_random_seed = TR
 verify_model.sbm_network <- function(sbm, show_messages = FALSE, warn_about_random_seed = TRUE){
   has_model_already <- not_null(attr(sbm, 'model'))
   has_state_already <- not_null(attr(sbm, "state"))
-
   if (has_model_already){
     model_is_stale <- tryCatch(
       error = function(err) TRUE,
       {
-        attr(sbm, 'model')$get_state()
+        attr(sbm, 'model')$n_levels()
         FALSE
       })
 
