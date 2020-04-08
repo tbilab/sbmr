@@ -36,14 +36,14 @@ test_that("State tracking returns the correct state", {
   expect_equal(
     dplyr::as_tibble(attr(net, 'model')$get_state()),
     dplyr::tribble(
-       ~id, ~parent,  ~type, ~level,
-      "a1",  "none", "bl_node_0",     0L,
-      "a2",  "none", "bl_node_1",     0L,
-      "a3",  "none", "bl_node_2",     0L,
-      "b1",  "none", "bl_node_3",     0L,
-      "b2",  "none", "bl_node_4",     0L,
-      "b3",  "none", "bl_node_5",     0L,
-      "b4",  "none", "bl_node_6",     0L
+       ~id,   ~type,     ~parent, ~level,
+      "a1",  "node", "bl_node_0",     0L,
+      "a2",  "node", "bl_node_1",     0L,
+      "a3",  "node", "bl_node_2",     0L,
+      "b1",  "node", "bl_node_3",     0L,
+      "b2",  "node", "bl_node_4",     0L,
+      "b3",  "node", "bl_node_5",     0L,
+      "b4",  "node", "bl_node_6",     0L
     )
   )
   # The state attribute of the s3 class should also have updated
@@ -98,6 +98,7 @@ test_that("State updating method", {
   expect_true( dplyr::all_equal(new_state, attr(net, 'model')$get_state()))
 })
 
+
 test_that("No costly duplication of S4 class is done when assigning s3 class copies.", {
 
   net <- sim_basic_block_network(n_blocks = 3,
@@ -119,6 +120,7 @@ test_that("No costly duplication of S4 class is done when assigning s3 class cop
   expect_equal(pre_sweep_model_address, post_sweep_model_address)
 })
 
+
 test_that("S3 class attributes are immutable", {
 
   net <- sim_basic_block_network(n_blocks = 3,
@@ -131,7 +133,7 @@ test_that("S3 class attributes are immutable", {
   pre_sweep_attr_state <- attr(net, 'state')
 
   # Run MCMC sweep
-  mcmc_results <- net %>% mcmc_sweep(num_sweeps = 25)
+  post_sweep_net <- net %>% mcmc_sweep(num_sweeps = 25)
 
   # Check snapshot of state after sweep
   post_sweep_attr_state <- attr(net, 'state')
@@ -139,7 +141,7 @@ test_that("S3 class attributes are immutable", {
   expect_equal(pre_sweep_attr_state, post_sweep_attr_state)
 
   # The returned SBM model should have a different (updated state, however)
-  returned_net_attr_state <- attr(mcmc_results$sbm_network, 'state')
+  returned_net_attr_state <- attr(post_sweep_net, 'state')
 
   expect_false(isTRUE(all.equal(pre_sweep_attr_state,returned_net_attr_state)))
 })
