@@ -85,7 +85,7 @@ Other modeling:
 \code{\link{collapse_run}()},
 \code{\link{get_block_edge_counts}()},
 \code{\link{get_entropy}()},
-\code{\link{get_num_blocks}()},
-\code{\link{get_state}()}
+\code{\link{get_state}()},
+\code{\link{n_blocks}()}
 }
 \concept{modeling}

@@ -12,7 +12,7 @@ test_that("MCMC Sweeps function as expected", {
   sweep_and_check_n_blocks <- function(i, variable_num_blocks, sbm){
     net %>%
       mcmc_sweep(variable_num_blocks = variable_num_blocks) %>%
-      get_num_blocks()
+      n_blocks()
   }
 
   # Run MCMC sweeps that do not allow block numbers to change

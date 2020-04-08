@@ -17,7 +17,7 @@ network <- sim_basic_block_network(n_blocks = 3,
                                    setup_model = TRUE) %>%
   initialize_blocks(num_blocks = 5)
 
-get_num_blocks(network)
+n_blocks(network)
 
 visualize_network(network, node_color_col = 'block', node_shape_col = 'type')
 

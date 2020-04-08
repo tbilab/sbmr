@@ -77,8 +77,8 @@ Other modeling:
 \code{\link{collapse_blocks}()},
 \code{\link{get_block_edge_counts}()},
 \code{\link{get_entropy}()},
-\code{\link{get_num_blocks}()},
 \code{\link{get_state}()},
-\code{\link{mcmc_sweep}()}
+\code{\link{mcmc_sweep}()},
+\code{\link{n_blocks}()}
 }
 \concept{modeling}

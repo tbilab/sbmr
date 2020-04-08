@@ -46,20 +46,20 @@ net <- new_sbm_network(edges)
 # Default values of function will give every node its own block
 net \%>\%
   initialize_blocks() \%>\%
-  get_num_blocks()
+  n_blocks()
 
 # You can also decide to have a given number of blocks randomly assigned Here
 # four blocks result because two random blocks are made for each of the two
 # types
 net \%>\%
   initialize_blocks(num_blocks = 2) \%>\%
-  get_num_blocks()
+  n_blocks()
 
 # If you have a polypartite network each set of node types will get their own
 # set of `num_blocks` randomly assigned
 new_sbm_network(edges, bipartite_edges = TRUE) \%>\%
   initialize_blocks(num_blocks = 2) \%>\%
-  get_num_blocks()
+  n_blocks()
 
 
 }

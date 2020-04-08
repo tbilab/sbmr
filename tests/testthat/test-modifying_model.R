@@ -96,7 +96,7 @@ test_that("Randomly initializing blocks in network", {
                        prob_of_edge = 1,
                        random_seed = 42) %>%
       initialize_blocks() %>%
-      get_num_blocks(),
+      n_blocks(),
     5
   )
 
@@ -106,7 +106,7 @@ test_that("Randomly initializing blocks in network", {
                        prob_of_edge = 1,
                        random_seed = 42) %>%
       initialize_blocks(num_blocks = 3) %>%
-      get_num_blocks(),
+      n_blocks(),
     3
   )
 
