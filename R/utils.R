@@ -64,3 +64,6 @@ not_in <- function(a, b){
 }
 
 not_null <- function(x) !is.null(x)
+
+# just makes the syntax a bit easier to understand.
+get_model <- function(sbm) attr(sbm, "model")
