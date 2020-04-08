@@ -38,10 +38,23 @@
 #'
 new_sbm_s4 <- function(nodes,
                        edges,
-                       allowed_edge_types = dplyr::tibble(a = character(), b = character()),
-                       node_types = unique(nodes$type),
-                       random_seed = ceiling(runif(1, 0, 1e6)),
-                       state){
+                       allowed_edge_types = NULL,
+                       node_types = NULL,
+                       random_seed = NULL,
+                       state = NULL){
+
+  # I use NULL to represent unpassed values because that's how they will be given from the s3 class.
+  if(is.null(allowed_edge_types)){
+    allowed_edge_types <- dplyr::tibble(a = character(), b = character())
+  }
+
+  if(is.null(node_types)){
+    node_types <- unique(nodes$type)
+  }
+
+  if(is.null(random_seed)){
+    random_seed <- ceiling(runif(1, 0, 1e6))
+  }
 
   # Load network model with nodes and random seed
   sbm_model <- methods::new(SBM,
@@ -56,7 +69,7 @@ new_sbm_s4 <- function(nodes,
                       allowed_edge_types$a,
                       allowed_edge_types$b)
 
-  if(!missing(state)){
+  if(!is.null(state)){
     sbm_model$update_state(state$id,
                            state$type,
                            state$parent,
