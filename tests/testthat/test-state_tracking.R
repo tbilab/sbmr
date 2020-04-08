@@ -25,20 +25,28 @@ test_that("State tracking returns the correct state", {
 
   net <- new_sbm_network(edges = edges, nodes = nodes, random_seed = 42)
 
+  #  Cant get a state with no nodes initialized yet
+  expect_error(attr(net, 'model')$get_state(),
+               "No state to export - Try adding blocks",
+               fixed = TRUE)
+
+  net <- net %>% initialize_blocks()
+
+  # After initializing blocks, we can get state however,
   expect_equal(
     dplyr::as_tibble(attr(net, 'model')$get_state()),
     dplyr::tribble(
        ~id, ~parent,  ~type, ~level,
-      "a1",  "none", "node",     0L,
-      "a2",  "none", "node",     0L,
-      "a3",  "none", "node",     0L,
-      "b1",  "none", "node",     0L,
-      "b2",  "none", "node",     0L,
-      "b3",  "none", "node",     0L,
-      "b4",  "none", "node",     0L
+      "a1",  "none", "bl_node_0",     0L,
+      "a2",  "none", "bl_node_1",     0L,
+      "a3",  "none", "bl_node_2",     0L,
+      "b1",  "none", "bl_node_3",     0L,
+      "b2",  "none", "bl_node_4",     0L,
+      "b3",  "none", "bl_node_5",     0L,
+      "b4",  "none", "bl_node_6",     0L
     )
   )
-
+  # The state attribute of the s3 class should also have updated
   expect_equal(attr(net, 'model')$get_state(), attr(net, 'state'))
 })
 
@@ -67,33 +75,20 @@ test_that("State updating method", {
   )
 
   new_state <- dplyr::tribble(
-     ~id,          ~parent,   ~type, ~level,
-    "a1",       "a_parent",  "node",     0L,
-    "a2",       "a_parent",  "node",     0L,
-    "a3",       "a_parent",  "node",     0L,
-    "b1",       "b_parent",  "node",     0L,
-    "b2",       "b_parent",  "node",     0L,
-    "b3",       "b_parent",  "node",     0L,
-    "b4",       "b_parent",  "node",     0L,
-    "a_parent", "none",      "node",     1L,
-    "b_parent", "none",      "node",     1L,
+     ~id,     ~parent,   ~type, ~level,
+    "a1",  "a_parent",  "node",     0L,
+    "a2",  "a_parent",  "node",     0L,
+    "a3",  "a_parent",  "node",     0L,
+    "b1",  "b_parent",  "node",     0L,
+    "b2",  "b_parent",  "node",     0L,
+    "b3",  "b_parent",  "node",     0L,
+    "b4",  "b_parent",  "node",     0L
   )
 
 
   net <- new_sbm_network(edges = edges,
                          nodes = nodes,
                          random_seed = 42)
-
-  # Update state using update_state() method
-  net <- net %>% update_state(new_state)
-
-  # Now the states should be identical
-  expect_true( dplyr::all_equal(new_state, attr(net, 'state')))
-  expect_true( dplyr::all_equal(new_state, attr(net, 'model')$get_state()))
-
-
-  # Now to updating using a integer-typed dataframe
-  net <- new_sbm_network(edges = edges, nodes = nodes, random_seed = 42)
 
   # Update state using update_state() method
   net <- net %>% update_state(new_state)
