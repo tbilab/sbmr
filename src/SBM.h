@@ -455,7 +455,11 @@ class SBM {
       // If we're in the 1-block-per-node mode make sure we reflect that in reserved size
       if (one_block_per_node) n_blocks = nodes_of_type.size();
 
-      if (n_blocks > nodes_of_type.size()) LOGIC_ERROR("Can't initialize more blocks than there are nodes of a given type");
+      if (n_blocks > nodes_of_type.size()) {
+        LOGIC_ERROR("Can't initialize " + as_str(n_blocks)
+                    + " blocks as there are only " + as_str(nodes_of_type.size()) + " nodes"
+                    + (edge_types == unipartite ? "" : " of type " + types[type_i]));
+      }
 
       // Reserve enough spaces for the blocks to be inserted
       blocks_of_type.reserve(n_blocks);
