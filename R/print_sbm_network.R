@@ -46,7 +46,7 @@ print.sbm_network <- function(x, ...){
 
   if (!is.null(attr(x, 'state'))){
     cat(glue::glue("Model", "\n",
-                   "Currently has {get_num_blocks(x)} blocks",
+                   "Currently has {n_blocks(x)} blocks",
                    "\n"))
   }
 }

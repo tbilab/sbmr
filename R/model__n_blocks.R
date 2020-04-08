@@ -24,24 +24,24 @@
 #' # A small simulated network with no blocks
 #' net <- new_sbm_network(edges)
 #'
-#' get_num_blocks(net)
+#' n_blocks(net)
 #'
 #' # Add some two random blocks
-#' net %>% initialize_blocks(2) %>% get_num_blocks()
+#' net %>% initialize_blocks(2) %>% n_blocks()
 #'
 #' # Add a block per node
-#' net %>% initialize_blocks() %>% get_num_blocks()
+#' net %>% initialize_blocks() %>% n_blocks()
 #'
-get_num_blocks <- function(sbm){
-  UseMethod("get_num_blocks")
+n_blocks <- function(sbm){
+  UseMethod("n_blocks")
 }
 
-get_num_blocks.default <- function(sbm){
-  cat("get_num_blocks generic")
+n_blocks.default <- function(sbm){
+  cat("n_blocks generic")
 }
 
 #' @export
-get_num_blocks.sbm_network <- function(sbm){
+n_blocks.sbm_network <- function(sbm){
 
   model <- verify_model(sbm) %>%
     attr('model')
