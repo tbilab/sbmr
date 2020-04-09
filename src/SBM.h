@@ -828,6 +828,37 @@ class SBM {
     return results;
   }
 
+  double calc_entropy(const int level) const
+  {
+    double entropy = -n_edges();
+
+    // Build map of number of nodes with given degree
+    std::map<int, int> n_w_degree;
+    for_all_nodes_at_level(level, [&n_w_degree](const Node_UPtr& node) {
+      n_w_degree[node->degree()]++;
+    });
+
+    // Calculate first component (sum of node degree counts portion)
+    for (const auto& degree_count : n_w_degree) {
+      // Using std's built in lgamma here: lgamma(x + 1) = log(x!)
+      entropy -= degree_count.second * lgamma(degree_count.first + 1);
+    }
+
+    // Counts between all pairs of blocks
+    Edge_Counts block_edge_counts = get_interblock_edge_counts(level + 1);
+
+    for (const auto& block_pair_count : block_edge_counts) {
+      const Node* block_r = block_pair_count.first.first();
+      const Node* block_s = block_pair_count.first.second();
+      const int scalar    = block_pair_count.first.is_matching() ? 2 : 1;
+      const int e_rs      = block_pair_count.second * scalar;
+
+      entropy -= ent(e_rs, block_r->degree(), block_s->degree()) / scalar;
+    }
+
+    return entropy;
+  }
+
   // =============================================================================
   // Model State
   // =============================================================================

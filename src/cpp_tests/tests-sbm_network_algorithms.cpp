@@ -183,3 +183,21 @@ TEST_CASE("Block Merging - Simple Unipartite", "[SBM]")
 
   REQUIRE(my_sbm.n_nodes_of_type("a", 1) == 2);
 }
+
+TEST_CASE("Entropy calculation -- Simple Bipartite", "[SBM]")
+{
+
+  auto my_sbm = simple_bipartite();
+
+  const double entropy = my_sbm.calc_entropy(0);
+
+  REQUIRE(entropy == Approx(-1.420612).epsilon(0.1));
+}
+
+TEST_CASE("Simple entropy calculation (unipartite)", "[SBM")
+{
+  auto my_sbm = simple_unipartite();
+
+  // Hand calculated
+  REQUIRE(my_sbm.calc_entropy(0) == Approx(6.433708).epsilon(0.1));
+}
