@@ -38,7 +38,7 @@ visualize_mcmc_trace.sbm_network <- function(sbm){
   sweep_results$sweep_info %>%
     dplyr::mutate(sweep = 1:N) %>%
     dplyr::rename(`entropy delta` = entropy_delta,
-                  `number of nodes moved` = num_nodes_moved) %>%
+                  `number of nodes moved` = n_nodes_moved) %>%
     tidyr::pivot_longer(c(`entropy delta`,`number of nodes moved`)) %>%
     ggplot2::ggplot(ggplot2::aes(x = sweep, y = value)) +
     ggplot2::geom_line() +
