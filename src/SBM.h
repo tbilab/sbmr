@@ -830,6 +830,10 @@ class SBM {
 
   double get_entropy(const int level) const
   {
+    if (!node_level_has_blocks(level)) {
+      LOGIC_ERROR("Can't calculate entropy because there is no block structure for nodes");
+    }
+
     double entropy = -n_edges();
 
     // Build map of number of nodes with given degree
