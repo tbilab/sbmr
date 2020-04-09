@@ -116,6 +116,22 @@ test_that("State loading and saving works", {
 
 })
 
+test_that("Getting model entopy", {
+  sbm <- new_sbm_network(edges, edges_from_column = a_node, edges_to_column = b_node) %>%
+    attr("model")
+
+  # Can't calculate entropy when no blocks are initialized
+  expect_error(sbm$get_entropy(0),
+               "Can't calculate entropy because there is no block structure for nodes",
+               fixed = TRUE)
+
+  sbm$initialize_blocks(2)
+
+  entropy <- sbm$get_entropy(0)
+  expect_true(!is.null(entropy))
+  expect_true(!is.na(entropy))
+})
+
 test_that("Interblock edge counts", {
 
   sbm <- new_sbm_network(edges, edges_from_column = a_node, edges_to_column = b_node) %>%
