@@ -1,5 +1,5 @@
-#include "../get_move_results.h"
 #include "../SBM.h"
+#include "../get_move_results.h"
 #include "build_testing_networks.h"
 #include "catch.hpp"
 
@@ -12,8 +12,8 @@ TEST_CASE("Generate Node move proposals - Simple Bipartite", "[SBM]")
 
   int n_trials        = 200;
   int n_times_no_move = 0;
-  Node* a1              = my_sbm.get_node_by_id("a1");
-  Node* old_block       = a1->parent();
+  Node* a1            = my_sbm.get_node_by_id("a1");
+  Node* old_block     = a1->parent();
 
   // Run multiple trials and of move and see how often a given node is moved
   for (int i = 0; i < n_trials; ++i) {
@@ -42,8 +42,8 @@ TEST_CASE("Generate Node move proposals - Simple Unipartite", "[SBM]")
   auto my_sbm = simple_unipartite();
 
   int n_trials = 2000;
-  Node* n5       = my_sbm.get_node_by_id("n5");
-  Node* b        = my_sbm.get_node_by_id("n4")->parent();
+  Node* n5     = my_sbm.get_node_by_id("n5");
+  Node* b      = my_sbm.get_node_by_id("n4")->parent();
 
   // Sanity check to make sure we've got the right block
   REQUIRE(n5->parent() != b);
@@ -189,7 +189,7 @@ TEST_CASE("Entropy calculation -- Simple Bipartite", "[SBM]")
 
   auto my_sbm = simple_bipartite();
 
-  const double entropy = my_sbm.calc_entropy(0);
+  const double entropy = my_sbm.get_entropy(0);
 
   REQUIRE(entropy == Approx(-1.420612).epsilon(0.1));
 }
@@ -199,5 +199,5 @@ TEST_CASE("Simple entropy calculation (unipartite)", "[SBM")
   auto my_sbm = simple_unipartite();
 
   // Hand calculated
-  REQUIRE(my_sbm.calc_entropy(0) == Approx(6.433708).epsilon(0.1));
+  REQUIRE(my_sbm.get_entropy(0) == Approx(6.433708).epsilon(0.1));
 }

@@ -828,7 +828,7 @@ class SBM {
     return results;
   }
 
-  double calc_entropy(const int level) const
+  double get_entropy(const int level) const
   {
     double entropy = -n_edges();
 
