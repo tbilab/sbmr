@@ -4,13 +4,13 @@
 \alias{initialize_blocks}
 \title{Assign blocks for all nodes}
 \usage{
-initialize_blocks(sbm, num_blocks = NULL)
+initialize_blocks(sbm, n_blocks = NULL)
 }
 \arguments{
 \item{sbm}{\code{sbm_network} object as created by
 \code{\link{new_sbm_network}}.}
 
-\item{num_blocks}{Total number of blocks to initialize for each unique node
+\item{n_blocks}{Total number of blocks to initialize for each unique node
 type. If set to \code{-1}, then a single block is made for every node.}
 }
 \value{
@@ -18,13 +18,13 @@ An S3 object of class \code{sbm_network}. For details see
 \code{\link{new_sbm_network}} section "Class structure."
 }
 \description{
-Initializes blocks for a given level of network. When \code{num_blocks = -1} (the
+Initializes blocks for a given level of network. When \code{n_blocks = -1} (the
 default) this will simply give every node its own block. Otherwise it will
 randomly draw each nodes block from \code{num_block} possible parent nodes for
-each node type. E.g. if network is bipartite and \code{num_blocks == 3} a total of
+each node type. E.g. if network is bipartite and \code{n_blocks == 3} a total of
 \code{3*2 = 6} blocks will be added and assigned randomly to nodes. Because of
 random assignment of parents there may sometimes be less blocks than
-\verb{num_blocks * <num_types>} due to some block nodes never being assigned to a
+\verb{n_blocks * <num_types>} due to some block nodes never being assigned to a
 child node.
 }
 \examples{
@@ -52,13 +52,13 @@ net \%>\%
 # four blocks result because two random blocks are made for each of the two
 # types
 net \%>\%
-  initialize_blocks(num_blocks = 2) \%>\%
+  initialize_blocks(n_blocks = 2) \%>\%
   n_blocks()
 
 # If you have a polypartite network each set of node types will get their own
-# set of `num_blocks` randomly assigned
+# set of `n_blocks` randomly assigned
 new_sbm_network(edges, bipartite_edges = TRUE) \%>\%
-  initialize_blocks(num_blocks = 2) \%>\%
+  initialize_blocks(n_blocks = 2) \%>\%
   n_blocks()
 
 

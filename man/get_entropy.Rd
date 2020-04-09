@@ -22,13 +22,13 @@ set.seed(42)
 
 # Start with a small simulated network with random block assignments
 net <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 15) \%>\%
-  initialize_blocks(num_blocks = 4)
+  initialize_blocks(n_blocks = 4)
 
 # Calculate entropy with random blocks
 get_entropy(net)
 
 # Run some MCMC sweeps
-net <- mcmc_sweep(net, num_sweeps = 25, variable_num_blocks = FALSE)
+net <- mcmc_sweep(net, num_sweeps = 25, variable_n_blocks = FALSE)
 
 # Entropy after sweeps
 get_entropy(net)

@@ -8,7 +8,7 @@ mcmc_sweep(
   sbm,
   num_sweeps = 1,
   eps = 0.1,
-  variable_num_blocks = TRUE,
+  variable_n_blocks = TRUE,
   track_pairs = FALSE,
   level = 0,
   verbose = FALSE
@@ -24,7 +24,7 @@ proposals.}
 \item{eps}{Controls randomness of move proposals. Effects both the block
 merging and mcmc sweeps.}
 
-\item{variable_num_blocks}{Should the model allow new blocks to be created or
+\item{variable_n_blocks}{Should the model allow new blocks to be created or
 empty blocks removed while sweeping or should number of blocks remain
 constant?}
 
@@ -56,13 +56,13 @@ set.seed(42)
 
 # Start with a small simulated network with random block assignments
 net <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 15) \%>\%
-  initialize_blocks(num_blocks = 4)
+  initialize_blocks(n_blocks = 4)
 
 # Calculate entropy with random blocks
 get_entropy(net)
 
 # Run some MCMC sweeps
-net <- mcmc_sweep(net, num_sweeps = 25, variable_num_blocks = FALSE)
+net <- mcmc_sweep(net, num_sweeps = 25, variable_n_blocks = FALSE)
 
 # Entropy after sweeps
 get_entropy(net)

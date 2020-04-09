@@ -6,7 +6,6 @@
 \usage{
 choose_best_collapse_state(
   sbm,
-  use_entropy_value_for_score = FALSE,
   heuristic = "dev_from_rolling_mean",
   verbose = FALSE
 )
@@ -14,10 +13,6 @@ choose_best_collapse_state(
 \arguments{
 \item{sbm}{\code{sbm_network} object as created by
 \code{\link{new_sbm_network}}.}
-
-\item{use_entropy_value_for_score}{If set to \code{TRUE} then instead of the merge
-results entropy delta being used for the score function the entropy will
-be. Typically the heuristics work better on entropy delta values.}
 
 \item{heuristic}{How the best partitioning is defined. Takes either a
 function that takes one/two arguments: an entropy vector and an optional
@@ -40,7 +35,7 @@ set.seed(42)
 
 # Start with a random network of two blocks with 25 nodes each
 net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) \%>\%
-  collapse_blocks(sigma = 2)
+  collapse_blocks(sigma = 1.4)
 
 # Choose best result with default heuristic
 net <- choose_best_collapse_state(net, verbose = TRUE)

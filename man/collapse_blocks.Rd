@@ -6,7 +6,7 @@
 \usage{
 collapse_blocks(
   sbm,
-  desired_num_blocks = 1,
+  desired_n_blocks = 1,
   num_mcmc_sweeps = 0,
   sigma = 1.5,
   eps = 0.1,
@@ -20,7 +20,7 @@ collapse_blocks(
 \item{sbm}{\code{sbm_network} object as created by
 \code{\link{new_sbm_network}}.}
 
-\item{desired_num_blocks}{How many blocks should this given merge drop down
+\item{desired_n_blocks}{How many blocks should this given merge drop down
 to. If the network has more than one node type this number is multiplied by
 the total number of types.}
 
