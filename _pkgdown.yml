@@ -23,6 +23,7 @@ reference:
 - title: Property getters
   desc: Extract various properties from the model
   contents:
+  - state
   - entropy
   - interblock_edge_counts
   - n_blocks
