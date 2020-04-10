@@ -28,17 +28,16 @@ NULL
 #' @examples
 #'
 #' my_letters <- head(letters, 5)
-#' \dontrun{
-#' letter_pairs <- get_combination_indices(length(my_letters), repeats = FALSE)
+#'
+#' letter_pairs <- combination_indices(length(my_letters), repeats = FALSE)
 #'
 #' dplyr::tibble(
 #'   letter_1 = letters[letter_pairs$a],
 #'   letter_2 = letters[letter_pairs$b]
 #' )
 #'
-#' }
 #'
-get_combination_indices <- function(n, repeats = FALSE){
+combination_indices <- function(n, repeats = FALSE){
 
   rep_counts <- n:1
 
