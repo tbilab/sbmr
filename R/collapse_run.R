@@ -31,7 +31,7 @@
 #' net %>% visualize_collapse_results()
 #'
 #' # We can choose best result with default heuristic
-#' net <- choose_best_collapse_state(net, verbose = TRUE)
+#' net <- choose_best_collapse_state(net, verbose = TRUE, use_entropy = TRUE)
 #'
 collapse_run <- function(sbm,
                          num_final_blocks = 1:10,
