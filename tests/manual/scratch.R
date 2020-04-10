@@ -1,21 +1,12 @@
-set.seed(42)
 
-# Start with a random network of two blocks with 25 nodes each
-net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) %>%
-  collapse_run(num_final_blocks = 1:5, sigma = 1.5)
+# Start with a random network
+net <- sim_basic_block_network(n_blocks = 2, n_nodes_per_block = 30, random_seed = 42) %>%
+  collapse_blocks(num_mcmc_sweeps = 0, sigma = 1.1, report_all_steps = TRUE)
 
-# # Collapse runs can be done in parallel
-# \dontrun{
-#   net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) %>%
-#     collapse_run(num_final_blocks = 1:5, sigma = 1.5, parallel = TRUE)
-# }
+visualize_collapse_results(net, heuristic = "delta_ratio", use_entropy = FALSE)
 
-# We can look directly at the collapse results
-net %>% get_collapse_results()
 
-# We can visualize the collapse results
-net %>% visualize_collapse_results()
-net %>% visualize_collapse_results(heuristic = "delta_ratio")
+net <- sim_basic_block_network(n_blocks = 2, n_nodes_per_block = 30, random_seed = 42) %>%
+  collapse_run(num_mcmc_sweeps = 0, sigma = 1.3)
 
-# We can choose best result with default heuristic
-net <- choose_best_collapse_state(net, verbose = TRUE)
+visualize_collapse_results(net, heuristic = "delta_ratio", use_entropy = FALSE)
