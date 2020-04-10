@@ -4,18 +4,10 @@
 \alias{visualize_collapse_results}
 \title{Visualize agglomerative collapse results}
 \usage{
-visualize_collapse_results(
-  sbm,
-  use_entropy_value_for_score = FALSE,
-  heuristic = NULL
-)
+visualize_collapse_results(sbm, heuristic = NULL)
 }
 \arguments{
 \item{sbm}{Object of class \code{sbm_network}.}
-
-\item{use_entropy_value_for_score}{If set to \code{TRUE} then instead of the merge
-results entropy delta being used for the score function the entropy will
-be. Typically the heuristics work better on entropy delta values.}
 
 \item{heuristic}{How the best partitioning is defined. Takes either a
 function that takes one/two arguments: an entropy vector and an optional
