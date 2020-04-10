@@ -235,7 +235,7 @@ test_that("Agglomerative merging", {
                                           TRUE) # allow_exhaustive = true
 
   # Reporting all steps should, return as many list elements as there are possible steps
-  expect_equal(length(collapse_results),
+  expect_equal(length(collapse_results$step_states),
                sbm$n_nodes_at_level(0) - final_n_blocks)
 
   just_final <- sbm$collapse_blocks(0,                # node_level,
@@ -248,7 +248,6 @@ test_that("Agglomerative merging", {
                                     TRUE)             # allow_exhaustive = true
 
   # Just reporting the final step should... just report the final step
-  expect_equal(names(just_final),
-               c("entropy_delta", "state", "n_blocks"))
+  expect_equal(length(just_final$step_states),1)
 })
 
