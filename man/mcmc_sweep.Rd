@@ -59,13 +59,13 @@ net <- sim_basic_block_network(n_blocks = 4, n_nodes_per_block = 15) \%>\%
   initialize_blocks(n_blocks = 4)
 
 # Calculate entropy with random blocks
-get_entropy(net)
+entropy(net)
 
 # Run some MCMC sweeps
 net <- mcmc_sweep(net, num_sweeps = 25, variable_n_blocks = FALSE)
 
 # Entropy after sweeps
-get_entropy(net)
+entropy(net)
 
 # Per-sweep level information
 get_sweep_results(net)
@@ -83,8 +83,8 @@ Other modeling:
 \code{\link{choose_best_collapse_state}()},
 \code{\link{collapse_blocks}()},
 \code{\link{collapse_run}()},
+\code{\link{entropy}()},
 \code{\link{get_block_edge_counts}()},
-\code{\link{get_entropy}()},
 \code{\link{get_state}()},
 \code{\link{n_blocks}()}
 }

@@ -121,13 +121,13 @@ test_that("Getting model entopy", {
     attr("model")
 
   # Can't calculate entropy when no blocks are initialized
-  expect_error(sbm$get_entropy(0),
+  expect_error(sbm$entropy(0),
                "Can't calculate entropy because there is no block structure for nodes",
                fixed = TRUE)
 
   sbm$initialize_blocks(2)
 
-  entropy <- sbm$get_entropy(0)
+  entropy <- sbm$entropy(0)
   expect_true(!is.null(entropy))
   expect_true(!is.na(entropy))
 })

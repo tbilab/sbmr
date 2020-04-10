@@ -75,8 +75,8 @@ net <- choose_best_collapse_state(net, verbose = TRUE)
 Other modeling: 
 \code{\link{choose_best_collapse_state}()},
 \code{\link{collapse_blocks}()},
+\code{\link{entropy}()},
 \code{\link{get_block_edge_counts}()},
-\code{\link{get_entropy}()},
 \code{\link{get_state}()},
 \code{\link{mcmc_sweep}()},
 \code{\link{n_blocks}()}

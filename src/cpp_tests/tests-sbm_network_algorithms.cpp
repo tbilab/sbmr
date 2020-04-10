@@ -189,7 +189,7 @@ TEST_CASE("Entropy calculation -- Simple Bipartite", "[SBM]")
 
   auto my_sbm = simple_bipartite();
 
-  const double entropy = my_sbm.get_entropy(0);
+  const double entropy = my_sbm.entropy(0);
 
   REQUIRE(entropy == Approx(-1.420612).epsilon(0.1));
 }
@@ -199,5 +199,5 @@ TEST_CASE("Simple entropy calculation (unipartite)", "[SBM")
   auto my_sbm = simple_unipartite();
 
   // Hand calculated
-  REQUIRE(my_sbm.get_entropy(0) == Approx(6.433708).epsilon(0.1));
+  REQUIRE(my_sbm.entropy(0) == Approx(6.433708).epsilon(0.1));
 }

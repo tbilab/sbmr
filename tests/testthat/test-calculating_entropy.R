@@ -5,7 +5,7 @@ test_that("computing entropy", {
                             random_seed = 42) %>%
     initialize_blocks(10)
 
-  first_entropy <- net %>% get_entropy()
+  first_entropy <- net %>% entropy()
 
   start_state <- get_state(net)
 
@@ -26,7 +26,7 @@ test_that("computing entropy", {
                               parent = ifelse(id == random_node$id, random_new_parent, parent)))
 
   # Record entropy again
-  second_entropy <- net %>% get_entropy()
+  second_entropy <- net %>% entropy()
 
   # Entropy should have changed
   expect_false(first_entropy == second_entropy)

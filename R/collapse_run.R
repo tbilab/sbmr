@@ -93,7 +93,7 @@ collapse_run.sbm_network <- function(sbm,
 
         model %>%
           get_collapse_results() %>%
-          dplyr::mutate(final_entropy = get_entropy(model))
+          dplyr::mutate(final_entropy = entropy(model))
       }
     )
 

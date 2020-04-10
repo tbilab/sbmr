@@ -40,13 +40,13 @@
 #'   initialize_blocks(n_blocks = 4)
 #'
 #' # Calculate entropy with random blocks
-#' get_entropy(net)
+#' entropy(net)
 #'
 #' # Run some MCMC sweeps
 #' net <- mcmc_sweep(net, num_sweeps = 25, variable_n_blocks = FALSE)
 #'
 #' # Entropy after sweeps
-#' get_entropy(net)
+#' entropy(net)
 #'
 #' # Per-sweep level information
 #' get_sweep_results(net)

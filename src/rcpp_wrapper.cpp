@@ -165,7 +165,7 @@ RCPP_MODULE(SBM)
                     "Exports the current state of the network as dataframe with each node as a row and columns for node id, parent id, node type, and node level.")
       .const_method("get_interblock_edge_counts", &SBM::get_interblock_edge_counts,
                     "Get dataframe of counts of edges between all unique pairs of blocks in network")
-      .const_method("get_entropy", &SBM::get_entropy,
+      .const_method("entropy", &SBM::entropy,
                     "Calculate the degree corrected entropy of current model state at desired level")
       .method("add_node", &SBM::add_node_no_ret,
               "Add a node to the network. Takes the node id (string), the node type (string), and the node level (int). Use level = 0 for data-level nodes.")

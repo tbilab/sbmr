@@ -15,9 +15,9 @@ network <- sim_basic_block_network(
 
 my_sbm <- create_sbm(network)
 
-# start_entropy <- get_entropy(my_sbm)
+# start_entropy <- entropy(my_sbm)
 
-# start_entropy <- my_sbm %>% initialize_blocks() %>% get_entropy()
+# start_entropy <- my_sbm %>% initialize_blocks() %>% entropy()
 single_collapse <- my_sbm %>%
   collapse_blocks(report_all_steps = TRUE,
                   sigma = 1.1,
@@ -239,7 +239,7 @@ sweep_results$sweep_info %>%
 #   geom_hline(yintercept = 1)
 #
 #
-# my_sbm %>% get_entropy()
+# my_sbm %>% entropy()
 #
 # plot_sweep_results(sweep_df)
 

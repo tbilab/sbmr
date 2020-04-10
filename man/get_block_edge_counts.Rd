@@ -36,7 +36,7 @@ Other modeling:
 \code{\link{choose_best_collapse_state}()},
 \code{\link{collapse_blocks}()},
 \code{\link{collapse_run}()},
-\code{\link{get_entropy}()},
+\code{\link{entropy}()},
 \code{\link{get_state}()},
 \code{\link{mcmc_sweep}()},
 \code{\link{n_blocks}()}

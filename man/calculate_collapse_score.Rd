@@ -4,7 +4,7 @@
 \alias{calculate_collapse_score}
 \title{Calculate block collapse scores}
 \usage{
-calculate_collapse_score(sbm, heuristic)
+calculate_collapse_score(sbm, heuristic, remove_state = TRUE)
 }
 \arguments{
 \item{sbm}{Object of class \code{sbm_network}.}
@@ -14,10 +14,15 @@ function that takes one/two arguments: an entropy vector and an optional
 number of blocks vector with each element corresponding to a given
 location, or a string labeling algorithm. Currently only \code{"lowest"},
 \code{"dev_from_rolling_mean"}, \code{"delta_ratio"}, \code{"trend_deviation"}, and \code{"nls_residual"} are supported.}
+
+\item{remove_state}{Should the state column be removed from results? Will be
+\code{TRUE} when visualizing results, \code{FALSE} when using score to choose best
+state.}
 }
 \value{
 Collapse results dataframe with a score column attached
 }
 \description{
-A helper function that is used in \code{visualize_collapse_results} and \code{choose_best_collapse_state}.
+A helper function that is used in \code{visualize_collapse_results} and
+\code{choose_best_collapse_state}.
 }

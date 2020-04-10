@@ -18,23 +18,23 @@
 #'   initialize_blocks(n_blocks = 4)
 #'
 #' # Calculate entropy with random blocks
-#' get_entropy(net)
+#' entropy(net)
 #'
 #' # Run some MCMC sweeps
 #' net <- mcmc_sweep(net, num_sweeps = 25, variable_n_blocks = FALSE)
 #'
 #' # Entropy after sweeps
-#' get_entropy(net)
+#' entropy(net)
 #'
-get_entropy <- function(sbm){
-  UseMethod("get_entropy")
+entropy <- function(sbm){
+  UseMethod("entropy")
 }
 
-get_entropy.default <- function(sbm){
-  cat("get_entropy generic")
+entropy.default <- function(sbm){
+  cat("entropy generic")
 }
 
 #' @export
-get_entropy.sbm_network <- function(sbm){
-  attr(verify_model(sbm), 'model')$get_entropy(0L)
+entropy.sbm_network <- function(sbm){
+  attr(verify_model(sbm), 'model')$entropy(0L)
 }

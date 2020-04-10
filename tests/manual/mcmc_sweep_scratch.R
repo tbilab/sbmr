@@ -18,7 +18,7 @@ network <- sim_basic_block_network(
 sbm <- create_sbm(network) %>%
   initialize_blocks(n_blocks)
 
-# start_entropy <- my_sbm %>% get_entropy()
+# start_entropy <- my_sbm %>% entropy()
 num_sweeps <- 100
 sweep_results <- mcmc_sweep(my_sbm,
                             num_sweeps = num_sweeps,
@@ -42,7 +42,7 @@ nodes_w_assignments <- get_state(my_sbm) %>%
 
 table(nodes_w_assignments$inferred, nodes_w_assignments$block)
 
-my_sbm %>% get_entropy()
+my_sbm %>% entropy()
 #
 # # nodes_w_assignments %>%
 # #   group_by(inferred) %>%
@@ -55,7 +55,7 @@ my_sbm %>% get_entropy()
 # #   arrange(-n_unique_assigned)
 #
 #
-# start_entropy <- get_entropy(my_sbm)
+# start_entropy <- entropy(my_sbm)
 # predicted_entropy <- start_entropy
 #
 # num_sweeps <- 20
@@ -73,7 +73,7 @@ my_sbm %>% get_entropy()
 #   predicted_entropy <- predicted_entropy + (delta)
 #
 #   # Update values
-#   true_res <- c(true_res, get_entropy(my_sbm))
+#   true_res <- c(true_res, entropy(my_sbm))
 #   predicted_res <- c(predicted_res, predicted_entropy)
 # }
 #
@@ -123,7 +123,7 @@ my_sbm %>% get_entropy()
 #     subtitle = "Entropy Delta of sweep and number of nodes moved for sweep"
 #   )
 #
-# true_final_entropy <- my_sbm %>% get_entropy()
+# true_final_entropy <- my_sbm %>% entropy()
 #
 # sweep_stats %>%
 #   ggplot(aes(x = sweep, y = entropy)) +
