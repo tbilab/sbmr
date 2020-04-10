@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute entropy for current model state — entropy • sbmR</title>
+<title>Get node's edge counts to blocks — node_to_block_edge_counts • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,10 @@
 
 
 
-<meta property="og:title" content="Compute entropy for current model state — entropy" />
-<meta property="og:description" content="Computes the (degree-corrected) entropy for the network at the node level." />
+<meta property="og:title" content="Get node's edge counts to blocks — node_to_block_edge_counts" />
+<meta property="og:description" content="For a given node in an SBM, returns a dataframe of each block (or node) that
+the desired node is connected to and how many connections they have to that
+block." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -123,56 +125,56 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute entropy for current model state</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/model__get_entropy.R'><code>R/model__get_entropy.R</code></a></small>
-    <div class="hidden name"><code>entropy.Rd</code></div>
+    <h1>Get node's edge counts to blocks</h1>
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/model__node_to_block_edge_counts.R'><code>R/model__node_to_block_edge_counts.R</code></a></small>
+    <div class="hidden name"><code>node_to_block_edge_counts.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Computes the (degree-corrected) entropy for the network at the node level.</p>
+    <p>For a given node in an SBM, returns a dataframe of each block (or node) that
+the desired node is connected to and how many connections they have to that
+block.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>entropy</span>(<span class='no'>sbm</span>)</pre>
+    <pre class="usage"><span class='fu'>node_to_block_edge_counts</span>(<span class='no'>sbm</span>, <span class='no'>node_id</span>, <span class='kw'>connection_level</span> <span class='kw'>=</span> <span class='fl'>1L</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>sbm</th>
-      <td><p><code>sbm_network</code> object as created by
-<code><a href='new_sbm_network.html'>new_sbm_network</a></code>.</p></td>
+      <th>node_id</th>
+      <td><p>String identifying the node that edge counts are desired for</p></td>
+    </tr>
+    <tr>
+      <th>connection_level</th>
+      <td><p>Level of blocks to get connections to. E.g. <code>1</code> = node block level, <code>0</code> = connections to other nodes.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Entropy value (numeric).</p>
+    <p>Dataframe with two columns: <code>id</code> for the id of the node/block connected to, and <code>count</code> for the number of connections between.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other modeling: 
-<code><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a>()</code>,
-<code><a href='collapse_blocks.html'>collapse_blocks</a>()</code>,
-<code><a href='collapse_run.html'>collapse_run</a>()</code>,
-<code><a href='get_state.html'>get_state</a>()</code>,
-<code><a href='interblock_edge_counts.html'>interblock_edge_counts</a>()</code>,
-<code><a href='mcmc_sweep.html'>mcmc_sweep</a>()</code>,
-<code><a href='n_blocks.html'>n_blocks</a>()</code></p></div>
+    <div class='dont-index'><p><code>get_block_edge_counts</code></p>
+<p>Other advanced: 
+<code><a href='add_edge.html'>add_edge</a>()</code>,
+<code><a href='add_node.html'>add_node</a>()</code>,
+<code><a href='initialize_blocks.html'>initialize_blocks</a>()</code>,
+<code><a href='update_state.html'>update_state</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
+<span class='co'># A small simulated network with random block assignment</span>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>10</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='fl'>3</span>)
 
-<span class='co'># Start with a small simulated network with random block assignments</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>15</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>)
-
-<span class='co'># Calculate entropy with random blocks</span>
-<span class='fu'>entropy</span>(<span class='no'>net</span>)</div><div class='output co'>#&gt; [1] 1285.001</div><div class='input'>
-<span class='co'># Run some MCMC sweeps</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='mcmc_sweep.html'>mcmc_sweep</a></span>(<span class='no'>net</span>, <span class='kw'>num_sweeps</span> <span class='kw'>=</span> <span class='fl'>25</span>, <span class='kw'>variable_n_blocks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-
-<span class='co'># Entropy after sweeps</span>
-<span class='fu'>entropy</span>(<span class='no'>net</span>)</div><div class='output co'>#&gt; [1] 1243.098</div><div class='input'>
+<span class='co'># Get a random node's edge counts to blocks</span>
+<span class='no'>node_id</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='no'>net</span>$<span class='no'>nodes</span>$<span class='no'>id</span>, <span class='fl'>1</span>)
+<span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'>node_to_block_edge_counts</span>(<span class='no'>node_id</span>, <span class='kw'>connection_level</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt;       block n_edges
+#&gt; 1 bl_node_2       3
+#&gt; 2 bl_node_1       3
+#&gt; 3 bl_node_0       3</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

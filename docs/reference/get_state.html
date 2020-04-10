@@ -163,7 +163,7 @@ hierarchy</p></dd>
 <code><a href='collapse_blocks.html'>collapse_blocks</a>()</code>,
 <code><a href='collapse_run.html'>collapse_run</a>()</code>,
 <code><a href='entropy.html'>entropy</a>()</code>,
-<code><a href='get_block_edge_counts.html'>get_block_edge_counts</a>()</code>,
+<code><a href='interblock_edge_counts.html'>interblock_edge_counts</a>()</code>,
 <code><a href='mcmc_sweep.html'>mcmc_sweep</a>()</code>,
 <code><a href='n_blocks.html'>n_blocks</a>()</code></p></div>
 
@@ -186,13 +186,13 @@ hierarchy</p></dd>
 <span class='fu'>get_state</span>(<span class='no'>net</span>)</div><div class='output co'>#&gt; NULL</div><div class='input'>
 <span class='co'># Add some blocks and state will reflect</span>
 <span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='fl'>2</span>) <span class='kw'>%&gt;%</span> <span class='fu'>get_state</span>()</div><div class='output co'>#&gt;   id type    parent level
-#&gt; 1 b1 node bl_node_0     0
+#&gt; 1 a2 node bl_node_0     0
 #&gt; 2 b4 node bl_node_1     0
-#&gt; 3 a3 node bl_node_0     0
-#&gt; 4 b3 node bl_node_1     0
-#&gt; 5 b2 node bl_node_0     0
-#&gt; 6 a1 node bl_node_1     0
-#&gt; 7 a2 node bl_node_0     0</div><div class='input'>
+#&gt; 3 b1 node bl_node_0     0
+#&gt; 4 a3 node bl_node_1     0
+#&gt; 5 a1 node bl_node_0     0
+#&gt; 6 b3 node bl_node_1     0
+#&gt; 7 b2 node bl_node_0     0</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

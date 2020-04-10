@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute entropy for current model state — entropy • sbmR</title>
+<title>Get counts between blocks at a level — interblock_edge_counts • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Compute entropy for current model state — entropy" />
-<meta property="og:description" content="Computes the (degree-corrected) entropy for the network at the node level." />
+<meta property="og:title" content="Get counts between blocks at a level — interblock_edge_counts" />
+<meta property="og:description" content="Returns a dataframe with all pairs of blocks at the desired level and the number of edges between them. Unconnected blocks are ommitted for space savings." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -123,16 +123,16 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute entropy for current model state</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/model__get_entropy.R'><code>R/model__get_entropy.R</code></a></small>
-    <div class="hidden name"><code>entropy.Rd</code></div>
+    <h1>Get counts between blocks at a level</h1>
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/model__interblock_edge_counts.R'><code>R/model__interblock_edge_counts.R</code></a></small>
+    <div class="hidden name"><code>interblock_edge_counts.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Computes the (degree-corrected) entropy for the network at the node level.</p>
+    <p>Returns a dataframe with all pairs of blocks at the desired level and the number of edges between them. Unconnected blocks are ommitted for space savings.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>entropy</span>(<span class='no'>sbm</span>)</pre>
+    <pre class="usage"><span class='fu'>interblock_edge_counts</span>(<span class='no'>sbm</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>1</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -142,37 +142,42 @@
       <td><p><code>sbm_network</code> object as created by
 <code><a href='new_sbm_network.html'>new_sbm_network</a></code>.</p></td>
     </tr>
+    <tr>
+      <th>level</th>
+      <td><p>Level of nodes who's blocks will have their block membership run
+through MCMC proposal-accept routine.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Entropy value (numeric).</p>
+    <p>Dataframe of block pairs (<code>block_a</code> and <code>block_b</code>) and the number of edges between them (<code>count</code>).</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>Other modeling: 
+    <div class='dont-index'><p><code><a href='node_to_block_edge_counts.html'>node_to_block_edge_counts</a></code></p>
+<p>Other modeling: 
 <code><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a>()</code>,
 <code><a href='collapse_blocks.html'>collapse_blocks</a>()</code>,
 <code><a href='collapse_run.html'>collapse_run</a>()</code>,
+<code><a href='entropy.html'>entropy</a>()</code>,
 <code><a href='get_state.html'>get_state</a>()</code>,
-<code><a href='interblock_edge_counts.html'>interblock_edge_counts</a>()</code>,
 <code><a href='mcmc_sweep.html'>mcmc_sweep</a>()</code>,
 <code><a href='n_blocks.html'>n_blocks</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
+<span class='co'># A small simulated network with random block assignment</span>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>10</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='fl'>3</span>)
 
-<span class='co'># Start with a small simulated network with random block assignments</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>15</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>)
-
-<span class='co'># Calculate entropy with random blocks</span>
-<span class='fu'>entropy</span>(<span class='no'>net</span>)</div><div class='output co'>#&gt; [1] 1285.001</div><div class='input'>
-<span class='co'># Run some MCMC sweeps</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='mcmc_sweep.html'>mcmc_sweep</a></span>(<span class='no'>net</span>, <span class='kw'>num_sweeps</span> <span class='kw'>=</span> <span class='fl'>25</span>, <span class='kw'>variable_n_blocks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-
-<span class='co'># Entropy after sweeps</span>
-<span class='fu'>entropy</span>(<span class='no'>net</span>)</div><div class='output co'>#&gt; [1] 1243.098</div><div class='input'>
+<span class='co'># Get counts of connections from each given block to the others</span>
+<span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'>interblock_edge_counts</span>()</div><div class='output co'>#&gt;     block_a   block_b n_edges
+#&gt; 1 bl_node_2 bl_node_2      32
+#&gt; 2 bl_node_1 bl_node_1      28
+#&gt; 3 bl_node_0 bl_node_0      27
+#&gt; 4 bl_node_2 bl_node_1      55
+#&gt; 5 bl_node_1 bl_node_0      57
+#&gt; 6 bl_node_2 bl_node_0      62</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

@@ -180,8 +180,8 @@ needed to make comparisons across separate collapses in the case of
 <code><a href='collapse_blocks.html'>collapse_blocks</a>()</code>,
 <code><a href='collapse_run.html'>collapse_run</a>()</code>,
 <code><a href='entropy.html'>entropy</a>()</code>,
-<code><a href='get_block_edge_counts.html'>get_block_edge_counts</a>()</code>,
 <code><a href='get_state.html'>get_state</a>()</code>,
+<code><a href='interblock_edge_counts.html'>interblock_edge_counts</a>()</code>,
 <code><a href='mcmc_sweep.html'>mcmc_sweep</a>()</code>,
 <code><a href='n_blocks.html'>n_blocks</a>()</code></p></div>
 
@@ -193,7 +193,7 @@ needed to make comparisons across separate collapses in the case of
   <span class='fu'><a href='collapse_blocks.html'>collapse_blocks</a></span>(<span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>1.4</span>)
 
 <span class='co'># Choose best result with default heuristic</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>net</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 7.6437.</div><div class='input'>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>net</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 2 blocks and an entropy of 36.7295.</div><div class='input'>
 <span class='co'># Score heuristic that fits a nonlinear model to observed values and chooses by</span>
 <span class='co'># largest negative residual</span>
 <span class='no'>nls_score</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>e</span>, <span class='no'>k</span>){
@@ -204,7 +204,7 @@ needed to make comparisons across separate collapses in the case of
 <span class='co'># Choose result using custom heuristic function</span>
 <span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>net</span>,
                                      <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='no'>nls_score</span>,
-                                     <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 8 blocks and an entropy of 47.3524.</div><div class='input'>
+                                     <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 26 blocks and an entropy of 323.2233.</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

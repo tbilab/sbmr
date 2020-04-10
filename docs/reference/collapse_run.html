@@ -196,8 +196,8 @@ searched exhaustively.</p></td>
 <code><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a>()</code>,
 <code><a href='collapse_blocks.html'>collapse_blocks</a>()</code>,
 <code><a href='entropy.html'>entropy</a>()</code>,
-<code><a href='get_block_edge_counts.html'>get_block_edge_counts</a>()</code>,
 <code><a href='get_state.html'>get_state</a>()</code>,
+<code><a href='interblock_edge_counts.html'>interblock_edge_counts</a>()</code>,
 <code><a href='mcmc_sweep.html'>mcmc_sweep</a>()</code>,
 <code><a href='n_blocks.html'>n_blocks</a>()</code></p></div>
 
@@ -220,14 +220,14 @@ searched exhaustively.</p></td>
 #&gt;   entropy n_blocks state            
 #&gt;     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;list&gt;</span><span>           
 #&gt; </span><span style='color: #BCBCBC;'>1</span><span>   </span><span style='text-decoration: underline;'>2</span><span>227.        1 </span><span style='color: #949494;'>&lt;df[,4] [75 × 4]&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span>   </span><span style='text-decoration: underline;'>2</span><span>224.        2 </span><span style='color: #949494;'>&lt;df[,4] [75 × 4]&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span>   </span><span style='text-decoration: underline;'>2</span><span>033.        3 </span><span style='color: #949494;'>&lt;df[,4] [75 × 4]&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>4</span><span>   </span><span style='text-decoration: underline;'>2</span><span>033.        4 </span><span style='color: #949494;'>&lt;df[,4] [75 × 4]&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>5</span><span>   </span><span style='text-decoration: underline;'>2</span><span>022.        5 </span><span style='color: #949494;'>&lt;df[,4] [75 × 4]&gt;</span><span></div><div class='input'>
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span>   </span><span style='text-decoration: underline;'>2</span><span>090.        2 </span><span style='color: #949494;'>&lt;df[,4] [75 × 4]&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span>   </span><span style='text-decoration: underline;'>2</span><span>034.        3 </span><span style='color: #949494;'>&lt;df[,4] [75 × 4]&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span>   </span><span style='text-decoration: underline;'>2</span><span>038.        4 </span><span style='color: #949494;'>&lt;df[,4] [75 × 4]&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span>   </span><span style='text-decoration: underline;'>2</span><span>038.        5 </span><span style='color: #949494;'>&lt;df[,4] [75 × 4]&gt;</span><span></div><div class='input'>
 <span class='co'># We can visualize the collapse results</span>
 <span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='visualize_collapse_results.html'>visualize_collapse_results</a></span>()</div><div class='output co'>#&gt; <span class='warning'>Warning: Can't use entropy delta for collapse score because collapse results doesn't report entropy delta for results from collapse_run(). Using entropy instead.</span></div><div class='img'><img src='collapse_run-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># We can choose best result with default heuristic</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a></span>(<span class='no'>net</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Can't use entropy delta for collapse score because collapse results doesn't report entropy delta for results from collapse_run(). Using entropy instead.</span></div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 2032.8128.</div><div class='input'>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a></span>(<span class='no'>net</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>use_entropy</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 2033.7959.</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
