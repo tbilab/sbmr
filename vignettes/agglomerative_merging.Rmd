@@ -312,22 +312,22 @@ full_collapse_time
 ```
 
 
-Now raise sigma to 1.5 and time...
+Now raise sigma to 1.4 and time...
 
 ```{r timed-high-sigma-collapse}
 raised_sigma_collapse_time <- system.time({
-  collapse_blocks(network, sigma = 1.5, report_all_steps = TRUE)
+  collapse_blocks(network, sigma = 1.4, report_all_steps = TRUE)
 })
 
 raised_sigma_collapse_time
 ```
 
-Just by increasing sigma to 1.5 we have sped up the collapsing by `r round(full_collapse_time[1]/raised_sigma_collapse_time[1], 2)` times.
+Just by increasing sigma to 1.4 we have sped up the collapsing by `r round(full_collapse_time[1]/raised_sigma_collapse_time[1], 2)` times.
 
 Speed isn't important if the model isnt working properly, however. So let's see how the collapse worked.
 
 ```{r visualize-high-sigma-collapse}
-network <- collapse_blocks(network, sigma = 1.5, report_all_steps = TRUE)
+network <- collapse_blocks(network, sigma = 1.4, report_all_steps = TRUE)
 
 visualize_collapse_results(network, heuristic = "dev_from_rolling_mean") +
   axis_limits +
@@ -367,7 +367,7 @@ Lets try it on our model scanning from 1-10 groups using sigma of `1.5` and `5` 
 ```{r parallel_collapse_run}
 network <- network %>% 
   collapse_run(num_final_blocks = 1:10, 
-               sigma = 1.5,
+               sigma = 1.4,
                num_mcmc_sweeps = 5,
                parallel = TRUE)
 ```
@@ -386,7 +386,9 @@ network %>%
 
 ```{r collapse-run-state-to-truth}
 network %>% 
-  choose_best_collapse_state(heuristic = "nls_residual", verbose = TRUE) %>% 
+  choose_best_collapse_state(heuristic = "nls_residual", 
+                             verbose = TRUE, 
+                             use_entropy = TRUE) %>% 
   state_to_truth_table()
 ```
 
