@@ -81,7 +81,7 @@ initialize_blocks.sbm_network <- function(sbm, n_blocks = NULL){
   attr(sbm, 'model')$initialize_blocks(as.integer(n_blocks))
 
   # Update state attribute
-  attr(sbm, "state") <- attr(sbm, 'model')$get_state()
+  attr(sbm, "state") <- attr(sbm, 'model')$state()
 
   sbm
 }

@@ -22,14 +22,14 @@ n_blocks(network)
 visualize_network(network, node_color_col = 'block', node_shape_col = 'type')
 
 pre_mode_address <- lobstr::obj_addr(attr(sbm_net, 'model'))
-pre_sweep_state <- attr(sbm_net, 'model')$get_state()
+pre_sweep_state <- attr(sbm_net, 'model')$state()
 pre_sweep_attr_state <- attr(sbm_net, 'state')
 mcmc_results <- sbm_net %>% mcmc_sweep(num_sweeps = 25)
 # Load up returned sbm_network from results
 sbm_net <- mcmc_results$sbm_network
 
 post_mode_address <- lobstr::obj_addr(attr(sbm_net, 'model'))
-post_sweep_state <- attr(sbm_net, 'model')$get_state()
+post_sweep_state <- attr(sbm_net, 'model')$state()
 post_sweep_attr_state <- attr(sbm_net, 'state')
 
 dplyr::all_equal(pre_sweep_attr_state,

@@ -76,9 +76,9 @@ Other modeling:
 \code{\link{choose_best_collapse_state}()},
 \code{\link{collapse_blocks}()},
 \code{\link{entropy}()},
-\code{\link{get_state}()},
 \code{\link{interblock_edge_counts}()},
 \code{\link{mcmc_sweep}()},
-\code{\link{n_blocks}()}
+\code{\link{n_blocks}()},
+\code{\link{state}()}
 }
 \concept{modeling}

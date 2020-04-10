@@ -132,7 +132,7 @@ test_that("Randomly initializing blocks in network", {
     initialize_blocks() %>%
     initialize_blocks()
 
-  model_state <- get_state(net)
+  model_state <- state(net)
 
   # There should now be 10 total nodes in state
   expect_equal(nrow(model_state), 10)

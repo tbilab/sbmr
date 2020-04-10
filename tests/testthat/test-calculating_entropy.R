@@ -7,7 +7,7 @@ test_that("computing entropy", {
 
   first_entropy <- net %>% entropy()
 
-  start_state <- get_state(net)
+  start_state <- state(net)
 
   # Choose random node
   random_node <- start_state %>%

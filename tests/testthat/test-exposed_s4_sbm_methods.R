@@ -92,7 +92,7 @@ test_that("State loading and saving works", {
 
   # Start with a random state of three nodes
   sbm$initialize_blocks(3)
-  three_block_state <- sbm$get_state()
+  three_block_state <- sbm$state()
 
   # Reset the state and make a random state with every block in its own node
   sbm$reset_blocks()
@@ -100,7 +100,7 @@ test_that("State loading and saving works", {
 
   # Make sure the three block state does not equal the latest state
   expect_false(
-    isTRUE(dplyr::all_equal(sbm$get_state(), three_block_state))
+    isTRUE(dplyr::all_equal(sbm$state(), three_block_state))
   )
 
   # Now reset the state to the three block state
@@ -111,7 +111,7 @@ test_that("State loading and saving works", {
 
   # Now the state of the network should match the old three block state
   expect_true(
-    isTRUE(dplyr::all_equal(sbm$get_state(), three_block_state))
+    isTRUE(dplyr::all_equal(sbm$state(), three_block_state))
   )
 
 })
@@ -140,7 +140,7 @@ test_that("Interblock edge counts", {
   # Give each node their own block
   sbm$initialize_blocks(-1)
 
-  sbm_state <- sbm$get_state()
+  sbm_state <- sbm$state()
 
   # Note blocks for a1 and b1
   a1_block <- sbm_state$parent[sbm_state$id == "a1"]

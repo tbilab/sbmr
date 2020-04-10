@@ -33,7 +33,7 @@ net <- sim_random_network(n_nodes = 5, prob_of_edge = 1, setup_model = TRUE)
 
 # Verify nodes
 net$nodes
-net \%>\% get_state()
+net \%>\% state()
 
 # Add two nodes
 net <- net \%>\%
@@ -42,7 +42,7 @@ net <- net \%>\%
 
 # New nodes are added to node data and state
 net$nodes
-net \%>\% get_state()
+net \%>\% state()
 
 }
 \seealso{

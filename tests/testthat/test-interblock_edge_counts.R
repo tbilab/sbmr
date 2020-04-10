@@ -6,7 +6,7 @@ test_that("Correct edge counts returned", {
   total_num_edges <- attr(net, 'n_edges')
 
   # Get ids of all the nodes and blocks generated
-  sbm_state <- get_state(net)
+  sbm_state <- state(net)
   node_ids <- sbm_state$id
   block_ids <- sbm_state$parent %>% unique()
 

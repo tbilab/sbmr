@@ -174,7 +174,7 @@ Since we have the true groups for our nodes we can check to see how well the mer
 
 ```{r state-to-truth-1}
 state_to_truth_table <- function(net){
-  right_join(get_state(net),
+  right_join(state(net),
              net$nodes,
              by = 'id') %>% 
     filter(level == 0) %>%

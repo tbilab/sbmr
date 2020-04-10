@@ -31,21 +31,21 @@
 #' # A small simulated network with no blocks
 #' net <- new_sbm_network(edges)
 #'
-#' get_state(net)
+#' state(net)
 #'
 #' # Add some blocks and state will reflect
-#' net %>% initialize_blocks(2) %>% get_state()
+#' net %>% initialize_blocks(2) %>% state()
 #'
-get_state <- function(sbm){
-  UseMethod("get_state")
+state <- function(sbm){
+  UseMethod("state")
 }
 
-get_state.default <- function(sbm){
-  cat("get_state generic")
+state.default <- function(sbm){
+  cat("state generic")
 }
 
 #' @export
-get_state.sbm_network <- function(sbm){
+state.sbm_network <- function(sbm){
   # Grab state from attribute and then swap in the string types
   attr(verify_model(sbm), 'state')
 }

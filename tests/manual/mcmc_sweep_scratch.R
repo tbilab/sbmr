@@ -35,7 +35,7 @@ sweep_results$sweep_info %>%
     geom_point() +
     facet_grid(name~., scales = "free_y")
 
-nodes_w_assignments <- get_state(my_sbm) %>%
+nodes_w_assignments <- state(my_sbm) %>%
   filter(level == 0) %>%
   right_join(network$nodes, by = 'id')%>%
   rename(inferred = parent)
@@ -131,7 +131,7 @@ my_sbm %>% entropy()
 #   geom_hline(yintercept = true_final_entropy)
 #
 #
-# node_states <- get_state(my_sbm) %>%
+# node_states <- state(my_sbm) %>%
 #   filter(level == 0)
 #
 # node_states %>%

@@ -22,7 +22,7 @@
 #'
 #' # Verify nodes
 #' net$nodes
-#' net %>% get_state()
+#' net %>% state()
 #'
 #' # Add two nodes
 #' net <- net %>%
@@ -31,7 +31,7 @@
 #'
 #' # New nodes are added to node data and state
 #' net$nodes
-#' net %>% get_state()
+#' net %>% state()
 #'
 add_node <- function(sbm, id, type = NULL, show_messages = TRUE){
   UseMethod("add_node")

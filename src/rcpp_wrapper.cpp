@@ -191,7 +191,7 @@ RCPP_MODULE(SBM)
                     "How many edges are in the network?")
       .const_method("block_counts", &SBM::block_counts,
                     "Gets dataframe of counts of blocks by type.")
-      .const_method("get_state", &SBM::state,
+      .const_method("state", &SBM::state,
                     "Exports the current state of the network as dataframe with each node as a row and columns for node id, parent id, node type, and node level.")
       .const_method("interblock_edge_counts", &SBM::interblock_edge_counts,
                     "Get dataframe of counts of edges between all unique pairs of blocks in network")
@@ -210,7 +210,7 @@ RCPP_MODULE(SBM)
       .method("reset_blocks", &SBM::reset_blocks,
               "Erases all block levels in network.")
       .method("update_state", &SBM::update_state,
-              "Takes model state export as given by SBM$get_state() and returns model to specified state. This is useful for resetting model before running various algorithms such as agglomerative merging.")
+              "Takes model state export as given by SBM$state() and returns model to specified state. This is useful for resetting model before running various algorithms such as agglomerative merging.")
       .method("mcmc_sweep", &SBM::mcmc_sweep,
               "Runs a single MCMC sweep across all nodes at specified level. Each node is given a chance to move blocks or stay in current block and all nodes are processed in random order. Takes the level that the sweep should take place on (int) and if new blocks blocks can be proposed and empty blocks removed (boolean).")
       .method("collapse_blocks", &SBM::collapse_blocks,

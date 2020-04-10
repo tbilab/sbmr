@@ -111,7 +111,7 @@ visualize_collapse_results(collapse_results, heuristic = "delta_ratio") +
 my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, heuristic =function(e,b){as.numeric(b == n_blocks)}, verbose = TRUE)
 
 my_sbm %>%
-  get_state() %>%
+  state() %>%
   filter(level == 0) %>%
   right_join(network$nodes, by = 'id')%>%
   rename(inferred = parent) %>% {
@@ -156,7 +156,7 @@ collapse_results %>%
 my_sbm <- choose_best_collapse_state(my_sbm, collapse_results, heuristic =function(e,b){as.numeric(b == n_blocks)}, verbose = TRUE)
 
 nodes_w_assignments <- my_sbm %>%
-  get_state() %>%
+  state() %>%
   filter(level == 0) %>%
   right_join(network$nodes, by = 'id')%>%
   rename(inferred = parent)
@@ -199,7 +199,7 @@ sweep_results$sweep_info %>%
   )
 #
 # my_sbm %>%
-#   get_state() %>%
+#   state() %>%
 #   filter(level == 0) %>%
 #   right_join(network$nodes, by = 'id')%>%
 #   rename(inferred = parent) %>%

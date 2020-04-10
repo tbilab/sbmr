@@ -46,8 +46,8 @@ Other modeling:
 \code{\link{collapse_blocks}()},
 \code{\link{collapse_run}()},
 \code{\link{entropy}()},
-\code{\link{get_state}()},
 \code{\link{interblock_edge_counts}()},
-\code{\link{mcmc_sweep}()}
+\code{\link{mcmc_sweep}()},
+\code{\link{state}()}
 }
 \concept{modeling}

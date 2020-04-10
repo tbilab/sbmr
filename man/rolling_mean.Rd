@@ -44,7 +44,7 @@ plot(rolled_mean_window_5)
 \seealso{
 Other helpers: 
 \code{\link{build_score_fn}()},
-\code{\link{get_combination_indices}()},
+\code{\link{combination_indices}()},
 \code{\link{get_sweep_pair_counts}()},
 \code{\link{get_sweep_results}()},
 \code{\link{print.sbm_network}()},

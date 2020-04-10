@@ -26,7 +26,7 @@ test_that("State tracking returns the correct state", {
   net <- new_sbm_network(edges = edges, nodes = nodes, random_seed = 42)
 
   #  Cant get a state with no nodes initialized yet
-  expect_error(attr(net, 'model')$get_state(),
+  expect_error(attr(net, 'model')$state(),
                "No state to export - Try adding blocks",
                fixed = TRUE)
 
@@ -34,7 +34,7 @@ test_that("State tracking returns the correct state", {
 
   # After initializing blocks, we can get state however,
   expect_equal(
-    dplyr::as_tibble(attr(net, 'model')$get_state()),
+    dplyr::as_tibble(attr(net, 'model')$state()),
     dplyr::tribble(
        ~id,   ~type,     ~parent, ~level,
       "a1",  "node", "bl_node_0",     0L,
@@ -47,7 +47,7 @@ test_that("State tracking returns the correct state", {
     )
   )
   # The state attribute of the s3 class should also have updated
-  expect_equal(attr(net, 'model')$get_state(), attr(net, 'state'))
+  expect_equal(attr(net, 'model')$state(), attr(net, 'state'))
 })
 
 
@@ -95,7 +95,7 @@ test_that("State updating method", {
 
   # Now the states should be identical
   expect_true( dplyr::all_equal(new_state, attr(net, 'state')))
-  expect_true( dplyr::all_equal(new_state, attr(net, 'model')$get_state()))
+  expect_true( dplyr::all_equal(new_state, attr(net, 'model')$state()))
 })
 
 

@@ -108,7 +108,7 @@ We can investigate the structure of this chosen partitioning against the true st
 
 ```{r extract_infered_blocks}
 true_to_inferred_table <- function(network){
-  right_join(get_state(network),
+  right_join(state(network),
              network$nodes,
              by = 'id') %>% 
     filter(level == 0) %>%
