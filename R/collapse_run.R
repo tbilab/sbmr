@@ -43,15 +43,6 @@ collapse_run <- function(sbm,
   UseMethod("collapse_run")
 }
 
-collapse_run.default <- function(sbm,
-                                 num_final_blocks = 1:10,
-                                 num_mcmc_sweeps = 10,
-                                 sigma = 2,
-                                 eps = 0.1,
-                                 num_block_proposals = 5,
-                                 parallel = FALSE){
-  cat("collapse_run generic")
-}
 
 #' @export
 collapse_run.sbm_network <- function(sbm,
@@ -83,17 +74,14 @@ collapse_run.sbm_network <- function(sbm,
       num_final_blocks,
       function(desired_num){
         # Initialize model and make sure to not warn about cached model and random seeds if present
-        model <- verify_model(sbm, warn_about_random_seed = FALSE) %>%
+        verify_model(sbm, warn_about_random_seed = FALSE) %>%
           collapse_blocks(desired_n_blocks = desired_num,
                           sigma = sigma,
                           eps = eps,
                           report_all_steps = FALSE,
                           num_block_proposals = num_block_proposals,
-                          num_mcmc_sweeps = num_mcmc_sweeps)
-
-        model %>%
-          get_collapse_results() %>%
-          dplyr::mutate(final_entropy = entropy(model))
+                          num_mcmc_sweeps = num_mcmc_sweeps) %>%
+          get_collapse_results()
       }
     )
 
