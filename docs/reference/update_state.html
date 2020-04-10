@@ -95,6 +95,9 @@
       <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
     <li>
+      <a href="../articles/bipartite_networks.html">bipartite_networks</a>
+    </li>
+    <li>
       <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
     </li>
   </ul>
@@ -121,7 +124,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Update SBM model state</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/update_state.R'><code>R/update_state.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/model__update_state.R'><code>R/model__update_state.R</code></a></small>
     <div class="hidden name"><code>update_state.Rd</code></div>
     </div>
 
@@ -154,8 +157,7 @@
 <code><a href='add_edge.html'>add_edge</a>()</code>,
 <code><a href='add_node.html'>add_node</a>()</code>,
 <code><a href='get_node_to_block_edge_counts.html'>get_node_to_block_edge_counts</a>()</code>,
-<code><a href='initialize_blocks.html'>initialize_blocks</a>()</code>,
-<code><a href='set_node_parent.html'>set_node_parent</a>()</code></p></div>
+<code><a href='initialize_blocks.html'>initialize_blocks</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
@@ -196,7 +198,7 @@
 <span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='new_sbm_network.html'>new_sbm_network</a></span>(<span class='kw'>edges</span> <span class='kw'>=</span> <span class='no'>edges</span>, <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='no'>nodes</span>)
 
 <span class='co'># before updating state the state should not equal the desired new state</span>
-<span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/all_equal.html'>all_equal</a></span>(<span class='no'>new_state</span>, <span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span>(<span class='no'>net</span>, <span class='st'>'state'</span>))</div><div class='output co'>#&gt; [1] "Different number of rows"</div><div class='input'><span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/all_equal.html'>all_equal</a></span>(<span class='no'>new_state</span>, <span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span>(<span class='no'>net</span>, <span class='st'>'model'</span>)$<span class='fu'><a href='get_state.html'>get_state</a></span>())</div><div class='output co'>#&gt; [1] "Different number of rows"</div><div class='input'>
+<span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/all_equal.html'>all_equal</a></span>(<span class='no'>new_state</span>, <span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span>(<span class='no'>net</span>, <span class='st'>'state'</span>))</div><div class='output co'>#&gt; [1] "Cols in x but not y: `level`, `type`, `parent`, `id`. "</div><div class='input'><span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/all_equal.html'>all_equal</a></span>(<span class='no'>new_state</span>, <span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span>(<span class='no'>net</span>, <span class='st'>'model'</span>)$<span class='fu'><a href='get_state.html'>get_state</a></span>())</div><div class='output co'>#&gt; <span class='error'>Error: No state to export - Try adding blocks</span></div><div class='input'>
 <span class='co'># Update state using update_state() method</span>
 <span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'>update_state</span>(<span class='no'>new_state</span>)
 

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot network of nodes connected by pairwise block propensity — visualize_propensity_network • sbmR</title>
+<title>Flower and pollinators network — clements_pollinators • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,10 +35,10 @@
 
 
 
-<meta property="og:title" content="Plot network of nodes connected by pairwise block propensity — visualize_propensity_network" />
-<meta property="og:description" content="Takes the results of mcmc_sweep() with track_pairs = TRUE and plots the
-data as a network where two nodes have an edge between them if their pairwise
-propensity to be in the same block is above some threshold." />
+<meta property="og:title" content="Flower and pollinators network — clements_pollinators" />
+<meta property="og:description" content="Tidy dataset of pollinator-flower network from the 1923 paper &quot;Experimental
+pollination. An outline of the ecology of flowers and insects.&quot;, by Clements,
+R. E., and F. L. Long." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -125,69 +125,50 @@ propensity to be in the same block is above some threshold." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot network of nodes connected by pairwise block propensity</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/visualize_propensity_network.R'><code>R/visualize_propensity_network.R</code></a></small>
-    <div class="hidden name"><code>visualize_propensity_network.Rd</code></div>
+    <h1>Flower and pollinators network</h1>
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/datasets_documentation.R'><code>R/datasets_documentation.R</code></a></small>
+    <div class="hidden name"><code>clements_pollinators.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Takes the results of <code><a href='mcmc_sweep.html'>mcmc_sweep()</a></code> with <code>track_pairs = TRUE</code> and plots the
-data as a network where two nodes have an edge between them if their pairwise
-propensity to be in the same block is above some threshold.</p>
+    <p>Tidy dataset of pollinator-flower network from the 1923 paper "Experimental
+pollination. An outline of the ecology of flowers and insects.", by Clements,
+R. E., and F. L. Long.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>visualize_propensity_network</span>(
-  <span class='no'>sbm</span>,
-  <span class='kw'>proportion_threshold</span> <span class='kw'>=</span> <span class='fl'>0.2</span>,
-  <span class='kw'>isolate_type</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+    <pre class="usage"><span class='no'>clements_pollinators</span></pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>sbm</th>
-      <td><p>Object of class <code>sbm_network</code>.</p></td>
-    </tr>
-    <tr>
-      <th>proportion_threshold</th>
-      <td><p>Threshold of pairwise propensity to consider two nodes linked. Choose carefully!</p></td>
-    </tr>
-    <tr>
-      <th>isolate_type</th>
-      <td><p>Node type to be isolated for visualization. If left empty all types are included.</p></td>
-    </tr>
-    </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>An interactive network plot with force layout.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+    <p>A edge data frame with 2 columns and 923 rows:</p><dl class='dl-horizontal'>
+<dt>pollinator</dt><dd><p>Scientific name in genus-species format of pollinating
+animal</p></dd>
+<dt>flower</dt><dd><p>Scientific name of the flower that the pollinator visited</p></dd>
 
-    <div class='dont-index'><p>Other visualizations: 
-<code><a href='visualize_collapse_results.html'>visualize_collapse_results</a>()</code>,
-<code><a href='visualize_mcmc_trace.html'>visualize_mcmc_trace</a>()</code>,
-<code><a href='visualize_network.html'>visualize_network</a>()</code>,
-<code><a href='visualize_propensity_dist.html'>visualize_propensity_dist</a>()</code></p></div>
+</dl>
+    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
-<span class='co'># Simulate network data and initialize model with it</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>30</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='collapse_blocks.html'>collapse_blocks</a></span>(<span class='kw'>desired_n_blocks</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>1.1</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a></span>(<span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='mcmc_sweep.html'>mcmc_sweep</a></span>(<span class='kw'>num_sweeps</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>eps</span> <span class='kw'>=</span> <span class='fl'>0.4</span>, <span class='kw'>track_pairs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 7.6085.</div><div class='input'>
-<span class='co'># Plot connection propensity network</span>
-<span class='fu'>visualize_propensity_network</span>(<span class='no'>net</span>, <span class='kw'>proportion_threshold</span> <span class='kw'>=</span> <span class='fl'>0.4</span>)</div></pre>
+    <p><a href='https://www.nceas.ucsb.edu/interactionweb/html/clements_1923.html'>Interaction Web DataBase
+entry:</a></p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>From the <a href='https://www.nceas.ucsb.edu/interactionweb/html/clements_1923.html'>Interaction Web DataBase
+entry:</a>
+"The study took place on Pikes Peak in Colorado, U.S.A., in the early 1920's.
+The authors recorded the identities of flower visitors to 94 native and two
+exotic plant species."</p>
+<p>Original data for network was downloaded from
+<a href='https://www.nceas.ucsb.edu/interactionweb/html/clements_1923.html'>https://www.nceas.ucsb.edu/interactionweb/html/clements_1923.html</a> on
+February 18, 2020</p>
+
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#see-also">See also</a></li>
-      <li><a href="#examples">Examples</a></li>
+      <li><a href="#format">Format</a></li>
+      <li><a href="#source">Source</a></li>
+      <li><a href="#details">Details</a></li>
     </ul>
 
   </div>

@@ -97,6 +97,9 @@ each merger step according to the heuristic provided is also shown." />
       <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
     <li>
+      <a href="../articles/bipartite_networks.html">bipartite_networks</a>
+    </li>
+    <li>
       <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
     </li>
   </ul>
@@ -133,11 +136,7 @@ each merger step according to the heuristic provided is also shown." />
 each merger step according to the heuristic provided is also shown.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>visualize_collapse_results</span>(
-  <span class='no'>sbm</span>,
-  <span class='kw'>use_entropy_value_for_score</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+    <pre class="usage"><span class='fu'>visualize_collapse_results</span>(<span class='no'>sbm</span>, <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>use_entropy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -147,18 +146,19 @@ each merger step according to the heuristic provided is also shown.</p>
       <td><p>Object of class <code>sbm_network</code>.</p></td>
     </tr>
     <tr>
-      <th>use_entropy_value_for_score</th>
-      <td><p>If set to <code>TRUE</code> then instead of the merge
-results entropy delta being used for the score function the entropy will
-be. Typically the heuristics work better on entropy delta values.</p></td>
-    </tr>
-    <tr>
       <th>heuristic</th>
       <td><p>How the best partitioning is defined. Takes either a
 function that takes one/two arguments: an entropy vector and an optional
 number of blocks vector with each element corresponding to a given
 location, or a string labeling algorithm. Currently only <code>"lowest"</code>,
 <code>"dev_from_rolling_mean"</code>, <code>"delta_ratio"</code>, <code>"trend_deviation"</code>, and <code>"nls_residual"</code> are supported.</p></td>
+    </tr>
+    <tr>
+      <th>use_entropy</th>
+      <td><p>Should the score be calculated with the entropy of the
+collapse? If <code>FALSE</code>, the entropy delta will be used. The full entropy is
+needed to make comparisons across separate collapses in the case of
+<code><a href='collapse_run.html'>collapse_run</a></code>.</p></td>
     </tr>
     </table>
 

@@ -96,6 +96,9 @@ mcmc_sweep run on the object before." />
       <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
     <li>
+      <a href="../articles/bipartite_networks.html">bipartite_networks</a>
+    </li>
+    <li>
       <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
     </li>
   </ul>
@@ -159,28 +162,29 @@ mcmc_sweep run on the object before." />
     <pre class="examples"><div class='input'>
 <span class='co'># Start with a small random network</span>
 <span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>15</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='kw'>num_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='mcmc_sweep.html'>mcmc_sweep</a></span>(<span class='kw'>num_sweeps</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>variable_num_blocks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+  <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='mcmc_sweep.html'>mcmc_sweep</a></span>(<span class='kw'>num_sweeps</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>variable_n_blocks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># Retrieve the sweep results from network</span>
 <span class='fu'>get_sweep_results</span>(<span class='no'>net</span>)</div><div class='output co'>#&gt; $nodes_moved
-#&gt;  [1] "g1_10" "g2_11" "g2_1"  "g2_13" "g3_3"  "g1_14" "g2_2"  "g1_12" "g3_12"
-#&gt; [10] "g1_8"  "g2_14" "g3_8"  "g2_8"  "g1_2"  "g1_4"  "g3_1"  "g2_15" "g1_1" 
-#&gt; [19] "g2_4"  "g3_2"  "g1_5"  "g1_15" "g1_15" "g2_15" "g1_7"  "g2_5"  "g1_1" 
-#&gt; [28] "g2_12" "g2_1"  "g2_3"  "g2_14" "g3_7"  "g2_10" "g3_2"  "g3_3"  "g1_8" 
-#&gt; [37] "g1_2"  "g1_4"  "g3_5"  "g1_6"  "g1_13" "g1_3"  "g1_9"  "g3_6"  "g2_11"
-#&gt; [46] "g3_9"  "g2_4"  "g3_9"  "g3_4"  "g3_1"  "g1_9"  "g2_13" "g3_5"  "g1_15"
-#&gt; [55] "g1_3"  "g3_7"  "g1_1"  "g2_14" "g2_4"  "g2_8"  "g2_10" "g2_11" "g1_4" 
-#&gt; [64] "g3_11" "g2_3"  "g2_12" "g2_7"  "g1_15" "g1_4"  "g3_7"  "g2_5"  "g1_5" 
-#&gt; [73] "g3_5"  "g1_12" "g1_11" "g3_4"  "g3_2"  "g3_6"  "g1_2"  "g2_13" "g1_1" 
-#&gt; [82] "g1_8" 
+#&gt;  [1] "g3_12" "g3_15" "g1_1"  "g1_11" "g2_9"  "g1_9"  "g3_2"  "g3_3"  "g3_9" 
+#&gt; [10] "g2_13" "g3_13" "g1_7"  "g3_6"  "g2_8"  "g3_8"  "g3_1"  "g1_14" "g2_2" 
+#&gt; [19] "g2_11" "g1_6"  "g1_13" "g1_7"  "g2_2"  "g2_1"  "g2_7"  "g2_13" "g3_6" 
+#&gt; [28] "g3_14" "g1_4"  "g3_12" "g3_13" "g3_5"  "g3_1"  "g1_2"  "g1_10" "g3_2" 
+#&gt; [37] "g3_4"  "g2_4"  "g3_8"  "g3_11" "g1_1"  "g2_5"  "g2_15" "g1_14" "g1_15"
+#&gt; [46] "g3_5"  "g2_3"  "g2_6"  "g1_3"  "g1_14" "g1_12" "g1_11" "g2_12" "g3_6" 
+#&gt; [55] "g2_8"  "g2_4"  "g3_4"  "g1_8"  "g2_5"  "g2_13" "g1_2"  "g2_2"  "g1_7" 
+#&gt; [64] "g2_14" "g2_1"  "g2_7"  "g3_3"  "g3_12" "g3_14" "g2_1"  "g2_2"  "g3_6" 
+#&gt; [73] "g1_11" "g1_7"  "g2_3"  "g1_2"  "g2_7"  "g2_5"  "g3_12" "g1_9"  "g2_9" 
+#&gt; [82] "g1_4"  "g3_3"  "g2_6"  "g1_1"  "g3_11" "g1_5"  "g3_7"  "g3_10" "g2_12"
+#&gt; [91] "g3_2" 
 #&gt; 
 #&gt; $sweep_info
-#&gt;   entropy_delta num_nodes_moved
-#&gt; 1    -1.1917674              22
-#&gt; 2    -4.9070218              25
-#&gt; 3    -0.7144661              18
-#&gt; 4     1.3216878              17
+#&gt;   entropy_delta n_nodes_moved
+#&gt; 1    -0.5739624            21
+#&gt; 2     3.5852515            24
+#&gt; 3    -1.6969199            23
+#&gt; 4    -3.7616366            23
 #&gt; </div><div class='input'>
 </div></pre>
   </div>

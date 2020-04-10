@@ -68,7 +68,7 @@ net \%>\% get_collapse_results()
 net \%>\% visualize_collapse_results()
 
 # We can choose best result with default heuristic
-net <- choose_best_collapse_state(net, verbose = TRUE)
+net <- choose_best_collapse_state(net, verbose = TRUE, use_entropy = TRUE)
 
 }
 \seealso{

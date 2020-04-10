@@ -100,6 +100,9 @@ average of a 50% chance of edge." />
       <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
     <li>
+      <a href="../articles/bipartite_networks.html">bipartite_networks</a>
+    </li>
+    <li>
       <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
     </li>
   </ul>
@@ -228,71 +231,71 @@ randomly drawn edge propensities between blocks.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'>sim_basic_block_network</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>40</span>)</div><div class='output co'>#&gt; SBM Network with 160 nodes of a single type and 9902 edges. 
+<span class='fu'>sim_basic_block_network</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>40</span>)</div><div class='output co'>#&gt; SBM Network with 160 nodes of a single type and 5187 edges. 
 #&gt;  
-#&gt; Nodes: <span style='color: #555555;'># A tibble: 6 x 3</span><span>
+#&gt; Nodes: <span style='color: #949494;'># A tibble: 6 x 3</span><span>
 #&gt;   id    block type 
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1    node 
-#&gt; </span><span style='color: #555555;'>2</span><span> g1_2  g1    node 
-#&gt; </span><span style='color: #555555;'>3</span><span> g1_3  g1    node 
-#&gt; </span><span style='color: #555555;'>4</span><span> g1_4  g1    node 
-#&gt; </span><span style='color: #555555;'>5</span><span> g1_5  g1    node 
-#&gt; </span><span style='color: #555555;'>6</span><span> g1_6  g1    node 
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> g1_1  g1    node 
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> g1_2  g1    node 
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> g1_3  g1    node 
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> g1_4  g1    node 
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> g1_5  g1    node 
+#&gt; </span><span style='color: #BCBCBC;'>6</span><span> g1_6  g1    node 
 #&gt; ... 
 #&gt;  
-#&gt; Edges: </span><span style='color: #555555;'># A tibble: 6 x 2</span><span>
+#&gt; Edges: </span><span style='color: #949494;'># A tibble: 6 x 2</span><span>
 #&gt;   from  to   
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1_3 
-#&gt; </span><span style='color: #555555;'>2</span><span> g1_1  g1_5 
-#&gt; </span><span style='color: #555555;'>3</span><span> g1_1  g1_7 
-#&gt; </span><span style='color: #555555;'>4</span><span> g1_1  g1_8 
-#&gt; </span><span style='color: #555555;'>5</span><span> g1_1  g1_9 
-#&gt; </span><span style='color: #555555;'>6</span><span> g1_1  g1_10
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> g1_1  g1_5 
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> g1_1  g1_9 
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> g1_1  g1_10
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> g1_1  g1_11
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> g1_1  g1_12
+#&gt; </span><span style='color: #BCBCBC;'>6</span><span> g1_1  g1_14
 #&gt; ... 
 #&gt;  </div><div class='input'>
-<span class='fu'>sim_basic_block_network</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>8</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>20</span>)</div><div class='output co'>#&gt; SBM Network with 160 nodes of a single type and 4092 edges. 
+<span class='fu'>sim_basic_block_network</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>8</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>20</span>)</div><div class='output co'>#&gt; SBM Network with 160 nodes of a single type and 7249 edges. 
 #&gt;  
-#&gt; Nodes: </span><span style='color: #555555;'># A tibble: 6 x 3</span><span>
+#&gt; Nodes: </span><span style='color: #949494;'># A tibble: 6 x 3</span><span>
 #&gt;   id    block type 
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1    node 
-#&gt; </span><span style='color: #555555;'>2</span><span> g1_2  g1    node 
-#&gt; </span><span style='color: #555555;'>3</span><span> g1_3  g1    node 
-#&gt; </span><span style='color: #555555;'>4</span><span> g1_4  g1    node 
-#&gt; </span><span style='color: #555555;'>5</span><span> g1_5  g1    node 
-#&gt; </span><span style='color: #555555;'>6</span><span> g1_6  g1    node 
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> g1_1  g1    node 
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> g1_2  g1    node 
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> g1_3  g1    node 
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> g1_4  g1    node 
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> g1_5  g1    node 
+#&gt; </span><span style='color: #BCBCBC;'>6</span><span> g1_6  g1    node 
 #&gt; ... 
 #&gt;  
-#&gt; Edges: </span><span style='color: #555555;'># A tibble: 6 x 2</span><span>
+#&gt; Edges: </span><span style='color: #949494;'># A tibble: 6 x 2</span><span>
 #&gt;   from  to   
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1_3 
-#&gt; </span><span style='color: #555555;'>2</span><span> g1_1  g1_4 
-#&gt; </span><span style='color: #555555;'>3</span><span> g1_1  g1_5 
-#&gt; </span><span style='color: #555555;'>4</span><span> g1_1  g1_6 
-#&gt; </span><span style='color: #555555;'>5</span><span> g1_1  g1_7 
-#&gt; </span><span style='color: #555555;'>6</span><span> g1_1  g1_9 
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> g1_1  g1_2 
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> g1_1  g1_3 
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> g1_1  g1_4 
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> g1_1  g1_5 
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> g1_1  g1_7 
+#&gt; </span><span style='color: #BCBCBC;'>6</span><span> g1_1  g1_9 
 #&gt; ... 
 #&gt;  </div><div class='input'>
 <span class='co'># Can save the generating edge propensities as well</span>
 <span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'>sim_basic_block_network</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>,
                                <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>20</span>,
                                <span class='kw'>return_edge_propensities</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='no'>net</span>$<span class='no'>edge_propensities</span></div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 10 x 3</span><span>
+<span class='no'>net</span>$<span class='no'>edge_propensities</span></div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 10 x 3</span><span>
 #&gt;    block_1 block_2 propensity
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> g1      g1          0.453 
-#&gt; </span><span style='color: #555555;'> 2</span><span> g1      g2          0.915 
-#&gt; </span><span style='color: #555555;'> 3</span><span> g1      g3          0.268 
-#&gt; </span><span style='color: #555555;'> 4</span><span> g1      g4          0.176 
-#&gt; </span><span style='color: #555555;'> 5</span><span> g2      g2          0.730 
-#&gt; </span><span style='color: #555555;'> 6</span><span> g2      g3          0.823 
-#&gt; </span><span style='color: #555555;'> 7</span><span> g2      g4          0.361 
-#&gt; </span><span style='color: #555555;'> 8</span><span> g3      g3          0.083</span><span style='text-decoration: underline;'>6</span><span>
-#&gt; </span><span style='color: #555555;'> 9</span><span> g3      g4          0.638 
-#&gt; </span><span style='color: #555555;'>10</span><span> g4      g4          0.546 </div><div class='input'>
+#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> g1      g1          0.263 
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> g1      g2          0.888 
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> g1      g3          0.620 
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> g1      g4          0.442 
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> g2      g2          0.352 
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> g2      g3          0.531 
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> g2      g4          0.709 
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> g3      g3          0.084</span><span style='text-decoration: underline;'>7</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> g3      g4          0.174 
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span> g4      g4          0.798 </div><div class='input'>
 
 <span class='no'>right_skewed_beta</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>n</span>) <span class='fu'><a href='https://rdrr.io/r/stats/Beta.html'>rbeta</a></span>(<span class='no'>n</span>, <span class='fl'>1</span>, <span class='fl'>5</span>)
 
@@ -301,19 +304,19 @@ randomly drawn edge propensities between blocks.</p>
                                <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>20</span>,
                                <span class='kw'>return_edge_propensities</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
                                <span class='kw'>propensity_drawer</span> <span class='kw'>=</span> <span class='no'>right_skewed_beta</span>)
-<span class='no'>net</span>$<span class='no'>edge_propensities</span></div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 10 x 3</span><span>
+<span class='no'>net</span>$<span class='no'>edge_propensities</span></div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 10 x 3</span><span>
 #&gt;    block_1 block_2 propensity
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> g1      g1          0.163 
-#&gt; </span><span style='color: #555555;'> 2</span><span> g1      g2          0.398 
-#&gt; </span><span style='color: #555555;'> 3</span><span> g1      g3          0.148 
-#&gt; </span><span style='color: #555555;'> 4</span><span> g1      g4          0.291 
-#&gt; </span><span style='color: #555555;'> 5</span><span> g2      g2          0.147 
-#&gt; </span><span style='color: #555555;'> 6</span><span> g2      g3          0.016</span><span style='text-decoration: underline;'>9</span><span>
-#&gt; </span><span style='color: #555555;'> 7</span><span> g2      g4          0.159 
-#&gt; </span><span style='color: #555555;'> 8</span><span> g3      g3          0.017</span><span style='text-decoration: underline;'>9</span><span>
-#&gt; </span><span style='color: #555555;'> 9</span><span> g3      g4          0.048</span><span style='text-decoration: underline;'>6</span><span>
-#&gt; </span><span style='color: #555555;'>10</span><span> g4      g4          0.446 </div><div class='input'>
+#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> g1      g1          0.163 
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> g1      g2          0.398 
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> g1      g3          0.148 
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> g1      g4          0.291 
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> g2      g2          0.147 
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> g2      g3          0.016</span><span style='text-decoration: underline;'>9</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> g2      g4          0.159 
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> g3      g3          0.017</span><span style='text-decoration: underline;'>9</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> g3      g4          0.048</span><span style='text-decoration: underline;'>6</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span> g4      g4          0.446 </div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

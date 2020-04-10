@@ -97,6 +97,9 @@ block." />
       <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
     <li>
+      <a href="../articles/bipartite_networks.html">bipartite_networks</a>
+    </li>
+    <li>
       <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
     </li>
   </ul>
@@ -163,7 +166,6 @@ block.</p>
 <code><a href='add_edge.html'>add_edge</a>()</code>,
 <code><a href='add_node.html'>add_node</a>()</code>,
 <code><a href='initialize_blocks.html'>initialize_blocks</a>()</code>,
-<code><a href='set_node_parent.html'>set_node_parent</a>()</code>,
 <code><a href='update_state.html'>update_state</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -174,10 +176,7 @@ block.</p>
 
 <span class='co'># Get a random node's edge counts to blocks</span>
 <span class='no'>node_id</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span>(<span class='no'>net</span>$<span class='no'>nodes</span>$<span class='no'>id</span>, <span class='fl'>1</span>)
-<span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'>get_node_to_block_edge_counts</span>(<span class='no'>node_id</span>, <span class='kw'>connection_level</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt;         id count
-#&gt; 1 node-1_0     7
-#&gt; 2 node-1_1     7
-#&gt; 3 node-1_2     5</div><div class='input'>
+<span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'>get_node_to_block_edge_counts</span>(<span class='no'>node_id</span>, <span class='kw'>connection_level</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt; <span class='error'>Error in envRefInferField(x, what, getClass(class(x)), selfEnv): ‘get_node_to_block_edge_counts’ is not a valid field or method name for reference class “Rcpp_SBM”</span></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

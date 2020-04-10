@@ -97,6 +97,9 @@ the same block over the given MCMC sweeps." />
       <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
     <li>
+      <a href="../articles/bipartite_networks.html">bipartite_networks</a>
+    </li>
+    <li>
       <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
     </li>
   </ul>
@@ -133,7 +136,7 @@ empirical CDF of the pairwise probability/proportion of two nodes residing in
 the same block over the given MCMC sweeps.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>visualize_propensity_dist</span>(<span class='no'>sbm</span>)</pre>
+    <pre class="usage"><span class='fu'>visualize_propensity_dist</span>(<span class='no'>sbm</span>, <span class='kw'>isolate_type</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -141,6 +144,10 @@ the same block over the given MCMC sweeps.</p>
     <tr>
       <th>sbm</th>
       <td><p>Object of class <code>sbm_network</code>.</p></td>
+    </tr>
+    <tr>
+      <th>isolate_type</th>
+      <td><p>Node type to be isolated for visualization. If left empty all types are included.</p></td>
     </tr>
     </table>
 
