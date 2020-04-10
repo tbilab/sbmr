@@ -15,8 +15,9 @@
 template <typename T>
 using String_Map = std::unordered_map<string, T>;
 
-using Const_Node_Pair = Ordered_Pair<const Node*>;
-using Edge_Counts     = Ordered_Pair_Int_Map<const Node*>;
+using Const_Node_Pair   = Ordered_Pair<const Node*>;
+using Edge_Counts       = Ordered_Pair_Int_Map<const Node*>;
+using Edge_Counts_by_ID = String_Map<int>;
 
 class State_Dump {
   private:
@@ -80,7 +81,7 @@ enum Partite_Structure {
 
 struct Collapse_Results {
   double entropy_delta = 0; // Will keep track of the overall entropy change from this collapse
-  double final_entropy = 0; 
+  double final_entropy = 0;
   int n_blocks;
   std::vector<Block_Mergers> merge_steps; // Will keep track of results at each step of the merger
   std::vector<State_Dump> states;
@@ -293,6 +294,20 @@ class SBM {
     for (auto& pair_count : counts) pair_count.second /= 2;
 
     return counts;
+  }
+
+  Edge_Counts_by_ID node_to_block_edge_counts(const string& node_id,
+                                              const int block_level = 1) const
+  {
+
+    auto block_counts = get_node_by_id(node_id)->gather_neighbors_at_level(block_level);
+
+    auto block_id_counts = Edge_Counts_by_ID();
+
+    for (const auto& block_count : block_counts) {
+      block_id_counts.emplace(block_count.first->id(), block_count.second);
+    }
+    return block_id_counts;
   }
 
   double entropy(const int level) const

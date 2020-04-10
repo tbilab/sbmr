@@ -18,6 +18,8 @@ template <>
 SEXP wrap(const Edge_Counts&);
 template <>
 SEXP wrap(const Block_Counts&);
+template <>
+SEXP wrap(const Edge_Counts_by_ID&);
 
 // Create and return dump of state as dataframe
 inline DataFrame state_to_df(const State_Dump& state)
@@ -100,6 +102,23 @@ SEXP wrap(const Edge_Counts& edge_counts)
 }
 
 template <>
+SEXP wrap(const Edge_Counts_by_ID& edge_counts)
+{
+  auto block_ids = CharacterVector(edge_counts.size());
+  auto counts    = IntegerVector(edge_counts.size());
+
+  int i = 0;
+  for (const auto& block_count : edge_counts) {
+    block_ids[i] = block_count.first;
+    counts[i]    = block_count.second;
+    i++;
+  }
+
+  return DataFrame::create(_["block"]   = block_ids,
+                           _["n_edges"] = counts);
+}
+
+template <>
 SEXP wrap(const Block_Counts& block_counts)
 {
   return DataFrame::create(_["type_id"]          = block_counts.ids,
@@ -176,6 +195,8 @@ RCPP_MODULE(SBM)
                     "Exports the current state of the network as dataframe with each node as a row and columns for node id, parent id, node type, and node level.")
       .const_method("interblock_edge_counts", &SBM::interblock_edge_counts,
                     "Get dataframe of counts of edges between all unique pairs of blocks in network")
+      .const_method("node_to_block_edge_counts", &SBM::node_to_block_edge_counts,
+                    "Get dataframe of a node's edge counts to blocks at a given level.")
       .const_method("entropy", &SBM::entropy,
                     "Calculate the degree corrected entropy of current model state at desired level")
       .method("add_node", &SBM::add_node_no_ret,

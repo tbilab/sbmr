@@ -176,6 +176,27 @@ test_that("Interblock edge counts", {
 
 })
 
+test_that("Node to block edge counts", {
+
+  sbm <- new_sbm_network(edges, edges_from_column = a_node, edges_to_column = b_node) %>%
+    attr("model")
+
+  # Give each node their own block
+  sbm$initialize_blocks(-1)
+
+  # Get the interblock edge counts
+  # When every block has its own node, each node's results have as many rows as that node has degrees
+  expect_equal(nrow(sbm$node_to_block_edge_counts("a1", 1)), 3)
+  expect_equal(nrow(sbm$node_to_block_edge_counts("a2", 1)), 2)
+  expect_equal(nrow(sbm$node_to_block_edge_counts("a3", 1)), 1)
+
+  expect_equal(nrow(sbm$node_to_block_edge_counts("b1", 1)), 3)
+  expect_equal(nrow(sbm$node_to_block_edge_counts("b2", 1)), 1)
+  expect_equal(nrow(sbm$node_to_block_edge_counts("b3", 1)), 1)
+  expect_equal(nrow(sbm$node_to_block_edge_counts("b4", 1)), 1)
+
+})
+
 test_that("MCMC sweeps, no pair tracking", {
 
   sbm <- new_sbm_network(edges, edges_from_column = a_node, edges_to_column = b_node, bipartite_edges = TRUE) %>%
