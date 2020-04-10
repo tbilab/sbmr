@@ -46,7 +46,7 @@ choose_best_collapse_state.sbm_network <- function(sbm,
                                                    heuristic = 'dev_from_rolling_mean',
                                                    verbose = FALSE){
 
-  best_state <- calculate_collapse_score(sbm, heuristic) %>%
+  best_state <- calculate_collapse_score(sbm, heuristic, remove_state = FALSE) %>%
     dplyr::filter(score == max(score, na.rm = TRUE))
 
   if(verbose){
