@@ -80,6 +80,7 @@ enum Partite_Structure {
 
 struct Collapse_Results {
   double entropy_delta = 0; // Will keep track of the overall entropy change from this collapse
+  double final_entropy = 0; 
   int n_blocks;
   std::vector<Block_Mergers> merge_steps; // Will keep track of results at each step of the merger
   std::vector<State_Dump> states;
@@ -859,6 +860,8 @@ class SBM {
     if (!report_all_steps) {
       results.states.push_back(state());
     }
+    
+    results.final_entropy = entropy(node_level);
 
     return results;
   }

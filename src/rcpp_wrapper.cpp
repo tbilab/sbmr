@@ -110,30 +110,41 @@ SEXP wrap(const Block_Counts& block_counts)
 template <>
 SEXP wrap(const Collapse_Results& collapse_results)
 {
-  const int n_steps = collapse_results.merge_steps.size();
+  const int n_steps             = collapse_results.states.size();
+  const bool all_steps_reported = collapse_results.merge_steps.size() != 0;
 
-  const bool just_final_result = n_steps == 0;
+  List results = List::create(_["entropy_delta"] = collapse_results.entropy_delta,
+                              _["final_entropy"] = collapse_results.final_entropy,
+                              _["n_blocks"]      = collapse_results.n_blocks);
 
-  if (just_final_result) {
-    return List::create(_["entropy_delta"] = collapse_results.entropy_delta,
-                        _["state"]         = state_to_df(collapse_results.states[0]),
-                        _["n_blocks"]      = collapse_results.n_blocks);
-  }
-
-  List entropy_results(n_steps);
-
+  auto step_states = List(n_steps);
   for (int i = 0; i < n_steps; i++) {
+    step_states[i] = state_to_df(collapse_results.states[i]);
+  }
+  results["step_states"] = step_states;
 
-    const auto& step = collapse_results.merge_steps[i];
+  if (all_steps_reported) {
+    auto step_merges    = List(n_steps);
+    auto entropy_deltas = NumericVector(n_steps);
+    auto n_blocks       = IntegerVector(n_steps);
 
-    entropy_results[i] = List::create(_["entropy_delta"] = step.entropy_delta,
-                                      _["merge_from"]    = step.merge_from,
-                                      _["merge_into"]    = step.merge_into,
-                                      _["state"]         = state_to_df(collapse_results.states[i]),
-                                      _["n_blocks"]      = step.n_blocks);
+    for (int i = 0; i < n_steps; i++) {
+      const auto& step = collapse_results.merge_steps[i];
+
+      entropy_deltas[i] = step.entropy_delta;
+      n_blocks[i]       = step.n_blocks;
+
+      step_merges[i] = DataFrame::create(_["from"] = step.merge_from,
+                                         _["into"] = step.merge_into);
+    }
+
+    results["step_info"] = DataFrame::create(_["n_blocks"]      = n_blocks,
+                                             _["entropy_delta"] = entropy_deltas);
+
+    results["step_merges"] = step_merges;
   }
 
-  return entropy_results;
+  return results;
 }
 
 } // End RCPP namespace
