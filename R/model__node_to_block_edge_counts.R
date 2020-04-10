@@ -7,7 +7,6 @@
 #' @family advanced
 #'
 #' @seealso \code{\link{get_block_edge_counts}}
-#' @inheritParams add_node
 #' @param node_id String identifying the node that edge counts are desired for
 #' @param connection_level Level of blocks to get connections to. E.g. `1` = node block level, `0` = connections to other nodes.
 #'
@@ -22,29 +21,18 @@
 #'
 #' # Get a random node's edge counts to blocks
 #' node_id <- sample(net$nodes$id, 1)
-#' net %>% get_node_to_block_edge_counts(node_id, connection_level = 1)
+#' net %>% node_to_block_edge_counts(node_id, connection_level = 1)
 #'
-get_node_to_block_edge_counts <- function(sbm, node_id, connection_level = 1L){
-  UseMethod("get_node_to_block_edge_counts")
+node_to_block_edge_counts <- function(sbm, node_id, connection_level = 1L){
+  UseMethod("node_to_block_edge_counts")
 }
 
-get_node_to_block_edge_counts.default <- function(sbm, node_id, connection_level = 1L){
-  cat("get_node_to_block_edge_counts generic")
-}
 
 #' @export
-get_node_to_block_edge_counts.sbm_network <- function(sbm, node_id, connection_level = 1L){
-
-  # Grab level of the node requested for connections.
-  node_level <- get_state(sbm) %>%
-    dplyr::filter(id == node_id) %>%
-    dplyr::pull(level) %>%
-    as.integer()
+node_to_block_edge_counts.sbm_network <- function(sbm, node_id, connection_level = 1L){
 
   # Call the exported method from the rcpp wrapper class.
-  attr(verify_model(sbm), 'model')$get_node_to_block_edge_counts(node_id,
-                                                                 node_level,
-                                                                 as.integer(connection_level))
+  attr(verify_model(sbm), 'model')$node_to_block_edge_counts(node_id, as.integer(connection_level))
 }
 
 utils::globalVariables(c("id", "level"))
