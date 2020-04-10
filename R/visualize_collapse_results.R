@@ -11,6 +11,7 @@
 #' @family visualizations
 #'
 #' @inheritParams verify_model
+#' @inheritParams calculate_collapse_score
 #' @inheritParams build_score_fn
 #'
 #' @return GGplot object comparing the fit results and each step's deviance from
@@ -46,15 +47,15 @@
 #'
 #' visualize_collapse_results(net, heuristic = nls_score)
 #'
-visualize_collapse_results <- function(sbm, heuristic = NULL){
+visualize_collapse_results <- function(sbm, heuristic = NULL, use_entropy = FALSE){
   UseMethod("visualize_collapse_results")
 }
 
 
 #' @export
-visualize_collapse_results.sbm_network <- function(sbm, heuristic = NULL){
+visualize_collapse_results.sbm_network <- function(sbm, heuristic = NULL, use_entropy = FALSE){
 
-  calculate_collapse_score(sbm, heuristic) %>%
+  calculate_collapse_score(sbm, heuristic = heuristic, use_entropy = use_entropy) %>%
     tidyr::pivot_longer(-n_blocks) %>%
     dplyr::mutate(name = stringr::str_replace_all(name, "_", " ")) %>%
     ggplot2::ggplot(ggplot2::aes(x = n_blocks, y = value)) +

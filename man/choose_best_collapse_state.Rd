@@ -7,6 +7,7 @@
 choose_best_collapse_state(
   sbm,
   heuristic = "dev_from_rolling_mean",
+  use_entropy = FALSE,
   verbose = FALSE
 )
 }
@@ -19,6 +20,11 @@ function that takes one/two arguments: an entropy vector and an optional
 number of blocks vector with each element corresponding to a given
 location, or a string labeling algorithm. Currently only \code{"lowest"},
 \code{"dev_from_rolling_mean"}, \code{"delta_ratio"}, \code{"trend_deviation"}, and \code{"nls_residual"} are supported.}
+
+\item{use_entropy}{Should the score be calculated with the entropy of the
+collapse? If \code{FALSE}, the entropy delta will be used. The full entropy is
+needed to make comparisons across separate collapses in the case of
+\code{\link{collapse_run}}.}
 
 \item{verbose}{Should model tell you what step was chosen (\code{TRUE} or
 \code{FALSE})?}

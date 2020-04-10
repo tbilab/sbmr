@@ -4,7 +4,12 @@
 \alias{calculate_collapse_score}
 \title{Calculate block collapse scores}
 \usage{
-calculate_collapse_score(sbm, heuristic, remove_state = TRUE)
+calculate_collapse_score(
+  sbm,
+  heuristic,
+  remove_state = TRUE,
+  use_entropy = FALSE
+)
 }
 \arguments{
 \item{sbm}{Object of class \code{sbm_network}.}
@@ -18,6 +23,11 @@ location, or a string labeling algorithm. Currently only \code{"lowest"},
 \item{remove_state}{Should the state column be removed from results? Will be
 \code{TRUE} when visualizing results, \code{FALSE} when using score to choose best
 state.}
+
+\item{use_entropy}{Should the score be calculated with the entropy of the
+collapse? If \code{FALSE}, the entropy delta will be used. The full entropy is
+needed to make comparisons across separate collapses in the case of
+\code{\link{collapse_run}}.}
 }
 \value{
 Collapse results dataframe with a score column attached

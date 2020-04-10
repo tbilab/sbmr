@@ -5,6 +5,7 @@
 #'
 #' @inheritParams mcmc_sweep
 #' @inheritParams build_score_fn
+#' @inheritParams calculate_collapse_score
 #' @inheritParams visualize_collapse_results
 #' @param verbose Should model tell you what step was chosen (`TRUE` or
 #'   `FALSE`)?
@@ -37,6 +38,7 @@
 #'
 choose_best_collapse_state <- function(sbm,
                                        heuristic = 'dev_from_rolling_mean',
+                                       use_entropy = FALSE,
                                        verbose = FALSE){
   UseMethod("choose_best_collapse_state")
 }
@@ -44,9 +46,13 @@ choose_best_collapse_state <- function(sbm,
 #' @export
 choose_best_collapse_state.sbm_network <- function(sbm,
                                                    heuristic = 'dev_from_rolling_mean',
+                                                   use_entropy = FALSE,
                                                    verbose = FALSE){
 
-  best_state <- calculate_collapse_score(sbm, heuristic, remove_state = FALSE) %>%
+  best_state <- sbm %>%
+    calculate_collapse_score(heuristic = heuristic,
+                             use_entropy = use_entropy,
+                             remove_state = FALSE) %>%
     dplyr::filter(score == max(score, na.rm = TRUE))
 
   if(verbose){
