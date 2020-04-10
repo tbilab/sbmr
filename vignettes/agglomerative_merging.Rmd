@@ -193,7 +193,7 @@ So we can see that the merging algorithm perfectly separated our nodes into thei
 
 ### Allowing for node shuffling
 
-Sometimes if we were worried that the model may be making bad merges early on that manifest in poor performance for smaller groups we may want to let the collapsing allow the nodes to find their prefered locations within each collapse. To do this we simply pause the collapsing and run a few mcmc sweeps to let the nodes find their natural resting place. This can help if a node or two accidentally got merged into an incorrect group earlier in the collapse. 
+Sometimes if we were worried that the model may be making bad merges early on that manifest in poor performance for smaller groups we may want to let the collapsing allow the nodes to find their preferred locations within each collapse. To do this we simply pause the collapsing and run a few mcmc sweeps to let the nodes find their natural resting place. This can help if a node or two accidentally got merged into an incorrect group earlier in the collapse. 
 
 To enable this shuffing we simply set the argument `num_mcmc_sweeps` to a value greater than `0`. 
 
