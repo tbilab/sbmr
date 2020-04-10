@@ -46,7 +46,7 @@
 #'   "b_parent", "none",      "node",      1L,
 #' )
 #'
-#' net <- new_sbm_network(edges = edges, nodes = nodes)
+#' net <- new_sbm_network(edges = edges, nodes = nodes) %>% initialize_blocks()
 #'
 #' # before updating state the state should not equal the desired new state
 #' dplyr::all_equal(new_state, attr(net, 'state'))
