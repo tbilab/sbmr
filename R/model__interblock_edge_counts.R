@@ -5,5 +5,5 @@ interblock_edge_counts <- function(sbm, level = 1){
 #' @export
 interblock_edge_counts.sbm_network <- function(sbm, level = 1){
   sbm <- verify_model(sbm)
-  attr(sbm, "model")$get_interblock_edge_counts(level)
+  attr(sbm, "model")$interblock_edge_counts(level)
 }

@@ -147,7 +147,7 @@ test_that("Interblock edge counts", {
   b1_block <- sbm_state$parent[sbm_state$id == "b1"]
 
   # Get the interblock edge counts
-  block_edge_counts <- sbm$get_interblock_edge_counts(1)
+  block_edge_counts <- sbm$interblock_edge_counts(1)
 
   # Get number of edges between a1 and a2s blocks
   get_a1_to_b1_block_counts <- . %>%
@@ -171,7 +171,7 @@ test_that("Interblock edge counts", {
   b1_block <- sbm_state$parent[sbm_state$id == "b1"]
 
   # Recheck the block edge counts, the value should have incremented up by 1
-  expect_equal(get_a1_to_b1_block_counts(sbm$get_interblock_edge_counts(1)),
+  expect_equal(get_a1_to_b1_block_counts(sbm$interblock_edge_counts(1)),
                original_count + 1)
 
 })

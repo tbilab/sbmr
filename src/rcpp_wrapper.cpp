@@ -174,7 +174,7 @@ RCPP_MODULE(SBM)
                     "Gets dataframe of counts of blocks by type.")
       .const_method("get_state", &SBM::state,
                     "Exports the current state of the network as dataframe with each node as a row and columns for node id, parent id, node type, and node level.")
-      .const_method("get_interblock_edge_counts", &SBM::get_interblock_edge_counts,
+      .const_method("interblock_edge_counts", &SBM::interblock_edge_counts,
                     "Get dataframe of counts of edges between all unique pairs of blocks in network")
       .const_method("entropy", &SBM::entropy,
                     "Calculate the degree corrected entropy of current model state at desired level")

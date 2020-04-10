@@ -275,7 +275,7 @@ class SBM {
         });
   }
 
-  Edge_Counts get_interblock_edge_counts(const int level) const
+  Edge_Counts interblock_edge_counts(const int level) const
   {
     if (level == 0) LOGIC_ERROR("Level 0 is not block level");
 
@@ -316,7 +316,7 @@ class SBM {
     }
 
     // Counts between all pairs of blocks
-    Edge_Counts block_edge_counts = get_interblock_edge_counts(level + 1);
+    Edge_Counts block_edge_counts = interblock_edge_counts(level + 1);
 
     for (const auto& block_pair_count : block_edge_counts) {
       const Node* block_r = block_pair_count.first.first();
@@ -860,7 +860,7 @@ class SBM {
     if (!report_all_steps) {
       results.states.push_back(state());
     }
-    
+
     results.final_entropy = entropy(node_level);
 
     return results;
