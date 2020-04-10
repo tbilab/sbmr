@@ -57,8 +57,7 @@ choose_best_collapse_state.sbm_network <- function(sbm,
 
   if(verbose){
     n <- best_state$n_blocks[1]
-    entropy_delta <- best_state$entropy_delta[1]
-    print(glue::glue("Choosing collapse with {n} blocks and an entropy delta of {round(entropy_delta,4)}."))
+    print(glue::glue("Choosing collapse with {n} blocks and an entropy of {round(best_state$entropy[1],4)}."))
   }
 
   # Update the model and s3 class states and return
