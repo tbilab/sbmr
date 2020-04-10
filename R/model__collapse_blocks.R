@@ -96,24 +96,34 @@ collapse_blocks.sbm_network <- function(sbm,
     report_all_steps,
     allow_exhaustive
   )
-
+  final_entropy <- collapse_results$final_entropy
+  final_n_blocks <- collapse_results$n_blocks
 
   # If we're reporting every step, extract from the list the important values and append
   # the state and merges at each step
   if(report_all_steps) {
-    sbm$collapse_results <- collapse_results %>%
-      purrr::map_dfr(~dplyr::tibble(entropy_delta = .$entropy_delta,
-                                    n_blocks = .$n_blocks)) %>%
-      dplyr::mutate(state = purrr::map(collapse_results, 'state'),
-                    merges = purrr::map(collapse_results,
-                                        ~dplyr::tibble(from = .$merge_from,
-                                                       into = .$merge_into)))
+
+    calc_current_entropy <- function(final, delta){
+      entropy_diff <- rev(delta) %>%
+        dplyr::lag(default = 0) %>%
+        cumsum() %>%
+        rev()
+      final - entropy_diff
+    }
+
+    sbm$collapse_results <- collapse_results$step_info %>%
+      dplyr::mutate(entropy = calc_current_entropy(final_entropy, entropy_delta),
+                    merges = collapse_results$step_merges)
+
   } else {
     # Otherwise, just build a single row df with results and final state
-    sbm$collapse_results <- dplyr::tibble(entropy_delta = collapse_results$entropy_delta,
-                  n_blocks = collapse_results$n_blocks) %>%
-      dplyr::mutate(state = list(collapse_results$state))
+    sbm$collapse_results <- dplyr::tibble(entropy = final_entropy,
+                                          n_blocks = final_n_blocks)
   }
+
+  # Add state to results df
+  sbm$collapse_results <-  sbm$collapse_results %>%
+    dplyr::mutate(state = collapse_results$step_states)
 
   sbm
 }
