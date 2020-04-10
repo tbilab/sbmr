@@ -10,9 +10,6 @@
 #'
 #' @family visualizations
 #'
-#' @param use_entropy_value_for_score If set to `TRUE` then instead of the merge
-#'   results entropy delta being used for the score function the entropy will
-#'   be. Typically the heuristics work better on entropy delta values.
 #' @inheritParams verify_model
 #' @inheritParams build_score_fn
 #'
@@ -49,40 +46,15 @@
 #'
 #' visualize_collapse_results(net, heuristic = nls_score)
 #'
-visualize_collapse_results <- function(sbm,
-                                       use_entropy_value_for_score = FALSE,
-                                       heuristic = NULL){
+visualize_collapse_results <- function(sbm, heuristic = NULL){
   UseMethod("visualize_collapse_results")
 }
 
 
 #' @export
-visualize_collapse_results.sbm_network <- function(sbm,
-                                                   use_entropy_value_for_score = FALSE,
-                                                   heuristic = NULL){
-  collapse_results <- get_collapse_results(sbm)
+visualize_collapse_results.sbm_network <- function(sbm, heuristic = NULL){
 
-  missing_entropy_delta <- !("entropy_delta" %in% colnames(collapse_results))
-
-  if(missing_entropy_delta & !use_entropy_value_for_score){
-    collapse_results <- collapse_results %>%
-      dplyr::mutate(entropy_delta = dplyr::lag(entropy) - entropy) %>%
-      dplyr::filter(!is.na(entropy_delta))
-  }
-
-  if(!is.null(heuristic)){
-
-    collapse_results <- dplyr::arrange(collapse_results, n_blocks)
-
-    if (use_entropy_value_for_score){
-      collapse_results <- dplyr::mutate(collapse_results, score = build_score_fn(heuristic)(entropy, n_blocks))
-    } else {
-      collapse_results <- dplyr::mutate(collapse_results, score = build_score_fn(heuristic)(entropy_delta, n_blocks))
-    }
-  }
-
-  collapse_results %>%
-    dplyr::select(entropy_delta, n_blocks) %>%
+  calculate_collapse_score(sbm, heuristic) %>%
     tidyr::pivot_longer(-n_blocks) %>%
     dplyr::mutate(name = stringr::str_replace_all(name, "_", " ")) %>%
     ggplot2::ggplot(ggplot2::aes(x = n_blocks, y = value)) +

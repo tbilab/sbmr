@@ -46,12 +46,8 @@ choose_best_collapse_state.sbm_network <- function(sbm,
                                                    heuristic = 'dev_from_rolling_mean',
                                                    verbose = FALSE){
 
-  # Apply the heuristic on the entropy column and choose the highest value
-  best_state <- get_collapse_results(sbm) %>%
-    dplyr::arrange(n_blocks) %>%
-    dplyr::mutate(score = build_score_fn(heuristic)(entropy_delta, n_blocks)) %>%
+  best_state <- calculate_collapse_score(sbm, heuristic) %>%
     dplyr::filter(score == max(score, na.rm = TRUE))
-
 
   if(verbose){
     n <- best_state$n_blocks[1]
