@@ -160,9 +160,9 @@ through MCMC proposal-accept routine.</p></td>
 <code><a href='collapse_blocks.html'>collapse_blocks</a>()</code>,
 <code><a href='collapse_run.html'>collapse_run</a>()</code>,
 <code><a href='entropy.html'>entropy</a>()</code>,
-<code><a href='get_state.html'>get_state</a>()</code>,
 <code><a href='mcmc_sweep.html'>mcmc_sweep</a>()</code>,
-<code><a href='n_blocks.html'>n_blocks</a>()</code></p></div>
+<code><a href='n_blocks.html'>n_blocks</a>()</code>,
+<code><a href='state.html'>state</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
@@ -172,12 +172,12 @@ through MCMC proposal-accept routine.</p></td>
 
 <span class='co'># Get counts of connections from each given block to the others</span>
 <span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'>interblock_edge_counts</span>()</div><div class='output co'>#&gt;     block_a   block_b n_edges
-#&gt; 1 bl_node_2 bl_node_2      32
-#&gt; 2 bl_node_1 bl_node_1      28
-#&gt; 3 bl_node_0 bl_node_0      27
-#&gt; 4 bl_node_2 bl_node_1      55
-#&gt; 5 bl_node_1 bl_node_0      57
-#&gt; 6 bl_node_2 bl_node_0      62</div><div class='input'>
+#&gt; 1 bl_node_1 bl_node_2      44
+#&gt; 2 bl_node_0 bl_node_1      54
+#&gt; 3 bl_node_2 bl_node_2      26
+#&gt; 4 bl_node_1 bl_node_1      18
+#&gt; 5 bl_node_0 bl_node_0      21
+#&gt; 6 bl_node_0 bl_node_2      61</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

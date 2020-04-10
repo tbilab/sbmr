@@ -163,7 +163,7 @@ is present for cached model?</p></td>
 
     <div class='dont-index'><p>Other helpers: 
 <code><a href='build_score_fn.html'>build_score_fn</a>()</code>,
-<code><a href='get_combination_indices.html'>get_combination_indices</a>()</code>,
+<code><a href='combination_indices.html'>combination_indices</a>()</code>,
 <code><a href='get_sweep_pair_counts.html'>get_sweep_pair_counts</a>()</code>,
 <code><a href='get_sweep_results.html'>get_sweep_results</a>()</code>,
 <code><a href='print.sbm_network.html'>print.sbm_network</a>()</code>,
@@ -174,7 +174,7 @@ is present for cached model?</p></td>
 <span class='co'># Setup network without model initialized</span>
 <span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>setup_model</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
-<span class='no'>net</span></div><div class='output co'>#&gt; SBM Network with 60 nodes of a single type and 578 edges. 
+<span class='no'>net</span></div><div class='output co'>#&gt; SBM Network with 60 nodes of a single type and 1130 edges. 
 #&gt;  
 #&gt; Nodes: <span style='color: #949494;'># A tibble: 6 x 3</span><span>
 #&gt;   id    block type 
@@ -191,16 +191,16 @@ is present for cached model?</p></td>
 #&gt;   from  to   
 #&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>1</span><span> g1_1  g1_2 
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> g1_1  g1_6 
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> g1_1  g1_3 
 #&gt; </span><span style='color: #BCBCBC;'>3</span><span> g1_1  g1_13
 #&gt; </span><span style='color: #BCBCBC;'>4</span><span> g1_1  g1_15
-#&gt; </span><span style='color: #BCBCBC;'>5</span><span> g1_1  g1_19
-#&gt; </span><span style='color: #BCBCBC;'>6</span><span> g1_1  g2_3 
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> g1_1  g1_18
+#&gt; </span><span style='color: #BCBCBC;'>6</span><span> g1_1  g1_20
 #&gt; ... 
 #&gt;  </div><div class='input'>
 <span class='co'># Run verify model and the model should now be initialized</span>
 <span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'>verify_model</span>()
-<span class='no'>net</span></div><div class='output co'>#&gt; SBM Network with 60 nodes of a single type and 578 edges. 
+<span class='no'>net</span></div><div class='output co'>#&gt; SBM Network with 60 nodes of a single type and 1130 edges. 
 #&gt;  
 #&gt; Nodes: </span><span style='color: #949494;'># A tibble: 6 x 3</span><span>
 #&gt;   id    block type 
@@ -217,11 +217,11 @@ is present for cached model?</p></td>
 #&gt;   from  to   
 #&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>1</span><span> g1_1  g1_2 
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> g1_1  g1_6 
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> g1_1  g1_3 
 #&gt; </span><span style='color: #BCBCBC;'>3</span><span> g1_1  g1_13
 #&gt; </span><span style='color: #BCBCBC;'>4</span><span> g1_1  g1_15
-#&gt; </span><span style='color: #BCBCBC;'>5</span><span> g1_1  g1_19
-#&gt; </span><span style='color: #BCBCBC;'>6</span><span> g1_1  g2_3 
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> g1_1  g1_18
+#&gt; </span><span style='color: #BCBCBC;'>6</span><span> g1_1  g1_20
 #&gt; ... 
 #&gt;  </div><div class='input'>
 </div></span></pre>

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Choose and load best model state from agglomerative collapsing algorithm — choose_best_collapse_state • sbmR</title>
+<title>Dump state of current SBM model to dataframe — state • sbmR</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,10 @@
 
 
 
-<meta property="og:title" content="Choose and load best model state from agglomerative collapsing algorithm — choose_best_collapse_state" />
-<meta property="og:description" content="Choose and load best model state from agglomerative collapsing algorithm" />
+<meta property="og:title" content="Dump state of current SBM model to dataframe — state" />
+<meta property="og:description" content="Exports the current state of the network as dataframe with each node as a row
+and columns for node id, parent id, node type, and node level. Can also be
+accomplished by attr(sbm, 'state')." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -123,21 +125,18 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Choose and load best model state from agglomerative collapsing algorithm</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/choose_best_collapse_state.R'><code>R/choose_best_collapse_state.R</code></a></small>
-    <div class="hidden name"><code>choose_best_collapse_state.Rd</code></div>
+    <h1>Dump state of current SBM model to dataframe</h1>
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/model__state.R'><code>R/model__state.R</code></a></small>
+    <div class="hidden name"><code>state.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Choose and load best model state from agglomerative collapsing algorithm</p>
+    <p>Exports the current state of the network as dataframe with each node as a row
+and columns for node id, parent id, node type, and node level. Can also be
+accomplished by <code><a href='https://rdrr.io/r/base/attr.html'>attr(sbm, 'state')</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>choose_best_collapse_state</span>(
-  <span class='no'>sbm</span>,
-  <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='st'>"dev_from_rolling_mean"</span>,
-  <span class='kw'>use_entropy</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>state</span>(<span class='no'>sbm</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -147,64 +146,53 @@
       <td><p><code>sbm_network</code> object as created by
 <code><a href='new_sbm_network.html'>new_sbm_network</a></code>.</p></td>
     </tr>
-    <tr>
-      <th>heuristic</th>
-      <td><p>How the best partitioning is defined. Takes either a
-function that takes one/two arguments: an entropy vector and an optional
-number of blocks vector with each element corresponding to a given
-location, or a string labeling algorithm. Currently only <code>"lowest"</code>,
-<code>"dev_from_rolling_mean"</code>, <code>"delta_ratio"</code>, <code>"trend_deviation"</code>, and <code>"nls_residual"</code> are supported.</p></td>
-    </tr>
-    <tr>
-      <th>use_entropy</th>
-      <td><p>Should the score be calculated with the entropy of the
-collapse? If <code>FALSE</code>, the entropy delta will be used. The full entropy is
-needed to make comparisons across separate collapses in the case of
-<code><a href='collapse_run.html'>collapse_run</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>verbose</th>
-      <td><p>Should model tell you what step was chosen (<code>TRUE</code> or
-<code>FALSE</code>)?</p></td>
-    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An S3 object of class <code>sbm_network</code>. For details see
-<code><a href='new_sbm_network.html'>new_sbm_network</a></code> section "Class structure."</p>
+    <p>A dataframe describing the current state of the network:</p><dl class='dl-horizontal'>
+<dt>id</dt><dd><p>id of node</p></dd> <dt>parent</dt><dd><p>id of node's parent. <code>none</code> if node has
+no parent.</p></dd> <dt>type</dt><dd><p>type of node</p></dd> <dt>level</dt><dd><p>level of node in network
+hierarchy</p></dd> 
+</dl>
+
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>visualize_collapse_results</p>
-<p>Other modeling: 
+    <div class='dont-index'><p>Other modeling: 
+<code><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a>()</code>,
 <code><a href='collapse_blocks.html'>collapse_blocks</a>()</code>,
 <code><a href='collapse_run.html'>collapse_run</a>()</code>,
 <code><a href='entropy.html'>entropy</a>()</code>,
 <code><a href='interblock_edge_counts.html'>interblock_edge_counts</a>()</code>,
 <code><a href='mcmc_sweep.html'>mcmc_sweep</a>()</code>,
-<code><a href='n_blocks.html'>n_blocks</a>()</code>,
-<code><a href='state.html'>state</a>()</code></p></div>
+<code><a href='n_blocks.html'>n_blocks</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>42</span>)
+    <pre class="examples"><div class='input'>
+<span class='co'># Small edge list to build network</span>
+<span class='no'>edges</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>tribble</a></span>(
+  ~<span class='no'>from</span>, ~<span class='no'>to</span>,
+  <span class='st'>"a1"</span>   , <span class='st'>"b1"</span>   ,
+  <span class='st'>"a1"</span>   , <span class='st'>"b2"</span>   ,
+  <span class='st'>"a1"</span>   , <span class='st'>"b3"</span>   ,
+  <span class='st'>"a2"</span>   , <span class='st'>"b1"</span>   ,
+  <span class='st'>"a2"</span>   , <span class='st'>"b4"</span>   ,
+  <span class='st'>"a3"</span>   , <span class='st'>"b1"</span>
+)
 
-<span class='co'># Start with a random network of two blocks with 25 nodes each</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>25</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='collapse_blocks.html'>collapse_blocks</a></span>(<span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>1.4</span>)
+<span class='co'># A small simulated network with no blocks</span>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='new_sbm_network.html'>new_sbm_network</a></span>(<span class='no'>edges</span>)
 
-<span class='co'># Choose best result with default heuristic</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>net</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 8.8088.</div><div class='input'>
-<span class='co'># Score heuristic that fits a nonlinear model to observed values and chooses by</span>
-<span class='co'># largest negative residual</span>
-<span class='no'>nls_score</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>e</span>, <span class='no'>k</span>){
-  <span class='no'>entropy_model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/nls.html'>nls</a></span>(<span class='no'>e</span> ~ <span class='no'>a</span> + <span class='no'>b</span> * <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span>(<span class='no'>k</span>), <span class='kw'>start</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span>(<span class='no'>e</span>), <span class='kw'>b</span> <span class='kw'>=</span> -<span class='fl'>25</span>))
-  -<span class='fu'><a href='https://rdrr.io/r/stats/residuals.html'>residuals</a></span>(<span class='no'>entropy_model</span>)
-}
-
-<span class='co'># Choose result using custom heuristic function</span>
-<span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>net</span>,
-                                     <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='no'>nls_score</span>,
-                                     <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 18 blocks and an entropy of 185.5606.</div><div class='input'>
+<span class='fu'>state</span>(<span class='no'>net</span>)</div><div class='output co'>#&gt; NULL</div><div class='input'>
+<span class='co'># Add some blocks and state will reflect</span>
+<span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='fl'>2</span>) <span class='kw'>%&gt;%</span> <span class='fu'>state</span>()</div><div class='output co'>#&gt;   id type    parent level
+#&gt; 1 a3 node bl_node_0     0
+#&gt; 2 a2 node bl_node_1     0
+#&gt; 3 a1 node bl_node_0     0
+#&gt; 4 b1 node bl_node_1     0
+#&gt; 5 b4 node bl_node_0     0
+#&gt; 6 b2 node bl_node_1     0
+#&gt; 7 b3 node bl_node_0     0</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
