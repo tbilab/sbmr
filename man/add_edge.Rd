@@ -67,8 +67,8 @@ attr(net, 'n_edges')
 \seealso{
 Other advanced: 
 \code{\link{add_node}()},
-\code{\link{get_node_to_block_edge_counts}()},
 \code{\link{initialize_blocks}()},
+\code{\link{node_to_block_edge_counts}()},
 \code{\link{update_state}()}
 }
 \concept{advanced}

@@ -48,8 +48,8 @@ net \%>\% get_state()
 \seealso{
 Other advanced: 
 \code{\link{add_edge}()},
-\code{\link{get_node_to_block_edge_counts}()},
 \code{\link{initialize_blocks}()},
+\code{\link{node_to_block_edge_counts}()},
 \code{\link{update_state}()}
 }
 \concept{advanced}

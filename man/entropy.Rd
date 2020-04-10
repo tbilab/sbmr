@@ -39,8 +39,8 @@ Other modeling:
 \code{\link{choose_best_collapse_state}()},
 \code{\link{collapse_blocks}()},
 \code{\link{collapse_run}()},
-\code{\link{get_block_edge_counts}()},
 \code{\link{get_state}()},
+\code{\link{interblock_edge_counts}()},
 \code{\link{mcmc_sweep}()},
 \code{\link{n_blocks}()}
 }

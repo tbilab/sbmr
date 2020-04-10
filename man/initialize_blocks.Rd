@@ -67,7 +67,7 @@ new_sbm_network(edges, bipartite_edges = TRUE) \%>\%
 Other advanced: 
 \code{\link{add_edge}()},
 \code{\link{add_node}()},
-\code{\link{get_node_to_block_edge_counts}()},
+\code{\link{node_to_block_edge_counts}()},
 \code{\link{update_state}()}
 }
 \concept{advanced}

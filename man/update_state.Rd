@@ -72,7 +72,7 @@ dplyr::all_equal(new_state, attr(net, 'model')$get_state())
 Other advanced: 
 \code{\link{add_edge}()},
 \code{\link{add_node}()},
-\code{\link{get_node_to_block_edge_counts}()},
-\code{\link{initialize_blocks}()}
+\code{\link{initialize_blocks}()},
+\code{\link{node_to_block_edge_counts}()}
 }
 \concept{advanced}
