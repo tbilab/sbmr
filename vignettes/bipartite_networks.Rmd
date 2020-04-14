@@ -12,6 +12,12 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+is_html <- knitr::is_html_output()
+
+html_message <- if(is_html) "" else "_If you were building this in an HTML output this would be an interactive network plot_"
+
+
 ```
 
 ```{r setup}
@@ -20,6 +26,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 ```
+
 
 
 Start with the package included pollinators network.
@@ -54,10 +61,14 @@ pollinator_net
 
 ## Visualize it
 
-_If you were building this in an HTML output this would be an interactive network plot_
+`r html_message`
 
-```{r, eval=FALSE}
-visualize_network(pollinator_net, node_color_col = 'type', node_shape_col = 'none')
+```{r}
+if(is_html){
+  visualize_network(pollinator_net, 
+                    node_color_col = 'type', 
+                    node_shape_col = 'none')
+}
 ```
 
 
@@ -85,12 +96,17 @@ pollinator_net <- pollinator_net %>%
 
 Let's visualize this result on the network layout
 
-_If you were building this in an HTML output this would be an interactive network plot_
+
+
+`r html_message`
 
 
 ```{r}
-pollinator_net %>% 
-  visualize_network(node_shape_col = 'type', node_color_col = 'block')
+if(is_html){
+  pollinator_net %>% 
+    visualize_network(node_shape_col = 'type', 
+                      node_color_col = 'block')
+}
 ```
 
 ## MCMC Sweeping
@@ -135,12 +151,15 @@ pollinator_net %>%
 visualize_propensity_dist(pollinator_net)
 ```
 
-_If you were building this in an HTML output this would be an interactive network plot_
+
+`r html_message`
 
 ```{r}
-pollinator_net %>% 
-  visualize_propensity_network(proportion_threshold = 0.01, 
-                               isolate_type = "flower")
+if(is_html){
+  pollinator_net %>% 
+    visualize_propensity_network(proportion_threshold = 0.01, 
+                                 isolate_type = "flower")
+}
 ```
 
 
