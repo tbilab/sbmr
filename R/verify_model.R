@@ -60,7 +60,7 @@ verify_model.sbm_network <- function(sbm, show_messages = FALSE, warn_about_rand
                                    edges = dplyr::rename(sbm$edges, a = !!attr(sbm, "from_column"), b = !!attr(sbm, "to_column")),
                                    node_types = attr(sbm, "node_types"),
                                    allowed_edge_types = attr(sbm, "allowed_edge_types"),
-                                   state =  attr(sbm, "state"),
+                                   state_df =  attr(sbm, "state"),
                                    random_seed = attr(sbm, "random_seed"))
 
   # Give back sbm_network object
