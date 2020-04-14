@@ -6,7 +6,6 @@
 #'
 #' @seealso \code{\link{node_to_block_edge_counts}}
 #' @inheritParams mcmc_sweep
-#' @inheritParams node_to_block_edge_counts
 #'
 #' @return Dataframe of block pairs (`block_a` and `block_b`) and the number of edges between them (`count`).
 #' @export
