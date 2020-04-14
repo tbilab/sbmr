@@ -1,10 +1,10 @@
-# SBMR
+# sbmr
 
 __All active work on this project is now taking place at github.com/nstrayer/sbmr__
 
 
 <!-- badges: start -->
-[![R build status](https://github.com/nstrayer/sbmr/workflows/R-CMD-check/badge.svg)](https://github.com/nstrayer/sbmr/actions)
+[![R build status](https://github.com/tbilab/sbmr/workflows/R-CMD-check/badge.svg)](https://github.com/tbilab/sbmr/actions)
 <!-- badges: end -->
 
 An R package for fitting and exploring the results of Stochastic Block Models for network data. 
