@@ -25,6 +25,7 @@ NULL
 #'
 #' @return A list with two vectors (`$a` and `$b`) containing integer indices of elements for every pair.
 #'
+#' @keywords internal
 #' @examples
 #'
 #' \dontrun{
