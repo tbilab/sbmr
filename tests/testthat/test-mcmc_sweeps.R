@@ -3,7 +3,7 @@ library(dplyr)
 
 test_that("MCMC Sweeps function as expected", {
   n_blocks <- 5
-  n_sweeps <- 50
+  n_sweeps <- 100
 
   # Start with a random network
   net <- sim_random_network(n_nodes = 25, random_seed = 42) %>%
