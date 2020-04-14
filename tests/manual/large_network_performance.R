@@ -1,7 +1,7 @@
 # Testing performance for large networks
 
 library(tidyverse)
-library(sbmR)
+library(sbmr)
 devtools::load_all()
 
 

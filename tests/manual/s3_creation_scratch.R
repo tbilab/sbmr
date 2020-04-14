@@ -1,6 +1,6 @@
 # Scratch work for the building the sbm_network s3 class
 
-# library(sbmR)
+# library(sbmr)
 # library(sloop)
 # network <- sim_basic_block_network(
 #   n_blocks = 3,

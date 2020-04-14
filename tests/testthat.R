@@ -1,4 +1,4 @@
 library(testthat)
-library(sbmR)
+library(sbmr)
 
-test_check("sbmR")
+test_check("sbmr")

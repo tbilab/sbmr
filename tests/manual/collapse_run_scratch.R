@@ -1,5 +1,5 @@
 # library(tidyverse)
-library(sbmR)
+library(sbmr)
 
 block_info <- dplyr::tribble(
   ~block, ~n_nodes,

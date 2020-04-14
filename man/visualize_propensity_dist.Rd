@@ -20,7 +20,7 @@ empirical CDF of the pairwise probability/proportion of two nodes residing in
 the same block over the given MCMC sweeps.
 }
 \details{
-\code{sbmR::mcmc_sweep(sbm, track_pairs = TRUE, ...)} must be run on object before this function.
+\code{sbmr::mcmc_sweep(sbm, track_pairs = TRUE, ...)} must be run on object before this function.
 }
 \examples{
 

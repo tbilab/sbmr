@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
   warning = FALSE
 )
 
-library(sbmR)
+library(sbmr)
 library(dplyr)
 library(tidyr)
 library(purrr)
@@ -30,10 +30,10 @@ Before we look at using both we need to setup some data to cluster.
 
 ## Setup
 
-First we load the `sbmR` package along with the `tidyverse` package. 
+First we load the `sbmr` package along with the `tidyverse` package. 
 
 ```{r, eval = FALSE}
-library(sbmR)
+library(sbmr)
 library(dplyr)
 library(tidyr)
 library(purrr)

@@ -70,7 +70,7 @@ visualize_network.sbm_network <- function(sbm,
       shape_col = node_shape_col
     ),
     container = 'div',
-    script = system.file("d3/network_viz.js", package = "sbmR"),
+    script = system.file("d3/network_viz.js", package = "sbmr"),
     width = width,
     height = height
   )

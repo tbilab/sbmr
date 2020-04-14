@@ -15,7 +15,7 @@ entropy delta and number of nodes moved during sweep.
 }
 \description{
 A simple line plot showing both the entropy delta and the number of nodes
-moved for each sweep. \code{sbmR::mcmc_sweep()} must be run on object before this function.
+moved for each sweep. \code{sbmr::mcmc_sweep()} must be run on object before this function.
 }
 \examples{
 

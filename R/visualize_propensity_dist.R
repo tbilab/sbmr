@@ -4,7 +4,7 @@
 #' empirical CDF of the pairwise probability/proportion of two nodes residing in
 #' the same block over the given MCMC sweeps.
 #'
-#' `sbmR::mcmc_sweep(sbm, track_pairs = TRUE, ...)` must be run on object before this function.
+#' `sbmr::mcmc_sweep(sbm, track_pairs = TRUE, ...)` must be run on object before this function.
 #'
 #' @family visualizations
 #'

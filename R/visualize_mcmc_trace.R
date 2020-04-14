@@ -1,7 +1,7 @@
 #' Trace plot of multiple MCMC sweep sweeps
 #'
 #' A simple line plot showing both the entropy delta and the number of nodes
-#' moved for each sweep. `sbmR::mcmc_sweep()` must be run on object before this function.
+#' moved for each sweep. `sbmr::mcmc_sweep()` must be run on object before this function.
 #'
 #' @family visualizations
 #'

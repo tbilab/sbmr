@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
   fig.width = 7
 )
 
-library(sbmR)
+library(sbmr)
 library(glue)
 library(dplyr)
 library(tidyr)
@@ -24,7 +24,7 @@ library(forcats)
 ```
 
 ```{r, eval = FALSE}
-library(sbmR)
+library(sbmr)
 library(glue)
 library(dplyr)
 library(tidyr)

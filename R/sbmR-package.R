@@ -3,7 +3,7 @@
 #' Inference and visualization of network data using the Stochastic Block Model.
 #'
 #' Imports
-#' @useDynLib sbmR, .registration = TRUE
+#' @useDynLib sbmr, .registration = TRUE
 #' @export SBM
 #' @importFrom Rcpp loadModule
 "_PACKAGE"
@@ -50,7 +50,7 @@ setMethod("show", "Rcpp_SBM" , function(object) {
 
 # On package unload make sure to unlink the dynamic c++ library
 .onUnload <- function(libpath){
-  library.dynam.unload("sbmR", libpath)
+  library.dynam.unload("sbmr", libpath)
 }
 
 

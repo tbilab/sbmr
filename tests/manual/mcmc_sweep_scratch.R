@@ -1,6 +1,6 @@
 library(tidyverse)
 library(glue)
-library(sbmR)
+library(sbmr)
 
 set.seed(42)
 
