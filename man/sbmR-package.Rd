@@ -14,8 +14,8 @@ Imports
 \seealso{
 Useful links:
 \itemize{
-  \item \url{http://nickstrayer.me/sbmR/}
-  \item \url{https://github.com/nstrayer/sbmR}
+  \item \url{http://nickstrayer.me/sbmr/}
+  \item \url{https://github.com/nstrayer/sbmr}
 }
 
 }
