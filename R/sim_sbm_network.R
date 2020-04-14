@@ -60,6 +60,11 @@ sim_sbm_network <- function(
   setup_model = FALSE,
   random_seed = NULL){
 
+  # Set random seed for R-based data generation if passed.
+  if(!is.null(random_seed)){
+    set.seed(random_seed)
+  }
+
   # Generate all the node names and their blocks
   nodes <- purrr::map2_dfr(
     block_info$block,
