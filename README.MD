@@ -1,7 +1,7 @@
 # SBMR
 
 <!-- badges: start -->
-[![R build status](https://github.com/nstrayer/sbmR/workflows/R-CMD-check/badge.svg)](https://github.com/nstrayer/sbmR/actions)
+[![R build status](https://github.com/nstrayer/sbmr/workflows/R-CMD-check/badge.svg)](https://github.com/nstrayer/sbmr/actions)
 <!-- badges: end -->
 
 An R package for fitting and exploring the results of Stochastic Block Models for network data. 
@@ -49,7 +49,7 @@ This package has a limited scope it aims to do the following things well:
 
 For more powerful (but larger and harder-to-install) libraries for working with graph data check out `graph-tool` for Python (heavy SBM focus with many more features than `sbmr`) and `iGraph` (a giant in graph data manipulation and exploration.) 
 
-If there is a feature that you feel would be very beneficial to the package that would save you needing to go to another package for a small graph-data/SBM related function, please let me know in [github issues](https://github.com/tbilab/sbmR/issues) or if you have the time/desire a PR (I am willing to help out implementation details for those not fully comfortable with PRs into open source yet). 
+If there is a feature that you feel would be very beneficial to the package that would save you needing to go to another package for a small graph-data/SBM related function, please let me know in [github issues](https://github.com/tbilab/sbmr/issues) or if you have the time/desire a PR (I am willing to help out implementation details for those not fully comfortable with PRs into open source yet). 
 
 
 ## Usage
@@ -58,7 +58,7 @@ Please see the [articles on package usage on the package website.]()
 
 ## Development
 
-This package is currently under active development. Commits to the master branch pass all included R and C++ tests but are not guarenteed to be bug free. If you discover a bug in use please report using the [issue tracker for the github repo.](https://github.com/tbilab/sbmR/issues)
+This package is currently under active development. Commits to the master branch pass all included R and C++ tests but are not guarenteed to be bug free. If you discover a bug in use please report using the [issue tracker for the github repo.](https://github.com/tbilab/sbmr/issues)
 
 
 ## Running Tests 
