@@ -7,6 +7,7 @@
 #' @family advanced
 #'
 #' @seealso \code{\link{interblock_edge_counts}}
+#' @inheritParams interblock_edge_counts
 #' @param node_id String identifying the node that edge counts are desired for
 #' @param connection_level Level of blocks to get connections to. E.g. `1` = node block level, `0` = connections to other nodes.
 #'
