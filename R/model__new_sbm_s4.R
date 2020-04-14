@@ -53,7 +53,7 @@ new_sbm_s4 <- function(nodes,
   }
 
   if(is.null(random_seed)){
-    random_seed <- ceiling(runif(1, 0, 1e6))
+    random_seed <- ceiling(stats::runif(1, 0, 1e6))
   }
 
   # Load network model with nodes and random seed
