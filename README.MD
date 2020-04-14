@@ -1,5 +1,8 @@
 # SBMR
 
+__All active work on this project is now taking place at github.com/nstrayer/sbmr__
+
+
 <!-- badges: start -->
 [![R build status](https://github.com/nstrayer/sbmR/workflows/R-CMD-check/badge.svg)](https://github.com/nstrayer/sbmR/actions)
 <!-- badges: end -->
