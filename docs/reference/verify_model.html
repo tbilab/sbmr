@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Verify model for sbm_network object exists — verify_model • sbmR</title>
+<title>Verify model for sbm_network object exists — verify_model • sbmr</title>
 
 
 <!-- jquery -->
@@ -69,7 +69,7 @@ exists and is usable. If it isn't it is created." />
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">sbmR</a>
+        <a class="navbar-link" href="../index.html">sbmr</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.0</span>
       </span>
     </div>
@@ -106,7 +106,7 @@ exists and is usable. If it isn't it is created." />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/nstrayer/sbmR">
+  <a href="https://github.com/tbilab/sbmr">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -125,7 +125,7 @@ exists and is usable. If it isn't it is created." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Verify model for sbm_network object exists</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/verify_model.R'><code>R/verify_model.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/tbilab/sbmr/blob/master/R/verify_model.R'><code>R/verify_model.R</code></a></small>
     <div class="hidden name"><code>verify_model.Rd</code></div>
     </div>
 
@@ -174,54 +174,54 @@ is present for cached model?</p></td>
 <span class='co'># Setup network without model initialized</span>
 <span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>setup_model</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
-<span class='no'>net</span></div><div class='output co'>#&gt; SBM Network with 60 nodes of a single type and 1130 edges. 
+<span class='no'>net</span></div><div class='output co'>#&gt; SBM Network with 60 nodes of a single type and 784 edges. 
 #&gt;  
-#&gt; Nodes: <span style='color: #949494;'># A tibble: 6 x 3</span><span>
+#&gt; Nodes: <span style='color: #555555;'># A tibble: 6 x 3</span><span>
 #&gt;   id    block type 
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> g1_1  g1    node 
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> g1_2  g1    node 
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span> g1_3  g1    node 
-#&gt; </span><span style='color: #BCBCBC;'>4</span><span> g1_4  g1    node 
-#&gt; </span><span style='color: #BCBCBC;'>5</span><span> g1_5  g1    node 
-#&gt; </span><span style='color: #BCBCBC;'>6</span><span> g1_6  g1    node 
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1    node 
+#&gt; </span><span style='color: #555555;'>2</span><span> g1_2  g1    node 
+#&gt; </span><span style='color: #555555;'>3</span><span> g1_3  g1    node 
+#&gt; </span><span style='color: #555555;'>4</span><span> g1_4  g1    node 
+#&gt; </span><span style='color: #555555;'>5</span><span> g1_5  g1    node 
+#&gt; </span><span style='color: #555555;'>6</span><span> g1_6  g1    node 
 #&gt; ... 
 #&gt;  
-#&gt; Edges: </span><span style='color: #949494;'># A tibble: 6 x 2</span><span>
+#&gt; Edges: </span><span style='color: #555555;'># A tibble: 6 x 2</span><span>
 #&gt;   from  to   
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> g1_1  g1_2 
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> g1_1  g1_3 
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span> g1_1  g1_13
-#&gt; </span><span style='color: #BCBCBC;'>4</span><span> g1_1  g1_15
-#&gt; </span><span style='color: #BCBCBC;'>5</span><span> g1_1  g1_18
-#&gt; </span><span style='color: #BCBCBC;'>6</span><span> g1_1  g1_20
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1_2 
+#&gt; </span><span style='color: #555555;'>2</span><span> g1_1  g1_3 
+#&gt; </span><span style='color: #555555;'>3</span><span> g1_1  g1_4 
+#&gt; </span><span style='color: #555555;'>4</span><span> g1_1  g1_5 
+#&gt; </span><span style='color: #555555;'>5</span><span> g1_1  g1_6 
+#&gt; </span><span style='color: #555555;'>6</span><span> g1_1  g1_7 
 #&gt; ... 
 #&gt;  </div><div class='input'>
 <span class='co'># Run verify model and the model should now be initialized</span>
 <span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'>verify_model</span>()
-<span class='no'>net</span></div><div class='output co'>#&gt; SBM Network with 60 nodes of a single type and 1130 edges. 
+<span class='no'>net</span></div><div class='output co'>#&gt; SBM Network with 60 nodes of a single type and 784 edges. 
 #&gt;  
-#&gt; Nodes: </span><span style='color: #949494;'># A tibble: 6 x 3</span><span>
+#&gt; Nodes: </span><span style='color: #555555;'># A tibble: 6 x 3</span><span>
 #&gt;   id    block type 
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> g1_1  g1    node 
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> g1_2  g1    node 
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span> g1_3  g1    node 
-#&gt; </span><span style='color: #BCBCBC;'>4</span><span> g1_4  g1    node 
-#&gt; </span><span style='color: #BCBCBC;'>5</span><span> g1_5  g1    node 
-#&gt; </span><span style='color: #BCBCBC;'>6</span><span> g1_6  g1    node 
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1    node 
+#&gt; </span><span style='color: #555555;'>2</span><span> g1_2  g1    node 
+#&gt; </span><span style='color: #555555;'>3</span><span> g1_3  g1    node 
+#&gt; </span><span style='color: #555555;'>4</span><span> g1_4  g1    node 
+#&gt; </span><span style='color: #555555;'>5</span><span> g1_5  g1    node 
+#&gt; </span><span style='color: #555555;'>6</span><span> g1_6  g1    node 
 #&gt; ... 
 #&gt;  
-#&gt; Edges: </span><span style='color: #949494;'># A tibble: 6 x 2</span><span>
+#&gt; Edges: </span><span style='color: #555555;'># A tibble: 6 x 2</span><span>
 #&gt;   from  to   
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> g1_1  g1_2 
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> g1_1  g1_3 
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span> g1_1  g1_13
-#&gt; </span><span style='color: #BCBCBC;'>4</span><span> g1_1  g1_15
-#&gt; </span><span style='color: #BCBCBC;'>5</span><span> g1_1  g1_18
-#&gt; </span><span style='color: #BCBCBC;'>6</span><span> g1_1  g1_20
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> g1_1  g1_2 
+#&gt; </span><span style='color: #555555;'>2</span><span> g1_1  g1_3 
+#&gt; </span><span style='color: #555555;'>3</span><span> g1_1  g1_4 
+#&gt; </span><span style='color: #555555;'>4</span><span> g1_1  g1_5 
+#&gt; </span><span style='color: #555555;'>5</span><span> g1_1  g1_6 
+#&gt; </span><span style='color: #555555;'>6</span><span> g1_1  g1_7 
 #&gt; ... 
 #&gt;  </div><div class='input'>
 </div></span></pre>

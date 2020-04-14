@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Build new SBM s4 class — new_sbm_s4 • sbmR</title>
+<title>Build new SBM s4 class — new_sbm_s4 • sbmr</title>
 
 
 <!-- jquery -->
@@ -68,7 +68,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">sbmR</a>
+        <a class="navbar-link" href="../index.html">sbmr</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.0</span>
       </span>
     </div>
@@ -105,7 +105,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/nstrayer/sbmR">
+  <a href="https://github.com/tbilab/sbmr">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -124,7 +124,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Build new SBM s4 class</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/model__new_sbm_s4.R'><code>R/model__new_sbm_s4.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/tbilab/sbmr/blob/master/R/model__new_sbm_s4.R'><code>R/model__new_sbm_s4.R</code></a></small>
     <div class="hidden name"><code>new_sbm_s4.Rd</code></div>
     </div>
 
@@ -138,7 +138,7 @@
   <span class='kw'>allowed_edge_types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>node_types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>random_seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>state</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+  <span class='kw'>state_df</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -172,6 +172,10 @@ undefined, it is inferred from edges.</p></td>
 sampling engine. Note that if the model is restored from a saved state this
 seed will be initialized again to the start value which will harm
 reproducability.</p></td>
+    </tr>
+    <tr>
+      <th>state_df</th>
+      <td><p>A state dataframe with <code>id</code>, <code>parent</code>, <code>level</code>, and <code>type</code> columns for all nodes in network (along with block nodes).</p></td>
     </tr>
     </table>
 

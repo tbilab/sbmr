@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Choose and load best model state from agglomerative collapsing algorithm — choose_best_collapse_state • sbmR</title>
+<title>Choose and load best model state from agglomerative collapsing algorithm — choose_best_collapse_state • sbmr</title>
 
 
 <!-- jquery -->
@@ -68,7 +68,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">sbmR</a>
+        <a class="navbar-link" href="../index.html">sbmr</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.0</span>
       </span>
     </div>
@@ -105,7 +105,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/nstrayer/sbmR">
+  <a href="https://github.com/tbilab/sbmr">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -124,7 +124,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Choose and load best model state from agglomerative collapsing algorithm</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/choose_best_collapse_state.R'><code>R/choose_best_collapse_state.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/tbilab/sbmr/blob/master/R/choose_best_collapse_state.R'><code>R/choose_best_collapse_state.R</code></a></small>
     <div class="hidden name"><code>choose_best_collapse_state.Rd</code></div>
     </div>
 
@@ -193,7 +193,7 @@ needed to make comparisons across separate collapses in the case of
   <span class='fu'><a href='collapse_blocks.html'>collapse_blocks</a></span>(<span class='kw'>sigma</span> <span class='kw'>=</span> <span class='fl'>1.4</span>)
 
 <span class='co'># Choose best result with default heuristic</span>
-<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>net</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 8.8088.</div><div class='input'>
+<span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>net</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 3 blocks and an entropy of 24.0963.</div><div class='input'>
 <span class='co'># Score heuristic that fits a nonlinear model to observed values and chooses by</span>
 <span class='co'># largest negative residual</span>
 <span class='no'>nls_score</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>e</span>, <span class='no'>k</span>){
@@ -204,7 +204,7 @@ needed to make comparisons across separate collapses in the case of
 <span class='co'># Choose result using custom heuristic function</span>
 <span class='no'>my_sbm</span> <span class='kw'>&lt;-</span> <span class='fu'>choose_best_collapse_state</span>(<span class='no'>net</span>,
                                      <span class='kw'>heuristic</span> <span class='kw'>=</span> <span class='no'>nls_score</span>,
-                                     <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 18 blocks and an entropy of 185.5606.</div><div class='input'>
+                                     <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; Choosing collapse with 18 blocks and an entropy of 195.1837.</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

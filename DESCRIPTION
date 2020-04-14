@@ -1,7 +1,7 @@
 Package: sbmr
 Title: Fit and investigate Stochastic Block Models in R
 Version: 0.0.1.0000
-URL: http://nickstrayer.me/sbmr/, https://github.com/nstrayer/sbmr
+URL: http://nickstrayer.me/sbmr/, https://github.com/tbilab/sbmr
 Authors@R: 
     person(given = "Nick",
            family = "Strayer",
