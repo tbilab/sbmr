@@ -12,3 +12,4 @@
 ^.vscode
 ^README.Rmd
 ^README.MD
+^vignettes/bipartite_networks.Rmd

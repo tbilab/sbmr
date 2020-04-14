@@ -54,7 +54,9 @@ pollinator_net
 
 ## Visualize it
 
-```{r}
+_If you were building this in an HTML output this would be an interactive network plot_
+
+```{r, eval=FALSE}
 visualize_network(pollinator_net, node_color_col = 'type', node_shape_col = 'none')
 ```
 
@@ -82,6 +84,9 @@ pollinator_net <- pollinator_net %>%
 
 
 Let's visualize this result on the network layout
+
+_If you were building this in an HTML output this would be an interactive network plot_
+
 
 ```{r}
 pollinator_net %>% 
@@ -129,6 +134,8 @@ pollinator_net %>%
 ```{r}
 visualize_propensity_dist(pollinator_net)
 ```
+
+_If you were building this in an HTML output this would be an interactive network plot_
 
 ```{r}
 pollinator_net %>% 
