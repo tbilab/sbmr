@@ -2,7 +2,7 @@ test_that("Proper number of edges happens", {
 
   n_nodes <- 5
   prob_of_edge <- 0.5
-  n_samples <- 100
+  n_samples <- 50
 
   sim_avg_con_count <- function(self_edges){
     1:n_samples %>%
@@ -10,7 +10,7 @@ test_that("Proper number of edges happens", {
         nrow(sim_random_network(n_nodes,
                                 prob_of_edge,
                                 allow_self_edges = self_edges,
-                                random_seed = 42)$edges)
+                                random_seed = 312)$edges)
       }) %>%
       mean()
   }
