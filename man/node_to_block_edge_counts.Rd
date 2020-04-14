@@ -31,7 +31,7 @@ net \%>\% node_to_block_edge_counts(node_id, connection_level = 1)
 
 }
 \seealso{
-\code{\link{get_block_edge_counts}}
+\code{\link{interblock_edge_counts}}
 
 Other advanced: 
 \code{\link{add_edge}()},
