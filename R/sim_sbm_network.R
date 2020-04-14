@@ -60,6 +60,11 @@ sim_sbm_network <- function(
   setup_model = FALSE,
   random_seed = NULL){
 
+  # Set random seed for R-based data generation if passed.
+  if(!is.null(random_seed)){
+    set.seed(random_seed)
+  }
+
   # Generate all the node names and their blocks
   nodes <- purrr::map2_dfr(
     block_info$block,
@@ -87,7 +92,7 @@ sim_sbm_network <- function(
 
   # Get all possible combinations of node-node pairs by their indices in
   # the nodes dataframe...
-  edge_pairs_inds <- get_combination_indices(length(nodes$id), repeats = allow_self_edges)
+  edge_pairs_inds <- combination_indices(length(nodes$id), repeats = allow_self_edges)
 
   # Extract indices from combination matrix and use to build an edge tibble
   node_1_inds <- edge_pairs_inds$a

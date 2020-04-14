@@ -97,6 +97,9 @@ accomplished by attr(sbm, 'state')." />
       <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
     <li>
+      <a href="../articles/bipartite_networks.html">bipartite_networks</a>
+    </li>
+    <li>
       <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
     </li>
   </ul>
@@ -123,7 +126,7 @@ accomplished by attr(sbm, 'state')." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Dump state of current SBM model to dataframe</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/get_state.R'><code>R/get_state.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/model__get_state.R'><code>R/model__get_state.R</code></a></small>
     <div class="hidden name"><code>get_state.Rd</code></div>
     </div>
 
@@ -159,10 +162,10 @@ hierarchy</p></dd>
 <code><a href='choose_best_collapse_state.html'>choose_best_collapse_state</a>()</code>,
 <code><a href='collapse_blocks.html'>collapse_blocks</a>()</code>,
 <code><a href='collapse_run.html'>collapse_run</a>()</code>,
-<code><a href='get_block_edge_counts.html'>get_block_edge_counts</a>()</code>,
-<code><a href='get_entropy.html'>get_entropy</a>()</code>,
-<code><a href='get_num_blocks.html'>get_num_blocks</a>()</code>,
-<code><a href='mcmc_sweep.html'>mcmc_sweep</a>()</code></p></div>
+<code><a href='entropy.html'>entropy</a>()</code>,
+<code><a href='interblock_edge_counts.html'>interblock_edge_counts</a>()</code>,
+<code><a href='mcmc_sweep.html'>mcmc_sweep</a>()</code>,
+<code><a href='n_blocks.html'>n_blocks</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
@@ -180,25 +183,16 @@ hierarchy</p></dd>
 <span class='co'># A small simulated network with no blocks</span>
 <span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='new_sbm_network.html'>new_sbm_network</a></span>(<span class='no'>edges</span>)
 
-<span class='fu'>get_state</span>(<span class='no'>net</span>)</div><div class='output co'>#&gt;   id parent type level
-#&gt; 1 a1   none node     0
-#&gt; 2 a2   none node     0
-#&gt; 3 a3   none node     0
-#&gt; 4 b1   none node     0
-#&gt; 5 b2   none node     0
-#&gt; 6 b3   none node     0
-#&gt; 7 b4   none node     0</div><div class='input'>
+<span class='fu'>get_state</span>(<span class='no'>net</span>)</div><div class='output co'>#&gt; NULL</div><div class='input'>
 <span class='co'># Add some blocks and state will reflect</span>
-<span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='fl'>2</span>) <span class='kw'>%&gt;%</span> <span class='fu'>get_state</span>()</div><div class='output co'>#&gt;         id   parent type level
-#&gt; 1       a1 node-1_1 node     0
-#&gt; 2       a2 node-1_1 node     0
-#&gt; 3       a3 node-1_1 node     0
-#&gt; 4       b1 node-1_1 node     0
-#&gt; 5       b2 node-1_1 node     0
-#&gt; 6       b3 node-1_1 node     0
-#&gt; 7       b4 node-1_1 node     0
-#&gt; 8 node-1_0     none node     1
-#&gt; 9 node-1_1     none node     1</div><div class='input'>
+<span class='no'>net</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='fl'>2</span>) <span class='kw'>%&gt;%</span> <span class='fu'>get_state</span>()</div><div class='output co'>#&gt;   id type    parent level
+#&gt; 1 a2 node bl_node_0     0
+#&gt; 2 b4 node bl_node_1     0
+#&gt; 3 b1 node bl_node_0     0
+#&gt; 4 a3 node bl_node_1     0
+#&gt; 5 a1 node bl_node_0     0
+#&gt; 6 b3 node bl_node_1     0
+#&gt; 7 b2 node bl_node_0     0</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

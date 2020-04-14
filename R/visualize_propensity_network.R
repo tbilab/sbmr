@@ -7,7 +7,8 @@
 #'
 #' @family visualizations
 #'
-#' @inheritParams  visualize_propensity_dist
+#' @inheritParams visualize_propensity_dist
+#' @inheritParams get_sweep_pair_counts
 #' @param proportion_threshold Threshold of pairwise propensity to consider two nodes linked. Choose carefully!
 #'
 #' @return An interactive network plot with force layout.
@@ -18,26 +19,21 @@
 #' set.seed(42)
 #' # Simulate network data and initialize model with it
 #' net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 30) %>%
-#'   collapse_blocks(desired_num_blocks = 1, sigma = 1.1) %>%
+#'   collapse_blocks(desired_n_blocks = 1, sigma = 1.1) %>%
 #'   choose_best_collapse_state(verbose = TRUE) %>%
 #'   mcmc_sweep(num_sweeps = 100, eps = 0.4, track_pairs = TRUE)
 #'
 #' # Plot connection propensity network
 #' visualize_propensity_network(net, proportion_threshold = 0.4)
 #'
-visualize_propensity_network <- function(sbm, proportion_threshold = 0.2){
+visualize_propensity_network <- function(sbm, proportion_threshold = 0.2, isolate_type = NULL){
   UseMethod("visualize_propensity_network")
 }
 
-visualize_propensity_network.default <- function(sbm, proportion_threshold = 0.2){
-  cat("visualize_propensity_network generic")
-}
-
 #' @export
-visualize_propensity_network.sbm_network <- function(sbm, proportion_threshold = 0.2){
-
+visualize_propensity_network.sbm_network <- function(sbm, proportion_threshold = 0.2, isolate_type = NULL){
   # Make sure we have propensity counts before proceeding
-  pair_counts <- get_sweep_pair_counts(sbm)
+  pair_counts <- get_sweep_pair_counts(sbm, isolate_type)
 
   edges <- pair_counts %>%
     dplyr::filter(proportion_connected > proportion_threshold) %>%
@@ -52,10 +48,15 @@ visualize_propensity_network.sbm_network <- function(sbm, proportion_threshold =
     tidyr::pivot_longer(c(node_a, node_b), values_to="id") %>%
     dplyr::group_by(id) %>%
     dplyr::summarise(avg_prop_connection = mean(proportion_connected[proportion_connected > 0])) %>%
-    dplyr::distinct(id, avg_prop_connection)
+    dplyr::distinct(id, avg_prop_connection) %>%
+    dplyr::left_join(sbm$nodes, by = "id")
 
-  new_sbm_network(edges = edges, nodes = nodes, setup_model = FALSE) %>%
-    visualize_network(node_color_col = "avg_prop_connection")
+  new_sbm_network(edges = edges,
+                  nodes = nodes,
+                  setup_model = FALSE,
+                  remove_isolated_nodes = FALSE) %>%
+    visualize_network(node_color_col = "avg_prop_connection",
+                      node_shape_col = "type")
 
 }
 

@@ -25,20 +25,22 @@ NULL
 #'
 #' @return A list with two vectors (`$a` and `$b`) containing integer indices of elements for every pair.
 #'
+#' @keywords internal
 #' @examples
 #'
-#' my_letters <- head(letters, 5)
 #' \dontrun{
-#' letter_pairs <- get_combination_indices(length(my_letters), repeats = FALSE)
+#' my_letters <- head(letters, 5)
+#'
+#' letter_pairs <- combination_indices(length(my_letters), repeats = FALSE)
 #'
 #' dplyr::tibble(
 #'   letter_1 = letters[letter_pairs$a],
 #'   letter_2 = letters[letter_pairs$b]
 #' )
-#'
 #' }
 #'
-get_combination_indices <- function(n, repeats = FALSE){
+#'
+combination_indices <- function(n, repeats = FALSE){
 
   rep_counts <- n:1
 
@@ -64,3 +66,6 @@ not_in <- function(a, b){
 }
 
 not_null <- function(x) !is.null(x)
+
+# just makes the syntax a bit easier to understand.
+get_model <- function(sbm) attr(sbm, "model")

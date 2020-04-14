@@ -26,7 +26,7 @@ Retrieves the dataframe recording the results of running either
 # Start with a random network of two blocks with 25 nodes each and
 # run agglomerative clustering with no intermediate MCMC steps on network
 my_sbm <- sim_basic_block_network(n_blocks = 2, n_nodes_per_block = 25) \%>\%
-  collapse_blocks(num_mcmc_sweeps = 0)
+  collapse_blocks(num_mcmc_sweeps = 0, sigma = 1.1)
 
 # Look at the results of the collapse directly
 get_collapse_results(my_sbm)

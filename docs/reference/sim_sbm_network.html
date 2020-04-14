@@ -99,6 +99,9 @@ who's main parameter the propensity value defines are needed." />
       <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
     <li>
+      <a href="../articles/bipartite_networks.html">bipartite_networks</a>
+    </li>
+    <li>
       <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
     </li>
   </ul>
@@ -227,26 +230,26 @@ reproducability.</p></td>
 
 <span class='fu'>sim_sbm_network</span>(<span class='no'>block_info</span>, <span class='no'>edge_propensities</span>, <span class='kw'>edge_dist</span> <span class='kw'>=</span> <span class='kw pkg'>purrr</span><span class='kw ns'>::</span><span class='no'><a href='https://purrr.tidyverse.org/reference/rbernoulli.html'>rbernoulli</a></span>)</div><div class='output co'>#&gt; SBM Network with 37 nodes of a single type and 245 edges. 
 #&gt;  
-#&gt; Nodes: <span style='color: #555555;'># A tibble: 6 x 3</span><span>
+#&gt; Nodes: <span style='color: #949494;'># A tibble: 6 x 3</span><span>
 #&gt;   id    block type 
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> a_1   a     node 
-#&gt; </span><span style='color: #555555;'>2</span><span> a_2   a     node 
-#&gt; </span><span style='color: #555555;'>3</span><span> a_3   a     node 
-#&gt; </span><span style='color: #555555;'>4</span><span> a_4   a     node 
-#&gt; </span><span style='color: #555555;'>5</span><span> a_5   a     node 
-#&gt; </span><span style='color: #555555;'>6</span><span> a_6   a     node 
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> a_1   a     node 
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> a_2   a     node 
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> a_3   a     node 
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> a_4   a     node 
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> a_5   a     node 
+#&gt; </span><span style='color: #BCBCBC;'>6</span><span> a_6   a     node 
 #&gt; ... 
 #&gt;  
-#&gt; Edges: </span><span style='color: #555555;'># A tibble: 6 x 3</span><span>
+#&gt; Edges: </span><span style='color: #949494;'># A tibble: 6 x 3</span><span>
 #&gt;   from  to    edges
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> a_1   a_2       1
-#&gt; </span><span style='color: #555555;'>2</span><span> a_1   a_3       1
-#&gt; </span><span style='color: #555555;'>3</span><span> a_1   a_4       1
-#&gt; </span><span style='color: #555555;'>4</span><span> a_1   a_9       1
-#&gt; </span><span style='color: #555555;'>5</span><span> a_1   a_10      1
-#&gt; </span><span style='color: #555555;'>6</span><span> a_1   b_2       1
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> a_1   a_2       1
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> a_1   a_3       1
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> a_1   a_4       1
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> a_1   a_9       1
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> a_1   a_10      1
+#&gt; </span><span style='color: #BCBCBC;'>6</span><span> a_1   b_2       1
 #&gt; ... 
 #&gt;  </div><div class='input'>
 </div></span></pre>

@@ -36,13 +36,13 @@
 
 
 <meta property="og:title" content="Assign blocks for all nodes — initialize_blocks" />
-<meta property="og:description" content="Initializes blocks for a given level of network. When num_blocks = -1 (the
+<meta property="og:description" content="Initializes blocks for a given level of network. When n_blocks = -1 (the
 default) this will simply give every node its own block. Otherwise it will
 randomly draw each nodes block from num_block possible parent nodes for
-each node type. E.g. if network is bipartite and num_blocks == 3 a total of
+each node type. E.g. if network is bipartite and n_blocks == 3 a total of
 3*2 = 6 blocks will be added and assigned randomly to nodes. Because of
 random assignment of parents there may sometimes be less blocks than
-num_blocks * &amp;lt;num_types&amp;gt; due to some block nodes never being assigned to a
+n_blocks * &amp;lt;num_types&amp;gt; due to some block nodes never being assigned to a
 child node." />
 <meta name="twitter:card" content="summary" />
 
@@ -102,6 +102,9 @@ child node." />
       <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
     <li>
+      <a href="../articles/bipartite_networks.html">bipartite_networks</a>
+    </li>
+    <li>
       <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
     </li>
   </ul>
@@ -128,22 +131,22 @@ child node." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Assign blocks for all nodes</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/initialize_blocks.R'><code>R/initialize_blocks.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/nstrayer/sbmR/blob/master/R/model__initialize_blocks.R'><code>R/model__initialize_blocks.R</code></a></small>
     <div class="hidden name"><code>initialize_blocks.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Initializes blocks for a given level of network. When <code>num_blocks = -1</code> (the
+    <p>Initializes blocks for a given level of network. When <code>n_blocks = -1</code> (the
 default) this will simply give every node its own block. Otherwise it will
 randomly draw each nodes block from <code>num_block</code> possible parent nodes for
-each node type. E.g. if network is bipartite and <code>num_blocks == 3</code> a total of
+each node type. E.g. if network is bipartite and <code>n_blocks == 3</code> a total of
 <code>3*2 = 6</code> blocks will be added and assigned randomly to nodes. Because of
 random assignment of parents there may sometimes be less blocks than
-<code>num_blocks * &lt;num_types&gt;</code> due to some block nodes never being assigned to a
+<code>n_blocks * &lt;num_types&gt;</code> due to some block nodes never being assigned to a
 child node.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>initialize_blocks</span>(<span class='no'>sbm</span>, <span class='kw'>num_blocks</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
+    <pre class="usage"><span class='fu'>initialize_blocks</span>(<span class='no'>sbm</span>, <span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -154,14 +157,9 @@ child node.</p>
 <code><a href='new_sbm_network.html'>new_sbm_network</a></code>.</p></td>
     </tr>
     <tr>
-      <th>num_blocks</th>
+      <th>n_blocks</th>
       <td><p>Total number of blocks to initialize for each unique node
 type. If set to <code>-1</code>, then a single block is made for every node.</p></td>
-    </tr>
-    <tr>
-      <th>level</th>
-      <td><p>Level of child node. This will almost always stay at default
-value of <code>0</code>.</p></td>
     </tr>
     </table>
 
@@ -174,8 +172,7 @@ value of <code>0</code>.</p></td>
     <div class='dont-index'><p>Other advanced: 
 <code><a href='add_edge.html'>add_edge</a>()</code>,
 <code><a href='add_node.html'>add_node</a>()</code>,
-<code><a href='get_node_to_block_edge_counts.html'>get_node_to_block_edge_counts</a>()</code>,
-<code><a href='set_node_parent.html'>set_node_parent</a>()</code>,
+<code><a href='node_to_block_edge_counts.html'>node_to_block_edge_counts</a>()</code>,
 <code><a href='update_state.html'>update_state</a>()</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -197,18 +194,18 @@ value of <code>0</code>.</p></td>
 <span class='co'># Default values of function will give every node its own block</span>
 <span class='no'>net</span> <span class='kw'>%&gt;%</span>
   <span class='fu'>initialize_blocks</span>() <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='get_num_blocks.html'>get_num_blocks</a></span>()</div><div class='output co'>#&gt; [1] 7</div><div class='input'>
+  <span class='fu'><a href='n_blocks.html'>n_blocks</a></span>()</div><div class='output co'>#&gt; [1] 7</div><div class='input'>
 <span class='co'># You can also decide to have a given number of blocks randomly assigned Here</span>
 <span class='co'># four blocks result because two random blocks are made for each of the two</span>
 <span class='co'># types</span>
 <span class='no'>net</span> <span class='kw'>%&gt;%</span>
-  <span class='fu'>initialize_blocks</span>(<span class='kw'>num_blocks</span> <span class='kw'>=</span> <span class='fl'>2</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='get_num_blocks.html'>get_num_blocks</a></span>()</div><div class='output co'>#&gt; [1] 2</div><div class='input'>
+  <span class='fu'>initialize_blocks</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>2</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='n_blocks.html'>n_blocks</a></span>()</div><div class='output co'>#&gt; [1] 7</div><div class='input'>
 <span class='co'># If you have a polypartite network each set of node types will get their own</span>
-<span class='co'># set of `num_blocks` randomly assigned</span>
+<span class='co'># set of `n_blocks` randomly assigned</span>
 <span class='fu'><a href='new_sbm_network.html'>new_sbm_network</a></span>(<span class='no'>edges</span>, <span class='kw'>bipartite_edges</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'>initialize_blocks</span>(<span class='kw'>num_blocks</span> <span class='kw'>=</span> <span class='fl'>2</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='get_num_blocks.html'>get_num_blocks</a></span>()</div><div class='output co'>#&gt; [1] 4</div><div class='input'>
+  <span class='fu'>initialize_blocks</span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>2</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='n_blocks.html'>n_blocks</a></span>()</div><div class='output co'>#&gt; [1] 4</div><div class='input'>
 
 </div></pre>
   </div>

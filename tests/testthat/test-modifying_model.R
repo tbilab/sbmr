@@ -19,6 +19,7 @@ test_that("Add Node", {
   # We should have a single node added
   expect_equal(attr(net, 'n_nodes'), 6)
 
+
   # Adding node again will let user know nothing happened
   expect_message({
       net <- net %>% add_node('new_node', show_messages = TRUE)
@@ -26,19 +27,19 @@ test_that("Add Node", {
     "new_node node was already in network. No action taken.",
     fixed = TRUE
   )
+
   # We should have a no nodes added
   expect_equal(attr(net, 'n_nodes'), 6)
 
   # Adding an new node with a specified type should work with no messages
   expect_silent({
-    net <- net %>% add_node('new_test_node', type = "test_node", show_messages = TRUE)
+    net <- net %>% add_node('new_test_node', type = "node", show_messages = TRUE)
   })
 
   # One more node should be added
   expect_equal(attr(net, 'n_nodes'), 7)
 
-  # If we try and add a node that has the same name as a previous node but a
-  # different type, a error should sound
+  # If we try and add a node that has a type not in the initially nodes passed, an error should sound
   expect_error({
       net <- net %>% add_node('new_node', type = "test_node", show_messages = TRUE)
     },
@@ -85,55 +86,6 @@ test_that("Add edge", {
   expect_equal(attr(net, 'n_edges'), pre_addition_edges + 1)
 })
 
-
-test_that("Set node parent", {
-  # Start with bipartite network with 6 nodes
-  net <- dplyr::tribble(
-      ~a_node, ~b_node,
-      "a1"   , "b1"   ,
-      "a1"   , "b2"   ,
-      "a1"   , "b3"   ,
-      "a2"   , "b1"   ,
-      "a3"   , "b1"
-    ) %>%
-  new_sbm_network(bipartite_edges = TRUE,
-                  edges_from_col = a_node,
-                  edges_to_col = b_node,
-                  random_seed = 42)
-
-
-  # Make a parent node and assign it to a1
-  net <- set_node_parent(net, child_id = 'a1', parent_id = 'a1_parent')
-
-  new_state <- get_state(net)
-  # Now we should have a state with 6 total nodes...
-  expect_equal(nrow(new_state), 7)
-
-  # One of which has the id of node_1_parent...
-  index_of_new_parent <- which(new_state$id == 'a1_parent')
-
-  # Check new parent exists
-  expect_equal(length(index_of_new_parent), 1)
-
-  # Make sure it has the proper level
-  expect_equal(new_state$level[index_of_new_parent], 1)
-
-  # Make sure it has the proper type
-  expect_equal(new_state$type[index_of_new_parent], 'a_node')
-
-  # The node a1 should have a parent of a1_parent
-  expect_equal(new_state$parent[new_state$id == "a1"], 'a1_parent')
-
-  # Now we can add a parent to the parent
-  net <- set_node_parent(net, child_id = 'a1_parent', parent_id = 'a1_grandparent')
-
-  new_new_state <- get_state(net)
-  index_of_new_grandparent <- which(new_new_state$id == 'a1_grandparent')
-  # Make sure grandparent has proper level
-  expect_equal(new_new_state$level[index_of_new_grandparent], 2)
-})
-
-
 test_that("Randomly initializing blocks in network", {
   # Default value is 1 block per node
   expect_equal(
@@ -141,17 +93,17 @@ test_that("Randomly initializing blocks in network", {
                        prob_of_edge = 1,
                        random_seed = 42) %>%
       initialize_blocks() %>%
-      get_num_blocks(),
+      n_blocks(),
     5
   )
 
   # Can also specify number of blocks
   expect_equal(
-    sim_random_network(n_nodes = 5,
+    sim_random_network(n_nodes = 15,
                        prob_of_edge = 1,
                        random_seed = 42) %>%
-      initialize_blocks(num_blocks = 3) %>%
-      get_num_blocks(),
+      initialize_blocks(n_blocks = 3) %>%
+      n_blocks(),
     3
   )
 
@@ -160,8 +112,8 @@ test_that("Randomly initializing blocks in network", {
     sim_random_network(n_nodes = 5,
                        prob_of_edge = 1,
                        random_seed = 42) %>%
-      initialize_blocks(num_blocks = 10),
-    "Network only has 5 nodes at level 0. Can't initialize 10 blocks"
+      initialize_blocks(n_blocks = 10),
+    "Can't initialize 10 blocks as there are only 5 nodes"
   )
 
   # Can't request negative numbers of blocks
@@ -169,7 +121,7 @@ test_that("Randomly initializing blocks in network", {
     sim_random_network(n_nodes = 5,
                        prob_of_edge = 1,
                        random_seed = 42) %>%
-      initialize_blocks(num_blocks = -2),
+      initialize_blocks(n_blocks = -2),
     "Can't initialize -2 blocks."
   )
 
@@ -178,16 +130,16 @@ test_that("Randomly initializing blocks in network", {
                             prob_of_edge = 1,
                             random_seed = 42) %>%
     initialize_blocks() %>%
-    initialize_blocks(level = 1)
+    initialize_blocks()
 
-  model_state <- get_state(net)
+  model_state <- state(net)
 
-  # There should now be fifteen total nodes in state
-  expect_equal(nrow(model_state), 15)
+  # There should now be 10 total nodes in state
+  expect_equal(nrow(model_state), 10)
 
-  # With five total blocks sitting at level 2
+  # With five total blocks sitting at level 1
   expect_equal(
-    sum(model_state$level == 2),
+    sum(model_state$level == 1),
     5
   )
 })

@@ -6,8 +6,8 @@
 \usage{
 visualize_network(
   sbm,
-  node_color_col = "block",
   node_shape_col = "type",
+  node_color_col = "none",
   width = "100\%",
   height = NULL
 )
@@ -15,13 +15,13 @@ visualize_network(
 \arguments{
 \item{sbm}{Object of class \code{sbm_network}.}
 
+\item{node_shape_col}{Name of column in the \code{nodes} dataframe that should be
+encoded with shape of nodes in the plot}
+
 \item{node_color_col}{Name of column in the \code{nodes} dataframe that should be
 encoded with color of nodes in the plot. If this value is numeric (defined
 as more than 10 unique values that are numbers) the network will color
 nodes on a linear scale from the min value to the highest value.}
-
-\item{node_shape_col}{Name of column in the \code{nodes} dataframe that should be
-encoded with shape of nodes in the plot}
 
 \item{width}{Desired width for output widget.}
 
@@ -39,8 +39,11 @@ net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 15)
 # Visualize network with color encoding the blocks
 visualize_network(net)
 
-# Visualize network with shape encoding the blocks
-visualize_network(net, node_shape_col = 'block', node_color_col = 'type')
+# Visualize network with shape encoding the true blocks
+visualize_network(net, node_shape_col = 'block')
+
+# Visualize network with color encoding the true blocks
+visualize_network(net, node_color_col = 'block')
 
 }
 \seealso{

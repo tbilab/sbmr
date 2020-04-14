@@ -1,0 +1,167 @@
+---
+title: "bipartite_networks"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{bipartite_newtorks}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+is_html <- knitr::is_html_output()
+
+html_message <- if(is_html) "" else "_If you were building this in an HTML output this would be an interactive network plot_"
+
+
+```
+
+```{r setup}
+library(sbmr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+
+
+Start with the package included pollinators network.
+
+```{r load-data}
+clements_pollinators %>% head()
+
+bind_rows(
+  count(clements_pollinators, pollinator) %>% 
+    transmute(id = pollinator, degree = n, type = "pollinator"),
+  count(clements_pollinators, flower) %>% 
+    transmute(id = flower, degree = n, type = "flower")
+) %>% 
+  ggplot(aes(x = degree)) +
+  geom_histogram(binwidth = 1, color = 'white') +
+  facet_grid(rows = "type", scales = "free_y") +
+  labs(title = "Degree distributions for flower and pollinator nodes",
+       subtitle = "Note different y-axis scales")
+```
+
+## Load into SBM
+
+```{r}
+pollinator_net <- new_sbm_network(edges = clements_pollinators,
+                                  bipartite_edges = TRUE,
+                                  edges_from_column = pollinator,
+                                  edges_to_column = flower,
+                                  random_seed = 42)
+
+pollinator_net
+```
+
+## Visualize it
+
+`r html_message`
+
+```{r}
+if(is_html){
+  visualize_network(pollinator_net, 
+                    node_color_col = 'type', 
+                    node_shape_col = 'none')
+}
+```
+
+
+
+## Run agglomerative merging to find initial MCMC State
+
+```{r}
+pollinator_net <- pollinator_net %>% 
+  collapse_blocks(desired_n_blocks = 4,
+                  num_mcmc_sweeps = 5,
+                  sigma = 1.1)
+```
+
+
+```{r}
+visualize_collapse_results(pollinator_net, heuristic = "delta_ratio")
+```
+So we have a very clear peak. Let's select it as our starting position. 
+
+```{r}
+pollinator_net <- pollinator_net %>% 
+  choose_best_collapse_state(heuristic = "delta_ratio", verbose = TRUE)
+```
+
+
+Let's visualize this result on the network layout
+
+
+
+`r html_message`
+
+
+```{r}
+if(is_html){
+  pollinator_net %>% 
+    visualize_network(node_shape_col = 'type', 
+                      node_color_col = 'block')
+}
+```
+
+## MCMC Sweeping
+
+We can now run 200 sweeps from the initial position chosen by the collapse...
+
+```{r}
+num_sweeps <- 200
+
+pollinator_net <- pollinator_net %>%
+  mcmc_sweep(num_sweeps = num_sweeps, 
+             eps = 0.1, 
+             track_pairs = TRUE)
+
+pollinator_net %>% 
+  visualize_mcmc_trace() +
+  labs(title = glue::glue('Result of {num_sweeps} MCMC sweeps'),
+       subtitle = "Entropy Delta of sweep and number of nodes moved for sweep")
+```
+
+
+## Visualizing propensity matrix
+
+```{r}
+pollinator_net %>% 
+  get_sweep_pair_counts() %>% 
+  ggplot(aes(x = node_a, y = node_b, fill = proportion_connected)) +
+  geom_raster() +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  labs(x = "node a", 
+       y = "node b",
+       fill = "Proportion of sweeps\nin same block",
+       title = "Node block consensus matrix")
+```
+
+## ECDF of propensity distribution
+
+```{r}
+visualize_propensity_dist(pollinator_net)
+```
+
+
+`r html_message`
+
+```{r}
+if(is_html){
+  pollinator_net %>% 
+    visualize_propensity_network(proportion_threshold = 0.01, 
+                                 isolate_type = "flower")
+}
+```
+
+
+
+

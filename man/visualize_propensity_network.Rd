@@ -4,12 +4,18 @@
 \alias{visualize_propensity_network}
 \title{Plot network of nodes connected by pairwise block propensity}
 \usage{
-visualize_propensity_network(sbm, proportion_threshold = 0.2)
+visualize_propensity_network(
+  sbm,
+  proportion_threshold = 0.2,
+  isolate_type = NULL
+)
 }
 \arguments{
 \item{sbm}{Object of class \code{sbm_network}.}
 
 \item{proportion_threshold}{Threshold of pairwise propensity to consider two nodes linked. Choose carefully!}
+
+\item{isolate_type}{Node type to be isolated for visualization. If left empty all types are included.}
 }
 \value{
 An interactive network plot with force layout.
@@ -24,7 +30,7 @@ propensity to be in the same block is above some threshold.
 set.seed(42)
 # Simulate network data and initialize model with it
 net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 30) \%>\%
-  collapse_blocks(desired_num_blocks = 1, sigma = 1.1) \%>\%
+  collapse_blocks(desired_n_blocks = 1, sigma = 1.1) \%>\%
   choose_best_collapse_state(verbose = TRUE) \%>\%
   mcmc_sweep(num_sweeps = 100, eps = 0.4, track_pairs = TRUE)
 

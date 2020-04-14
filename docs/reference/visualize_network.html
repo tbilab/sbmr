@@ -96,6 +96,9 @@ membership and type (if present) for a passed network." />
       <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
     <li>
+      <a href="../articles/bipartite_networks.html">bipartite_networks</a>
+    </li>
+    <li>
       <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
     </li>
   </ul>
@@ -133,8 +136,8 @@ membership and type (if present) for a passed network.</p>
 
     <pre class="usage"><span class='fu'>visualize_network</span>(
   <span class='no'>sbm</span>,
-  <span class='kw'>node_color_col</span> <span class='kw'>=</span> <span class='st'>"block"</span>,
   <span class='kw'>node_shape_col</span> <span class='kw'>=</span> <span class='st'>"type"</span>,
+  <span class='kw'>node_color_col</span> <span class='kw'>=</span> <span class='st'>"none"</span>,
   <span class='kw'>width</span> <span class='kw'>=</span> <span class='st'>"100%"</span>,
   <span class='kw'>height</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
@@ -147,16 +150,16 @@ membership and type (if present) for a passed network.</p>
       <td><p>Object of class <code>sbm_network</code>.</p></td>
     </tr>
     <tr>
+      <th>node_shape_col</th>
+      <td><p>Name of column in the <code>nodes</code> dataframe that should be
+encoded with shape of nodes in the plot</p></td>
+    </tr>
+    <tr>
       <th>node_color_col</th>
       <td><p>Name of column in the <code>nodes</code> dataframe that should be
 encoded with color of nodes in the plot. If this value is numeric (defined
 as more than 10 unique values that are numbers) the network will color
 nodes on a linear scale from the min value to the highest value.</p></td>
-    </tr>
-    <tr>
-      <th>node_shape_col</th>
-      <td><p>Name of column in the <code>nodes</code> dataframe that should be
-encoded with shape of nodes in the plot</p></td>
     </tr>
     <tr>
       <th>width</th>
@@ -185,7 +188,8 @@ encoded with shape of nodes in the plot</p></td>
 <span class='fu'>visualize_network</span>(<span class='no'>net</span>)
 
 <span class='co'># Visualize network with shape encoding the blocks</span>
-<span class='fu'>visualize_network</span>(<span class='no'>net</span>, <span class='kw'>node_shape_col</span> <span class='kw'>=</span> <span class='st'>'block'</span>, <span class='kw'>node_color_col</span> <span class='kw'>=</span> <span class='st'>'type'</span>)</div></pre>
+<span class='fu'>visualize_network</span>(<span class='no'>net</span>, <span class='kw'>node_shape_col</span> <span class='kw'>=</span> <span class='st'>'block'</span>, <span class='kw'>node_color_col</span> <span class='kw'>=</span> <span class='st'>'type'</span>)</div><div class='output co'>#&gt; <span class='error'>Error in visualize_network.sbm_network(net, node_shape_col = "block",     node_color_col = "type"): Can't visualize block structure as model has not been initialized.</span></div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

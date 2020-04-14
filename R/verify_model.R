@@ -35,13 +35,11 @@ verify_model <- function(sbm, show_messages = FALSE, warn_about_random_seed = TR
 verify_model.sbm_network <- function(sbm, show_messages = FALSE, warn_about_random_seed = TRUE){
   has_model_already <- not_null(attr(sbm, 'model'))
   has_state_already <- not_null(attr(sbm, "state"))
-  has_random_seed <- not_null(attr(sbm, 'random_seed'))
-
   if (has_model_already){
     model_is_stale <- tryCatch(
       error = function(err) TRUE,
       {
-        attr(sbm, 'model')$get_state()
+        attr(sbm, 'model')$n_levels()
         FALSE
       })
 
@@ -52,58 +50,18 @@ verify_model.sbm_network <- function(sbm, show_messages = FALSE, warn_about_rand
       return(sbm)
     }
 
-    if(has_random_seed & warn_about_random_seed){
+    if(warn_about_random_seed){
       warning("Random seed was specified but model is being restarted from a saved state.\nThis will harm reproducability if compared to uninterupted use of model.")
     }
   }
 
-  if(has_random_seed){
-    # Instantiate instance of sbm class with random seed
-    sbm_model <- methods::new(SBM, as.integer(attr(sbm, 'random_seed')))
-  } else {
-    # Instantiate instance of sbm class with no random seed
-    sbm_model <- methods::new(SBM)
-  }
-
-
-  # Fill in all the needed nodes
-  # bind the integer types to nodes before sending them to model
-  purrr::walk2(sbm$nodes$id, sbm$nodes$type, function(id, type){ sbm_model$add_node(id, type, 0L) })
-
-  # If the model has a allowed node pairs list, let model know before adding edges
-  allowed_pairs <- attr(sbm, 'edge_types')
-  if(not_null(allowed_pairs)){
-    sbm_model$add_edge_types(dplyr::pull(allowed_pairs, !!attr(sbm, "from_column")),
-                             dplyr::pull(allowed_pairs, !!attr(sbm, "to_column")))
-  }
-
-  # Fill in the edges
-  from_nodes <- dplyr::pull(sbm$edges, !!attr(sbm, "from_column"))
-  to_nodes <- dplyr::pull(sbm$edges, !!attr(sbm, "to_column"))
-  for(i in 1:attr(sbm, "n_edges")){
-    sbm_model$add_edge(from_nodes[i],
-                       to_nodes[i])
-  }
-
-  if (has_state_already) {
-    if(show_messages) message("Reloading saved model state.")
-
-    # Reload using saved state to get model back to working condition
-    previous_state <- attr(sbm, "state")
-
-    # Reload state using the s4 method for doing so exposed by rcpp
-    sbm_model$set_state(previous_state$id,
-                              previous_state$parent,
-                              previous_state$level,
-                              previous_state$type)
-  } else {
-    if(show_messages) message("New SBM model object initialized.")
-    # Update object state with newly created state
-    attr(sbm, "state") <- sbm_model$get_state()
-  }
-
   # Assign sbm_model object to name model in sbm_network object
-  attr(sbm, 'model') <- sbm_model
+  attr(sbm, 'model') <- new_sbm_s4(nodes = sbm$nodes,
+                                   edges = dplyr::rename(sbm$edges, a = !!attr(sbm, "from_column"), b = !!attr(sbm, "to_column")),
+                                   node_types = attr(sbm, "node_types"),
+                                   allowed_edge_types = attr(sbm, "allowed_edge_types"),
+                                   state_df =  attr(sbm, "state"),
+                                   random_seed = attr(sbm, "random_seed"))
 
   # Give back sbm_network object
   sbm

@@ -21,7 +21,7 @@
 #'
 #' # Setup fake entropy and number of blocks vectors
 #' entropy <- -(10:1)*1000 + rnorm(10, 200)
-#' num_blocks <- 1:10
+#' n_blocks <- 1:10
 #'
 #' # Works with heuristic functions that take two arguments
 #' nls_score <- function(e, k){
@@ -29,15 +29,15 @@
 #'   -residuals(entropy_model)
 #' }
 #'
-#' build_score_fn(nls_score)(entropy, num_blocks)
+#' build_score_fn(nls_score)(entropy, n_blocks)
 #'
 #' # Works with functions that take one argument
 #' invert_score <- function(e) -e/2
-#' build_score_fn(invert_score)(entropy, num_blocks)
+#' build_score_fn(invert_score)(entropy, n_blocks)
 #'
 #' # Works with predefined strings
-#' build_score_fn("dev_from_rolling_mean")(entropy, num_blocks)
-#' build_score_fn("lowest")(entropy, num_blocks)
+#' build_score_fn("dev_from_rolling_mean")(entropy, n_blocks)
+#' build_score_fn("lowest")(entropy, n_blocks)
 #'
 build_score_fn <- function(heuristic){
 

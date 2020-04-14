@@ -6,8 +6,8 @@
 \usage{
 choose_best_collapse_state(
   sbm,
-  use_entropy_value_for_score = FALSE,
   heuristic = "dev_from_rolling_mean",
+  use_entropy = FALSE,
   verbose = FALSE
 )
 }
@@ -15,15 +15,16 @@ choose_best_collapse_state(
 \item{sbm}{\code{sbm_network} object as created by
 \code{\link{new_sbm_network}}.}
 
-\item{use_entropy_value_for_score}{If set to \code{TRUE} then instead of the merge
-results entropy delta being used for the score function the entropy will
-be. Typically the heuristics work better on entropy delta values.}
-
 \item{heuristic}{How the best partitioning is defined. Takes either a
 function that takes one/two arguments: an entropy vector and an optional
 number of blocks vector with each element corresponding to a given
 location, or a string labeling algorithm. Currently only \code{"lowest"},
 \code{"dev_from_rolling_mean"}, \code{"delta_ratio"}, \code{"trend_deviation"}, and \code{"nls_residual"} are supported.}
+
+\item{use_entropy}{Should the score be calculated with the entropy of the
+collapse? If \code{FALSE}, the entropy delta will be used. The full entropy is
+needed to make comparisons across separate collapses in the case of
+\code{\link{collapse_run}}.}
 
 \item{verbose}{Should model tell you what step was chosen (\code{TRUE} or
 \code{FALSE})?}
@@ -40,7 +41,7 @@ set.seed(42)
 
 # Start with a random network of two blocks with 25 nodes each
 net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 25) \%>\%
-  collapse_blocks(sigma = 2)
+  collapse_blocks(sigma = 1.4)
 
 # Choose best result with default heuristic
 net <- choose_best_collapse_state(net, verbose = TRUE)
@@ -64,10 +65,10 @@ visualize_collapse_results
 Other modeling: 
 \code{\link{collapse_blocks}()},
 \code{\link{collapse_run}()},
-\code{\link{get_block_edge_counts}()},
-\code{\link{get_entropy}()},
-\code{\link{get_num_blocks}()},
-\code{\link{get_state}()},
-\code{\link{mcmc_sweep}()}
+\code{\link{entropy}()},
+\code{\link{interblock_edge_counts}()},
+\code{\link{mcmc_sweep}()},
+\code{\link{n_blocks}()},
+\code{\link{state}()}
 }
 \concept{modeling}

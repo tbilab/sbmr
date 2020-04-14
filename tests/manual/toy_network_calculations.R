@@ -13,7 +13,7 @@ ent <- function(e_rs,e_r,e_s,self = FALSE){
 }
 
 # Extra connection network default state
-get_entropy <- function(e_a, e_b, e_c, e_aa, e_ab, e_ac, e_bb, e_cb, e_cc, node_degrees){
+entropy <- function(e_a, e_b, e_c, e_aa, e_ab, e_ac, e_bb, e_cb, e_cc, node_degrees){
   edge_counts <- (e_a + e_b + e_c)/2
 
   degree_sum <- tibble(degrees = node_degrees) %>%
@@ -34,7 +34,7 @@ prob_move_to_block <- function(e_ts, e_t, eps, B){
 }
 
 # Extra edge network in default format
-pre_move_uni <- get_entropy(
+pre_move_uni <- entropy(
   e_a = 8,
   e_b = 9,
   e_c = 7,
@@ -57,7 +57,7 @@ p_n4_to_c <- prob_move_to_block(
 )
 
 # Extra edge network in n4 -> c format
-post_move_uni <- get_entropy(
+post_move_uni <- entropy(
   e_a = 8,
   e_b = 4,
   e_c = 12,
@@ -87,7 +87,7 @@ unipartite_move_prob <- exp(unipartite_ent_delta)*(p_n4_to_c/p_n4_back_to_b)
 unipartite_move_prob
 
 # Function to do the same for a simple bipartite network
-get_entropy_bipartite <- function(e_a11, e_a12, e_a13, e_b11, e_b12, e_b13,
+entropy_bipartite <- function(e_a11, e_a12, e_a13, e_b11, e_b12, e_b13,
                                   a11_b11, a11_b12, a11_b13,
                                   a12_b11, a12_b12, a12_b13,
                                   a13_b11, a13_b12, a13_b13,
@@ -109,7 +109,7 @@ get_entropy_bipartite <- function(e_a11, e_a12, e_a13, e_b11, e_b12, e_b13,
 }
 
 # Bipartite model in base state
-pre_move_bi <- get_entropy_bipartite(e_a11 = 1, e_a12 = 5, e_a13 = 1, e_b11 = 5, e_b12 = 1, e_b13 = 1,
+pre_move_bi <- entropy_bipartite(e_a11 = 1, e_a12 = 5, e_a13 = 1, e_b11 = 5, e_b12 = 1, e_b13 = 1,
                       a11_b11 = 1, a11_b12 = 0, a11_b13 = 0,
                       a12_b11 = 4, a12_b12 = 0, a12_b13 = 1,
                       a13_b11 = 0, a13_b12 = 1, a13_b13 = 0,
@@ -125,7 +125,7 @@ p_a2_to_a11 <- prob_move_to_block(
 
 
 # Bipartite entropy after moving a2 -> a_11
-post_move_bi <- get_entropy_bipartite(e_a11 = 3, e_a12 = 3, e_a13 = 1, e_b11 = 5, e_b12 = 1, e_b13 = 1,
+post_move_bi <- entropy_bipartite(e_a11 = 3, e_a12 = 3, e_a13 = 1, e_b11 = 5, e_b12 = 1, e_b13 = 1,
                       a11_b11 = 3, a11_b12 = 0, a11_b13 = 0,
                       a12_b11 = 2, a12_b12 = 0, a12_b13 = 1,
                       a13_b11 = 0, a13_b12 = 1, a13_b13 = 0,

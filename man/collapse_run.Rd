@@ -68,17 +68,17 @@ net \%>\% get_collapse_results()
 net \%>\% visualize_collapse_results()
 
 # We can choose best result with default heuristic
-net <- choose_best_collapse_state(net, verbose = TRUE)
+net <- choose_best_collapse_state(net, verbose = TRUE, use_entropy = TRUE)
 
 }
 \seealso{
 Other modeling: 
 \code{\link{choose_best_collapse_state}()},
 \code{\link{collapse_blocks}()},
-\code{\link{get_block_edge_counts}()},
-\code{\link{get_entropy}()},
-\code{\link{get_num_blocks}()},
-\code{\link{get_state}()},
-\code{\link{mcmc_sweep}()}
+\code{\link{entropy}()},
+\code{\link{interblock_edge_counts}()},
+\code{\link{mcmc_sweep}()},
+\code{\link{n_blocks}()},
+\code{\link{state}()}
 }
 \concept{modeling}

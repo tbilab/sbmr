@@ -5,9 +5,9 @@ test_that("computing entropy", {
                             random_seed = 42) %>%
     initialize_blocks(10)
 
-  first_entropy <- net %>% get_entropy()
+  first_entropy <- net %>% entropy()
 
-  start_state <- get_state(net)
+  start_state <- state(net)
 
   # Choose random node
   random_node <- start_state %>%
@@ -16,14 +16,17 @@ test_that("computing entropy", {
 
   # Find a _new_ parent for our random node
   random_new_parent <- start_state %>%
-    dplyr::filter(level == 1, id != random_node$parent) %>%
-    dplyr::sample_n(1)
+    dplyr::filter(parent != random_node$parent) %>%
+    dplyr::sample_n(1) %>%
+    dplyr::pull(parent)
 
-  # Assign node its new parent
-  net <- net %>% set_node_parent(child_id = random_node$id, parent_id = random_new_parent$id)
+  # Assign node its new parent by modifying state
+  net <- net %>%
+    update_state(dplyr::mutate(start_state,
+                              parent = ifelse(id == random_node$id, random_new_parent, parent)))
 
   # Record entropy again
-  second_entropy <- net %>% get_entropy()
+  second_entropy <- net %>% entropy()
 
   # Entropy should have changed
   expect_false(first_entropy == second_entropy)

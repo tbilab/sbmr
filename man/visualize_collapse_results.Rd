@@ -4,24 +4,21 @@
 \alias{visualize_collapse_results}
 \title{Visualize agglomerative collapse results}
 \usage{
-visualize_collapse_results(
-  sbm,
-  use_entropy_value_for_score = FALSE,
-  heuristic = NULL
-)
+visualize_collapse_results(sbm, heuristic = NULL, use_entropy = FALSE)
 }
 \arguments{
 \item{sbm}{Object of class \code{sbm_network}.}
-
-\item{use_entropy_value_for_score}{If set to \code{TRUE} then instead of the merge
-results entropy delta being used for the score function the entropy will
-be. Typically the heuristics work better on entropy delta values.}
 
 \item{heuristic}{How the best partitioning is defined. Takes either a
 function that takes one/two arguments: an entropy vector and an optional
 number of blocks vector with each element corresponding to a given
 location, or a string labeling algorithm. Currently only \code{"lowest"},
 \code{"dev_from_rolling_mean"}, \code{"delta_ratio"}, \code{"trend_deviation"}, and \code{"nls_residual"} are supported.}
+
+\item{use_entropy}{Should the score be calculated with the entropy of the
+collapse? If \code{FALSE}, the entropy delta will be used. The full entropy is
+needed to make comparisons across separate collapses in the case of
+\code{\link{collapse_run}}.}
 }
 \value{
 GGplot object comparing the fit results and each step's deviance from

@@ -99,6 +99,9 @@ passed edges dataframe as two different types of nodes." />
       <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
     <li>
+      <a href="../articles/bipartite_networks.html">bipartite_networks</a>
+    </li>
+    <li>
       <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
     </li>
   </ul>
@@ -144,10 +147,11 @@ passed edges dataframe as two different types of nodes.</p>
   <span class='kw'>edges_to_column</span> <span class='kw'>=</span> <span class='no'>to</span>,
   <span class='kw'>bipartite_edges</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>setup_model</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>edge_types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>allowed_edge_types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>default_node_type</span> <span class='kw'>=</span> <span class='st'>"node"</span>,
   <span class='kw'>show_warnings</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>(),
-  <span class='kw'>random_seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+  <span class='kw'>random_seed</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>remove_isolated_nodes</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -183,10 +187,10 @@ column?</p></td>
 network is just being visualized or described.</p></td>
     </tr>
     <tr>
-      <th>edge_types</th>
+      <th>allowed_edge_types</th>
       <td><p>A dataframe in the same format of as <code>edges</code> that contains
 allowed pairs (order does not matter) of possible node type combinations
-across edges. For instance: nodes of type polinator are allowed to connect
+across edges. For instance: nodes of type pollinator are allowed to connect
 to flower nodes but not to other pollinator nodes. If this is left
 undefined, it is inferred from edges.</p></td>
     </tr>
@@ -198,7 +202,7 @@ called?</p></td>
     <tr>
       <th>show_warnings</th>
       <td><p>Do you want to be warned when minor problems are
-detected by function? Usefull to disable when not running in an interactive
+detected by function? Useful to disable when not running in an interactive
 mode etc.</p></td>
     </tr>
     <tr>
@@ -207,6 +211,12 @@ mode etc.</p></td>
 sampling engine. Note that if the model is restored from a saved state this
 seed will be initialized again to the start value which will harm
 reproducability.</p></td>
+    </tr>
+    <tr>
+      <th>remove_isolated_nodes</th>
+      <td><p>Should the network filter out nodes that have no
+edges? This option should only be set to <code>FALSE</code> for visualization purposes
+as the SBM model needs at least one edge for every node to work.</p></td>
     </tr>
     </table>
 
@@ -239,6 +249,7 @@ then the slot <code>$collapse_result</code> will be append.</p>
 <dt><code>n_nodes</code></dt><dd><p>Number of unique nodes in the current model.
 Equivalent to <code><a href='https://rdrr.io/r/base/nrow.html'>nrow(sbm_network$nodes)</a></code>.</p></dd> <dt><code>n_edges</code></dt><dd><p>Number of edges
 in the current model. Equivalent to <code><a href='https://rdrr.io/r/base/nrow.html'>nrow(sbm_network$edges)</a></code>.</p></dd>
+<dt><code>node_types</code></dt><dd><p>"Vector of the unique types for nodes in network"</p></dd>
 <dt><code>from_column</code></dt><dd><p>Raw quosure representing the <code>edges_from_column</code>
 argument. This is kept so bipartite network types can be inferred and no
 modification of the passed <code>edges</code> dataframe needs to take place.</p></dd>
@@ -269,30 +280,28 @@ thus it can be ignored.</p></dd>
 
 <span class='fu'>new_sbm_network</span>(<span class='no'>edges</span>, <span class='kw'>edges_from_column</span> <span class='kw'>=</span> <span class='no'>a_node</span>, <span class='kw'>edges_to_column</span> <span class='kw'>=</span> <span class='no'>b_node</span>)</div><div class='output co'>#&gt; SBM Network with 7 nodes of a single type and 6 edges. 
 #&gt;  
-#&gt; Nodes: <span style='color: #555555;'># A tibble: 6 x 2</span><span>
+#&gt; Nodes: <span style='color: #949494;'># A tibble: 6 x 2</span><span>
 #&gt;   id    type 
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> a1    node 
-#&gt; </span><span style='color: #555555;'>2</span><span> a2    node 
-#&gt; </span><span style='color: #555555;'>3</span><span> a3    node 
-#&gt; </span><span style='color: #555555;'>4</span><span> b1    node 
-#&gt; </span><span style='color: #555555;'>5</span><span> b2    node 
-#&gt; </span><span style='color: #555555;'>6</span><span> b3    node 
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> a1    node 
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> a2    node 
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> a3    node 
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> b1    node 
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> b2    node 
+#&gt; </span><span style='color: #BCBCBC;'>6</span><span> b3    node 
 #&gt; ... 
 #&gt;  
-#&gt; Edges: </span><span style='color: #555555;'># A tibble: 6 x 2</span><span>
+#&gt; Edges: </span><span style='color: #949494;'># A tibble: 6 x 2</span><span>
 #&gt;   a_node b_node
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> 
-#&gt; </span><span style='color: #555555;'>1</span><span> a1     b1    
-#&gt; </span><span style='color: #555555;'>2</span><span> a1     b2    
-#&gt; </span><span style='color: #555555;'>3</span><span> a1     b3    
-#&gt; </span><span style='color: #555555;'>4</span><span> a2     b1    
-#&gt; </span><span style='color: #555555;'>5</span><span> a2     b4    
-#&gt; </span><span style='color: #555555;'>6</span><span> a3     b1    
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> 
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> a1     b1    
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> a1     b2    
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> a1     b3    
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> a2     b1    
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> a2     b4    
+#&gt; </span><span style='color: #BCBCBC;'>6</span><span> a3     b1    
 #&gt; ... 
-#&gt;  
-#&gt; Model
-#&gt; Currently has 0 blocks</div><div class='input'>
+#&gt;  </div><div class='input'>
 <span class='co'># Builds network from nodes and edges</span>
 <span class='no'>nodes</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>tribble</a></span>(
   ~<span class='no'>id</span>, ~<span class='no'>type</span>,
@@ -310,59 +319,55 @@ thus it can be ignored.</p></dd>
                 <span class='kw'>edges_from_column</span> <span class='kw'>=</span> <span class='no'>a_node</span>,
                 <span class='kw'>edges_to_column</span> <span class='kw'>=</span> <span class='no'>b_node</span>)</div><div class='output co'>#&gt; SBM Network with 7 nodes of a single type and 6 edges. 
 #&gt;  
-#&gt; Nodes: </span><span style='color: #555555;'># A tibble: 6 x 2</span><span>
+#&gt; Nodes: </span><span style='color: #949494;'># A tibble: 6 x 2</span><span>
 #&gt;   id    type 
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> a1    node 
-#&gt; </span><span style='color: #555555;'>2</span><span> a2    node 
-#&gt; </span><span style='color: #555555;'>3</span><span> a3    node 
-#&gt; </span><span style='color: #555555;'>4</span><span> b1    node 
-#&gt; </span><span style='color: #555555;'>5</span><span> b2    node 
-#&gt; </span><span style='color: #555555;'>6</span><span> b3    node 
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> a1    node 
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> a2    node 
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> a3    node 
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> b1    node 
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> b2    node 
+#&gt; </span><span style='color: #BCBCBC;'>6</span><span> b3    node 
 #&gt; ... 
 #&gt;  
-#&gt; Edges: </span><span style='color: #555555;'># A tibble: 6 x 2</span><span>
+#&gt; Edges: </span><span style='color: #949494;'># A tibble: 6 x 2</span><span>
 #&gt;   a_node b_node
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> 
-#&gt; </span><span style='color: #555555;'>1</span><span> a1     b1    
-#&gt; </span><span style='color: #555555;'>2</span><span> a1     b2    
-#&gt; </span><span style='color: #555555;'>3</span><span> a1     b3    
-#&gt; </span><span style='color: #555555;'>4</span><span> a2     b1    
-#&gt; </span><span style='color: #555555;'>5</span><span> a2     b4    
-#&gt; </span><span style='color: #555555;'>6</span><span> a3     b1    
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> 
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> a1     b1    
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> a1     b2    
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> a1     b3    
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> a2     b1    
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> a2     b4    
+#&gt; </span><span style='color: #BCBCBC;'>6</span><span> a3     b1    
 #&gt; ... 
-#&gt;  
-#&gt; Model
-#&gt; Currently has 0 blocks</div><div class='input'>
+#&gt;  </div><div class='input'>
 <span class='co'># Can build a bipartite network just from an edge list</span>
 <span class='fu'>new_sbm_network</span>(<span class='no'>edges</span>, <span class='kw'>bipartite_edges</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
                 <span class='kw'>edges_from_column</span> <span class='kw'>=</span> <span class='no'>a_node</span>,
                 <span class='kw'>edges_to_column</span> <span class='kw'>=</span> <span class='no'>b_node</span>)</div><div class='output co'>#&gt; SBM Network with 7 nodes of 2 types and 6 edges. 
 #&gt;  
-#&gt; Nodes: </span><span style='color: #555555;'># A tibble: 6 x 2</span><span>
+#&gt; Nodes: </span><span style='color: #949494;'># A tibble: 6 x 2</span><span>
 #&gt;   id    type  
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> 
-#&gt; </span><span style='color: #555555;'>1</span><span> a1    a_node
-#&gt; </span><span style='color: #555555;'>2</span><span> a2    a_node
-#&gt; </span><span style='color: #555555;'>3</span><span> a3    a_node
-#&gt; </span><span style='color: #555555;'>4</span><span> b1    b_node
-#&gt; </span><span style='color: #555555;'>5</span><span> b2    b_node
-#&gt; </span><span style='color: #555555;'>6</span><span> b3    b_node
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> 
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> a1    a_node
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> a2    a_node
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> a3    a_node
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> b1    b_node
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> b2    b_node
+#&gt; </span><span style='color: #BCBCBC;'>6</span><span> b3    b_node
 #&gt; ... 
 #&gt;  
-#&gt; Edges: </span><span style='color: #555555;'># A tibble: 6 x 2</span><span>
+#&gt; Edges: </span><span style='color: #949494;'># A tibble: 6 x 2</span><span>
 #&gt;   a_node b_node
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> 
-#&gt; </span><span style='color: #555555;'>1</span><span> a1     b1    
-#&gt; </span><span style='color: #555555;'>2</span><span> a1     b2    
-#&gt; </span><span style='color: #555555;'>3</span><span> a1     b3    
-#&gt; </span><span style='color: #555555;'>4</span><span> a2     b1    
-#&gt; </span><span style='color: #555555;'>5</span><span> a2     b4    
-#&gt; </span><span style='color: #555555;'>6</span><span> a3     b1    
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> 
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> a1     b1    
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> a1     b2    
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> a1     b3    
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> a2     b1    
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> a2     b4    
+#&gt; </span><span style='color: #BCBCBC;'>6</span><span> a3     b1    
 #&gt; ... 
-#&gt;  
-#&gt; Model
-#&gt; Currently has 0 blocks</div><div class='input'>
+#&gt;  </div><div class='input'>
 <span class='co'># Or if adding a node dataframe as well, arbitrary polypartite structure is possible</span>
 <span class='no'>edges_tripartite</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>tribble</a></span>(
   ~<span class='no'>from</span>,    ~<span class='no'>to</span>,
@@ -387,43 +392,41 @@ thus it can be ignored.</p></dd>
 <span class='fu'>new_sbm_network</span>(<span class='kw'>edges</span> <span class='kw'>=</span> <span class='no'>edges_tripartite</span>,
                 <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='no'>nodes_tripartite</span>)</div><div class='output co'>#&gt; SBM Network with 6 nodes of 3 types and 6 edges. 
 #&gt;  
-#&gt; Nodes: </span><span style='color: #555555;'># A tibble: 6 x 2</span><span>
+#&gt; Nodes: </span><span style='color: #949494;'># A tibble: 6 x 2</span><span>
 #&gt;   id    type 
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> a1    a    
-#&gt; </span><span style='color: #555555;'>2</span><span> a2    a    
-#&gt; </span><span style='color: #555555;'>3</span><span> b1    b    
-#&gt; </span><span style='color: #555555;'>4</span><span> b2    b    
-#&gt; </span><span style='color: #555555;'>5</span><span> c1    c    
-#&gt; </span><span style='color: #555555;'>6</span><span> c2    c    
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> a1    a    
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> a2    a    
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> b1    b    
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> b2    b    
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> c1    c    
+#&gt; </span><span style='color: #BCBCBC;'>6</span><span> c2    c    
 #&gt; ... 
 #&gt;  
-#&gt; Edges: </span><span style='color: #555555;'># A tibble: 6 x 2</span><span>
+#&gt; Edges: </span><span style='color: #949494;'># A tibble: 6 x 2</span><span>
 #&gt;   from  to   
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> a1    b1   
-#&gt; </span><span style='color: #555555;'>2</span><span> a1    b2   
-#&gt; </span><span style='color: #555555;'>3</span><span> a2    b1   
-#&gt; </span><span style='color: #555555;'>4</span><span> b1    c1   
-#&gt; </span><span style='color: #555555;'>5</span><span> b2    c1   
-#&gt; </span><span style='color: #555555;'>6</span><span> b2    c2   
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> a1    b1   
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> a1    b2   
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> a2    b1   
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> b1    c1   
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> b2    c1   
+#&gt; </span><span style='color: #BCBCBC;'>6</span><span> b2    c2   
 #&gt; ... 
-#&gt;  
-#&gt; Model
-#&gt; Currently has 0 blocks</div><div class='input'>
-<span class='co'># the edge_types argument lets you explicitely tell the</span>
+#&gt;  </div><div class='input'>
+<span class='co'># the allowed_edge_types argument lets you explicitely tell the</span>
 <span class='co'># model what each type of node is allowed to connect to.</span>
 <span class='co'># Here we use it to enforce tripartite structure where nodes of</span>
 <span class='co'># the a type can connect to either b or c but b and c can only</span>
 <span class='co'># connect to a.</span>
 
-<span class='no'>edge_types</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>tribble</a></span>(~<span class='no'>from</span>, ~<span class='no'>to</span>,
+<span class='no'>allowed_edge_types</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>tribble</a></span>(~<span class='no'>from</span>, ~<span class='no'>to</span>,
                                <span class='st'>"a"</span>, <span class='st'>"b"</span>,
                                <span class='st'>"a"</span>, <span class='st'>"c"</span>)
 <span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='fu'>new_sbm_network</span>(<span class='kw'>edges</span> <span class='kw'>=</span> <span class='no'>edges_tripartite</span>,
                 <span class='kw'>nodes</span> <span class='kw'>=</span> <span class='no'>nodes_tripartite</span>,
-                <span class='kw'>edge_types</span> <span class='kw'>=</span> <span class='no'>edge_types</span>)
+                <span class='kw'>allowed_edge_types</span> <span class='kw'>=</span> <span class='no'>allowed_edge_types</span>)
 }</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

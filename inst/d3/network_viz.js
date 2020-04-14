@@ -1,4 +1,4 @@
-// !preview r2d3 data=sim_basic_block_network(3, 20), options = list(color_col = 'block', shape_col = 'type'), container = 'div'
+// !preview r2d3 data=new_sbm_network(edges = clements_pollinators,bipartite_edges = TRUE,edges_from_column = pollinator,edges_to_column = flower), options = list(color_col = 'block', shape_col = 'type'), container = 'div'
 
 div.html('')
   .style('width', `${width}px`)
@@ -32,8 +32,11 @@ const svg = div.append('svg')
 const {color_col, shape_col} = options;
 
 // Clean up data into the node and link format that d3 needs
+const edge_cols = Object.keys(data.edges);
 const links = HTMLWidgets.dataframeToD3(data.edges)
-  .map(function(edge){return({source: edge.from, target: edge.to})});
+  .map(function(edge){return({source: edge[edge_cols[0]], target: edge[edge_cols[1]]})});
+
+
 const nodes = HTMLWidgets.dataframeToD3(data.nodes);
 
 
@@ -74,11 +77,21 @@ const X = d3.scaleLinear()
 const Y = d3.scaleLinear()
   .range([padding, height-padding]);
 
+
 // Setup the simulation
+// Optimized for disjoint graphs...
 const simulation = d3.forceSimulation(nodes)
-      .force("link", d3.forceLink(links).id(d => d.id))
-      .force("charge", d3.forceManyBody())
-      .force("center", d3.forceCenter(width / 2, height / 2));
+    .force("link", d3.forceLink(links).id(d => d.id))
+    .force("charge", d3.forceManyBody())
+    .force("x", d3.forceX(width / 2))
+    .force("y", d3.forceY(height / 2))
+    .force('collision', d3.forceCollide().radius(10));
+
+// Optimized for fully connected graphs.
+//const simulation = d3.forceSimulation(nodes)
+//      .force("link", d3.forceLink(links).id(d => d.id))
+//      .force("charge", d3.forceManyBody().strength(-5))
+//      .force("center", d3.forceCenter(width / 2, height / 2));
 
 let not_being_dragged = true;
 

@@ -1,6 +1,6 @@
 library(tidyverse)
 library(glue)
-library(sbmR)
+library(sbmr)
 
 set.seed(42)
 
@@ -18,12 +18,12 @@ network <- sim_basic_block_network(
 sbm <- create_sbm(network) %>%
   initialize_blocks(n_blocks)
 
-# start_entropy <- my_sbm %>% get_entropy()
+# start_entropy <- my_sbm %>% entropy()
 num_sweeps <- 100
 sweep_results <- mcmc_sweep(my_sbm,
                             num_sweeps = num_sweeps,
                             track_pairs = FALSE,
-                            variable_num_blocks = TRUE,
+                            variable_n_blocks = TRUE,
                             verbose = FALSE)
 
 
@@ -35,14 +35,14 @@ sweep_results$sweep_info %>%
     geom_point() +
     facet_grid(name~., scales = "free_y")
 
-nodes_w_assignments <- get_state(my_sbm) %>%
+nodes_w_assignments <- state(my_sbm) %>%
   filter(level == 0) %>%
   right_join(network$nodes, by = 'id')%>%
   rename(inferred = parent)
 
 table(nodes_w_assignments$inferred, nodes_w_assignments$block)
 
-my_sbm %>% get_entropy()
+my_sbm %>% entropy()
 #
 # # nodes_w_assignments %>%
 # #   group_by(inferred) %>%
@@ -55,7 +55,7 @@ my_sbm %>% get_entropy()
 # #   arrange(-n_unique_assigned)
 #
 #
-# start_entropy <- get_entropy(my_sbm)
+# start_entropy <- entropy(my_sbm)
 # predicted_entropy <- start_entropy
 #
 # num_sweeps <- 20
@@ -65,7 +65,7 @@ my_sbm %>% get_entropy()
 #
 # for(sweep in 1:num_sweeps){
 #   # One sweep
-#   sweep_results <- mcmc_sweep(my_sbm, num_sweeps = 1, track_pairs = FALSE, variable_num_blocks = FALSE)
+#   sweep_results <- mcmc_sweep(my_sbm, num_sweeps = 1, track_pairs = FALSE, variable_n_blocks = FALSE)
 #
 #   # Extract entropy delta
 #   delta <- sweep_results$sweep_info$entropy_delta[1]
@@ -73,7 +73,7 @@ my_sbm %>% get_entropy()
 #   predicted_entropy <- predicted_entropy + (delta)
 #
 #   # Update values
-#   true_res <- c(true_res, get_entropy(my_sbm))
+#   true_res <- c(true_res, entropy(my_sbm))
 #   predicted_res <- c(predicted_res, predicted_entropy)
 # }
 #
@@ -103,7 +103,7 @@ my_sbm %>% get_entropy()
 #   geom_line()
 #
 #
-# sweep_results <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps, track_pairs = FALSE, variable_num_blocks = TRUE)
+# sweep_results <- mcmc_sweep(my_sbm, num_sweeps = num_sweeps, track_pairs = FALSE, variable_n_blocks = TRUE)
 #
 # sweep_stats <- sweep_results$sweep_info %>%
 #   mutate(sweep = 1:n(),
@@ -123,7 +123,7 @@ my_sbm %>% get_entropy()
 #     subtitle = "Entropy Delta of sweep and number of nodes moved for sweep"
 #   )
 #
-# true_final_entropy <- my_sbm %>% get_entropy()
+# true_final_entropy <- my_sbm %>% entropy()
 #
 # sweep_stats %>%
 #   ggplot(aes(x = sweep, y = entropy)) +
@@ -131,7 +131,7 @@ my_sbm %>% get_entropy()
 #   geom_hline(yintercept = true_final_entropy)
 #
 #
-# node_states <- get_state(my_sbm) %>%
+# node_states <- state(my_sbm) %>%
 #   filter(level == 0)
 #
 # node_states %>%

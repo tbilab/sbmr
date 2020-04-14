@@ -20,8 +20,8 @@ Retrieves the MCMC sweep results from an \code{sbm_network} object. Needs to hav
 
 # Start with a small random network
 net <- sim_basic_block_network(n_blocks = 3, n_nodes_per_block = 15) \%>\%
-  initialize_blocks(num_blocks = 4) \%>\%
-  mcmc_sweep(num_sweeps = 4, variable_num_blocks = FALSE)
+  initialize_blocks(n_blocks = 4) \%>\%
+  mcmc_sweep(num_sweeps = 4, variable_n_blocks = FALSE)
 
 # Retrieve the sweep results from network
 get_sweep_results(net)
@@ -30,7 +30,7 @@ get_sweep_results(net)
 \seealso{
 Other helpers: 
 \code{\link{build_score_fn}()},
-\code{\link{get_combination_indices}()},
+\code{\link{combination_indices}()},
 \code{\link{get_sweep_pair_counts}()},
 \code{\link{print.sbm_network}()},
 \code{\link{rolling_mean}()},

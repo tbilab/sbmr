@@ -1,6 +1,6 @@
-#' Flower and polinators network
+#' Flower and pollinators network
 #'
-#' Tidy dataset of polinator-flower network from the 1923 paper "Experimental
+#' Tidy dataset of pollinator-flower network from the 1923 paper "Experimental
 #' pollination. An outline of the ecology of flowers and insects.", by Clements,
 #' R. E., and F. L. Long.
 #'
@@ -16,11 +16,11 @@
 #'
 #' @format A edge data frame with 2 columns and 923 rows:
 #' \describe{
-#'   \item{polinator}{Scientific name in genus-species format of polinating
+#'   \item{pollinator}{Scientific name in genus-species format of pollinating
 #'   animal}
-#'   \item{flower}{Scientific name of the flower that the polinator visited}
+#'   \item{flower}{Scientific name of the flower that the pollinator visited}
 #' }
 #'
 #' @source \href{https://www.nceas.ucsb.edu/interactionweb/html/clements_1923.html}{Interaction Web DataBase
 #' entry:}
-"clements_polinators"
+"clements_pollinators"

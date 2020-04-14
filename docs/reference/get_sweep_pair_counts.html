@@ -96,6 +96,9 @@ mcmc_sweep(track_pairs = TRUE) run on the object before." />
       <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
     <li>
+      <a href="../articles/bipartite_networks.html">bipartite_networks</a>
+    </li>
+    <li>
       <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
     </li>
   </ul>
@@ -131,7 +134,7 @@ mcmc_sweep(track_pairs = TRUE) run on the object before." />
 <code><a href='mcmc_sweep.html'>mcmc_sweep</a></code><code>(track_pairs = TRUE)</code> run on the object before.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_sweep_pair_counts</span>(<span class='no'>sbm</span>)</pre>
+    <pre class="usage"><span class='fu'>get_sweep_pair_counts</span>(<span class='no'>sbm</span>, <span class='kw'>isolate_type</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -139,6 +142,10 @@ mcmc_sweep(track_pairs = TRUE) run on the object before." />
     <tr>
       <th>sbm</th>
       <td><p>Object of class <code>sbm_network</code>.</p></td>
+    </tr>
+    <tr>
+      <th>isolate_type</th>
+      <td><p>Node type to be isolated for visualization. If left empty all types are included.</p></td>
     </tr>
     </table>
 
@@ -149,7 +156,7 @@ mcmc_sweep(track_pairs = TRUE) run on the object before." />
 
     <div class='dont-index'><p>Other helpers: 
 <code><a href='build_score_fn.html'>build_score_fn</a>()</code>,
-<code><a href='get_combination_indices.html'>get_combination_indices</a>()</code>,
+<code><a href='combination_indices.html'>combination_indices</a>()</code>,
 <code><a href='get_sweep_results.html'>get_sweep_results</a>()</code>,
 <code><a href='print.sbm_network.html'>print.sbm_network</a>()</code>,
 <code><a href='rolling_mean.html'>rolling_mean</a>()</code>,
@@ -159,25 +166,28 @@ mcmc_sweep(track_pairs = TRUE) run on the object before." />
     <pre class="examples"><div class='input'>
 <span class='co'># Start with a small random network</span>
 <span class='no'>net</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='sim_basic_block_network.html'>sim_basic_block_network</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>n_nodes_per_block</span> <span class='kw'>=</span> <span class='fl'>15</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='kw'>num_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='mcmc_sweep.html'>mcmc_sweep</a></span>(<span class='kw'>num_sweeps</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>variable_num_blocks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+  <span class='fu'><a href='initialize_blocks.html'>initialize_blocks</a></span>(<span class='kw'>n_blocks</span> <span class='kw'>=</span> <span class='fl'>4</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='mcmc_sweep.html'>mcmc_sweep</a></span>(<span class='kw'>num_sweeps</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>variable_n_blocks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># Retrieve the sweep results from network</span>
 <span class='fu'><a href='get_sweep_results.html'>get_sweep_results</a></span>(<span class='no'>net</span>)</div><div class='output co'>#&gt; $nodes_moved
-#&gt;  [1] "g1_8"  "g2_3"  "g3_9"  "g3_13" "g3_11" "g1_13" "g1_9"  "g3_1"  "g1_2" 
-#&gt; [10] "g3_8"  "g3_3"  "g3_15" "g3_12" "g3_10" "g3_5"  "g1_5"  "g2_14" "g3_6" 
-#&gt; [19] "g2_7"  "g1_2"  "g3_11" "g3_10" "g3_1"  "g2_2"  "g2_7"  "g3_4"  "g2_8" 
-#&gt; [28] "g3_13" "g3_15" "g3_14" "g3_6"  "g3_5"  "g1_7"  "g3_10" "g3_7"  "g2_10"
-#&gt; [37] "g1_2"  "g3_4"  "g2_1"  "g1_3"  "g1_13" "g3_1"  "g3_15" "g1_9"  "g2_14"
-#&gt; [46] "g3_6"  "g1_10" "g3_8"  "g2_13" "g1_7"  "g1_5"  "g3_7"  "g1_15" "g3_5" 
-#&gt; [55] "g3_4"  "g3_13"
+#&gt;  [1] "g3_1"  "g1_4"  "g2_4"  "g2_12" "g2_7"  "g1_15" "g1_11" "g3_10" "g3_5" 
+#&gt; [10] "g1_3"  "g1_5"  "g1_9"  "g1_1"  "g2_6"  "g2_2"  "g3_7"  "g2_10" "g2_15"
+#&gt; [19] "g2_11" "g3_13" "g3_12" "g2_1"  "g3_3"  "g1_8"  "g3_14" "g2_6"  "g2_7" 
+#&gt; [28] "g1_5"  "g1_2"  "g1_9"  "g3_2"  "g1_6"  "g2_14" "g1_1"  "g1_10" "g3_3" 
+#&gt; [37] "g3_5"  "g2_2"  "g2_9"  "g2_10" "g1_13" "g3_8"  "g1_12" "g2_7"  "g1_13"
+#&gt; [46] "g2_15" "g2_8"  "g3_4"  "g2_4"  "g2_2"  "g3_13" "g3_7"  "g1_8"  "g1_11"
+#&gt; [55] "g2_11" "g1_12" "g3_12" "g3_3"  "g1_14" "g1_3"  "g2_9"  "g3_11" "g1_2" 
+#&gt; [64] "g2_14" "g3_2"  "g1_15" "g2_5"  "g2_3"  "g1_6"  "g3_4"  "g2_10" "g1_5" 
+#&gt; [73] "g1_2"  "g3_2"  "g1_12" "g3_10" "g2_4"  "g1_9"  "g2_13" "g2_11" "g3_14"
+#&gt; [82] "g2_3"  "g1_13" "g3_5"  "g1_15" "g3_8"  "g3_6"  "g1_7"  "g2_5" 
 #&gt; 
 #&gt; $sweep_info
-#&gt;   entropy_delta num_nodes_moved
-#&gt; 1   -11.9101128              19
-#&gt; 2   -23.1109183              14
-#&gt; 3     0.9113516              13
-#&gt; 4     1.7059270              10
+#&gt;   entropy_delta n_nodes_moved
+#&gt; 1    -2.0507433            23
+#&gt; 2     0.9396352            20
+#&gt; 3    -1.0845948            26
+#&gt; 4     1.6959935            20
 #&gt; </div><div class='input'>
 </div></pre>
   </div>

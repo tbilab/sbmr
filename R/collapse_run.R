@@ -31,7 +31,7 @@
 #' net %>% visualize_collapse_results()
 #'
 #' # We can choose best result with default heuristic
-#' net <- choose_best_collapse_state(net, verbose = TRUE)
+#' net <- choose_best_collapse_state(net, verbose = TRUE, use_entropy = TRUE)
 #'
 collapse_run <- function(sbm,
                          num_final_blocks = 1:10,
@@ -43,15 +43,6 @@ collapse_run <- function(sbm,
   UseMethod("collapse_run")
 }
 
-collapse_run.default <- function(sbm,
-                                 num_final_blocks = 1:10,
-                                 num_mcmc_sweeps = 10,
-                                 sigma = 2,
-                                 eps = 0.1,
-                                 num_block_proposals = 5,
-                                 parallel = FALSE){
-  cat("collapse_run generic")
-}
 
 #' @export
 collapse_run.sbm_network <- function(sbm,
@@ -75,13 +66,16 @@ collapse_run.sbm_network <- function(sbm,
     # Set up parallel processing environment. .skip will avoid re-creating a
     # plan if one already exists (saves substantial time on subsequent runs)
     future::plan(future::multiprocess, .skip = TRUE)
+  }
 
-    results <- furrr::future_map_dfr(
+  map_fn <- if(parallel) furrr::future_map_dfr else purrr::map_dfr
+
+  results <- map_fn(
       num_final_blocks,
       function(desired_num){
         # Initialize model and make sure to not warn about cached model and random seeds if present
         verify_model(sbm, warn_about_random_seed = FALSE) %>%
-          collapse_blocks(desired_num_blocks = desired_num,
+          collapse_blocks(desired_n_blocks = desired_num,
                           sigma = sigma,
                           eps = eps,
                           report_all_steps = FALSE,
@@ -90,21 +84,6 @@ collapse_run.sbm_network <- function(sbm,
           get_collapse_results()
       }
     )
-  } else {
-    collapse_results <- attr(verify_model(sbm), 'model')$collapse_run(0L,
-                                         as.integer(num_mcmc_sweeps),
-                                         as.integer(num_block_proposals),
-                                         sigma,
-                                         eps,
-                                         as.integer(num_final_blocks))
-
-    results <- purrr::map_dfr(
-      collapse_results,
-      ~dplyr::tibble(entropy = .$entropy,
-                     num_blocks = .$num_blocks)
-    ) %>%
-      dplyr::mutate(state = purrr::map(collapse_results, 'state'))
-  }
 
   sbm$collapse_results <- results
 

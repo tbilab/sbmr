@@ -1,4 +1,4 @@
-^sbmR\.Rproj$
+^sbmr\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^data-raw$
@@ -7,7 +7,9 @@
 ^pkgdown$
 ^\.github/workflows/R-CMD-check\.yaml$
 ^src/cpp_tests
+^src/debugging
 ^src/.clang-format
 ^.vscode
 ^README.Rmd
 ^README.MD
+^vignettes/bipartite_networks.Rmd

@@ -3,21 +3,21 @@ library(dplyr)
 
 test_that("MCMC Sweeps function as expected", {
   n_blocks <- 5
-  n_sweeps <- 50
+  n_sweeps <- 100
 
   # Start with a random network
   net <- sim_random_network(n_nodes = 25, random_seed = 42) %>%
-    initialize_blocks(num_blocks = n_blocks)
+    initialize_blocks(n_blocks = n_blocks)
 
-  sweep_and_check_n_blocks <- function(i, variable_num_blocks, sbm){
+  sweep_and_check_n_blocks <- function(i, variable_n_blocks, sbm){
     net %>%
-      mcmc_sweep(variable_num_blocks = variable_num_blocks) %>%
-      get_num_blocks()
+      mcmc_sweep(variable_n_blocks = variable_n_blocks) %>%
+      n_blocks()
   }
 
   # Run MCMC sweeps that do not allow block numbers to change
   n_blocks_stays_same_results <- 1:n_sweeps %>%
-    purrr::map_int(sweep_and_check_n_blocks, variable_num_blocks = FALSE, sbm = my_sbm)
+    purrr::map_int(sweep_and_check_n_blocks, variable_n_blocks = FALSE, sbm = my_sbm)
 
   # Every step should result in the same number of blocks in model
   n_blocks_stays_same_results %>%
@@ -28,7 +28,7 @@ test_that("MCMC Sweeps function as expected", {
 
   # Now let the model change number of blocks and see if it ever does
   n_blocks_changes <- 1:n_sweeps %>%
-    purrr::map_int(sweep_and_check_n_blocks, variable_num_blocks = TRUE, sbm = my_sbm)
+    purrr::map_int(sweep_and_check_n_blocks, variable_n_blocks = TRUE, sbm = my_sbm)
 
   # Expect at least one block change
   n_blocks_changes %>%
@@ -44,7 +44,7 @@ test_that("Pair tracking can be enabled and disabled",{
 
   # Start with a random network
   net <- sim_random_network(n_nodes = 30, random_seed = 42) %>%
-    initialize_blocks(num_blocks = 5)
+    initialize_blocks(n_blocks = 5)
 
   # Run a few sweeps where pair tracking is enabled
   pair_tracking_sweeps <- mcmc_sweep(net, num_sweeps = num_sweeps, track_pairs = TRUE)$mcmc_sweeps

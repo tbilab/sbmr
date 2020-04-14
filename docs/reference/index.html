@@ -93,6 +93,9 @@
       <a href="../articles/agglomerative_merging.html">Agglomerative Merging</a>
     </li>
     <li>
+      <a href="../articles/bipartite_networks.html">bipartite_networks</a>
+    </li>
+    <li>
       <a href="../articles/sampling_from_posterior.html">Sampling From Posterior</a>
     </li>
   </ul>
@@ -261,45 +264,39 @@
       <tr>
         
         <td>
-          <p><code><a href="get_block_edge_counts.html">get_block_edge_counts()</a></code> </p>
+          <p><code><a href="state.html">state()</a></code> </p>
+        </td>
+        <td><p>Dump state of current SBM model to dataframe</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="entropy.html">entropy()</a></code> </p>
+        </td>
+        <td><p>Compute entropy for current model state</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="interblock_edge_counts.html">interblock_edge_counts()</a></code> </p>
         </td>
         <td><p>Get counts between blocks at a level</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="n_blocks.html">n_blocks()</a></code> </p>
+        </td>
+        <td><p>Get number of blocks currently in model</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="node_to_block_edge_counts.html">node_to_block_edge_counts()</a></code> </p>
+        </td>
+        <td><p>Get node's edge counts to blocks</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="get_collapse_results.html">get_collapse_results()</a></code> </p>
         </td>
         <td><p>Get collapse results from model</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_combination_indices.html">get_combination_indices()</a></code> </p>
-        </td>
-        <td><p>Get Combination Indices</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_entropy.html">get_entropy()</a></code> </p>
-        </td>
-        <td><p>Compute entropy for current model state</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_node_to_block_edge_counts.html">get_node_to_block_edge_counts()</a></code> </p>
-        </td>
-        <td><p>Get node's edge counts to blocks</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_num_blocks.html">get_num_blocks()</a></code> </p>
-        </td>
-        <td><p>Get number of blocks currently in model</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_state.html">get_state()</a></code> </p>
-        </td>
-        <td><p>Dump state of current SBM model to dataframe</p></td>
       </tr><tr>
         
         <td>
@@ -332,12 +329,6 @@
           <p><code><a href="add_node.html">add_node()</a></code> </p>
         </td>
         <td><p>Add a new node to network</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="set_node_parent.html">set_node_parent()</a></code> </p>
-        </td>
-        <td><p>Set the parent of a node</p></td>
       </tr><tr>
         
         <td>
@@ -379,6 +370,12 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="combination_indices.html">combination_indices()</a></code> </p>
+        </td>
+        <td><p>Get Combination Indices</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="sbmR-package.html">sbmR-package</a></code> </p>
         </td>
         <td><p>Package reference</p></td>
@@ -388,6 +385,20 @@
           <p><code><a href="print.sbm_network.html">print(<i>&lt;sbm_network&gt;</i>)</a></code> </p>
         </td>
         <td><p>Print network</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-datasets" class="hasAnchor"><a href="#section-datasets" class="anchor"></a>Datasets</h2>
+          <p class="section-desc"><p>Included datasets for demonstrating package</p></p>
+        </th>
+      </tr>
+      <tr>
+        
+        <td>
+          <p><code><a href="clements_pollinators.html">clements_pollinators</a></code> </p>
+        </td>
+        <td><p>Flower and pollinators network</p></td>
       </tr>
     </tbody>
     </table>
@@ -403,6 +414,7 @@
       <li><a href="#section-property-getters">Property getters</a></li>
       <li><a href="#section-low-level-model-manipulation">Low-level model manipulation</a></li>
       <li><a href="#section-helper-functions">Helper Functions</a></li>
+      <li><a href="#section-datasets">Datasets</a></li>
     </ul>
   </div>
 </div>

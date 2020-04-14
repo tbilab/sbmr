@@ -4,10 +4,12 @@
 \alias{visualize_propensity_dist}
 \title{Visualize pairwise propensity distribution}
 \usage{
-visualize_propensity_dist(sbm)
+visualize_propensity_dist(sbm, isolate_type = NULL)
 }
 \arguments{
 \item{sbm}{Object of class \code{sbm_network}.}
+
+\item{isolate_type}{Node type to be isolated for visualization. If left empty all types are included.}
 }
 \value{
 GGplot2 plot containing ECDF of the pairwise propensities of residing in same block for MCMC sweeps.
@@ -18,7 +20,7 @@ empirical CDF of the pairwise probability/proportion of two nodes residing in
 the same block over the given MCMC sweeps.
 }
 \details{
-\code{sbmR::mcmc_sweep(sbm, track_pairs = TRUE, ...)} must be run on object before this function.
+\code{sbmr::mcmc_sweep(sbm, track_pairs = TRUE, ...)} must be run on object before this function.
 }
 \examples{
 

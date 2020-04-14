@@ -1,16 +1,9 @@
 echo $PWD
 
 cd src/
-echo "=============================================================================\nCompiling Classes..."
-echo "=============================================================================\n"
 
 OPTIMIZATION_LEVEL=""
 # OPTIMIZATION_LEVEL=-O2
-
-# Compile the main classes
-g++ -std=c++11 ${OPTIMIZATION_LEVEL} -c \
-  -DNO_RCPP=1 \
-  Node.cpp Block_Consensus.cpp SBM.cpp Sampler.cpp 
 
 
 echo "=============================================================================\nCompiling Tests..."
@@ -26,14 +19,14 @@ fi
 # Compile all the tests
 g++ -std=c++11 ${OPTIMIZATION_LEVEL} -DNO_RCPP=1\
   cpp_tests/tests-main.o \
-  Node.o SBM.o Sampler.o Block_Consensus.o \
   cpp_tests/tests-node.cpp \
-  cpp_tests/tests-edge.cpp \
   cpp_tests/tests-sampler.cpp \
-  cpp_tests/tests-network.cpp \
-  cpp_tests/tests-sbm.cpp \
+  cpp_tests/tests-sbm_network.cpp \
+  cpp_tests/tests-Block_Concensus.cpp \
+  cpp_tests/tests-mcmc_sweep.cpp \
+  cpp_tests/tests-sbm_network_algorithms.cpp \
+  cpp_tests/tests-agglomerative_merge.cpp \
   -o cpp_tests/run_tests.o 
-
 
 
 echo "=============================================================================\nRunning Tests..."
@@ -41,11 +34,3 @@ echo "==========================================================================
 
 # Run tests
 ./cpp_tests/run_tests.o -d yes
-
-
-
-echo "=============================================================================\nCleaning Up..."
-echo "=============================================================================\n"
-# Cleanup the compiled classes so RCpp doesn't get mad
-rm *.o
-
