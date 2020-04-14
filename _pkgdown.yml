@@ -42,7 +42,6 @@ reference:
   - build_score_fn
   - rolling_mean
   - combination_indices
-  - sbmr-package
   - print.sbm_network
 - title: Datasets
   desc: Included datasets for demonstrating package

@@ -266,12 +266,12 @@
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>network <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb13-2"><a href="#cb13-2"></a><span class="st">  </span><span class="kw"><a href="../reference/choose_best_collapse_state.html">choose_best_collapse_state</a></span>(<span class="dt">heuristic =</span> <span class="st">"dev_from_rolling_mean"</span>, <span class="dt">verbose =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb13-3"><a href="#cb13-3"></a><span class="st">  </span><span class="kw">state_to_truth_table</span>()</span>
-<span id="cb13-4"><a href="#cb13-4"></a><span class="co">#&gt; Choosing collapse with 3 blocks and an entropy of 0.6817.</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="co">#&gt; Choosing collapse with 3 blocks and an entropy of 3.466.</span></span>
 <span id="cb13-5"><a href="#cb13-5"></a><span class="co">#&gt;              </span></span>
 <span id="cb13-6"><a href="#cb13-6"></a><span class="co">#&gt;               g1 g2 g3</span></span>
-<span id="cb13-7"><a href="#cb13-7"></a><span class="co">#&gt;   bl_node_128 40  0  0</span></span>
-<span id="cb13-8"><a href="#cb13-8"></a><span class="co">#&gt;   bl_node_174  0 40  0</span></span>
-<span id="cb13-9"><a href="#cb13-9"></a><span class="co">#&gt;   bl_node_210  0  0 40</span></span></code></pre></div>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="co">#&gt;   bl_node_155 40  0  0</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a><span class="co">#&gt;   bl_node_196  0 40  0</span></span>
+<span id="cb13-9"><a href="#cb13-9"></a><span class="co">#&gt;   bl_node_204  0  0 40</span></span></code></pre></div>
 <p>After adding the sweeps we again get a perfect collapsing into the <code>n_block</code> generating blocks.</p>
 </div>
 </div>
@@ -318,7 +318,7 @@
 <span id="cb15-4"><a href="#cb15-4"></a></span>
 <span id="cb15-5"><a href="#cb15-5"></a>full_collapse_time</span>
 <span id="cb15-6"><a href="#cb15-6"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb15-7"><a href="#cb15-7"></a><span class="co">#&gt;   1.028   0.001   1.031</span></span></code></pre></div>
+<span id="cb15-7"><a href="#cb15-7"></a><span class="co">#&gt;   1.009   0.002   1.010</span></span></code></pre></div>
 <p>Now raise sigma to 1.4 and time…</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>raised_sigma_collapse_time &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span>({</span>
 <span id="cb16-2"><a href="#cb16-2"></a>  <span class="kw"><a href="../reference/collapse_blocks.html">collapse_blocks</a></span>(network, <span class="dt">sigma =</span> <span class="fl">1.4</span>, <span class="dt">report_all_steps =</span> <span class="ot">TRUE</span>)</span>
@@ -326,8 +326,8 @@
 <span id="cb16-4"><a href="#cb16-4"></a></span>
 <span id="cb16-5"><a href="#cb16-5"></a>raised_sigma_collapse_time</span>
 <span id="cb16-6"><a href="#cb16-6"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb16-7"><a href="#cb16-7"></a><span class="co">#&gt;   0.072   0.000   0.073</span></span></code></pre></div>
-<p>Just by increasing sigma to 1.4 we have sped up the collapsing by 14.28 times.</p>
+<span id="cb16-7"><a href="#cb16-7"></a><span class="co">#&gt;   0.073   0.001   0.073</span></span></code></pre></div>
+<p>Just by increasing sigma to 1.4 we have sped up the collapsing by 13.82 times.</p>
 <p>Speed isn’t important if the model isnt working properly, however. So let’s see how the collapse worked.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>network &lt;-<span class="st"> </span><span class="kw"><a href="../reference/collapse_blocks.html">collapse_blocks</a></span>(network, <span class="dt">sigma =</span> <span class="fl">1.4</span>, <span class="dt">report_all_steps =</span> <span class="ot">TRUE</span>)</span>
 <span id="cb17-2"><a href="#cb17-2"></a></span>
@@ -341,12 +341,12 @@
 <span id="cb18-2"><a href="#cb18-2"></a><span class="st">  </span><span class="kw"><a href="../reference/choose_best_collapse_state.html">choose_best_collapse_state</a></span>(<span class="dt">heuristic =</span> <span class="st">"dev_from_rolling_mean"</span>, </span>
 <span id="cb18-3"><a href="#cb18-3"></a>                             <span class="dt">verbose =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb18-4"><a href="#cb18-4"></a><span class="st">  </span><span class="kw">state_to_truth_table</span>()</span>
-<span id="cb18-5"><a href="#cb18-5"></a><span class="co">#&gt; Choosing collapse with 3 blocks and an entropy of 14.803.</span></span>
+<span id="cb18-5"><a href="#cb18-5"></a><span class="co">#&gt; Choosing collapse with 3 blocks and an entropy of 56.2572.</span></span>
 <span id="cb18-6"><a href="#cb18-6"></a><span class="co">#&gt;              </span></span>
 <span id="cb18-7"><a href="#cb18-7"></a><span class="co">#&gt;               g1 g2 g3</span></span>
-<span id="cb18-8"><a href="#cb18-8"></a><span class="co">#&gt;   bl_node_518 40  0  0</span></span>
-<span id="cb18-9"><a href="#cb18-9"></a><span class="co">#&gt;   bl_node_578  0  0 39</span></span>
-<span id="cb18-10"><a href="#cb18-10"></a><span class="co">#&gt;   bl_node_581  0 40  1</span></span></code></pre></div>
+<span id="cb18-8"><a href="#cb18-8"></a><span class="co">#&gt;   bl_node_501 40  0  0</span></span>
+<span id="cb18-9"><a href="#cb18-9"></a><span class="co">#&gt;   bl_node_545  0 40  3</span></span>
+<span id="cb18-10"><a href="#cb18-10"></a><span class="co">#&gt;   bl_node_571  0  0 37</span></span></code></pre></div>
 <p>So again we are getting extremely good performance. Often a balance between allowing MCMC sweeps and a moderate sigma value will return very good and very fast collapsing results.</p>
 </div>
 <div id="collapse-runs" class="section level2">
@@ -381,11 +381,11 @@
 <span id="cb21-4"><a href="#cb21-4"></a>                             <span class="dt">use_entropy =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb21-5"><a href="#cb21-5"></a><span class="st">  </span><span class="kw">state_to_truth_table</span>()</span>
 <span id="cb21-6"><a href="#cb21-6"></a><span class="co">#&gt; Choosing collapse with 3 blocks and an entropy of 5319.8309.</span></span>
-<span id="cb21-7"><a href="#cb21-7"></a><span class="co">#&gt;              </span></span>
-<span id="cb21-8"><a href="#cb21-8"></a><span class="co">#&gt;               g1 g2 g3</span></span>
-<span id="cb21-9"><a href="#cb21-9"></a><span class="co">#&gt;   bl_node_118  0  0 40</span></span>
-<span id="cb21-10"><a href="#cb21-10"></a><span class="co">#&gt;   bl_node_31  40  0  0</span></span>
-<span id="cb21-11"><a href="#cb21-11"></a><span class="co">#&gt;   bl_node_46   0 40  0</span></span></code></pre></div>
+<span id="cb21-7"><a href="#cb21-7"></a><span class="co">#&gt;             </span></span>
+<span id="cb21-8"><a href="#cb21-8"></a><span class="co">#&gt;              g1 g2 g3</span></span>
+<span id="cb21-9"><a href="#cb21-9"></a><span class="co">#&gt;   bl_node_20 40  0  0</span></span>
+<span id="cb21-10"><a href="#cb21-10"></a><span class="co">#&gt;   bl_node_68  0  0 40</span></span>
+<span id="cb21-11"><a href="#cb21-11"></a><span class="co">#&gt;   bl_node_71  0 40  0</span></span></code></pre></div>
 <p>So we can get MCMC sweeps and moderate sigma values and maintain rather fast collapsing. The nice thing is every end point is targeted directly so the model has the best chance to find the optimal partition for that given number of blocks.</p>
 </div>
 <div id="effects-of-other-parameters-on-merge-paths" class="section level2">
