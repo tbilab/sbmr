@@ -37,14 +37,6 @@ visualize_network <- function(sbm,
   UseMethod("visualize_network")
 }
 
-visualize_network.default <- function(sbm,
-                                      node_shape_col = 'type',
-                                      node_color_col = "none",
-                                      width = "100%",
-                                      height = NULL){
-  cat("visualize_network generic")
-
-}
 
 #' @export
 visualize_network.sbm_network <- function(sbm,
@@ -81,4 +73,5 @@ visualize_network.sbm_network <- function(sbm,
     height = height
   )
 }
+utils::globalVariables(c("parent"))
 

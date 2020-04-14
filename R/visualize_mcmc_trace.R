@@ -45,4 +45,4 @@ visualize_mcmc_trace.sbm_network <- function(sbm){
     ggplot2::facet_grid(name~., scales = "free_y")
 }
 
-utils::globalVariables(c("num_nodes_moved", "entropy delta", "number of nodes moved", "value"))
+utils::globalVariables(c("n_nodes_moved", "entropy delta", "number of nodes moved", "value"))
