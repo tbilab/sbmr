@@ -10,7 +10,7 @@ new_sbm_s4(
   allowed_edge_types = NULL,
   node_types = NULL,
   random_seed = NULL,
-  state = NULL
+  state_df = NULL
 )
 }
 \arguments{
@@ -32,6 +32,8 @@ undefined, it is inferred from edges.}
 sampling engine. Note that if the model is restored from a saved state this
 seed will be initialized again to the start value which will harm
 reproducability.}
+
+\item{state_df}{A state dataframe with \code{id}, \code{parent}, \code{level}, and \code{type} columns for all nodes in network (along with block nodes).}
 }
 \value{
 An SBM S4 class

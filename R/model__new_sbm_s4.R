@@ -41,7 +41,7 @@ new_sbm_s4 <- function(nodes,
                        allowed_edge_types = NULL,
                        node_types = NULL,
                        random_seed = NULL,
-                       state = NULL){
+                       state_df = NULL){
 
   # I use NULL to represent unpassed values because that's how they will be given from the s3 class.
   if(is.null(allowed_edge_types)){
@@ -69,11 +69,11 @@ new_sbm_s4 <- function(nodes,
                       allowed_edge_types$a,
                       allowed_edge_types$b)
 
-  if(!is.null(state)){
-    sbm_model$update_state(state$id,
-                           state$type,
-                           state$parent,
-                           state$level)
+  if(!is.null(state_df)){
+    sbm_model$update_state(state_df$id,
+                           state_df$type,
+                           state_df$parent,
+                           state_df$level)
   }
 
   sbm_model
