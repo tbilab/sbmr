@@ -26,8 +26,11 @@
 #' # Visualize network with color encoding the blocks
 #' visualize_network(net)
 #'
-#' # Visualize network with shape encoding the blocks
-#' visualize_network(net, node_shape_col = 'block', node_color_col = 'type')
+#' # Visualize network with shape encoding the true blocks
+#' visualize_network(net, node_shape_col = 'block')
+#'
+#' # Visualize network with color encoding the true blocks
+#' visualize_network(net, node_color_col = 'block')
 #'
 visualize_network <- function(sbm,
                               node_shape_col = 'type',
@@ -46,7 +49,7 @@ visualize_network.sbm_network <- function(sbm,
                                           height = NULL){
   nodes_for_plotting <- sbm$nodes
 
-  if(node_color_col == "block" | node_shape_col == "block"){
+  if(node_color_col == "parent" | node_shape_col == "parent"){
     node_state <- attr(sbm, "state")
 
     if(is.null(node_state)){
@@ -54,8 +57,7 @@ visualize_network.sbm_network <- function(sbm,
     }
 
     nodes_for_plotting <- node_state %>%
-      dplyr::filter(level == 0) %>%
-      dplyr::rename(block = parent)
+      dplyr::filter(level == 0)
   }
 
   r2d3::r2d3(
