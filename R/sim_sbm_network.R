@@ -92,7 +92,7 @@ sim_sbm_network <- function(
 
   # Get all possible combinations of node-node pairs by their indices in
   # the nodes dataframe...
-  edge_pairs_inds <- combination_indices(length(nodes$id), repeats = allow_self_edges)
+  edge_pairs_inds <- sbmR:::combination_indices(length(nodes$id), repeats = allow_self_edges)
 
   # Extract indices from combination matrix and use to build an edge tibble
   node_1_inds <- edge_pairs_inds$a

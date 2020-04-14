@@ -27,6 +27,7 @@ NULL
 #'
 #' @examples
 #'
+#' \dontrun{
 #' my_letters <- head(letters, 5)
 #'
 #' letter_pairs <- combination_indices(length(my_letters), repeats = FALSE)
@@ -35,6 +36,7 @@ NULL
 #'   letter_1 = letters[letter_pairs$a],
 #'   letter_2 = letters[letter_pairs$b]
 #' )
+#' }
 #'
 #'
 combination_indices <- function(n, repeats = FALSE){

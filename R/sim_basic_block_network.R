@@ -71,7 +71,7 @@ sim_basic_block_network <- function(
   # Build edge propensities by going through all combinations of block
   # pairs and drawing the edge propensity from the passed
   # prob_of_edges_dist function.
-  block_pair_inds <- combination_indices(n_blocks, repeats = TRUE)
+  block_pair_inds <- sbmR:::combination_indices(n_blocks, repeats = TRUE)
   n_pairs <- length(block_pair_inds$a)
 
   edge_propensities <- dplyr::tibble(

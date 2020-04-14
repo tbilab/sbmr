@@ -21,6 +21,7 @@ of all combinations (order does \emph{not} matter) of elements of vector of leng
 }
 \examples{
 
+\dontrun{
 my_letters <- head(letters, 5)
 
 letter_pairs <- combination_indices(length(my_letters), repeats = FALSE)
@@ -29,6 +30,7 @@ dplyr::tibble(
   letter_1 = letters[letter_pairs$a],
   letter_2 = letters[letter_pairs$b]
 )
+}
 
 
 }
