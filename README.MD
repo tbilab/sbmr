@@ -55,7 +55,7 @@ If there is a feature that you feel would be very beneficial to the package that
 
 ## Usage
 
-Please see the [articles on package usage on the package website.]()
+Please see the [articles on package usage on the package website.](https://tbilab.github.io/sbmr/articles/)
 
 ## Development
 
